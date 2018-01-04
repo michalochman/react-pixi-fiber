@@ -1,0 +1,34 @@
+{
+  "name": "react-pixi-fiber",
+  "version": "0.1.0",
+  "description": "React Fiber renderer for PIXI.js",
+  "main": "index.js",
+  "author": "Michal Ochman",
+  "license": "MIT",
+  "dependencies": {
+    "react-reconciler": "^0.7.0"
+  },
+  "peerDependencies": {
+    "fbjs": "^0.8.0",
+    "pixi.js": "^4.4.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "eslint-config-fbjs": "^2.0.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-babel": "^4.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-prettier": "^2.4.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-react": "^7.5.0",
+    "prettier": "^1.9.2"
+  },
+  "scripts": {
+    "eslint": "eslint src",
+    "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

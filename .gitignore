@@ -1,0 +1,15 @@
+.DS_STORE
+node_modules
+*~
+dist/
+coverage/
+.module-cache
+*.log*
+chrome-user-data
+*.sublime-project
+*.sublime-workspace
+.idea
+*.iml
+.vscode
+*.swp
+*.swo

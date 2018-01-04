@@ -1,1 +1,1 @@
-# react-pixi-fiber
+# React Fiber renderer for PIXI.js
