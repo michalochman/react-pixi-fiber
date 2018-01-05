@@ -11,7 +11,10 @@ See [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6) demo.
 
 ## Usage
 
+### With ReactDOM
+
 ```jsx harmony
+import { render } from "react-dom";
 import { Sprite, Stage } from "react-pixi-fiber";
 import bunny from "./bunny.png";
 
@@ -21,17 +24,38 @@ function Bunny(props) {
   );
 }
 
-ReactDOM.render(
+render(
   <Stage width={800} height={600}>
     <Bunny x={200} y={200} />
   </Stage>,
-  document.getElementById('container')
+  document.getElementById("container")
 );
 ```
 
 This example will render PIXI.js [Sprite](http://pixijs.download/release/docs/PIXI.Sprite.html) object into a [root Container](http://pixijs.download/release/docs/PIXI.Application.html#stage) of PIXI Application on the page.
 
 The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html) is not required to use with this renderer, but it makes code more readable. You can use [Babel](https://babeljs.io/) with a [React preset](https://babeljs.io/docs/plugins/preset-react/) to convert JSX into native JavaScript.
+
+
+### Without ReactDOM
+
+```jsx harmony
+import { render, Text } from "react-pixi-fiber";
+import * as PIXI from "pixi.js";
+
+// Setup PIXI.js Application
+const canvasElement = document.getElementById("container")
+const app = new PIXI.Application(800, 600, {
+  view: canvasElement
+});
+
+render(
+  <Text text="Hello World!" x={200} y={200} />, 
+  app.stage
+);
+```
+
+This example will render PIXI.js [Text](http://pixijs.download/release/docs/PIXI.Text.html) object into a [root Container](http://pixijs.download/release/docs/PIXI.Application.html#stage) of PIXI Application (created as `app`) inside the `<canvas id="container"></canvas>` element on the page.
 
 
 ## Running Examples
