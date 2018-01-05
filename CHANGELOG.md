@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.1.1] - 2018-01-05
+
+### Fixed
+- Added missing `performance-now` dependency
+
+
 ## [0.1.0] - 2018-01-05
 
 ### Added
