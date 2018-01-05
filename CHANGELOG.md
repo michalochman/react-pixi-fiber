@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added standalone `render` function
+
 
 ## [0.1.1] - 2018-01-05
 
