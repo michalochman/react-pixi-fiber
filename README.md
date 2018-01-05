@@ -103,6 +103,19 @@ Provides the following context:
 ## Caveats
 
 
+## Contributing
+
+The main purpose of this repository is to be able to render PIXI.js objects inside React 16 Fiber architecture.
+ 
+Development of React Pixi Fiber happens in the open on GitHub, and I would be grateful to the community for any contributions, including bug reports and suggestions.
+
+Read below to learn how you can take part in improving React Pixi Fiber.
+
+### [Contributing Guide](https://github.com/michalochman/react-pixi-fiber/blob/master/CONTRIBUTING.md)
+
+Read the contributing guide to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to React Pixi Fiber.
+
+
 ### License
 
 React Fiber Pixi is [MIT licensed]((https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE)).
