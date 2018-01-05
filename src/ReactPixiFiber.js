@@ -40,7 +40,7 @@ function render(pixiElement, stage, callback) {
   ReactPixiFiber.injectIntoDevTools({
     findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
     bundleType: 1,
-    version: "0.1.0",
+    version: "0.2.0",
     rendererPackageName: "react-pixi-fiber"
   });
 }
@@ -256,7 +256,7 @@ class Stage extends React.Component {
     ReactPixiFiber.injectIntoDevTools({
       findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
       bundleType: 1,
-      version: "0.1.0",
+      version: "0.2.0",
       rendererPackageName: "react-pixi-fiber"
     });
   }
