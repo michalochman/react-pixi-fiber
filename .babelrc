@@ -1,0 +1,45 @@
+{
+  "env": {
+    "production": {
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-react-jsx"
+      ],
+      "presets": [
+        ["env", {
+          "targets": {
+            "browsers": [
+              "last 2 versions"
+            ]
+          },
+          "modules": false,
+          "useBuiltIns": true
+        }]
+      ]
+    },
+    "development": {
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-react-jsx"
+      ],
+      "presets": [
+        ["env", {
+          "targets": {
+            "browsers": [
+              "last 2 versions"
+            ]
+          },
+          "modules": false,
+          "useBuiltIns": true
+        }]
+      ]
+    },
+    "test": {
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-react-jsx",
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  }
+}

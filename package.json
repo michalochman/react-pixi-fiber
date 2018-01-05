@@ -5,6 +5,7 @@
   "main": "index.js",
   "author": "Michal Ochman",
   "license": "MIT",
+  "repository": "github:michalochman/react-pixi-fiber",
   "dependencies": {
     "react-reconciler": "^0.7.0"
   },
@@ -15,6 +16,11 @@
     "react-dom": "^16.0.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "eslint": "^4.8.0",
     "eslint-config-fbjs": "^2.0.1",
     "eslint-config-prettier": "^2.9.0",
@@ -27,8 +33,10 @@
     "prettier": "^1.9.2"
   },
   "scripts": {
+    "dist": "babel src/ReactPixiFiber.js -o dist/react-pixi-fiber.development.js",
     "eslint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
+    "postinstall": "yarn dist && yarn link",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
