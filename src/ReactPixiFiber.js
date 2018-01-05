@@ -28,6 +28,23 @@ const applyProps = (instance, props, prevProps) => {
   Object.assign(instance, filterByKey(props, filterProps));
 };
 
+function render(pixiElement, stage, callback) {
+  let container = stage._reactRootContainer;
+  if (!container) {
+    container = ReactPixiFiber.createContainer(stage);
+    stage._reactRootContainer = container;
+  }
+
+  ReactPixiFiber.updateContainer(pixiElement, container, undefined, callback);
+
+  ReactPixiFiber.injectIntoDevTools({
+    findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
+    bundleType: 1,
+    version: "0.1.0",
+    rendererPackageName: "react-pixi-fiber"
+  });
+}
+
 /* Helper Methods */
 
 export const filterByKey = (inputObject, filter) => {
@@ -226,7 +243,7 @@ class Stage extends React.Component {
   }
 
   componentDidMount() {
-    const { backgroundColor, height, width } = this.props;
+    const { backgroundColor, children, height, width } = this.props;
 
     this._app = new PIXI.Application(width, height, {
       backgroundColor: backgroundColor,
@@ -234,24 +251,24 @@ class Stage extends React.Component {
     });
 
     this._mountNode = ReactPixiFiber.createContainer(this._app.stage);
-    ReactPixiFiber.updateContainer(this.props.children, this._mountNode, this);
+    ReactPixiFiber.updateContainer(children, this._mountNode, this);
 
     ReactPixiFiber.injectIntoDevTools({
       findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
       bundleType: 1,
       version: "0.1.0",
-      rendererPackageName: "react-pixi" // package name
+      rendererPackageName: "react-pixi-fiber"
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { height, width } = this.props;
+    const { children, height, width } = this.props;
 
     // TODO resize stage
     if (height !== prevProps.height || width !== prevProps.width) {
     }
 
-    ReactPixiFiber.updateContainer(this.props.children, this._mountNode, this);
+    ReactPixiFiber.updateContainer(children, this._mountNode, this);
   }
 
   componentWillUnmount() {
@@ -276,7 +293,7 @@ Stage.childContextTypes = {
 
 /* API */
 
-export { Stage };
+export { Stage, render };
 
 export const BitmapText = TYPES.BITMAP_TEXT;
 export const Container = TYPES.CONTAINER;
