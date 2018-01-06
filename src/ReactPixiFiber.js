@@ -14,6 +14,7 @@ const TYPES = {
   BITMAP_TEXT: "BitmapText",
   CONTAINER: "Container",
   GRAPHICS: "Graphics",
+  PARTICLE_CONTAINER: "ParticleContainer",
   SPRITE: "Sprite",
   TEXT: "Text",
   TILING_SPRITE: "TilingSprite"
@@ -107,13 +108,11 @@ const ReactPixiFiber = ReactFiberReconciler({
   appendInitialChild: appendChild,
 
   createInstance: function(type, props, internalInstanceHandle) {
-    const { canvas, height, style, text, texture, width } = props;
-
     let instance;
 
     switch (type) {
       case TYPES.BITMAP_TEXT:
-        instance = new PIXI.BitmapText(text, style);
+        instance = new PIXI.BitmapText(props.text, props.style);
         break;
       case TYPES.CONTAINER:
         instance = new PIXI.Container();
@@ -121,14 +120,26 @@ const ReactPixiFiber = ReactFiberReconciler({
       case TYPES.GRAPHICS:
         instance = new PIXI.Graphics();
         break;
+      case TYPES.PARTICLE_CONTAINER:
+        instance = new PIXI.particles.ParticleContainer(
+          props.maxSize,
+          props.properties,
+          props.batchSize,
+          props.autoResize
+        );
+        break;
       case TYPES.SPRITE:
-        instance = new PIXI.Sprite(texture);
+        instance = new PIXI.Sprite(props.texture);
         break;
       case TYPES.TEXT:
-        instance = new PIXI.Text(text, style, canvas);
+        instance = new PIXI.Text(props.text, props.style, props.canvas);
         break;
       case TYPES.TILING_SPRITE:
-        instance = new PIXI.extras.TilingSprite(texture, width, height);
+        instance = new PIXI.extras.TilingSprite(
+          props.texture,
+          props.width,
+          props.height
+        );
         break;
       default:
         break;
@@ -298,6 +309,7 @@ export { Stage, render };
 export const BitmapText = TYPES.BITMAP_TEXT;
 export const Container = TYPES.CONTAINER;
 export const Graphics = TYPES.GRAPHICS;
+export const ParticleContainer = TYPES.PARTICLE_CONTAINER;
 export const Sprite = TYPES.SPRITE;
 export const Text = TYPES.TEXT;
 export const TilingSprite = TYPES.TILING_SPRITE;
