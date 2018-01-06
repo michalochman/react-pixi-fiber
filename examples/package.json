@@ -3,11 +3,12 @@
   "version": "0.2.0",
   "private": true,
   "dependencies": {
+    "pixi.js": "^4.4.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
-    "pixi.js": "^4.4.0"
+    "stats.js": "^0.17.0"
   },
   "scripts": {
     "start": "react-scripts start",

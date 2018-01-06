@@ -4,6 +4,7 @@ import { Route, Switch } from "react-router-dom";
 import "./App.css";
 import ExampleList from "../ExampleList/ExampleList";
 import BunnyExample from "../BunnyExample/BunnyExample";
+import BunnymarkExample from "../BunnymarkExample/BunnymarkExample";
 import ClickExample from "../ClickExample/ClickExample";
 
 const examples = [
@@ -11,6 +12,11 @@ const examples = [
     name: "Bunny",
     slug: "bunny",
     component: BunnyExample
+  },
+  {
+    name: "Bunnymark",
+    slug: "bunnymark",
+    component: BunnymarkExample
   },
   {
     name: "Click",
