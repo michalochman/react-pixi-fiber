@@ -34,7 +34,7 @@
     "prettier": "^1.9.2"
   },
   "scripts": {
-    "dist": "babel src/ReactPixiFiber.js -o dist/react-pixi-fiber.development.js",
+    "dist": "mkdir dist; babel src/ReactPixiFiber.js -o dist/react-pixi-fiber.development.js",
     "eslint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
     "postinstall": "yarn dist && yarn link",
