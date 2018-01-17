@@ -6,7 +6,7 @@
     "pixi.js": "^4.4.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-pixi-fiber": "*",
+    "react-pixi-fiber": "latest",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "stats.js": "^0.17.0"
