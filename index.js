@@ -1,1 +1,1 @@
-module.exports = require("./dist/react-pixi-fiber.development.js");
+module.exports = require("./cjs/react-pixi-fiber.development.js");

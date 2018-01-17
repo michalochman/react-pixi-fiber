@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added `<ParticleContainer />` component
+- Added development build script
+- Added `files` to `package.json`
 
 
 ## [0.2.0] - 2018-01-05

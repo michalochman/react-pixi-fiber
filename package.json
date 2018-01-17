@@ -6,6 +6,13 @@
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": "github:michalochman/react-pixi-fiber",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "index.js",
+    "cjs/",
+    "src/"
+  ],
   "dependencies": {
     "performance-now": "^2.1.0",
     "react-reconciler": "^0.7.0"
@@ -34,10 +41,11 @@
     "prettier": "^1.9.2"
   },
   "scripts": {
-    "dist": "mkdir dist; babel src/ReactPixiFiber.js -o dist/react-pixi-fiber.development.js",
+    "prebuild:dev": "mkdir -p cjs",
+    "build:dev": "babel src/ReactPixiFiber.js -o cjs/react-pixi-fiber.development.js",
     "eslint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
-    "postinstall": "yarn dist && yarn link",
+    "prepublish": "npm run build:dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
