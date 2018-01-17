@@ -79,6 +79,37 @@ or
 This package works flawlessly with [Create React App](https://github.com/facebookincubator/create-react-app) – see examples above, they already use it.
 
 
+## Migrating from [`react-pixi`](https://github.com/Izzimach/react-pixi)
+
+It is possible to use React Pixi Fiber as a drop-in replacement for `react-pixi`. 
+
+> Please note that it has only been tested with basic scenarios – it is not guaranteed to work flawlessly. 
+
+There are two options:
+
+### Changing `import` / `require` statements
+
+Change:
+    
+    import ReactPIXI from "react-pixi";
+    // or
+    const ReactPIXI = require("react-pixi");
+
+to:
+ 
+    import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
+    // or
+    const ReactPIXI = require("react-pixi/react-pixi-alias");
+
+### Using `webpack` resolve `alias`
+
+    resolve: {
+      alias: {
+        'react-pixi$': 'react-pixi-fiber/react-pixi-alias'
+      }
+    }
+
+
 ## API
 
 ### Components
@@ -125,6 +156,17 @@ Provides the following context:
 
 
 ## Caveats
+
+
+## FAQ
+
+### Can I migrate from `react-pixi`?
+
+Yes, it is easy, read [migration guide](#migrating-from-react-pixi).
+
+### Is this production ready?
+
+Not yet.
 
 
 ## Contributing
