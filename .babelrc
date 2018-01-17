@@ -3,7 +3,8 @@
     "production": {
       "plugins": [
         "transform-object-rest-spread",
-        "transform-react-jsx"
+        "transform-react-jsx",
+        "transform-es2015-modules-commonjs",
       ],
       "presets": [
         ["env", {
@@ -20,7 +21,8 @@
     "development": {
       "plugins": [
         "transform-object-rest-spread",
-        "transform-react-jsx"
+        "transform-react-jsx",
+        "transform-es2015-modules-commonjs"
       ],
       "presets": [
         ["env", {
