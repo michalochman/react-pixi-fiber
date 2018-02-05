@@ -24,10 +24,8 @@
     "react-dom": "^16.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^22.1.1",
     "@types/pixi.js": "^4.7.0",
     "@types/react": "^16.0.36",
-    "@types/react-test-renderer": "^16.0.0",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -42,14 +40,8 @@
     "eslint-plugin-node": "^5.2.0",
     "eslint-plugin-prettier": "^2.4.0",
     "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-react": "^7.5.0",
-    "jest": "^22.1.4",
-    "pixi.js": "^4.7.0",
     "prettier": "^1.9.2",
-    "react": "^16.2.0",
-    "react-test-renderer": "^16.2.0",
-    "ts-jest": "^22.0.3",
-    "typescript": "^2.7.1"
+    "eslint-plugin-react": "^7.5.0"
   },
   "scripts": {
     "prebuild:dev": "mkdir -p cjs",
@@ -58,19 +50,5 @@
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
     "prepublish": "npm run build:dev",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
   }
 }

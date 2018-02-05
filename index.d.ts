@@ -17,31 +17,26 @@ declare module 'react-pixi-fiber' {
    */
   export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
 
-  /** The structure of a `StagedComponent<P, S>` or `StagedStatlessComponent<P>`'s context. */
-  export interface StagedComponentContext {
-    app: PIXI.Application;
+  /** The shape of an object that has an optional `children` property of any type. */
+  interface ObjectWithChildren { children?: any; }
+
+  /** The shape of `T` without it's `children` property. */
+  export type Childrenless<T extends ObjectWithChildren> = Omit<T, 'children'>;
+
+  /** The shape of a component that has an optional `children` property. */
+  export interface ChildrenProperties {
+    children?: React.ReactNode;
   }
 
-  /** A `React.Component` with context configured and typed. */
-  export abstract class StagedComponent<P = {}, S = {}> extends React.Component<P, S> {
-    context: StagedComponentContext;
-  }
-
-  /** A `React.StatlessComponent<P>` with typed context.  To configure, use the `lift` or `connect` HoC's. */
-  export interface StagedStatlessComponent<P = {}> {
-    (props: P & { children?: React.ReactNode }, context: StagedComponentContext): React.ReactElement<any> | null;
-    propTypes?: React.ValidationMap<P>;
-    contextTypes?: React.ValidationMap<any>;
-    defaultProps?: Partial<P>;
-    displayName?: string;
-  }
-
-  /** A shorthand alias for `StagedStatelessComponent<P>`. */
-  export type StagedSFC<P = {}> = StagedStatlessComponent<P>;
+  /**
+   * This removes the `children` property of all component properties that inherit from `PIXI.Container`
+   * and replaces it with a `children` property appropriate for composition with JSX.
+   */
+  export type ContainerWithChildren<T extends ObjectWithChildren> = Partial<Childrenless<T>> & ChildrenProperties;
 
   /** `BitmapText` component properties. */
-  export interface BitmapTextProperties {
-    text?: string;
+  export interface BitmapTextProperties extends ContainerWithChildren<PIXI.extras.BitmapText> {
+    text: string;
   }
 
   /**
@@ -49,35 +44,30 @@ declare module 'react-pixi-fiber' {
    *
    * see: http://pixijs.download/dev/docs/PIXI.extras.BitmapText.html
    */
-  export class BitmapText extends React.Component<TilingSpriteProperties> {}
+  export class BitmapText extends React.Component<BitmapTextProperties> {}
 
   /** `Container` component properties. */
-  export interface ContainerProperties {}
+  export interface ContainerProperties extends ContainerWithChildren<PIXI.Container> {}
 
   /**
    * A component wrapper for `PIXI.extras.BitmapText`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Container.html
    */
-  export class Container extends React.Component<TilingSpriteProperties> {}
+  export class Container extends React.Component<ContainerProperties> {}
 
   /** `Graphics` component properties. */
-  export interface GraphicsProperties {}
+  export interface GraphicsProperties extends ContainerWithChildren<PIXI.Graphics> {}
 
   /**
    * A component wrapper for `PIXI.Graphics`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Graphics.html
    */
-  export class Graphics extends React.Component<TilingSpriteProperties> {}
+  export class Graphics extends React.Component<GraphicsProperties> {}
 
   /** `ParticleContainer` component properties. */
-  export interface ParticleContainerProperties {
-    maxSize?: number;
-    properties?: PIXI.particles.ParticleContainerProperties,
-    batchSize?: number;
-    autoResize?: boolean;
-  }
+  export interface ParticleContainerProperties extends ContainerWithChildren<PIXI.particles.ParticleContainer> {}
 
   /**
    * A component wrapper for `PIXI.particles.ParticleContainer`.
@@ -87,10 +77,7 @@ declare module 'react-pixi-fiber' {
   export class ParticleContainer extends React.Component<TilingSpriteProperties> {}
 
   /** `Sprite` component properties. */
-  export interface SpriteProperties extends Partial<PIXI.Sprite> {
-    // anchor?: PIXI.Point;
-    // texture
-  }
+  export interface SpriteProperties extends ContainerWithChildren<PIXI.Sprite> {}
 
   /**
    * A component wrapper for `PIXI.Sprite`.
@@ -100,23 +87,18 @@ declare module 'react-pixi-fiber' {
   export class Sprite extends React.Component<SpriteProperties> {}
 
   /** `Text` component properties */
-  export interface TextProperties {
-    text?: string;
-    style?: PIXI.TextStyle;
-  }
+  export interface TextProperties extends ContainerWithChildren<PIXI.Text> {}
 
   /**
    * A component wrapper for `PIXI.Text`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Text.html
    */
-  export class Text extends React.Component<TilingSpriteProperties> {}
+  export class Text extends React.Component<TextProperties> {}
 
   /** `TilingSprite` component properties. */
-  export interface TilingSpriteProperties {
-    texture?: PIXI.Texture;
-    width?: number;
-    height?: number;
+  export interface TilingSpriteProperties extends ContainerWithChildren<PIXI.extras.TilingSprite> {
+    texture: PIXI.Texture;
   }
 
   /**
@@ -126,12 +108,8 @@ declare module 'react-pixi-fiber' {
    */
   export class TilingSprite extends React.Component<TilingSpriteProperties> {}
 
-  /** `Stage` component properties. */
-  export interface StageProperties {
-    backgroundColor?: number;
-    width?: number;
-    height?: number;
-  }
+  /** `Stage` component properties." */
+  export interface StageProperties extends ContainerWithChildren<PIXI.Container> {}
 
   /**
    * A component wrapper for `PIXI.Application`.
@@ -143,34 +121,4 @@ declare module 'react-pixi-fiber' {
   /** Custom React Reconciler render method. */
   export function render(pixiElement: any, stage: any, callback?: Function): void;
 
-  /**
-   * Project a `React.SFC<P>` to a `StagedStatlessComponent<P>`.
-   *
-   * @example
-   * const Comp = lift((props, context) =>  <Sprite />);
-   */
-  function lift<P, C extends StagedComponentContext = StagedComponentContext>(fn: (props: P, context: C) => JSX.Element): StagedSFC<P>;
-
-  /** Connect definition predicate */
-  export interface EnhancerWithOwnProperties<C, P extends C> {
-    (component: React.ComponentClass<P> | React.StatelessComponent<P>): React.ComponentClass<Omit<P, keyof C>>;
-  }
-
-  /**
-   * Connect the context to a React component via property mapping.
-   *
-   * @example
-   * interface CompProperties {}
-   *
-   * interface CompContextProperties { app: PIXI.Application; }
-   *
-   * interface CompMergedProperties extends CompProperties, CompContextProperties {}
-   *
-   * const Comp: StagedSFC<CompMergedProperties> = (props, context) =>  <Sprite />;
-   *
-   * const mapContextToProps = (context: StagedComponentContext): CompContextProperties => ({ app: context.app });
-   *
-   * connect<CompContextProperties, CompMergedProperties>(mapContextToProps)(Comp);
-   */
-  function connect<C extends object, P extends C>(fn: (context: StagedComponentContext) => C): EnhancerWithOwnProperties<C, P>;
 }
