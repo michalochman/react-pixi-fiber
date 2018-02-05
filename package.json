@@ -6,6 +6,7 @@
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": "github:michalochman/react-pixi-fiber",
+  "typings": "./index.d.ts",
   "files": [
     "LICENSE",
     "README.md",
