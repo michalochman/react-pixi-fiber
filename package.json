@@ -31,7 +31,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.1",
-    "canvas-prebuilt": "^1.6.5-prerelease.1",
     "eslint": "^4.8.0",
     "eslint-config-fbjs": "^2.0.1",
     "eslint-config-prettier": "^2.9.0",
@@ -40,8 +39,8 @@
     "eslint-plugin-node": "^5.2.0",
     "eslint-plugin-prettier": "^2.4.0",
     "eslint-plugin-promise": "^3.6.0",
-    "prettier": "^1.9.2",
-    "eslint-plugin-react": "^7.5.0"
+    "eslint-plugin-react": "^7.5.0",
+    "prettier": "^1.9.2"
   },
   "scripts": {
     "prebuild:dev": "mkdir -p cjs",
