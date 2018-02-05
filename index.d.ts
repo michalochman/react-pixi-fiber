@@ -21,7 +21,7 @@ declare module 'react-pixi-fiber' {
   interface ObjectWithChildren { children?: any; }
 
   /** The shape of `T` without it's `children` property. */
-  export type Childrenless<T extends ObjectWithChildren> = Omit<T, 'children'>;
+  export type Childless<T extends ObjectWithChildren> = Omit<T, 'children'>;
 
   /** The shape of a component that has an optional `children` property. */
   export interface ChildrenProperties {
@@ -29,13 +29,17 @@ declare module 'react-pixi-fiber' {
   }
 
   /**
-   * This removes the `children` property of all component properties that inherit from `PIXI.Container`
-   * and replaces it with a `children` property appropriate for composition with JSX.
+   * A PIXI Component with no children.
    */
-  export type ContainerWithChildren<T extends ObjectWithChildren> = Partial<Childrenless<T>> & ChildrenProperties;
+  export type ChildlessComponent<T extends ObjectWithChildren> = Partial<Childless<T>>;
+
+  /**
+   * A PIXI Component with children.
+   */
+  export type Component<T extends ObjectWithChildren> = ChildlessComponent<T> & ChildrenProperties;
 
   /** `BitmapText` component properties. */
-  export interface BitmapTextProperties extends ContainerWithChildren<PIXI.extras.BitmapText> {
+  export interface BitmapTextProperties extends ChildlessComponent<PIXI.extras.BitmapText> {
     text: string;
   }
 
@@ -47,7 +51,7 @@ declare module 'react-pixi-fiber' {
   export class BitmapText extends React.Component<BitmapTextProperties> {}
 
   /** `Container` component properties. */
-  export interface ContainerProperties extends ContainerWithChildren<PIXI.Container> {}
+  export interface ContainerProperties extends ChildlessComponent<PIXI.Container> {}
 
   /**
    * A component wrapper for `PIXI.extras.BitmapText`.
@@ -57,7 +61,7 @@ declare module 'react-pixi-fiber' {
   export class Container extends React.Component<ContainerProperties> {}
 
   /** `Graphics` component properties. */
-  export interface GraphicsProperties extends ContainerWithChildren<PIXI.Graphics> {}
+  export interface GraphicsProperties extends Component<PIXI.Graphics> {}
 
   /**
    * A component wrapper for `PIXI.Graphics`.
@@ -67,7 +71,7 @@ declare module 'react-pixi-fiber' {
   export class Graphics extends React.Component<GraphicsProperties> {}
 
   /** `ParticleContainer` component properties. */
-  export interface ParticleContainerProperties extends ContainerWithChildren<PIXI.particles.ParticleContainer> {}
+  export interface ParticleContainerProperties extends Component<PIXI.particles.ParticleContainer> {}
 
   /**
    * A component wrapper for `PIXI.particles.ParticleContainer`.
@@ -77,7 +81,7 @@ declare module 'react-pixi-fiber' {
   export class ParticleContainer extends React.Component<TilingSpriteProperties> {}
 
   /** `Sprite` component properties. */
-  export interface SpriteProperties extends ContainerWithChildren<PIXI.Sprite> {}
+  export interface SpriteProperties extends ChildlessComponent<PIXI.Sprite> {}
 
   /**
    * A component wrapper for `PIXI.Sprite`.
@@ -87,7 +91,7 @@ declare module 'react-pixi-fiber' {
   export class Sprite extends React.Component<SpriteProperties> {}
 
   /** `Text` component properties */
-  export interface TextProperties extends ContainerWithChildren<PIXI.Text> {}
+  export interface TextProperties extends ChildlessComponent<PIXI.Text> {}
 
   /**
    * A component wrapper for `PIXI.Text`.
@@ -97,7 +101,7 @@ declare module 'react-pixi-fiber' {
   export class Text extends React.Component<TextProperties> {}
 
   /** `TilingSprite` component properties. */
-  export interface TilingSpriteProperties extends ContainerWithChildren<PIXI.extras.TilingSprite> {
+  export interface TilingSpriteProperties extends ChildlessComponent<PIXI.extras.TilingSprite> {
     texture: PIXI.Texture;
   }
 
@@ -109,7 +113,7 @@ declare module 'react-pixi-fiber' {
   export class TilingSprite extends React.Component<TilingSpriteProperties> {}
 
   /** `Stage` component properties." */
-  export interface StageProperties extends ContainerWithChildren<PIXI.Container> {}
+  export interface StageProperties extends Component<PIXI.Container> {}
 
   /**
    * A component wrapper for `PIXI.Application`.
