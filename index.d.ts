@@ -17,17 +17,17 @@ declare module 'react-pixi-fiber' {
    */
   export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
 
-  /** The structure of a staged component's context. */
+  /** The structure of a `StagedComponent<P, S>` or `StagedStatlessComponent<P>`'s context. */
   export interface StagedComponentContext {
     app: PIXI.Application;
   }
 
-  /** a React component with context configured and typed. */
+  /** A `React.Component` with context configured and typed. */
   export abstract class StagedComponent<P = {}, S = {}> extends React.Component<P, S> {
     context: StagedComponentContext;
   }
 
-  /** A React stateless funtional component with typed context.  To configure, use the `lift` or `connect` HoC's. */
+  /** A `React.StatlessComponent<P>` with typed context.  To configure, use the `lift` or `connect` HoC's. */
   export interface StagedStatlessComponent<P = {}> {
     (props: P & { children?: React.ReactNode }, context: StagedComponentContext): React.ReactElement<any> | null;
     propTypes?: React.ValidationMap<P>;
@@ -36,42 +36,42 @@ declare module 'react-pixi-fiber' {
     displayName?: string;
   }
 
-  /** A shorthand alias for StagedStatelessComponent<P>. */
+  /** A shorthand alias for `StagedStatelessComponent<P>`. */
   export type StagedSFC<P = {}> = StagedStatlessComponent<P>;
 
-  /** BitmapText component properties. */
+  /** `BitmapText` component properties. */
   export interface BitmapTextProperties {
     text?: string;
   }
 
   /**
-   * A component wrapper for PIXI.extras.BitmapText.
+   * A component wrapper for `PIXI.extras.BitmapText`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.extras.BitmapText.html
    */
   export class BitmapText extends React.Component<TilingSpriteProperties> {}
 
-  /** Container component properties. */
+  /** `Container` component properties. */
   export interface ContainerProperties {}
 
   /**
-   * A component wrapper for PIXI.extras.BitmapText.
+   * A component wrapper for `PIXI.extras.BitmapText`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Container.html
    */
   export class Container extends React.Component<TilingSpriteProperties> {}
 
-  /** Graphics component properties. */
+  /** `Graphics` component properties. */
   export interface GraphicsProperties {}
 
   /**
-   * A component wrapper for PIXI.Graphics.
+   * A component wrapper for `PIXI.Graphics`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Graphics.html
    */
   export class Graphics extends React.Component<TilingSpriteProperties> {}
 
-  /** ParticleContainer component properties. */
+  /** `ParticleContainer` component properties. */
   export interface ParticleContainerProperties {
     maxSize?: number;
     properties?: PIXI.particles.ParticleContainerProperties,
@@ -80,33 +80,33 @@ declare module 'react-pixi-fiber' {
   }
 
   /**
-   * A component wrapper for PIXI.particles.ParticleContainer.
+   * A component wrapper for `PIXI.particles.ParticleContainer`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.particles.ParticleContainer.html
    */
   export class ParticleContainer extends React.Component<TilingSpriteProperties> {}
 
-  /** Sprite component properties. */
+  /** `Sprite` component properties. */
   export interface SpriteProperties extends Partial<PIXI.Sprite> {
     // anchor?: PIXI.Point;
     // texture
   }
 
   /**
-   * A component wrapper for PIXI.Sprite.
+   * A component wrapper for `PIXI.Sprite`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Sprite.html
    */
   export class Sprite extends React.Component<SpriteProperties> {}
 
-  /** Text component properties */
+  /** `Text` component properties */
   export interface TextProperties {
     text?: string;
     style?: PIXI.TextStyle;
   }
 
   /**
-   * A component wrapper for PIXI.Text.
+   * A component wrapper for `PIXI.Text`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Text.html
    */
@@ -144,7 +144,7 @@ declare module 'react-pixi-fiber' {
   export function render(pixiElement: any, stage: any, callback?: Function): void;
 
   /**
-   * Project a React stateless functional component to a PIXI statless functional component.
+   * Project a `React.SFC<P>` to a `StagedStatlessComponent<P>`.
    *
    * @example
    * const Comp = lift((props, context) =>  <Sprite />);
