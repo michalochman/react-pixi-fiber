@@ -313,3 +313,25 @@ export const ParticleContainer = TYPES.PARTICLE_CONTAINER;
 export const Sprite = TYPES.SPRITE;
 export const Text = TYPES.TEXT;
 export const TilingSprite = TYPES.TILING_SPRITE;
+
+// a React component with context types configured
+export class StagedComponent extends React.Component {}
+StagedComponent.contextTypes = Stage.childContextTypes;
+
+// lift a React stateless functional component to a PIXI statless functional component
+export function lift(fn) {
+  const Comp = fn;
+  Comp.contextTypes = Stage.childContextTypes;
+  return Comp;
+}
+
+// connect the context via prop mapping
+export function connect(fn) {
+  return (Component) => {
+    return class WrappedComponent extends StagedComponent {
+      render() {
+        return <Component {...this.props} {...fn(this.context)} />;
+      }
+    };
+  }
+}
