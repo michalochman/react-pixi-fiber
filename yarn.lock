@@ -2,11 +2,11 @@
 # yarn lockfile v1
 
 
-"@types/pixi.js@^4.7.0":
+"@types/pixi.js@^4.4.0":
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/@types/pixi.js/-/pixi.js-4.7.0.tgz#df14c36b2d1e264668d46f00d0aee691016a7cfe"
 
-"@types/react@^16.0.36":
+"@types/react@^16.0.0":
   version "16.0.36"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.0.36.tgz#ceb5639013bdb92a94147883052e69bb2c22c69b"
 
