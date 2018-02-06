@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+- Removed deprecated useSyncScheduling option
+
 
 ## [0.2.3] - 2018-01-17
 
