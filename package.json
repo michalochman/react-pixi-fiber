@@ -6,6 +6,7 @@
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": "github:michalochman/react-pixi-fiber",
+  "typings": "./index.d.ts",
   "files": [
     "LICENSE",
     "README.md",
@@ -24,6 +25,8 @@
     "react-dom": "^16.0.0"
   },
   "devDependencies": {
+    "@types/pixi.js": "^4.4.0",
+    "@types/react": "^16.0.0",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
