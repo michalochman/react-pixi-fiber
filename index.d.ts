@@ -71,7 +71,7 @@ declare module 'react-pixi-fiber' {
   export class Graphics extends React.Component<GraphicsProperties> {}
 
   /** `ParticleContainer` component properties. */
-  export interface ParticleContainerProperties extends Component<PIXI.particles.ParticleContainer> {}
+  export interface ParticleContainerProperties extends ChildlessComponent<PIXI.particles.ParticleContainer> {}
 
   /**
    * A component wrapper for `PIXI.particles.ParticleContainer`.
@@ -113,7 +113,9 @@ declare module 'react-pixi-fiber' {
   export class TilingSprite extends React.Component<TilingSpriteProperties> {}
 
   /** `Stage` component properties." */
-  export interface StageProperties extends Component<PIXI.Container> {}
+  export interface StageProperties extends Component<PIXI.Container> {
+    backgroundColor?: number;
+  }
 
   /**
    * A component wrapper for `PIXI.Application`.
