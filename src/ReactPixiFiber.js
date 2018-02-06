@@ -220,8 +220,6 @@ const ReactPixiFiber = ReactFiberReconciler({
     return false;
   },
 
-  useSyncScheduling: true,
-
   mutation: {
     appendChild: appendChild,
     appendChildToContainer: appendChild,
