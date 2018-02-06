@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added an alias for "easy" migration from [`react-pixi`](https://github.com/Izzimach/react-pixi)
+
 
 ## [0.2.2] - 2018-01-17
 

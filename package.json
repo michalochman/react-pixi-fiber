@@ -44,11 +44,13 @@
     "prettier": "^1.9.2"
   },
   "scripts": {
-    "prebuild:dev": "mkdir -p cjs",
+    "prebuild": "mkdir -p cjs",
+    "build": "npm run build:dev && npm run build:alias",
+    "build:alias": "babel src/react-pixi-alias/index.js -o cjs/react-pixi-alias.development.js",
     "build:dev": "babel src/ReactPixiFiber.js -o cjs/react-pixi-fiber.development.js",
     "eslint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
-    "prepublish": "npm run build:dev",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
