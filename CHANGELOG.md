@@ -8,14 +8,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.2.3] - 2018-01-17
+
 ### Added
 - Added an alias for "easy" migration from [`react-pixi`](https://github.com/Izzimach/react-pixi)
+- Added TypeScript definitions
 
 
 ## [0.2.2] - 2018-01-17
 
 ### Fixed
 - Fixed distributed cjs files by using `transform-es2015-modules-commonjs` with `babel`
+
 
 ## [0.2.1] - 2018-01-17
 
