@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.2.4] - 2018-02-07
+
 ### Fixed
 - Added `index.d.ts` file to distributed package `files` list
 
@@ -15,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed deprecated useSyncScheduling option
 
 
-## [0.2.3] - 2018-01-17
+## [0.2.3] - 2018-02-06
 
 ### Added
 - Added an alias for "easy" migration from [`react-pixi`](https://github.com/Izzimach/react-pixi)
