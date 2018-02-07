@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Added `index.d.ts` file to distributed package `files` list
+
 ### Removed
 - Removed deprecated useSyncScheduling option
 
