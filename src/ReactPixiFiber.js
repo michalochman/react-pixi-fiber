@@ -17,17 +17,103 @@ const TYPES = {
   PARTICLE_CONTAINER: "ParticleContainer",
   SPRITE: "Sprite",
   TEXT: "Text",
-  TILING_SPRITE: "TilingSprite"
+  TILING_SPRITE: "TilingSprite",
+  CUSTOM_COMPONENT: "CustomComponent"
 };
 
+//
+// A DisplayObject Point-like props
+//
+const gPointLikeProps = [
+  "anchor",
+  "pivot",
+  "position",
+  "scale",
+  "skew",
+  "tilePosition",
+  "tileScale"
+];
+
+let __componentIndex = 0;
+const CUSTOM_COMPONENTS = {};
+
 const UPDATE_SIGNAL = {};
+
+const filterProps = key => Object.keys(RESERVED_PROPS).indexOf(key) === -1;
+
+const filterOutPoints = key => gPointLikeProps.indexOf(key) === -1;
+
+const filterPoints = key => gPointLikeProps.indexOf(key) > -1;
 
 /* Render Methods */
 
 // TODO consider whitelisting props based on component type
 const applyProps = (instance, props, prevProps) => {
-  Object.assign(instance, filterByKey(props, filterProps));
+  let filtered = filterByKey(props, filterProps);
+  filtered = filterByKey(filtered, filterOutPoints);
+  Object.assign(instance, filtered);
+
+  const pointProps = filterByKey(props, filterPoints);
+
+  Object.keys(pointProps).forEach(key => {
+    setPixiValue(instance, key, props[key]);
+  });
 };
+
+function isPointType(v) {
+  return v instanceof PIXI.Point || v instanceof PIXI.ObservablePoint;
+}
+
+//
+// Parse a value as a PIXI.Point.
+//
+function parsePoint(val) {
+  var arr;
+  if (typeof val === "string") {
+    arr = val.split(",").map(val => parseFloat(val));
+  } else if (typeof val === "number") {
+    arr = [val];
+  } else if (Array.isArray(val)) {
+    // shallow copy the array
+    arr = val.slice();
+  } else if ("x" in val) {
+    arr = [val.x, val.y];
+  }
+  return arr;
+}
+
+//
+// Set props on a DisplayObject by checking the type. If a PIXI.Point or
+// a PIXI.ObservablePoint is having its value set, then either a comma-separated
+// string with in the form of "x,y" or a size 2 array with index 0 being the x
+// coordinate and index 1 being the y coordinate.
+//
+function setPixiValue(container, key, value) {
+  // Just copy the data if a Point type is being assigned to a Point type
+  if (isPointType(container[key]) && isPointType(value)) {
+    container[key].copy(value);
+  } else if (isPointType(container[key])) {
+    var coordinateData = parsePoint(value);
+
+    if (
+      typeof coordinateData === "undefined" ||
+      coordinateData.length < 1 ||
+      coordinateData.length > 2
+    ) {
+      throw new Error(
+        `The property '${key}' is a PIXI.Point or PIXI.ObservablePoint and ` +
+          "must be set to a comma-separated string of either 1 or 2 " +
+          "coordinates, a 1 or 2 element array containing coordinates, or a " +
+          "PIXI Point/ObservablePoint. If only one coordinate is " +
+          "given then X and Y will be set to the provided value."
+      );
+    }
+
+    container[key].set(coordinateData.shift(), coordinateData.shift());
+  } else {
+    container[key] = value;
+  }
+}
 
 function render(pixiElement, stage, callback) {
   let container = stage._reactRootContainer;
@@ -89,8 +175,6 @@ const insertBefore = (parentInstance, child, beforeChild) => {
   }
 };
 
-const filterProps = key => Object.keys(RESERVED_PROPS).indexOf(key) === -1;
-
 const commitUpdate = (
   instance,
   updatePayload,
@@ -99,7 +183,14 @@ const commitUpdate = (
   newProps,
   internalInstanceHandle
 ) => {
-  applyProps(instance, newProps, oldProps);
+  if (instance.___customComponentID) {
+    const component = CUSTOM_COMPONENTS[instance.___customComponentID];
+    if (component.customApplyProps) {
+      component.customApplyProps(instance, oldProps, newProps);
+    }
+  } else {
+    applyProps(instance, newProps, oldProps);
+  }
 };
 
 /* PIXI.js Renderer */
@@ -145,9 +236,18 @@ const ReactPixiFiber = ReactFiberReconciler({
         break;
     }
 
-    invariant(instance, 'ReactPixiFiber does not support the type: "%s"', type);
+    if (CUSTOM_COMPONENTS[type]) {
+      const component = CUSTOM_COMPONENTS[type];
+      instance = component.customDisplayObject(props);
+      instance.___customComponentID = type;
+      if (component.customApplyProps) {
+        component.customApplyProps(instance, {}, props);
+      }
+    } else {
+      invariant(instance, 'ReactPixiFiber does not support the type: "%s"', type);
 
-    applyProps(instance, props);
+      applyProps(instance, props);
+    }
 
     return instance;
   },
@@ -254,11 +354,18 @@ class Stage extends React.Component {
   }
 
   componentDidMount() {
-    const { backgroundColor, children, height, width } = this.props;
+    const {
+      backgroundColor,
+      children,
+      height,
+      width,
+      resolution = 1
+    } = this.props;
 
     this._app = new PIXI.Application(width, height, {
       backgroundColor: backgroundColor,
-      view: this._canvas
+      view: this._canvas,
+      resolution
     });
 
     this._mountNode = ReactPixiFiber.createContainer(this._app.stage);
@@ -273,10 +380,27 @@ class Stage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { children, height, width } = this.props;
+    const { children, height, width, prepare } = this.props;
 
     // TODO resize stage
     if (height !== prevProps.height || width !== prevProps.width) {
+      this._canvas.height = height;
+      this._canvas.width = width;
+
+      this._app.renderer.resize(width, height);
+    }
+
+    if (prepare && prepare !== prevProps.prepare) {
+      var { plugins } = this._app.renderer;
+
+      if (!Array.isArray(prepare)) {
+        plugins.prepare.upload(prepare);
+      } else {
+        prepare.forEach(item => {
+          plugins.prepare.add(item);
+        });
+        plugins.prepare.upload();
+      }
     }
 
     ReactPixiFiber.updateContainer(children, this._mountNode, this);
@@ -287,7 +411,9 @@ class Stage extends React.Component {
   }
 
   render() {
-    return <canvas ref={ref => (this._canvas = ref)} />;
+    const { style } = this.props;
+
+    return <canvas ref={ref => (this._canvas = ref)} style={style} />;
   }
 }
 
@@ -295,7 +421,10 @@ Stage.propTypes = {
   backgroundColor: PropTypes.number,
   children: PropTypes.node,
   height: PropTypes.number,
-  width: PropTypes.number
+  width: PropTypes.number,
+  resolution: PropTypes.number,
+  style: PropTypes.object,
+  prepare: PropTypes.array
 };
 
 Stage.childContextTypes = {
@@ -313,3 +442,11 @@ export const ParticleContainer = TYPES.PARTICLE_CONTAINER;
 export const Sprite = TYPES.SPRITE;
 export const Text = TYPES.TEXT;
 export const TilingSprite = TYPES.TILING_SPRITE;
+
+export function CustomPIXIComponent(params) {
+  const CustomComponentID = TYPES.CUSTOM_COMPONENT + __componentIndex++;
+
+  CUSTOM_COMPONENTS[CustomComponentID] = params;
+
+  return CustomComponentID;
+}
