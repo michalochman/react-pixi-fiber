@@ -157,6 +157,13 @@ function appendChild(parentInstance, child) {
     if (component.customDidAttach) {
       component.customDidAttach(child);
     }
+    if (component.customWillDetach) {
+      const originalDestroy = child.destroy;
+      child.destroy = (...args) => {
+        component.customWillDetach(child);
+        originalDestroy.apply(child, args);
+      };
+    }
   }
 }
 
@@ -169,13 +176,6 @@ const removeChild = (parentInstance, child) => {
   }
 
   parentInstance.removeChild(child);
-
-  if (child.___customComponentID) {
-    const component = CUSTOM_COMPONENTS[child.___customComponentID];
-    if (component.customWillDetach) {
-      component.customWillDetach(child);
-    }
-  }
 
   child.destroy();
 };
