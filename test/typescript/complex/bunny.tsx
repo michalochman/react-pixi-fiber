@@ -24,7 +24,7 @@ export interface BunnyProperties {
   /** Event fired when sprite instance is hovered out. */
   onHoverOut?: (instance: PIXI.Sprite) => any;
   /** Event fired when sprite instance is dragged. */
-  onDrag?: (instance: PIXI.Sprite, x: number, y: number) => any;
+  onDrag?: (x: number, y: number, instance: PIXI.Sprite) => any;
 }
 
 export class Bunny extends StagedComponent<BunnyProperties> {
@@ -56,7 +56,7 @@ export class Bunny extends StagedComponent<BunnyProperties> {
   private emitHoverOut = () => this.sprite && this.props.onHoverOut && this.props.onHoverOut(this.sprite);
 
   /** Emit onDrag. */
-  private emitDrag = (x: number, y: number) => this.sprite && this.props.onDrag && this.props.onDrag(this.sprite, x, y);
+  private emitDrag = (x: number, y: number) => this.sprite && this.props.onDrag && this.props.onDrag(x, y, this.sprite);
 
   /** When dragging starts, set the dragging flag. */
   private dragStart = () => { this.dragging = true; }

@@ -1,4 +1,3 @@
-import * as PIXI from 'pixi.js';
 import * as React from 'react';
 import { Bunny } from './bunny';
 import { StagedComponent } from './lib';
@@ -41,11 +40,11 @@ export class InteractiveBunny extends StagedComponent<InteractiveBunnyProperties
     }
   }
 
-  private handleHoverIn = (sprite: PIXI.Sprite) => this.setState({ alpha: BUNNY_HIGHLIGHT });
+  private handleHoverIn = () => this.setState({ alpha: BUNNY_HIGHLIGHT });
 
-  private handleHoverOut = (sprite: PIXI.Sprite) => this.setState({ alpha: BUNNY_NORMAL });
+  private handleHoverOut = () => this.setState({ alpha: BUNNY_NORMAL });
 
-  private handleDrag = (sprite: PIXI.Sprite, x: number, y: number) =>
+  private handleDrag = (x: number, y: number) =>
     (this.props.validateDrag ? this.props.validateDrag(x, y) : true) && this.setState({ x, y })
 
   render() {
