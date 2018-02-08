@@ -28,8 +28,8 @@ const StageExample: React.SFC = () => (
       <BitmapText text="" />
     </Container>
     <Graphics />
-    <ParticleContainer texture={texture}>
-    <BitmapText text="" />
+    <ParticleContainer>
+      <BitmapText text="" />
     </ParticleContainer>
     <Sprite anchor={anchor} texture={texture} />
     <Text />
