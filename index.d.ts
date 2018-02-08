@@ -144,7 +144,7 @@ declare namespace ReactPIXIFiber {
    * Container properties.
    * @see http://pixijs.download/dev/docs/PIXI.Container.html
    */
-  interface ContainerProperties extends DisplayObjectProperties<Container> {}
+  interface ContainerProperties extends DisplayObjectContainerProperties<Container> {}
   /**
    * Graphics properties.
    * @see http://pixijs.download/dev/docs/PIXI.Graphics.html
@@ -154,7 +154,7 @@ declare namespace ReactPIXIFiber {
    * ParticleContainer properties.
    * @see http://pixijs.download/dev/docs/PIXI.particles.ParticleContainer.html
    */
-  interface ParticleContainerProperties extends DisplayObjectProperties<ParticleContainer> {}
+  interface ParticleContainerProperties extends DisplayObjectContainerProperties<ParticleContainer> {}
   /**
    * Sprite properties.
    * @see http://pixijs.download/dev/docs/PIXI.Sprite.html
@@ -239,12 +239,12 @@ declare namespace ReactPIXIFiber {
  * our custom components.
  */
 declare module 'react' {
-  function createElement<T extends keyof ReactPIXIFiber.PropertiesMap, P extends ReactPIXIFiber.ClassAttributes<T>>(
+  function createElement<T extends keyof ReactPIXIFiber.PropertiesMap, P extends ReactPIXIFiber.ClassAttributes<T> = {}>(
       type: T,
       props?: P | null,
       ...children: React.ReactNode[]): ReactPIXIFiber.Element<T, P>;
 
-  function cloneElement<T extends keyof ReactPIXIFiber.PropertiesMap, P extends ReactPIXIFiber.ClassAttributes<T>>(
+  function cloneElement<T extends keyof ReactPIXIFiber.PropertiesMap, P extends ReactPIXIFiber.ClassAttributes<T> = {}>(
     element: ReactPIXIFiber.Element<T, P>,
     props?: P,
     ...children: PIXI.DisplayObject[]): ReactPIXIFiber.Element<T, P>;
