@@ -10,12 +10,12 @@ declare namespace ReactPIXIFiber {
 
   /**
    * The difference of T and U.
-   * [attribution](https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766)
+   * @see https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766
    */
   type Diff<T extends string, U extends string> = ({ [P in T]: P } & { [P in U]: never } & { [x: string]: never })[T];
   /**
    * From T omit property with name U.
-   * [attribution](https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766)
+   * @see https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766
    */
   type Omit<T, U extends keyof T> = Pick<T, Diff<keyof T, U>>;
   /** The shape of an object that has an optional `children` property of any type. */
