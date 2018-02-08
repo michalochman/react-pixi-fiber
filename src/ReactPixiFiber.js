@@ -17,9 +17,9 @@ const TYPES = {
   PARTICLE_CONTAINER: "ParticleContainer",
   SPRITE: "Sprite",
   TEXT: "Text",
-  TILING_SPRITE: "TilingSprite",
-  CUSTOM_COMPONENT: "CustomComponent"
+  TILING_SPRITE: "TilingSprite"
 };
+const CUSTOM_COMPONENT_PREFIX = "_CusToM-CoMpOnEnT#";
 
 //
 // A DisplayObject Point-like props
@@ -465,7 +465,7 @@ export const Text = TYPES.TEXT;
 export const TilingSprite = TYPES.TILING_SPRITE;
 
 export function CustomPIXIComponent(params) {
-  const CustomComponentID = TYPES.CUSTOM_COMPONENT + __componentIndex++;
+  const CustomComponentID = CUSTOM_COMPONENT_PREFIX + __componentIndex++;
 
   CUSTOM_COMPONENTS[CustomComponentID] = params;
 
