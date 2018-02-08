@@ -26,7 +26,7 @@ export abstract class StagedComponent<P = {}, S = {}> extends React.Component<P,
 }
 
 /** A React stateless funtional component with typed context.  To configure, use the `lift` or `connect` HoC's. */
-export interface StagedStatlessComponent<P = {}> {
+export interface StagedStatelessComponent<P = {}> {
   (props: P & { children?: React.ReactNode }, context: StagedComponentContext): React.ReactElement<any> | null;
   propTypes?: React.ValidationMap<P>;
   contextTypes?: React.ValidationMap<any>;
@@ -35,7 +35,7 @@ export interface StagedStatlessComponent<P = {}> {
 }
 
 /** A shorthand alias for StagedStatelessComponent<P>. */
-export type StagedSFC<P = {}> = StagedStatlessComponent<P>;
+export type StagedSFC<P = {}> = StagedStatelessComponent<P>;
 
 /**
  * Project a React stateless functional component to a PIXI statless functional component.
