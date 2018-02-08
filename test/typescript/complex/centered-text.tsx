@@ -30,23 +30,27 @@ export class CenteredText extends StagedComponent<CenteredTextProperties, Center
   private textChanged: boolean = false;
 
   componentDidMount() {
+    // set the initial text width
     this.setTextWidth();
   }
 
   componentWillReceiveProps(nextProps: CenteredTextProperties) {
+    // text width is changing
     if (nextProps.text !== this.props.text) {
       this.textChanged = true;
     }
   }
 
   componentDidUpdate() {
+    // update text width if text changed
     if (this.textChanged) {
       this.setTextWidth();
       this.textChanged = false;
     }
   }
 
-  setTextWidth() {
+  /** Set the width of the text for centering. */
+  private setTextWidth() {
     if (!this.text) { return; }
     this.setState({ textWidth: this.text.width });
   }

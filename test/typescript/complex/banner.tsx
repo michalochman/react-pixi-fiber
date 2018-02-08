@@ -31,14 +31,16 @@ export class Banner extends StagedComponent<BannerProperties, BannerState> {
     this.start();
   }
 
-  async start() {
+  /** Start sequencing message display. */
+  private async start() {
     const { messages = [] } = this.props;
     for (const message of messages) {
       await this.showMessage(message);
     }
   }
 
-  async showMessage({ text, delay = 0, duration = 0 }: BannerMessage) {
+  /** Show a particular message with a delay and duration. */
+  private async showMessage({ text, delay = 0, duration = 0 }: BannerMessage) {
     return new Promise(resolve => {
       setTimeout(
         () => {
