@@ -1,130 +1,261 @@
-import * as React from 'react';
 import * as PIXI from 'pixi.js';
 
-declare module 'react-pixi-fiber' {
+export = ReactPIXIFiber;
+
+declare namespace ReactPIXIFiber {
+
+  //
+  // Utility types.
+  //
 
   /**
-   * The set of object keys in T not in U.
-   *
-   * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766:
+   * The difference of T and U.
+   * [attribution](https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766)
    */
-  export type Diff<T extends string, U extends string> = ({ [P in T]: P } & { [P in U]: never } & { [x: string]: never })[T];
-
+  type Diff<T extends string, U extends string> = ({ [P in T]: P } & { [P in U]: never } & { [x: string]: never })[T];
   /**
-   * An object with keys in T not in U.
-   *
-   * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766:
+   * From T omit property with name U.
+   * [attribution](https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766)
    */
-  export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
-
+  type Omit<T, U extends keyof T> = Pick<T, Diff<keyof T, U>>;
   /** The shape of an object that has an optional `children` property of any type. */
   interface ObjectWithChildren { children?: any; }
-
   /** The shape of `T` without it's `children` property. */
-  export type Childless<T extends ObjectWithChildren> = Omit<T, 'children'>;
-
+  type Childless<T extends ObjectWithChildren> = Omit<T, 'children'>;
   /** The shape of a component that has an optional `children` property. */
-  export interface ChildrenProperties {
+  interface ChildrenProperties {
     children?: React.ReactNode;
   }
+  /** Produces a `Partial` form of any type defined in `ClassMap`, stripped of a `children` property. */
+  type PropertiesWithoutChildren<K extends keyof ClassMap> = Partial<Childless<ClassMap[K]>>;
+  /** Properties suitable for a display object */
+  type DisplayObjectProperties<K extends keyof ClassMap> = ClassAttributes<K> & PropertiesWithoutChildren<K>;
+  /** Properties suitable for a PIXI display object container */
+  type DisplayObjectContainerProperties<K extends keyof ClassMap> = DisplayObjectProperties<K> & ChildrenProperties;
+
+  //
+  // Component identifier types.
+  //
+
+  /** BitmapText component identifier type */
+  type BitmapText = 'BitmapText';
+  /** Container component identifier type */
+  type Container = 'Container';
+  /** Graphics component identifier type */
+  type Graphics = 'Graphics';
+  /** ParticleContainer component identifier type */
+  type ParticleContainer = 'ParticleContainer';
+  /** Sprite component identifier type */
+  type Sprite = 'Sprite';
+  /** Stage component identifier type */
+  type Stage = 'Stage';
+  /** Text component identifier type */
+  type Text = 'Text';
+  /** TilingSprite component identifier type */
+  type TilingSprite = 'TilingSprite';
+
+  //
+  //  Publically exported React element types that the reconciler can identifiy. You can
+  //  use these as you would other components.  This works iefei simlarly to how intrinsic elements
+  //  such as HTML and SVG elements work.
+  //
 
   /**
-   * A PIXI Component with no children.
+   * BitmapText React element type.
+   * @example const text = '';
+   * <BitmapText text={text} />
+   * @example React.createElement(BitmapText, { text })
+   * @example // equivalent to:
+   * React.createElement('BitmapText', { text })
    */
-  export type ChildlessComponent<T extends ObjectWithChildren> = Partial<Childless<T>>;
+  const BitmapText: BitmapText;
+  /**
+   * Container React element type.
+   * @example <Container />
+   * @example React.createElement(Container)
+   * @example // equivalent to:
+   * React.createElement('Container')
+   */
+  const Container: Container;
+  /**
+   * Graphics React element type.
+   * @example <Graphics />
+   * @example React.createElement(Graphics)
+   * @example // equivalent to:
+   * React.createElement('Graphics')
+   */
+  const Graphics: Graphics;
+  /**
+   * ParticleContainer React element type.
+   * @example <ParticleContainer />
+   * @example React.createElement(ParticleContainer)
+   * @example // equivalent to:
+   * React.createElement('ParticleContainer')
+   */
+  const ParticleContainer: ParticleContainer;
+  /**
+   * Sprite React element type.
+   * @example <Sprite />
+   * @example React.createElement(Sprite)
+   * @example // equivalent to:
+   * React.createElement('Sprite')
+   */
+  const Sprite: Sprite;
+  /**
+   * Stage React element type.
+   * @example <Stage width={100} height={100} />
+   * @example React.createElement(Stage)
+   * @example // equivalent to:
+   * React.createElement('Stage')
+   */
+  const Stage: Stage;
+  /**
+   * Text React element type.
+   * @example <Text />
+   * @example React.createElement(Text)
+   * @example // equivalent to:
+   * React.createElement('Text')
+  */
+  const Text: Text;
+  /**
+   * TilingSprite React element type.
+   * @example const texture = PIXI.Texture.fromImage(...);
+   * <TilingSprite texture={texture} />
+   * @example React.createElement(TilingSprite, { texture })
+   * @example // equivalent to:
+   * React.createElement('TilingSprite', { texture })
+   */
+  const TilingSprite: TilingSprite;
+
+  //
+  //  Component properties.
+  //  - `DisplayObjectProperties` do not have children.
+  //  - `DisplayObjectContainerProperties` can have children.
+  //
 
   /**
-   * A PIXI Component with children.
+   * BitmapText properties.
+   * @see http://pixijs.download/dev/docs/PIXI.extras.BitmapText.html
    */
-  export type Component<T extends ObjectWithChildren> = ChildlessComponent<T> & ChildrenProperties;
-
-  /** `BitmapText` component properties. */
-  export interface BitmapTextProperties extends ChildlessComponent<PIXI.extras.BitmapText> {
+  interface BitmapTextProperties extends DisplayObjectProperties<BitmapText> {
     text: string;
   }
-
   /**
-   * A component wrapper for `PIXI.extras.BitmapText`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.extras.BitmapText.html
+   * Container properties.
+   * @see http://pixijs.download/dev/docs/PIXI.Container.html
    */
-  export class BitmapText extends React.Component<BitmapTextProperties> {}
-
-  /** `Container` component properties. */
-  export interface ContainerProperties extends ChildlessComponent<PIXI.Container> {}
-
+  interface ContainerProperties extends DisplayObjectProperties<Container> {}
   /**
-   * A component wrapper for `PIXI.extras.BitmapText`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.Container.html
+   * Graphics properties.
+   * @see http://pixijs.download/dev/docs/PIXI.Graphics.html
    */
-  export class Container extends React.Component<ContainerProperties> {}
-
-  /** `Graphics` component properties. */
-  export interface GraphicsProperties extends Component<PIXI.Graphics> {}
-
+  interface GraphicsProperties extends DisplayObjectContainerProperties<Graphics> {}
   /**
-   * A component wrapper for `PIXI.Graphics`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.Graphics.html
+   * ParticleContainer properties.
+   * @see http://pixijs.download/dev/docs/PIXI.particles.ParticleContainer.html
    */
-  export class Graphics extends React.Component<GraphicsProperties> {}
-
-  /** `ParticleContainer` component properties. */
-  export interface ParticleContainerProperties extends ChildlessComponent<PIXI.particles.ParticleContainer> {}
-
+  interface ParticleContainerProperties extends DisplayObjectProperties<ParticleContainer> {}
   /**
-   * A component wrapper for `PIXI.particles.ParticleContainer`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.particles.ParticleContainer.html
+   * Sprite properties.
+   * @see http://pixijs.download/dev/docs/PIXI.Sprite.html
    */
-  export class ParticleContainer extends React.Component<TilingSpriteProperties> {}
-
-  /** `Sprite` component properties. */
-  export interface SpriteProperties extends ChildlessComponent<PIXI.Sprite> {}
-
+  interface SpriteProperties extends DisplayObjectProperties<Sprite> {}
   /**
-   * A component wrapper for `PIXI.Sprite`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.Sprite.html
+   * Stage properties.
+   * @see http://pixijs.download/dev/docs/PIXI.Application.html
    */
-  export class Sprite extends React.Component<SpriteProperties> {}
-
-  /** `Text` component properties */
-  export interface TextProperties extends ChildlessComponent<PIXI.Text> {}
-
+  interface StageProperties extends DisplayObjectContainerProperties<Stage> {
+    backgroundColor?: number;
+  }
   /**
-   * A component wrapper for `PIXI.Text`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.Text.html
+   * Text properties.
+   * @see http://pixijs.download/dev/docs/PIXI.Text.html
    */
-  export class Text extends React.Component<TextProperties> {}
-
-  /** `TilingSprite` component properties. */
-  export interface TilingSpriteProperties extends ChildlessComponent<PIXI.extras.TilingSprite> {
+  interface TextProperties extends DisplayObjectProperties<Text> {}
+  /**
+   * TilingSprite properties.
+   * @see http://pixijs.download/dev/docs/PIXI.extras.TilingSprite.html
+   */
+  interface TilingSpriteProperties extends DisplayObjectProperties<TilingSprite> {
     texture: PIXI.Texture;
   }
 
-  /**
-   * A component wrapper for `PIXI.extras.TilingSprite`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.extras.TilingSprite.html
-   */
-  export class TilingSprite extends React.Component<TilingSpriteProperties> {}
-
-  /** `Stage` component properties." */
-  export interface StageProperties extends Component<PIXI.Container> {
-    backgroundColor?: number;
-  }
-
-  /**
-   * A component wrapper for `PIXI.Application`.
-   *
-   * see: http://pixijs.download/dev/docs/PIXI.Application.html
-   */
-  export class Stage extends React.Component<StageProperties> {}
+  //
+  // Types required for augmenting the React module and the JSX namespace to support
+  // these custom elements.
+  //
 
   /** Custom React Reconciler render method. */
-  export function render(pixiElement: PIXI.DisplayObject | PIXI.DisplayObject[], stage: PIXI.Container, callback?: Function): void;
+  function render(pixiElement: PIXI.DisplayObject | PIXI.DisplayObject[], stage: PIXI.Container, callback?: Function): void;
 
+  /** Common class attributes. */
+  interface ClassAttributes<T extends keyof InstanceMap> extends React.ClassAttributes<InstanceMap[T]> {}
+
+  /** Map React element types to the PIXI object it's properties decorate. */
+  interface ClassMap {
+    [BitmapText]: PIXI.extras.BitmapText;
+    [Container]: PIXI.Container;
+    [Graphics]: PIXI.Graphics;
+    [ParticleContainer]: PIXI.particles.ParticleContainer;
+    [Sprite]: PIXI.Sprite;
+    [Stage]: PIXI.Container;
+    [Text]: PIXI.Text;
+    [TilingSprite]: PIXI.extras.TilingSprite;
+  }
+
+  /** Map React element types to the properties the component supports. */
+  interface PropertiesMap {
+    [BitmapText]: BitmapTextProperties;
+    [Container]: ContainerProperties;
+    [Graphics]: GraphicsProperties;
+    [ParticleContainer]: ParticleContainerProperties;
+    [Sprite]: SpriteProperties;
+    [Stage]: StageProperties;
+    [Text]: TextProperties;
+    [TilingSprite]: TilingSpriteProperties;
+  }
+
+  /** Map React element types reference type it emits. */
+  interface InstanceMap {
+    [BitmapText]: PIXI.extras.BitmapText;
+    [Container]: PIXI.Container;
+    [Graphics]: PIXI.Graphics;
+    [ParticleContainer]: PIXI.particles.ParticleContainer;
+    [Sprite]: PIXI.Sprite;
+    [Stage]: Element<Stage, any>;
+    [Text]: PIXI.Text;
+    [TilingSprite]: PIXI.extras.TilingSprite;
+  }
+
+  /** The JSX element type. */
+  interface Element<T extends keyof InstanceMap, P = {}> extends React.ReactElement<P> {
+    type: React.ComponentClass<P>;
+    ref: React.Ref<InstanceMap[T]>;
+  }
+}
+
+/**
+ * Augment the `react` module with a new `createElement` and `cloneElement` method supporting
+ * our custom components.
+ */
+declare module 'react' {
+  function createElement<T extends keyof ReactPIXIFiber.PropertiesMap, P extends ReactPIXIFiber.ClassAttributes<T>>(
+      type: T,
+      props?: P | null,
+      ...children: React.ReactNode[]): ReactPIXIFiber.Element<T, P>;
+
+  function cloneElement<T extends keyof ReactPIXIFiber.PropertiesMap, P extends ReactPIXIFiber.ClassAttributes<T>>(
+    element: ReactPIXIFiber.Element<T, P>,
+    props?: P,
+    ...children: PIXI.DisplayObject[]): ReactPIXIFiber.Element<T, P>;
+}
+
+/**
+ * Augment the global JSX namespace to include our custom component type map as
+ * intrinsic elements.
+ */
+declare global {
+  namespace JSX {
+    interface IntrinsicElements extends ReactPIXIFiber.PropertiesMap {}
+  }
 }
