@@ -151,10 +151,31 @@ function appendChild(parentInstance, child) {
   parentInstance.removeChild(child);
 
   parentInstance.addChild(child);
+
+  if (child.___customComponentID) {
+    const component = CUSTOM_COMPONENTS[child.___customComponentID];
+    if (component.customDidAttach) {
+      component.customDidAttach(child);
+    }
+  }
 }
 
 const removeChild = (parentInstance, child) => {
+  if (child.children) {
+    let childIndex = child.children.length;
+    while (childIndex--) {
+      removeChild(child, child.children[childIndex]);
+    }
+  }
+
   parentInstance.removeChild(child);
+
+  if (child.___customComponentID) {
+    const component = CUSTOM_COMPONENTS[child.___customComponentID];
+    if (component.customWillDetach) {
+      component.customWillDetach(child);
+    }
+  }
 
   child.destroy();
 };
