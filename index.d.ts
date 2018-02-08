@@ -34,103 +34,90 @@ declare namespace ReactPIXIFiber {
   type DisplayObjectContainerProperties<K extends keyof ClassMap> = DisplayObjectProperties<K> & ChildrenProperties;
 
   //
-  // Component identifier types.
-  //
-
-  /** BitmapText component identifier type */
-  type BitmapText = 'BitmapText';
-  /** Container component identifier type */
-  type Container = 'Container';
-  /** Graphics component identifier type */
-  type Graphics = 'Graphics';
-  /** ParticleContainer component identifier type */
-  type ParticleContainer = 'ParticleContainer';
-  /** Sprite component identifier type */
-  type Sprite = 'Sprite';
-  /** Stage component identifier type */
-  type Stage = 'Stage';
-  /** Text component identifier type */
-  type Text = 'Text';
-  /** TilingSprite component identifier type */
-  type TilingSprite = 'TilingSprite';
-
-  //
   //  Publically exported React element types that the reconciler can identifiy. You can
   //  use these as you would other components.  This works iefei simlarly to how intrinsic elements
   //  such as HTML and SVG elements work.
   //
 
   /**
-   * BitmapText React element type.
-   * @example const text = '';
+   * BitmapText element type.
+   * @example
+   * const text = '';
    * <BitmapText text={text} />
-   * @example React.createElement(BitmapText, { text })
-   * @example // equivalent to:
-   * React.createElement('BitmapText', { text })
+   * React.createElement(BitmapText, { text });
+   * React.createElement('BitmapText', { text });
    */
+  type BitmapText = 'BitmapText'; // type identifier
   const BitmapText: BitmapText;
   /**
-   * Container React element type.
-   * @example <Container />
-   * @example React.createElement(Container)
-   * @example // equivalent to:
-   * React.createElement('Container')
+   * Container element type.
+   * @example
+   * <Container />
+   * React.createElement(Container);
+   * React.createElement('Container');
    */
+  type Container = 'Container'; // type identifier
   const Container: Container;
   /**
-   * Graphics React element type.
-   * @example <Graphics />
-   * @example React.createElement(Graphics)
-   * @example // equivalent to:
-   * React.createElement('Graphics')
+   * Graphics element type.
+   * <Graphics />
+   * React.createElement(Graphics);
+   * React.createElement('Graphics');
    */
+  type Graphics = 'Graphics'; // type identifier
   const Graphics: Graphics;
   /**
-   * ParticleContainer React element type.
-   * @example <ParticleContainer />
-   * @example React.createElement(ParticleContainer)
-   * @example // equivalent to:
-   * React.createElement('ParticleContainer')
+   * ParticleContainer element type.
+   * @example
+   * <ParticleContainer />
+   * React.createElement(ParticleContainer);
+   * React.createElement('ParticleContainer');
    */
+  type ParticleContainer = 'ParticleContainer'; // type identifier
   const ParticleContainer: ParticleContainer;
   /**
-   * Sprite React element type.
-   * @example <Sprite />
-   * @example React.createElement(Sprite)
-   * @example // equivalent to:
-   * React.createElement('Sprite')
+   * Sprite element type.
+   * @example
+   * <Sprite />
+   * React.createElement(Sprite);
+   * React.createElement('Sprite');
    */
+  type Sprite = 'Sprite'; // type identifier
   const Sprite: Sprite;
   /**
-   * Stage React element type.
-   * @example <Stage width={100} height={100} />
-   * @example React.createElement(Stage)
-   * @example // equivalent to:
-   * React.createElement('Stage')
+   * Stage element type.
+   * @example
+   * const width = 100, height = 100;
+   * <Stage width={width} height={height} />
+   * React.createElement(Stage, { width, height });
+   * React.createElement('Stage', { width, height });
    */
+  type Stage = 'Stage'; // type identifier
   const Stage: Stage;
   /**
-   * Text React element type.
-   * @example <Text />
-   * @example React.createElement(Text)
-   * @example // equivalent to:
-   * React.createElement('Text')
+   * Text element type.
+   * @example
+   * <Text />
+   * React.createElement(Text);
+   * React.createElement('Text');
   */
+  type Text = 'Text'; // Text type identifier
   const Text: Text;
   /**
-   * TilingSprite React element type.
-   * @example const texture = PIXI.Texture.fromImage(...);
+   * TilingSprite element type.
+   * @example
+   * const texture = PIXI.Texture.fromImage(...);
    * <TilingSprite texture={texture} />
-   * @example React.createElement(TilingSprite, { texture })
-   * @example // equivalent to:
-   * React.createElement('TilingSprite', { texture })
+   * React.createElement(TilingSprite, { texture });
+   * React.createElement('TilingSprite', { texture });
    */
+  type TilingSprite = 'TilingSprite'; // type identifier
   const TilingSprite: TilingSprite;
 
   //
   //  Component properties.
-  //  - `DisplayObjectProperties` do not have children.
-  //  - `DisplayObjectContainerProperties` can have children.
+  //  - `DisplayObjectProperties` _can not_ have children.
+  //  - `DisplayObjectContainerProperties` _can_ have children.
   //
 
   /**
@@ -191,7 +178,7 @@ declare namespace ReactPIXIFiber {
   /** Common class attributes. */
   interface ClassAttributes<T extends keyof InstanceMap> extends React.ClassAttributes<InstanceMap[T]> {}
 
-  /** Map React element types to the PIXI object it's properties decorate. */
+  /** Map custom element types to the PIXI object its properties decorate. */
   interface ClassMap {
     [BitmapText]: PIXI.extras.BitmapText;
     [Container]: PIXI.Container;
@@ -203,7 +190,7 @@ declare namespace ReactPIXIFiber {
     [TilingSprite]: PIXI.extras.TilingSprite;
   }
 
-  /** Map React element types to the properties the component supports. */
+  /** Map custom element types to the properties the component requires and supports. */
   interface PropertiesMap {
     [BitmapText]: BitmapTextProperties;
     [Container]: ContainerProperties;
@@ -215,7 +202,7 @@ declare namespace ReactPIXIFiber {
     [TilingSprite]: TilingSpriteProperties;
   }
 
-  /** Map React element types reference type it emits. */
+  /** Map custom element types to its `ref` type. */
   interface InstanceMap {
     [BitmapText]: PIXI.extras.BitmapText;
     [Container]: PIXI.Container;
@@ -227,7 +214,7 @@ declare namespace ReactPIXIFiber {
     [TilingSprite]: PIXI.extras.TilingSprite;
   }
 
-  /** The JSX element type. */
+  /** The custom JSX element type. */
   interface Element<T extends keyof InstanceMap, P = {}> extends React.ReactElement<P> {
     type: React.ComponentClass<P>;
     ref: React.Ref<InstanceMap[T]>;
