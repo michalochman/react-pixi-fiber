@@ -9,56 +9,56 @@ import ClickExample from "../ClickExample/ClickExample";
 import ViewportExample from "../ViewportExample/ViewportExample";
 
 const examples = [
-	{
-		name: "Bunny",
-		slug: "bunny",
-		component: BunnyExample
-	},
-	{
-		name: "Bunnymark",
-		slug: "bunnymark",
-		component: BunnymarkExample
-	},
-	{
-		name: "Click",
-		slug: "click",
-		component: ClickExample
-	},
-	{
-		name: "Viewport",
-		slug: "viewport",
-		component: ViewportExample
-	}
+    {
+        name: "Bunny",
+        slug: "bunny",
+        component: BunnyExample
+    },
+    {
+        name: "Bunnymark",
+        slug: "bunnymark",
+        component: BunnymarkExample
+    },
+    {
+        name: "Click",
+        slug: "click",
+        component: ClickExample
+    },
+    {
+        name: "Viewport",
+        slug: "viewport",
+        component: ViewportExample
+    }
 ];
 
 class App extends Component {
-	render() {
-		return (
-			<div className="App">
-				<header className="App-header">
-					<img src={logo} className="App-logo" alt="logo" />
-					<h1 className="App-title">react-pixi-fiber Examples</h1>
-				</header>
-				<div className="App-intro">
-					<Switch>
-						<Route
-							exact
-							path="/"
-							render={props => <ExampleList {...props} examples={examples} />}
-						/>
-						{examples.map(example => (
-							<Route
-								key={example.slug}
-								exact
-								path={`/${example.slug}`}
-								component={example.component}
-							/>
-						))}
-					</Switch>
-				</div>
-			</div>
-		);
-	}
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <img src={logo} className="App-logo" alt="logo" />
+                    <h1 className="App-title">react-pixi-fiber Examples</h1>
+                </header>
+                <div className="App-intro">
+                    <Switch>
+                        <Route
+                            exact
+                            path="/"
+                            render={props => <ExampleList {...props} examples={examples} />}
+                        />
+                        {examples.map(example => (
+                            <Route
+                                key={example.slug}
+                                exact
+                                path={`/${example.slug}`}
+                                component={example.component}
+                            />
+                        ))}
+                    </Switch>
+                </div>
+            </div>
+        );
+    }
 }
 
 export default App;
