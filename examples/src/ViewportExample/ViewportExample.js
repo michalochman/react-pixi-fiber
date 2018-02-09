@@ -33,9 +33,4 @@ class ViewportExample extends Component {
 	}
 }
 
-// ViewportExample.childContextTypes = {
-// 	app: PropTypes.object,
-// 	toWorld: PropTypes.function
-// }
-
 export default ViewportExample;
