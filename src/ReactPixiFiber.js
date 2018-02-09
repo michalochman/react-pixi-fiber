@@ -109,7 +109,7 @@ const commitUpdate = (
 const ReactPixiFiber = ReactFiberReconciler({
   appendInitialChild: appendChild,
 
-  createInstance: function (type, props, internalInstanceHandle) {
+  createInstance: function(type, props, internalInstanceHandle) {
     let instance;
 
     switch (type) {
@@ -169,7 +169,7 @@ const ReactPixiFiber = ReactFiberReconciler({
     );
   },
 
-  finalizeInitialChildren: function (
+  finalizeInitialChildren: function(
     pixiElement,
     type,
     props,
@@ -196,7 +196,7 @@ const ReactPixiFiber = ReactFiberReconciler({
     // Noop
   },
 
-  prepareUpdate: function (
+  prepareUpdate: function(
     pixiElement,
     type,
     oldProps,
@@ -215,7 +215,7 @@ const ReactPixiFiber = ReactFiberReconciler({
     // Noop
   },
 
-  shouldDeprioritizeSubtree: function (type, props) {
+  shouldDeprioritizeSubtree: function(type, props) {
     const isAlphaVisible =
       typeof props.alpha === "undefined" || props.alpha > 0;
     const isRenderable =
@@ -226,7 +226,7 @@ const ReactPixiFiber = ReactFiberReconciler({
     return !(isAlphaVisible && isRenderable && isVisible);
   },
 
-  shouldSetTextContent: function (type, props) {
+  shouldSetTextContent: function(type, props) {
     return false;
   },
 
