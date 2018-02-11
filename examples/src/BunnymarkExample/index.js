@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { Stage } from "react-pixi-fiber";
 import Bunnymark from "./Bunnymark";
 
@@ -16,8 +15,5 @@ class BunnymarkExample extends Component {
     );
   }
 }
-BunnymarkExample.contextTypes = {
-  app: PropTypes.object,
-};
 
 export default BunnymarkExample;

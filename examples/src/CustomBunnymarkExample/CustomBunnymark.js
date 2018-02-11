@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { ParticleContainer, Sprite, Text } from "react-pixi-fiber";
 import Stats from "stats.js/src/Stats";
 import * as PIXI from "pixi.js";
+import Particle from "./Particle"
 import bunnys from "./bunnys.png";
 
 const maxSize = 200000;
@@ -19,51 +20,45 @@ const particleContainerProperties = {
   position: true,
   rotation: false,
   uvs: false,
-  tint: false,
+  tint: false
 };
 
 const generateBunny = texture => ({
   speedX: Math.random() * 10,
   speedY: Math.random() * 10 - 5,
   texture: texture,
-  x: 0,
-  y: 0,
 });
 
-const moveBunny = bunny => {
-  const movedBunny = { ...bunny };
+const moveBunny = function() {
+  this.x += this.speedX;
+  this.y += this.speedY;
+  this.speedY += gravity;
 
-  movedBunny.x += movedBunny.speedX;
-  movedBunny.y += movedBunny.speedY;
-  movedBunny.speedY += gravity;
-
-  if (movedBunny.x > maxX) {
-    movedBunny.speedX *= -1;
-    movedBunny.x = maxX;
-  } else if (movedBunny.x < minX) {
-    movedBunny.speedX *= -1;
-    movedBunny.x = minX;
+  if (this.x > maxX) {
+    this.speedX *= -1;
+    this.x = maxX;
+  } else if (this.x < minX) {
+    this.speedX *= -1;
+    this.x = minX;
   }
 
-  if (movedBunny.y > maxY) {
-    movedBunny.speedY *= -0.85;
-    movedBunny.y = maxY;
+  if (this.y > maxY) {
+    this.speedY *= -0.85;
+    this.y = maxY;
     if (Math.random() > 0.5) {
-      movedBunny.speedY -= Math.random() * 6;
+      this.speedY -= Math.random() * 6;
     }
-  } else if (movedBunny.y < minY) {
-    movedBunny.speedY = 0;
-    movedBunny.y = minY;
+  } else if (this.y < minY) {
+    this.speedY = 0;
+    this.y = minY;
   }
-
-  return movedBunny;
 };
 
-class Bunnymark extends Component {
+class CustomBunnymark extends Component {
   state = {
     bunnys: [],
     currentTexture: 0,
-    isAdding: false,
+    isAdding: false
   };
 
   componentDidMount() {
@@ -71,17 +66,32 @@ class Bunnymark extends Component {
     document.body.appendChild(this.stats.domElement);
 
     const bunnyTextures = new PIXI.Texture.fromImage(bunnys);
-    const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
-    const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
-    const bunny3 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37));
-    const bunny4 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 164, 26, 37));
-    const bunny5 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 2, 26, 37));
+    const bunny1 = new PIXI.Texture(
+      bunnyTextures.baseTexture,
+      new PIXI.Rectangle(2, 47, 26, 37)
+    );
+    const bunny2 = new PIXI.Texture(
+      bunnyTextures.baseTexture,
+      new PIXI.Rectangle(2, 86, 26, 37)
+    );
+    const bunny3 = new PIXI.Texture(
+      bunnyTextures.baseTexture,
+      new PIXI.Rectangle(2, 125, 26, 37)
+    );
+    const bunny4 = new PIXI.Texture(
+      bunnyTextures.baseTexture,
+      new PIXI.Rectangle(2, 164, 26, 37)
+    );
+    const bunny5 = new PIXI.Texture(
+      bunnyTextures.baseTexture,
+      new PIXI.Rectangle(2, 2, 26, 37)
+    );
 
     this.bunnyTextures = [bunny1, bunny2, bunny3, bunny4, bunny5];
     const currentTexture = 2;
     this.setState({
       bunnys: [generateBunny(currentTexture), generateBunny(currentTexture)],
-      currentTexture: currentTexture,
+      currentTexture: currentTexture
     });
 
     this.context.app.ticker.add(this.animate);
@@ -93,21 +103,23 @@ class Bunnymark extends Component {
 
   animate = () => {
     const { bunnys, currentTexture, isAdding } = this.state;
-    const addedBunnys = [];
 
     this.stats.update();
 
     if (isAdding) {
+      const addedBunnys = [];
+
       if (bunnys.length < maxSize) {
         for (let i = 0; i < bunniesAddedPerFrame; i++) {
           addedBunnys.push(generateBunny(currentTexture));
         }
       }
+      const newBunnys = bunnys.concat(addedBunnys);
+
+      this.setState({ bunnys: newBunnys });
     }
 
-    const newBunnys = bunnys.concat(addedBunnys).map(moveBunny);
-
-    this.setState({ bunnys: newBunnys });
+    this.particleContainer.children.forEach(bunny => bunny.update(bunny))
   };
 
   handlePointerDown = () => {
@@ -116,7 +128,7 @@ class Bunnymark extends Component {
 
   handlePointerUp = () => {
     this.setState(state => ({
-      currentTexture: (state.currentTexture + 1) % 5,
+      currentTexture: (state.currentTexture + 1) % 5
     }));
 
     this.setState({ isAdding: false });
@@ -127,12 +139,28 @@ class Bunnymark extends Component {
 
     return (
       <Fragment>
-        <ParticleContainer maxSize={maxSize} properties={particleContainerProperties}>
+        <ParticleContainer
+          ref={c => this.particleContainer = c}
+          maxSize={maxSize}
+          properties={particleContainerProperties}
+        >
           {bunnys.map((bunny, i) => (
-            <Sprite key={i} anchor={bunnyAnchor} texture={this.bunnyTextures[bunny.texture]} x={bunny.x} y={bunny.y} />
+            <Particle
+              key={i}
+              anchor={bunnyAnchor}
+              update={moveBunny}
+              speedX={bunny.speedX}
+              speedY={bunny.speedY}
+              texture={this.bunnyTextures[bunny.texture]}
+            />
           ))}
         </ParticleContainer>
-        <Text text={`${bunnys.length} BUNNIES`} style={{ fill: 0xffff00, fontSize: 14 }} x={5} y={5} />
+        <Text
+          text={`${bunnys.length} BUNNIES`}
+          style={{ fill: 0xffff00, fontSize: 14 }}
+          x={5}
+          y={5}
+        />
         {/* ParticleContainer and its children cannot be interactive
             so here's a clickable hit area */}
         <Sprite
@@ -147,8 +175,8 @@ class Bunnymark extends Component {
     );
   }
 }
-Bunnymark.contextTypes = {
-  app: PropTypes.object,
+CustomBunnymark.contextTypes = {
+  app: PropTypes.object
 };
 
-export default Bunnymark;
+export default CustomBunnymark;

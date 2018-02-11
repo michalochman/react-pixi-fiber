@@ -8,6 +8,8 @@ import BunnyExample from "../BunnyExample";
 import BunnymarkExample from "../BunnymarkExample";
 import CanvasPropsExample from "../CanvasPropsExample";
 import ClickExample from "../ClickExample";
+import CustomBunnymarkExample from "../CustomBunnymarkExample";
+import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import PointsExample from "../PointsExample/PointsExample";
 
 const examples = [
@@ -27,6 +29,11 @@ const examples = [
     component: BunnymarkExample,
   },
   {
+    name: "Bunnymark (using custom components)",
+    slug: "custombunnymark",
+    component: CustomBunnymarkExample,
+  },
+  {
     name: "Canvas Props",
     slug: "canvasprops",
     component: CanvasPropsExample,
@@ -35,6 +42,11 @@ const examples = [
     name: "Click",
     slug: "click",
     component: ClickExample,
+  },
+  {
+    name: "CustomPIXIComponent",
+    slug: "custompixicomponent",
+    component: CustomPIXIComponentExample,
   },
   {
     name: "Point-like props",
