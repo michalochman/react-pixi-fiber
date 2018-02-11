@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added missing `performance-now` dependency
 
 
-## [0.1.0] - 2018-01-05
+## 0.1.0 - 2018-01-05
 
 ### Added
 - Added `ReactPixiFiber` renderer
@@ -68,3 +68,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Sprite />` component
 - Added `<Text />` component
 - Added `<TilingSprite />` component
+
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.2...v0.2.3
+[0.2.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
