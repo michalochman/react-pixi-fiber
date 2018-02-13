@@ -33,15 +33,14 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.1",
-    "eslint": "^4.8.0",
+    "eslint": "^4.17.0",
     "eslint-config-fbjs": "^2.0.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^5.2.0",
-    "eslint-plugin-prettier": "^2.4.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-react": "^7.5.0",
+    "eslint-plugin-react": "^7.6.1",
     "prettier": "^1.9.2"
   },
   "scripts": {
