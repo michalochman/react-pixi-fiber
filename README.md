@@ -69,7 +69,7 @@ This example will render [`PIXI.Text`] object into a [Root Container] of PIXI Ap
 
 ## Installing
 
-The current version assumes [React](https://github.com/facebook/react) >16.0.0 and [PixiJS] >4.4.0
+The current version assumes [React] >16.0.0 and [PixiJS] >4.4.0
 
     yarn add react-pixi-fiber
 
@@ -141,6 +141,10 @@ Renders [`PIXI.Container`].
 
 Renders [`PIXI.Graphics`].
 
+#### `<ParticleContainer />`
+
+Renders [`PIXI.particles.ParticleContainer`].
+
 #### `<Sprite />`
 
 Renders [`PIXI.Sprite`].
@@ -156,6 +160,24 @@ Renders [`PIXI.Text`].
 #### `<BitmapText />`
 
 Renders [`PIXI.extras.BitmapText`].
+
+### Props
+
+[Similarly](https://reactjs.org/blog/2017/09/08/dom-attributes-in-react-16.html) to ReactDOM in React 16, 
+ReactPixiFiber is not ignoring unknown [`PIXI.DisplayObject`] members – they are all passed through. You can read 
+more about [Unknown Prop Warning](https://reactjs.org/warnings/unknown-prop.html)  in ReactDOM, however 
+ReactPixiFiber will not warn you about unknown members. 
+
+#### Setting values for Point and ObservablePoint types
+
+For setting properties on PixiJS types that are either [`PIXI.Point`]s or [`PIXI.ObservablePoint`]s you can use either 
+and array of integers or a comma-separated string of integers in the following forms: `[x,y]`, `"x,y"`, `[i]`, `"i"`. 
+
+In the case where two integers are provided, the first will be applied to the `x` coordinate and the second will be 
+applied to the `y` coordinate. In the case where a single integer if provided, it will be applied to both coordinates.
+
+You can still create your own PIXI `Point` or `ObservablePoint` objects and assign them directly to the property. 
+These won't actually replace the property but they will be applied using the original object's `.copy()` method.
 
 
 ## Testing
@@ -214,18 +236,23 @@ For helping me understand how to build an actual renderer.
 
 On which this renderer was initially based.
 
-### [React](https://github.com/facebook/react) Contributors
+### [React] Contributors
 
 For making an awesome project structure and documentation that is used in similar fashon here.
 
 
 [PixiJS]: https://github.com/pixijs/pixi.js
-[`react-pixi`]: https://github.com/Izzimach/react-pixi
-[`PIXI.Application`]: http://pixijs.download/release/docs/PIXI.Application.html
+[React]: https://github.com/facebook/react
 [Root Container]: http://pixijs.download/release/docs/PIXI.Application.html#stage
+[`PIXI.Application`]: http://pixijs.download/release/docs/PIXI.Application.html
 [`PIXI.Container`]: http://pixijs.download/release/docs/PIXI.Container.html
-[`PIXI.Graphics`]: http://pixijs.download/release/docs/PIXI.Graphics.html
-[`PIXI.Sprite`]: http://pixijs.download/release/docs/PIXI.Sprite.html
-[`PIXI.extras.TilingSprite`]: http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
-[`PIXI.Text`]: http://pixijs.download/release/docs/PIXI.Text.html
+[`PIXI.DisplayObject`]: http://pixijs.download/release/docs/PIXI.DisplayObject.html 
 [`PIXI.extras.BitmapText`]: http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
+[`PIXI.extras.TilingSprite`]: http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
+[`PIXI.Graphics`]: http://pixijs.download/release/docs/PIXI.Graphics.html
+[`PIXI.ObservablePoint`]: http://pixijs.download/release/docs/PIXI.ObservablePoint.html
+[`PIXI.particles.ParticleContainer`]: http://pixijs.download/release/docs/PIXI.particles.ParticleContainer.html
+[`PIXI.Point`]: http://pixijs.download/release/docs/PIXI.Point.html
+[`PIXI.Sprite`]: http://pixijs.download/release/docs/PIXI.Sprite.html
+[`PIXI.Text`]: http://pixijs.download/release/docs/PIXI.Text.html
+[`react-pixi`]: https://github.com/Izzimach/react-pixi
