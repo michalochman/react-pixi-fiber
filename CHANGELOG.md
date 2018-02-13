@@ -8,9 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added parser for PIXI.Point-like props - Point-like DisplayObject members can now be assigned using string, number, array and Point/ObservablePoint
+
 ### Changed
 - Changed `<Stage />` to pass `options` prop to `PIXI.Application`
 - Changed `<Stage />` to pass not consumed props to rendered canvas
+- Changed inconsistent usage of reconciler config functions to use regular functions instead of anonymous arrow functions
+- Changed `PIXI.DisplayObject` members handling when passed as props - `undefined` values will now be replaced with default values if default defined
+
+### Fixed
+- Fixed deprecated usage of `PIXI.BitmapText` to `PIXI.extras.BitmapText`
 
 ### Removed
 - Removed `backgroundColor` prop from `<Stage />`
