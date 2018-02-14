@@ -5,6 +5,7 @@ import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
+import PixiViewport from "pixi-viewport";
 
 const RESERVED_PROPS = {
   children: true
@@ -17,7 +18,8 @@ const TYPES = {
   PARTICLE_CONTAINER: "ParticleContainer",
   SPRITE: "Sprite",
   TEXT: "Text",
-  TILING_SPRITE: "TilingSprite"
+  TILING_SPRITE: "TilingSprite",
+  VIEWPORT: "Viewport"
 };
 
 const UPDATE_SIGNAL = {};
@@ -140,6 +142,14 @@ const ReactPixiFiber = ReactFiberReconciler({
           props.width,
           props.height
         );
+        break;
+      case TYPES.VIEWPORT:
+        instance = new PixiViewport({
+          screenWidth: props.screenWidth,
+          screenHeight: props.screenHeight,
+          worldWidth: props.worldWidth,
+          worldHeight: props.worldHeight,
+        });
         break;
       default:
         break;
@@ -314,3 +324,4 @@ export const ParticleContainer = TYPES.PARTICLE_CONTAINER;
 export const Sprite = TYPES.SPRITE;
 export const Text = TYPES.TEXT;
 export const TilingSprite = TYPES.TILING_SPRITE;
+export const Viewport = TYPES.VIEWPORT;

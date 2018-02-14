@@ -6,6 +6,7 @@ import ExampleList from "../ExampleList/ExampleList";
 import BunnyExample from "../BunnyExample/BunnyExample";
 import BunnymarkExample from "../BunnymarkExample/BunnymarkExample";
 import ClickExample from "../ClickExample/ClickExample";
+import ViewportExample from "../ViewportExample/ViewportExample";
 
 const examples = [
   {
@@ -22,6 +23,11 @@ const examples = [
     name: "Click",
     slug: "click",
     component: ClickExample
+  },
+  {
+    name: "Viewport",
+    slug: "viewport",
+    component: ViewportExample
   }
 ];
 
