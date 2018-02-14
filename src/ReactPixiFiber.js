@@ -275,8 +275,9 @@ class Stage extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const { children, height, width } = this.props;
 
-    // TODO resize stage
+    // Root container has been resized - resize renderer
     if (height !== prevProps.height || width !== prevProps.width) {
+      this._app.renderer.resize(width, height);
     }
 
     ReactPixiFiber.updateContainer(children, this._mountNode, this);
