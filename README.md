@@ -99,7 +99,7 @@ to:
  
     import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
     // or
-    const ReactPIXI = require("react-pixi/react-pixi-alias");
+    const ReactPIXI = require("react-pixi-fiber/react-pixi-alias");
 
 ### Using `webpack` resolve `alias`
 
