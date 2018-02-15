@@ -187,7 +187,9 @@ ReactPixiFiber can recognize your custom components using API compatible with `r
 
 #### `customDisplayObject(props)`
 
-Use this to create an instance of [PIXI.DisplayObject](http://pixijs.download/release/docs/PIXI.DisplayObject.html). This is your entry point to custom components and the only required method.
+Use this to create an instance of [PIXI.DisplayObject]. 
+
+This is your entry point to custom components and the only required method. Can be also passed as `behavior` of type `function` to `CustomPIXIComponent`.
 
 #### `customApplyProps(displayObject, oldProps, newProps)` (optional)
 

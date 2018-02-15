@@ -260,6 +260,7 @@ const ReactPixiFiber = ReactFiberReconciler({
 
           if (typeof injectedType.customApplyProps === "function") {
             instance._customApplyProps = injectedType.customApplyProps.bind({
+              // See: https://github.com/Izzimach/react-pixi/blob/a25196251a13ed9bb116a8576d93e9fceac2a14c/src/ReactPIXI.js#L953
               applyDisplayObjectProps: defaultApplyProps.bind(null, instance),
             });
           }
