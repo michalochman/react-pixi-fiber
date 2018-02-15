@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Changed
+- Changed `<Stage />` to pass `options` prop to `PIXI.Application`
 - Changed `<Stage />` to pass not consumed props to rendered canvas
+
+### Removed
+- Removed `backgroundColor` prop from `<Stage />`
 
 
 ## [0.2.5] - 2018-02-11

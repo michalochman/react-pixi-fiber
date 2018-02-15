@@ -2,13 +2,19 @@ import React, { Component } from "react";
 import logo from "../logo.svg";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
-import ExampleList from "../ExampleList/ExampleList";
-import BunnyExample from "../BunnyExample/BunnyExample";
-import BunnymarkExample from "../BunnymarkExample/BunnymarkExample";
-import CanvasPropsExample from "../CanvasPropsExample/CanvasPropsExample";
-import ClickExample from "../ClickExample/ClickExample";
+import ExampleList from "../ExampleList";
+import ApplicationOptionsExample from "../ApplicationOptionsExample";
+import BunnyExample from "../BunnyExample";
+import BunnymarkExample from "../BunnymarkExample";
+import CanvasPropsExample from "../CanvasPropsExample";
+import ClickExample from "../ClickExample";
 
 const examples = [
+  {
+    name: "Application Options",
+    slug: "applicationoptions",
+    component: ApplicationOptionsExample
+  },
   {
     name: "Bunny",
     slug: "bunny",

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Stage } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
-import Bunny from "../Bunny/Bunny";
+import Bunny from "../Bunny";
 
 // Scale mode for all textures, will retain pixelation
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;

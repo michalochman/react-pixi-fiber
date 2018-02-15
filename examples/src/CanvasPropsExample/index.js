@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Stage } from "react-pixi-fiber";
-import Bunny from "../Bunny/Bunny";
+import Bunny from "../Bunny";
 
 class CanvasPropsExample extends Component {
   render() {
