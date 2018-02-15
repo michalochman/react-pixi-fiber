@@ -6,13 +6,7 @@ import bunny from "./bunny.png";
 const centerAnchor = new PIXI.Point(0.5, 0.5);
 
 function Bunny(props) {
-  return (
-    <Sprite
-      anchor={centerAnchor}
-      texture={PIXI.Texture.fromImage(bunny)}
-      {...props}
-    />
-  );
+  return <Sprite anchor={centerAnchor} texture={PIXI.Texture.fromImage(bunny)} {...props} />;
 }
 
 export default Bunny;

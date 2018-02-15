@@ -8,33 +8,39 @@ import BunnyExample from "../BunnyExample";
 import BunnymarkExample from "../BunnymarkExample";
 import CanvasPropsExample from "../CanvasPropsExample";
 import ClickExample from "../ClickExample";
+import PointsExample from "../PointsExample/PointsExample";
 
 const examples = [
   {
     name: "Application Options",
     slug: "applicationoptions",
-    component: ApplicationOptionsExample
+    component: ApplicationOptionsExample,
   },
   {
     name: "Bunny",
     slug: "bunny",
-    component: BunnyExample
+    component: BunnyExample,
   },
   {
     name: "Bunnymark",
     slug: "bunnymark",
-    component: BunnymarkExample
+    component: BunnymarkExample,
   },
   {
     name: "Canvas Props",
     slug: "canvasprops",
-    component: CanvasPropsExample
+    component: CanvasPropsExample,
   },
   {
     name: "Click",
     slug: "click",
-    component: ClickExample
-  }
+    component: ClickExample,
+  },
+  {
+    name: "Point-like props",
+    slug: "points",
+    component: PointsExample,
+  },
 ];
 
 class App extends Component {
@@ -47,18 +53,9 @@ class App extends Component {
         </header>
         <div className="App-intro">
           <Switch>
-            <Route
-              exact
-              path="/"
-              render={props => <ExampleList {...props} examples={examples} />}
-            />
+            <Route exact path="/" render={props => <ExampleList {...props} examples={examples} />} />
             {examples.map(example => (
-              <Route
-                key={example.slug}
-                exact
-                path={`/${example.slug}`}
-                component={example.component}
-              />
+              <Route key={example.slug} exact path={`/${example.slug}`} component={example.component} />
             ))}
           </Switch>
         </div>

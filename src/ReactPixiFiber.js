@@ -6,10 +6,40 @@ import invariant from "fbjs/lib/invariant";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
 
+// List of props that should be handled in a specific way
 const RESERVED_PROPS = {
-  children: true
+  children: true, // special handling in React
 };
 
+// List of default values for DisplayObject members
+const DEFAULT_PROPS = {
+  alpha: 1,
+  buttonMode: false,
+  cacheAsBitmap: false,
+  cursor: "auto",
+  filterArea: null,
+  filters: null,
+  hitArea: null,
+  interactive: false,
+  // localTransform  // readonly
+  mask: null,
+  // parent  // readonly
+  pivot: 0,
+  position: 0,
+  renderable: true,
+  rotation: 0,
+  scale: 1,
+  skew: 0,
+  transform: null,
+  visible: true,
+  // worldAlpha  // readonly
+  // worldTransform  // readonly
+  // worldVisible  // readonly
+  x: 0,
+  y: 0,
+};
+
+// List of types supported by ReactPixiFiber
 const TYPES = {
   BITMAP_TEXT: "BitmapText",
   CONTAINER: "Container",
@@ -17,7 +47,7 @@ const TYPES = {
   PARTICLE_CONTAINER: "ParticleContainer",
   SPRITE: "Sprite",
   TEXT: "Text",
-  TILING_SPRITE: "TilingSprite"
+  TILING_SPRITE: "TilingSprite",
 };
 
 const UPDATE_SIGNAL = {};
@@ -25,9 +55,20 @@ const UPDATE_SIGNAL = {};
 /* Render Methods */
 
 // TODO consider whitelisting props based on component type
-const applyProps = (instance, props, prevProps) => {
-  Object.assign(instance, filterByKey(props, filterReservedProps));
-};
+function applyProps(instance, props, prevProps) {
+  Object.keys(filterByKey(props, filterReservedProps)).forEach(propName => {
+    const value = props[propName];
+
+    // Set value if defined
+    if (typeof value !== "undefined") {
+      setPixiValue(instance, propName, value);
+    } else if (typeof instance[propName] !== "undefined" && typeof DEFAULT_PROPS[propName] !== "undefined") {
+      // Reset to default value (if it is defined) when display object had prop set and no longer has
+      console.warn(`setting DEFAULT PROP: ${propName} was ${instance[propName]} is ${value} for`, instance);
+      setPixiValue(instance, propName, DEFAULT_PROPS[propName]);
+    }
+  });
+}
 
 function render(pixiElement, stage, callback) {
   let container = stage._reactRootContainer;
@@ -41,14 +82,67 @@ function render(pixiElement, stage, callback) {
   ReactPixiFiber.injectIntoDevTools({
     findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
     bundleType: 1,
-    version: "0.2.0",
-    rendererPackageName: "react-pixi-fiber"
+    version: "0.2.5",
+    rendererPackageName: "react-pixi-fiber",
   });
+}
+
+/* Point related Methods */
+
+// Converts value to an array of coordinates
+function parsePoint(value) {
+  let arr = [];
+  if (typeof value === "string") {
+    arr = value.split(",");
+  } else if (typeof value === "number") {
+    arr = [value];
+  } else if (Array.isArray(value)) {
+    // shallow copy the array
+    arr = value.slice();
+  } else if (typeof value.x !== "undefined" && typeof value.y !== "undefined") {
+    arr = [value.x, value.y];
+  }
+
+  return arr.map(Number);
+}
+
+function isPointType(value) {
+  return value instanceof PIXI.Point || value instanceof PIXI.ObservablePoint;
+}
+
+// Set props on a DisplayObject by checking the type. If a PIXI.Point or
+// a PIXI.ObservablePoint is having its value set, then either a comma-separated
+// string with in the form of "x,y" or a size 2 array with index 0 being the x
+// coordinate and index 1 being the y coordinate.
+// See: https://github.com/Izzimach/react-pixi/blob/a25196251a13ed9bb116a8576d93e9fceac2a14c/src/ReactPIXI.js#L114
+function setPixiValue(instance, propName, value) {
+  if (isPointType(instance[propName]) && isPointType(value)) {
+    // Just copy the data if a Point type is being assigned to a Point type
+    instance[propName].copy(value);
+  } else if (isPointType(instance[propName])) {
+    // Parse value if a non-Point type is being assigned to a Point type
+    const coordinateData = parsePoint(value);
+
+    invariant(
+      typeof coordinateData !== "undefined" && coordinateData.length > 0 && coordinateData.length < 3,
+      "The property '%s' is a PIXI.Point or PIXI.ObservablePoint and must be set to a comma-separated string of " +
+        "either 1 or 2 coordinates, a 1 or 2 element array containing coordinates, or a PIXI Point/ObservablePoint. " +
+        "If only one coordinate is given then X and Y will be set to the provided value. Received: '%s' of type '%s'.",
+      propName,
+      JSON.stringify(value),
+      typeof value
+    );
+
+    instance[propName].set(coordinateData.shift(), coordinateData.shift());
+  } else {
+    // Just assign the value directly if a non-Point type is being assigned to a non-Point type
+    instance[propName] = value;
+  }
 }
 
 /* Helper Methods */
 
-const filterByKey = (inputObject, filter) => {
+function filterByKey(inputObject, filter) {
   const exportObject = {};
 
   Object.keys(inputObject)
@@ -58,7 +152,7 @@ const filterByKey = (inputObject, filter) => {
     });
 
   return exportObject;
-};
+}
 const filterProps = props => key => props.indexOf(key) === -1;
 const filterReservedProps = filterProps(Object.keys(RESERVED_PROPS));
 
@@ -71,17 +165,14 @@ function appendChild(parentInstance, child) {
   parentInstance.addChild(child);
 }
 
-const removeChild = (parentInstance, child) => {
+function removeChild(parentInstance, child) {
   parentInstance.removeChild(child);
 
   child.destroy();
-};
+}
 
-const insertBefore = (parentInstance, child, beforeChild) => {
-  invariant(
-    child !== beforeChild,
-    "ReactPixiFiber cannot insert node before itself"
-  );
+function insertBefore(parentInstance, child, beforeChild) {
+  invariant(child !== beforeChild, "ReactPixiFiber cannot insert node before itself");
 
   const childExists = parentInstance.children.indexOf(child) !== -1;
   const index = parentInstance.getChildIndex(beforeChild);
@@ -91,18 +182,11 @@ const insertBefore = (parentInstance, child, beforeChild) => {
   } else {
     parentInstance.addChildAt(child, index);
   }
-};
+}
 
-const commitUpdate = (
-  instance,
-  updatePayload,
-  type,
-  oldProps,
-  newProps,
-  internalInstanceHandle
-) => {
+function commitUpdate(instance, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
   applyProps(instance, newProps, oldProps);
-};
+}
 
 const ReactPixiFiber = ReactFiberReconciler({
   appendInitialChild: appendChild,
@@ -112,7 +196,7 @@ const ReactPixiFiber = ReactFiberReconciler({
 
     switch (type) {
       case TYPES.BITMAP_TEXT:
-        instance = new PIXI.BitmapText(props.text, props.style);
+        instance = new PIXI.extras.BitmapText(props.text, props.style);
         break;
       case TYPES.CONTAINER:
         instance = new PIXI.Container();
@@ -135,11 +219,7 @@ const ReactPixiFiber = ReactFiberReconciler({
         instance = new PIXI.Text(props.text, props.style, props.canvas);
         break;
       case TYPES.TILING_SPRITE:
-        instance = new PIXI.extras.TilingSprite(
-          props.texture,
-          props.width,
-          props.height
-        );
+        instance = new PIXI.extras.TilingSprite(props.texture, props.width, props.height);
         break;
       default:
         break;
@@ -152,66 +232,48 @@ const ReactPixiFiber = ReactFiberReconciler({
     return instance;
   },
 
-  createTextInstance(text, rootContainerInstance, internalInstanceHandle) {
-    invariant(
-      false,
-      "ReactPixiFiber does not support text instances. Use Text component instead."
-    );
+  createTextInstance: function(text, rootContainerInstance, internalInstanceHandle) {
+    invariant(false, "ReactPixiFiber does not support text instances. Use Text component instead.");
   },
 
-  finalizeInitialChildren: function(
-    pixiElement,
-    type,
-    props,
-    rootContainerInstance
-  ) {
+  finalizeInitialChildren: function(pixiElement, type, props, rootContainerInstance) {
     return false;
   },
 
-  getChildHostContext(parentHostContext, type) {
+  getChildHostContext: function(parentHostContext, type) {
     return emptyObject;
   },
 
-  getRootHostContext(rootContainerInstance) {
+  getRootHostContext: function(rootContainerInstance) {
     return emptyObject;
   },
 
-  getPublicInstance(inst) {
+  getPublicInstance: function(inst) {
     return inst;
   },
 
   now: now,
 
-  prepareForCommit() {
+  prepareForCommit: function() {
     // Noop
   },
 
-  prepareUpdate: function(
-    pixiElement,
-    type,
-    oldProps,
-    newProps,
-    rootContainerInstance,
-    hostContext
-  ) {
+  prepareUpdate: function(pixiElement, type, oldProps, newProps, rootContainerInstance, hostContext) {
     return UPDATE_SIGNAL;
   },
 
-  resetAfterCommit() {
+  resetAfterCommit: function() {
     // Noop
   },
 
-  resetTextContent(pixiElement) {
+  resetTextContent: function(pixiElement) {
     // Noop
   },
 
   shouldDeprioritizeSubtree: function(type, props) {
-    const isAlphaVisible =
-      typeof props.alpha === "undefined" || props.alpha > 0;
-    const isRenderable =
-      typeof props.renderable === "undefined" || props.renderable === true;
-    const isVisible =
-      typeof props.visible === "undefined" || props.visible === true;
+    const isAlphaVisible = typeof props.alpha === "undefined" || props.alpha > 0;
+    const isRenderable = typeof props.renderable === "undefined" || props.renderable === true;
+    const isVisible = typeof props.visible === "undefined" || props.visible === true;
 
     return !(isAlphaVisible && isRenderable && isVisible);
   },
@@ -232,24 +294,22 @@ const ReactPixiFiber = ReactFiberReconciler({
     removeChild: removeChild,
     removeChildFromContainer: removeChild,
 
-    commitTextUpdate: (textInstance, oldText, newText) => {
+    commitTextUpdate: function(textInstance, oldText, newText) {
       // Noop
     },
 
-    commitMount: (instance, type, newProps) => {
+    commitMount: function(instance, type, newProps) {
       // Noop
     },
 
-    commitUpdate: commitUpdate
-  }
+    commitUpdate: commitUpdate,
+  },
 });
 
 /* React Components */
 
 function validateCanvas(props, propName, componentName) {
-  const isCanvas =
-    props[propName] instanceof Element &&
-    typeof props[propName].getContext === "function";
+  const isCanvas = props[propName] instanceof Element && typeof props[propName].getContext === "function";
   if (!isCanvas) {
     const propType = typeof props[propName];
     return new Error(
@@ -276,21 +336,21 @@ const StagePropTypes = {
     sharedTicker: PropTypes.bool,
     transparent: PropTypes.bool,
     view: validateCanvas,
-    width: PropTypes.number
+    width: PropTypes.number,
   }),
   children: PropTypes.node,
   height: PropTypes.number,
-  width: PropTypes.number
+  width: PropTypes.number,
 };
 const StageChildContextTypes = {
-  app: PropTypes.object
+  app: PropTypes.object,
 };
 const filterStageProps = filterProps(Object.keys(StagePropTypes));
 
 class Stage extends React.Component {
   getChildContext() {
     return {
-      app: this._app
+      app: this._app,
     };
   }
 
@@ -299,7 +359,7 @@ class Stage extends React.Component {
 
     this._app = new PIXI.Application(width, height, {
       view: this._canvas,
-      ...options
+      ...options,
     });
 
     this._mountNode = ReactPixiFiber.createContainer(this._app.stage);
@@ -309,7 +369,7 @@ class Stage extends React.Component {
       findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
       bundleType: 1,
       version: "0.2.0",
-      rendererPackageName: "react-pixi-fiber"
+      rendererPackageName: "react-pixi-fiber",
     });
   }
 
@@ -333,7 +393,7 @@ class Stage extends React.Component {
     const canvasProps = filterByKey(this.props, filterStageProps);
 
     // Do not render anything if view is passed to options
-    if (options.view) {
+    if (typeof options !== "undefined" && options.view) {
       return null;
     } else {
       return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;

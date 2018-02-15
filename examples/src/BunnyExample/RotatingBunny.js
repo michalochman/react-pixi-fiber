@@ -5,7 +5,7 @@ import Bunny from "../Bunny";
 // http://pixijs.io/examples/#/basics/basic.js
 class RotatingBunny extends Component {
   state = {
-    rotation: 0
+    rotation: 0,
   };
 
   componentDidMount() {
@@ -22,7 +22,7 @@ class RotatingBunny extends Component {
     // creates frame-independent tranformation
     this.setState(state => ({
       ...state,
-      rotation: state.rotation + 0.1 * delta
+      rotation: state.rotation + 0.1 * delta,
     }));
   };
 
@@ -31,7 +31,7 @@ class RotatingBunny extends Component {
   }
 }
 RotatingBunny.contextTypes = {
-  app: PropTypes.object
+  app: PropTypes.object,
 };
 
 export default RotatingBunny;

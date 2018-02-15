@@ -8,6 +8,7 @@
     "react",
     "prettier"
   ],
+  "parser": "babel-eslint",
   "parserOptions": {
     "sourceType": "module",
     "ecmaFeatures": {
