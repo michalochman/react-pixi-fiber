@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added parser for PIXI.Point-like props - Point-like DisplayObject members can now be assigned using string, number, array and Point/ObservablePoint
+- Added support for custom components using `react-pixi` API
 
 ### Changed
 - Changed `<Stage />` to pass `options` prop to `PIXI.Application`

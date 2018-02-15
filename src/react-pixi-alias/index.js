@@ -5,6 +5,7 @@ import ReactDOM from "react-dom";
 // Note: ReactPIXI.factories and ReactPIXI.CustomPIXIComponent are not supported
 const ReactPIXI = {
   // Render methods
+  CustomPIXIComponent: ReactPixiFiber.CustomPIXIComponent,
   render: ReactDOM.render,
   unmountComponentAtNode: ReactDOM.unmountComponentAtNode,
   // Components

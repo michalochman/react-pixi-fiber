@@ -179,6 +179,79 @@ applied to the `y` coordinate. In the case where a single integer if provided, i
 You can still create your own PIXI `Point` or `ObservablePoint` objects and assign them directly to the property. 
 These won't actually replace the property but they will be applied using the original object's `.copy()` method.
 
+### Custom Components
+
+ReactPixiFiber can recognize your custom components using API compatible with `react-pixi`.
+
+`CustomPIXIComponent(behavior, type)` accepts a `behavior` object with the following 4 properties and a `type` string.
+
+#### `customDisplayObject(props)`
+
+Use this to create an instance of [PIXI.DisplayObject]. 
+
+This is your entry point to custom components and the only required method. Can be also passed as `behavior` of type `function` to `CustomPIXIComponent`.
+
+#### `customApplyProps(displayObject, oldProps, newProps)` (optional)
+
+Use this to apply `newProps` to your `Component` in a custom way.
+
+Note: this replaces the default method of transfering `props` to the specified `displayObject`. Call `this.applyDisplayObjectProps(oldProps,newProps)` inside your `customApplyProps` method if you want that.
+
+#### `customDidAttach(displayObject)` (optional)
+
+Use this to do something after `displayObject` is attached, which happens **after** `componentDidMount` lifecycle method.
+
+#### `customWillDetach(displayObject)` (optional)
+
+Use this to do something (usually cleanup) before detaching, which happens **before** `componentWillUnmount` lifecycle method.
+
+#### Simple Graphics example
+
+For example, this is how you could implement `Rectangle` component:
+```javascript
+// components/Rectangle.js
+import { CustomPIXIComponent } from "react-pixi-fiber";
+import * as PIXI from "pixi.js";
+
+const TYPE = "Rectangle";
+export const behavior = {
+  customDisplayObject: props => new PIXI.Graphics(),
+  customApplyProps: function(instance, oldProps, newProps) {
+    const { fill, x, y, width, height } = newProps;
+    if (typeof oldProps !== "undefined") {
+      instance.clear();
+    }
+    instance.beginFill(fill);
+    instance.drawRect(x, y, width, height);
+    instance.endFill();
+  }
+};
+export default CustomPIXIComponent(behavior, TYPE);
+```
+
+```jsx harmony
+// App.js
+import { render } from "react-pixi-fiber";
+import * as PIXI from "pixi.js";
+import Rectangle from "./components/Rectangle"
+
+// Setup PIXI.js Application
+const canvasElement = document.getElementById("container")
+const app = new PIXI.Application(800, 600, {
+  view: canvasElement
+});
+
+render(
+  <Rectangle
+    x={250}
+    y={200}
+    width={300}
+    height={200}
+    fill={0xFFFF00}
+  />, 
+  app.stage
+);
+```
 
 ## Testing
 
@@ -215,7 +288,7 @@ Read the contributing guide to learn about our development process, how to propo
 
 ### License
 
-React Fiber Pixi is [MIT licensed]((https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE)).
+ReactPixiFiber is [MIT licensed]((https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE)).
 
 
 ## Credits

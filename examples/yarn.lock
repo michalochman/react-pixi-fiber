@@ -5199,9 +5199,9 @@ react-error-overlay@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
 
-react-pixi-fiber@latest:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.2.2.tgz#ff28e71d9057d447dc0b27c34513b4f9feb59222"
+react-pixi-fiber@0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.2.5.tgz#28b567e0f7883673cf93e954bc495ad8c5c5abed"
   dependencies:
     performance-now "^2.1.0"
     react-reconciler "^0.7.0"

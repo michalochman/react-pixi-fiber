@@ -52,12 +52,20 @@ const TYPES = {
 
 const UPDATE_SIGNAL = {};
 
+/* Inject Methods */
+
+const INJECTED_TYPES = {};
+const injectType = (type, behavior) => {
+  INJECTED_TYPES[type] = behavior;
+  return type;
+};
+
 /* Render Methods */
 
 // TODO consider whitelisting props based on component type
-function applyProps(instance, props, prevProps) {
-  Object.keys(filterByKey(props, filterReservedProps)).forEach(propName => {
-    const value = props[propName];
+function defaultApplyProps(instance, oldProps, newProps) {
+  Object.keys(filterByKey(newProps, filterReservedProps)).forEach(propName => {
+    const value = newProps[propName];
 
     // Set value if defined
     if (typeof value !== "undefined") {
@@ -69,6 +77,14 @@ function applyProps(instance, props, prevProps) {
     }
   });
 }
+
+const applyProps = (instance, oldProps, newProps) => {
+  if (typeof instance._customApplyProps === "function") {
+    instance._customApplyProps(instance, oldProps, newProps);
+  } else {
+    defaultApplyProps(instance, oldProps, newProps);
+  }
+};
 
 function render(pixiElement, stage, callback) {
   let container = stage._reactRootContainer;
@@ -125,9 +141,9 @@ function setPixiValue(instance, propName, value) {
 
     invariant(
       typeof coordinateData !== "undefined" && coordinateData.length > 0 && coordinateData.length < 3,
-      "The property '%s' is a PIXI.Point or PIXI.ObservablePoint and must be set to a comma-separated string of " +
+      "The property `%s` is a PIXI.Point or PIXI.ObservablePoint and must be set to a comma-separated string of " +
         "either 1 or 2 coordinates, a 1 or 2 element array containing coordinates, or a PIXI Point/ObservablePoint. " +
-        "If only one coordinate is given then X and Y will be set to the provided value. Received: '%s' of type '%s'.",
+        "If only one coordinate is given then X and Y will be set to the provided value. Received: `%s` of type `%s`.",
       propName,
       JSON.stringify(value),
       typeof value
@@ -163,9 +179,16 @@ function appendChild(parentInstance, child) {
   parentInstance.removeChild(child);
 
   parentInstance.addChild(child);
+  if (typeof child._customDidAttach === "function") {
+    child._customDidAttach(child);
+  }
 }
 
 function removeChild(parentInstance, child) {
+  if (typeof child._customWillDetach === "function") {
+    child._customWillDetach(child);
+  }
+
   parentInstance.removeChild(child);
 
   child.destroy();
@@ -185,7 +208,7 @@ function insertBefore(parentInstance, child, beforeChild) {
 }
 
 function commitUpdate(instance, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
-  applyProps(instance, newProps, oldProps);
+  applyProps(instance, oldProps, newProps);
 }
 
 const ReactPixiFiber = ReactFiberReconciler({
@@ -222,12 +245,38 @@ const ReactPixiFiber = ReactFiberReconciler({
         instance = new PIXI.extras.TilingSprite(props.texture, props.width, props.height);
         break;
       default:
+        if (type in INJECTED_TYPES) {
+          const injectedType = INJECTED_TYPES[type];
+          let customDisplayObject;
+          if (typeof injectedType === "function") {
+            customDisplayObject = injectedType;
+          } else if (typeof injectedType.customDisplayObject === "function") {
+            customDisplayObject = injectedType.customDisplayObject;
+          }
+
+          invariant(customDisplayObject, "Invalid Component injected to ReactPixiFiber: `%s`.", type);
+
+          instance = customDisplayObject(props);
+
+          if (typeof injectedType.customApplyProps === "function") {
+            instance._customApplyProps = injectedType.customApplyProps.bind({
+              // See: https://github.com/Izzimach/react-pixi/blob/a25196251a13ed9bb116a8576d93e9fceac2a14c/src/ReactPIXI.js#L953
+              applyDisplayObjectProps: defaultApplyProps.bind(null, instance),
+            });
+          }
+          if (typeof injectedType.customDidAttach === "function") {
+            instance._customDidAttach = injectedType.customDidAttach;
+          }
+          if (typeof injectedType.customWillDetach === "function") {
+            instance._customWillDetach = injectedType.customWillDetach;
+          }
+        }
         break;
     }
 
-    invariant(instance, 'ReactPixiFiber does not support the type: "%s"', type);
+    invariant(instance, "ReactPixiFiber does not support the type: `%s`.", type);
 
-    applyProps(instance, props);
+    applyProps(instance, {}, props);
 
     return instance;
   },
@@ -404,9 +453,19 @@ class Stage extends React.Component {
 Stage.propTypes = StagePropTypes;
 Stage.childContextTypes = StageChildContextTypes;
 
+function CustomPIXIComponent(behavior, type) {
+  invariant(
+    typeof type === "string",
+    "Invalid argument `type` of type `%s` supplied to `CustomPIXIComponent`, expected `string`.",
+    typeof type
+  );
+
+  return injectType(type, behavior);
+}
+
 /* API */
 
-export { Stage, render };
+export { CustomPIXIComponent, Stage, render };
 
 export const BitmapText = TYPES.BITMAP_TEXT;
 export const Container = TYPES.CONTAINER;
