@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Changed `<Stage />` to pass not consumed props to rendered canvas
+
 
 ## [0.2.5] - 2018-02-11
 
