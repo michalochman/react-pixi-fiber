@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Bunny from "../Bunny/Bunny";
+import Bunny from "../Bunny";
 
 // http://pixijs.io/examples/#/basics/basic.js
 class RotatingBunny extends Component {

@@ -246,8 +246,38 @@ const ReactPixiFiber = ReactFiberReconciler({
 
 /* React Components */
 
+function validateCanvas(props, propName, componentName) {
+  const isCanvas =
+    props[propName] instanceof Element &&
+    typeof props[propName].getContext === "function";
+  if (!isCanvas) {
+    const propType = typeof props[propName];
+    return new Error(
+      `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`
+    );
+  }
+}
+
 const StagePropTypes = {
-  backgroundColor: PropTypes.number,
+  options: PropTypes.shape({
+    antialias: PropTypes.bool,
+    autoStart: PropTypes.bool,
+    backgroundColor: PropTypes.number,
+    clearBeforeRender: PropTypes.bool,
+    forceCanvas: PropTypes.bool,
+    forceFXAA: PropTypes.bool,
+    height: PropTypes.number,
+    legacy: PropTypes.bool,
+    powerPreference: PropTypes.string,
+    preserveDrawingBuffer: PropTypes.bool,
+    resolution: PropTypes.number,
+    roundPixels: PropTypes.bool,
+    sharedLoader: PropTypes.bool,
+    sharedTicker: PropTypes.bool,
+    transparent: PropTypes.bool,
+    view: validateCanvas,
+    width: PropTypes.number
+  }),
   children: PropTypes.node,
   height: PropTypes.number,
   width: PropTypes.number
@@ -265,11 +295,11 @@ class Stage extends React.Component {
   }
 
   componentDidMount() {
-    const { backgroundColor, children, height, width } = this.props;
+    const { children, height, options, width } = this.props;
 
     this._app = new PIXI.Application(width, height, {
-      backgroundColor: backgroundColor,
-      view: this._canvas
+      view: this._canvas,
+      ...options
     });
 
     this._mountNode = ReactPixiFiber.createContainer(this._app.stage);
@@ -299,9 +329,15 @@ class Stage extends React.Component {
   }
 
   render() {
+    const { options } = this.props;
     const canvasProps = filterByKey(this.props, filterStageProps);
 
-    return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
+    // Do not render anything if view is passed to options
+    if (options.view) {
+      return null;
+    } else {
+      return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
+    }
   }
 }
 

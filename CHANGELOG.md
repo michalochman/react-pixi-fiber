@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Changed
+- Changed `<Stage />` to pass `options` prop to `PIXI.Application`
 - Changed `<Stage />` to pass not consumed props to rendered canvas
 
 

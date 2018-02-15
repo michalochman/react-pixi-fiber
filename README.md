@@ -1,8 +1,8 @@
-# ReactPixiFiber – React Fiber renderer for PIXI.js
+# ReactPixiFiber – React Fiber renderer for PixiJS
 
-ReactPixiFiber is a JavaScript library for writing PIXI.js applications using React declarative style in React 16.
+ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16.
 
-For React <16.0.0 see [react-pixi](https://github.com/Izzimach/react-pixi).
+For React <16.0.0 see [`react-pixi`].
 
 ## Demo
 
@@ -25,14 +25,14 @@ function Bunny(props) {
 }
 
 render(
-  <Stage width={800} height={600}>
+  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
     <Bunny x={200} y={200} />
   </Stage>,
   document.getElementById("container")
 );
 ```
 
-This example will render PIXI.js [Sprite](http://pixijs.download/release/docs/PIXI.Sprite.html) object into a [root Container](http://pixijs.download/release/docs/PIXI.Application.html#stage) of PIXI Application on the page.
+This example will render [`PIXI.Sprite`] object into a [Root Container] of [`PIXI.Application`] on the page.
 
 The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html) is not required to use with this renderer, but it makes code more readable. You can use [Babel](https://babeljs.io/) with a [React preset](https://babeljs.io/docs/plugins/preset-react/) to convert JSX into native JavaScript.
 
@@ -43,9 +43,10 @@ The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html
 import { render, Text } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 
-// Setup PIXI.js Application
+// Setup PixiJS Application
 const canvasElement = document.getElementById("container")
 const app = new PIXI.Application(800, 600, {
+  backgroundColor: 0x10bb99,
   view: canvasElement
 });
 
@@ -55,7 +56,7 @@ render(
 );
 ```
 
-This example will render PIXI.js [Text](http://pixijs.download/release/docs/PIXI.Text.html) object into a [root Container](http://pixijs.download/release/docs/PIXI.Application.html#stage) of PIXI Application (created as `app`) inside the `<canvas id="container"></canvas>` element on the page.
+This example will render [`PIXI.Text`] object into a [Root Container] of PIXI Application (created as `app`) inside the `<canvas id="container"></canvas>` element on the page.
 
 
 ## Running Examples
@@ -68,7 +69,7 @@ This example will render PIXI.js [Text](http://pixijs.download/release/docs/PIXI
 
 ## Installing
 
-The current version assumes [React](https://github.com/facebook/react) >16.0.0 and [PIXI.js](https://github.com/pixijs/pixi.js) >4.4.0
+The current version assumes [React](https://github.com/facebook/react) >16.0.0 and [PixiJS] >4.4.0
 
     yarn add react-pixi-fiber
 
@@ -79,7 +80,7 @@ or
 This package works flawlessly with [Create React App](https://github.com/facebookincubator/create-react-app) – see examples above, they already use it.
 
 
-## Migrating from [`react-pixi`](https://github.com/Izzimach/react-pixi)
+## Migrating from [`react-pixi`]
 
 It is possible to use React Pixi Fiber as a drop-in replacement for `react-pixi`. 
 
@@ -118,38 +119,43 @@ React Pixi Fiber currently supports following components:
 
 #### `<Stage />`
 
-[Root Container](http://pixijs.download/release/docs/PIXI.Application.html#stage) of any [PIXI.js application](PIXIjs.download/release/docs/PIXI.Application.html).
+Renders [Root Container] of any [`PIXI.Application`].
+
+Expects the following props:
+* `width` (can be also passed in `options`),
+* `height` (can be also passed in `options`),
+* `options` - see [`PIXI.Application`] options.
 
 Provides the following context:
-* `app` – an instance of PIXI.js Application, with properties like:
-  * `loader` – Loader instance to help with asset loading
-  * `renderer` – WebGL or CanvasRenderer
-  * `ticker` – Ticker for doing render updates
-  * `view` – reference to the renderer's canvas element
+* `app` – an instance of PixiJS Application, with properties like:
+  * `loader` – Loader instance to help with asset loading,
+  * `renderer` – WebGL or CanvasRenderer,
+  * `ticker` – Ticker for doing render updates,
+  * `view` – reference to the renderer's canvas element.
 
 #### `<Container />`
 
-[PIXI.Container](http://pixijs.download/release/docs/PIXI.Container.html)
+Renders [`PIXI.Container`].
 
 #### `<Graphics />`
 
-[PIXI.Graphics](http://pixijs.download/release/docs/PIXI.Graphics.html)
+Renders [`PIXI.Graphics`].
 
 #### `<Sprite />`
 
-[PIXI.Sprite](http://pixijs.download/release/docs/PIXI.Sprite.html)
+Renders [`PIXI.Sprite`].
 
 #### `<TilingSprite />`
 
-[PIXI.extras.TilingSprite](http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html)
+Renders [`PIXI.extras.TilingSprite`].
 
 #### `<Text />`
 
-[PIXI.Text](http://pixijs.download/release/docs/PIXI.Text.html)
+Renders [`PIXI.Text`].
 
 #### `<BitmapText />`
 
-[PIXI.extras.BitmapText](http://pixijs.download/release/docs/PIXI.extras.BitmapText.html)
+Renders [`PIXI.extras.BitmapText`].
 
 
 ## Testing
@@ -171,7 +177,7 @@ Not yet.
 
 ## Contributing
 
-The main purpose of this repository is to be able to render PIXI.js objects inside React 16 Fiber architecture.
+The main purpose of this repository is to be able to render PixiJS objects inside React 16 Fiber architecture.
  
 Development of React Pixi Fiber happens in the open on GitHub, and I would be grateful to the community for any contributions, including bug reports and suggestions.
 
@@ -192,7 +198,7 @@ React Fiber Pixi is [MIT licensed]((https://github.com/michalochman/react-pixi-f
 
 ## Credits
 
-### [react-pixi](https://github.com/Izzimach/react-pixi)
+### [`react-pixi`]
 
 For making PIXI available in React for the first time.
 
@@ -211,3 +217,15 @@ On which this renderer was initially based.
 ### [React](https://github.com/facebook/react) Contributors
 
 For making an awesome project structure and documentation that is used in similar fashon here.
+
+
+[PixiJS]: https://github.com/pixijs/pixi.js
+[`react-pixi`]: https://github.com/Izzimach/react-pixi
+[`PIXI.Application`]: http://pixijs.download/release/docs/PIXI.Application.html
+[Root Container]: http://pixijs.download/release/docs/PIXI.Application.html#stage
+[`PIXI.Container`]: http://pixijs.download/release/docs/PIXI.Container.html
+[`PIXI.Graphics`]: http://pixijs.download/release/docs/PIXI.Graphics.html
+[`PIXI.Sprite`]: http://pixijs.download/release/docs/PIXI.Sprite.html
+[`PIXI.extras.TilingSprite`]: http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
+[`PIXI.Text`]: http://pixijs.download/release/docs/PIXI.Text.html
+[`PIXI.extras.BitmapText`]: http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
