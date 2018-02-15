@@ -15,7 +15,7 @@ const ReactPIXI = {
   Sprite: ReactPixiFiber.Sprite,
   Stage: ReactPixiFiber.Stage,
   Text: ReactPixiFiber.Text,
-  TilingSprite: ReactPixiFiber.TilingSprite
+  TilingSprite: ReactPixiFiber.TilingSprite,
 };
 
 export default ReactPIXI;

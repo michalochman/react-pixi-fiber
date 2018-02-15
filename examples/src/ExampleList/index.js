@@ -7,9 +7,9 @@ const propTypes = {
     PropTypes.shape({
       component: PropTypes.func.isRequired,
       name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired
+      slug: PropTypes.string.isRequired,
     })
-  )
+  ),
 };
 
 function ExampleList({ examples }) {

@@ -393,7 +393,7 @@ class Stage extends React.Component {
     const canvasProps = filterByKey(this.props, filterStageProps);
 
     // Do not render anything if view is passed to options
-    if (options.view) {
+    if (typeof options !== "undefined" && options.view) {
       return null;
     } else {
       return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
