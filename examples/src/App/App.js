@@ -5,6 +5,7 @@ import "./App.css";
 import ExampleList from "../ExampleList/ExampleList";
 import BunnyExample from "../BunnyExample/BunnyExample";
 import BunnymarkExample from "../BunnymarkExample/BunnymarkExample";
+import CanvasPropsExample from "../CanvasPropsExample/CanvasPropsExample";
 import ClickExample from "../ClickExample/ClickExample";
 
 const examples = [
@@ -17,6 +18,11 @@ const examples = [
     name: "Bunnymark",
     slug: "bunnymark",
     component: BunnymarkExample
+  },
+  {
+    name: "Canvas Props",
+    slug: "canvasprops",
+    component: CanvasPropsExample
   },
   {
     name: "Click",

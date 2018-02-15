@@ -27,3 +27,7 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.bordered {
+  border: 5px solid #222;
+}
