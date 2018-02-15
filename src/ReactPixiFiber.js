@@ -26,7 +26,7 @@ const UPDATE_SIGNAL = {};
 
 // TODO consider whitelisting props based on component type
 const applyProps = (instance, props, prevProps) => {
-  Object.assign(instance, filterByKey(props, filterProps));
+  Object.assign(instance, filterByKey(props, filterReservedProps));
 };
 
 function render(pixiElement, stage, callback) {
@@ -48,7 +48,7 @@ function render(pixiElement, stage, callback) {
 
 /* Helper Methods */
 
-export const filterByKey = (inputObject, filter) => {
+const filterByKey = (inputObject, filter) => {
   const exportObject = {};
 
   Object.keys(inputObject)
@@ -59,6 +59,10 @@ export const filterByKey = (inputObject, filter) => {
 
   return exportObject;
 };
+const filterProps = props => key => props.indexOf(key) === -1;
+const filterReservedProps = filterProps(Object.keys(RESERVED_PROPS));
+
+/* PIXI.js Renderer */
 
 function appendChild(parentInstance, child) {
   // TODO do we need to remove the child first if it's already added?
@@ -89,8 +93,6 @@ const insertBefore = (parentInstance, child, beforeChild) => {
   }
 };
 
-const filterProps = key => Object.keys(RESERVED_PROPS).indexOf(key) === -1;
-
 const commitUpdate = (
   instance,
   updatePayload,
@@ -101,8 +103,6 @@ const commitUpdate = (
 ) => {
   applyProps(instance, newProps, oldProps);
 };
-
-/* PIXI.js Renderer */
 
 const ReactPixiFiber = ReactFiberReconciler({
   appendInitialChild: appendChild,
@@ -246,6 +246,17 @@ const ReactPixiFiber = ReactFiberReconciler({
 
 /* React Components */
 
+const StagePropTypes = {
+  backgroundColor: PropTypes.number,
+  children: PropTypes.node,
+  height: PropTypes.number,
+  width: PropTypes.number
+};
+const StageChildContextTypes = {
+  app: PropTypes.object
+};
+const filterStageProps = filterProps(Object.keys(StagePropTypes));
+
 class Stage extends React.Component {
   getChildContext() {
     return {
@@ -288,20 +299,14 @@ class Stage extends React.Component {
   }
 
   render() {
-    return <canvas ref={ref => (this._canvas = ref)} />;
+    const canvasProps = filterByKey(this.props, filterStageProps);
+
+    return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
   }
 }
 
-Stage.propTypes = {
-  backgroundColor: PropTypes.number,
-  children: PropTypes.node,
-  height: PropTypes.number,
-  width: PropTypes.number
-};
-
-Stage.childContextTypes = {
-  app: PropTypes.object
-};
+Stage.propTypes = StagePropTypes;
+Stage.childContextTypes = StageChildContextTypes;
 
 /* API */
 
