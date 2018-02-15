@@ -98,7 +98,7 @@ function render(pixiElement, stage, callback) {
   ReactPixiFiber.injectIntoDevTools({
     findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
     bundleType: 1,
-    version: "0.2.5",
+    version: "0.3.0",
     rendererPackageName: "react-pixi-fiber",
   });
 }
