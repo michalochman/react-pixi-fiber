@@ -27,7 +27,7 @@ const behavior = {
     instance.off("mousedown", this.dragStart);
     instance.off("mouseup", this.dragStop);
     instance.off("mousemove", this.drag);
-  }
+  },
 };
 
 export default CustomPIXIComponent(behavior, TYPE);

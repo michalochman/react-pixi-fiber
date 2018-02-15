@@ -10,6 +10,6 @@ export const behavior = {
     }
 
     this.applyDisplayObjectProps(oldProps, newProps);
-  }
+  },
 };
 export default CustomPIXIComponent(behavior, PARTICLE);

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { ParticleContainer, Sprite, Text } from "react-pixi-fiber";
 import Stats from "stats.js/src/Stats";
 import * as PIXI from "pixi.js";
-import Particle from "./Particle"
+import Particle from "./Particle";
 import bunnys from "./bunnys.png";
 
 const maxSize = 200000;
@@ -20,7 +20,7 @@ const particleContainerProperties = {
   position: true,
   rotation: false,
   uvs: false,
-  tint: false
+  tint: false,
 };
 
 const generateBunny = texture => ({
@@ -58,7 +58,7 @@ class CustomBunnymark extends Component {
   state = {
     bunnys: [],
     currentTexture: 0,
-    isAdding: false
+    isAdding: false,
   };
 
   componentDidMount() {
@@ -66,32 +66,17 @@ class CustomBunnymark extends Component {
     document.body.appendChild(this.stats.domElement);
 
     const bunnyTextures = new PIXI.Texture.fromImage(bunnys);
-    const bunny1 = new PIXI.Texture(
-      bunnyTextures.baseTexture,
-      new PIXI.Rectangle(2, 47, 26, 37)
-    );
-    const bunny2 = new PIXI.Texture(
-      bunnyTextures.baseTexture,
-      new PIXI.Rectangle(2, 86, 26, 37)
-    );
-    const bunny3 = new PIXI.Texture(
-      bunnyTextures.baseTexture,
-      new PIXI.Rectangle(2, 125, 26, 37)
-    );
-    const bunny4 = new PIXI.Texture(
-      bunnyTextures.baseTexture,
-      new PIXI.Rectangle(2, 164, 26, 37)
-    );
-    const bunny5 = new PIXI.Texture(
-      bunnyTextures.baseTexture,
-      new PIXI.Rectangle(2, 2, 26, 37)
-    );
+    const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
+    const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
+    const bunny3 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37));
+    const bunny4 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 164, 26, 37));
+    const bunny5 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 2, 26, 37));
 
     this.bunnyTextures = [bunny1, bunny2, bunny3, bunny4, bunny5];
     const currentTexture = 2;
     this.setState({
       bunnys: [generateBunny(currentTexture), generateBunny(currentTexture)],
-      currentTexture: currentTexture
+      currentTexture: currentTexture,
     });
 
     this.context.app.ticker.add(this.animate);
@@ -119,7 +104,7 @@ class CustomBunnymark extends Component {
       this.setState({ bunnys: newBunnys });
     }
 
-    this.particleContainer.children.forEach(bunny => bunny.update(bunny))
+    this.particleContainer.children.forEach(bunny => bunny.update(bunny));
   };
 
   handlePointerDown = () => {
@@ -128,7 +113,7 @@ class CustomBunnymark extends Component {
 
   handlePointerUp = () => {
     this.setState(state => ({
-      currentTexture: (state.currentTexture + 1) % 5
+      currentTexture: (state.currentTexture + 1) % 5,
     }));
 
     this.setState({ isAdding: false });
@@ -140,7 +125,7 @@ class CustomBunnymark extends Component {
     return (
       <Fragment>
         <ParticleContainer
-          ref={c => this.particleContainer = c}
+          ref={c => (this.particleContainer = c)}
           maxSize={maxSize}
           properties={particleContainerProperties}
         >
@@ -155,12 +140,7 @@ class CustomBunnymark extends Component {
             />
           ))}
         </ParticleContainer>
-        <Text
-          text={`${bunnys.length} BUNNIES`}
-          style={{ fill: 0xffff00, fontSize: 14 }}
-          x={5}
-          y={5}
-        />
+        <Text text={`${bunnys.length} BUNNIES`} style={{ fill: 0xffff00, fontSize: 14 }} x={5} y={5} />
         {/* ParticleContainer and its children cannot be interactive
             so here's a clickable hit area */}
         <Sprite
@@ -176,7 +156,7 @@ class CustomBunnymark extends Component {
   }
 }
 CustomBunnymark.contextTypes = {
-  app: PropTypes.object
+  app: PropTypes.object,
 };
 
 export default CustomBunnymark;

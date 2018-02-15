@@ -12,7 +12,7 @@ export const behavior = {
     instance.beginFill(fill);
     instance.drawRect(x, y, width, height);
     instance.endFill();
-  }
+  },
 };
 
 export default CustomPIXIComponent(behavior, TYPE);

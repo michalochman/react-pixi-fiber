@@ -1,48 +1,43 @@
 import React, { Component } from "react";
 import { Stage, Text } from "react-pixi-fiber";
-import DraggableContainer from "./DraggableContainer"
-import Rect from "./Rect"
+import DraggableContainer from "./DraggableContainer";
+import Rect from "./Rect";
 
-const colors = [
-  0xFF00FF,
-  0x00FFFF,
-]
-const positions = [
-  { x: 300, y: 200 },
-  { x: 400, y: 200 },
-  { x: 400, y: 300 },
-  { x: 300, y: 300 },
-]
+const COLORS = [0xff00ff, 0x00ffff];
+const POSITIONS = [{ x: 300, y: 200 }, { x: 400, y: 200 }, { x: 400, y: 300 }, { x: 300, y: 300 }];
+const OPTIONS = {
+  backgroundColor: 0x1099bb,
+};
 
 class CustomComponentExample extends Component {
   state = {
     color: 0,
     position: 0,
-  }
+  };
 
   componentDidMount = () => {
     setInterval(() => {
       this.setState(state => ({
         ...state,
-        color: (state.color + 1) % colors.length,
-        position: (state.position + 1) % positions.length
+        color: (state.color + 1) % COLORS.length,
+        position: (state.position + 1) % POSITIONS.length,
       }));
     }, 2000);
-  }
+  };
 
   render() {
     return (
-      <Stage width={800} height={600} backgroundColor={0x1099bb}>
+      <Stage width={800} height={600} options={OPTIONS}>
         <DraggableContainer>
-          <Rect x={0} y={0} width={100} height={100} fill={0xFFFF00} />
+          <Rect x={0} y={0} width={100} height={100} fill={0xffff00} />
           <Text text={"drag\nme\nnow"} style={{ fontSize: 20 }} x={10} y={10} />
         </DraggableContainer>
         <Rect
-          x={positions[this.state.position].x}
-          y={positions[this.state.position].y}
+          x={POSITIONS[this.state.position].x}
+          y={POSITIONS[this.state.position].y}
           width={100}
           height={100}
-          fill={colors[this.state.color]}
+          fill={COLORS[this.state.color]}
         />
       </Stage>
     );
