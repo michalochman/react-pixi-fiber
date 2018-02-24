@@ -359,7 +359,7 @@ const ReactPixiFiber = ReactFiberReconciler({
 
 function validateCanvas(props, propName, componentName) {
   const isCanvas = props[propName] instanceof Element && typeof props[propName].getContext === "function";
-  if (!isCanvas) {
+  if (!isCanvas && typeof props[propName] !== "undefined") {
     const propType = typeof props[propName];
     return new Error(
       `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`
