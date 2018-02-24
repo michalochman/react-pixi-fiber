@@ -3,6 +3,7 @@ import logo from "../logo.svg";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
 import ExampleList from "../ExampleList";
+import AnimatedExample from "../AnimatedExample";
 import ApplicationOptionsExample from "../ApplicationOptionsExample";
 import BunnyExample from "../BunnyExample";
 import BunnymarkExample from "../BunnymarkExample";
@@ -13,6 +14,11 @@ import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import PointsExample from "../PointsExample/PointsExample";
 
 const examples = [
+  {
+    name: "Animated",
+    slug: "animated",
+    component: AnimatedExample,
+  },
   {
     name: "Application Options",
     slug: "applicationoptions",
