@@ -8,8 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.3.1] - 2018-02-25
+
 ### Fixed
-- Added `react-pixi-alias.js` file to distributed package `files` list
+- Fixed PropTypes warning in Stage ([#34])
+- Added `react-pixi-alias.js` file to distributed package `files` list ([#37])
 
 
 ## [0.3.0] - 2018-02-15
@@ -92,7 +96,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.5...v0.3.0
 [0.2.5]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.3...v0.2.4
@@ -102,12 +107,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#37]: https://github.com/michalochman/react-pixi-fiber/pull/37
+[#34]: https://github.com/michalochman/react-pixi-fiber/pull/34
 [#30]: https://github.com/michalochman/react-pixi-fiber/pull/31
-[#29]: https://github.com/michalochman/react-pixi-fiber/pull/29
-[#28]: https://github.com/michalochman/react-pixi-fiber/pull/28
-[#19]: https://github.com/michalochman/react-pixi-fiber/pull/19
-[#15]: https://github.com/michalochman/react-pixi-fiber/pull/15
-[#9]: https://github.com/michalochman/react-pixi-fiber/pull/9
-[#8]: https://github.com/michalochman/react-pixi-fiber/pull/8
-[#4]: https://github.com/michalochman/react-pixi-fiber/pull/4
-[#2]: https://github.com/michalochman/react-pixi-fiber/pull/2
+[#29]: https://github.com/michalochman/react-pixi-fiber/issues/29
+[#28]: https://github.com/michalochman/react-pixi-fiber/issues/28
+[#19]: https://github.com/michalochman/react-pixi-fiber/issues/19
+[#15]: https://github.com/michalochman/react-pixi-fiber/issues/15
+[#9]: https://github.com/michalochman/react-pixi-fiber/issues/9
+[#8]: https://github.com/michalochman/react-pixi-fiber/issues/8
+[#4]: https://github.com/michalochman/react-pixi-fiber/issues/4
+[#2]: https://github.com/michalochman/react-pixi-fiber/issues/2
