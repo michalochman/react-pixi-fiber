@@ -12,6 +12,7 @@
     "README.md",
     "index.d.ts",
     "index.js",
+    "react-pixi-alias.js",
     "cjs/",
     "src/"
   ],

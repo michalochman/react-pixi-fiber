@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Added `react-pixi-alias.js` file to distributed package `files` list
+
 
 ## [0.3.0] - 2018-02-15
 
