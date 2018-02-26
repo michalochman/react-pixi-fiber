@@ -9,6 +9,7 @@
 
 ### Additional info
 
+- react-pixi-fiber version: 
 - React version:
 - ReactDOM version:
 - PixiJS version:
