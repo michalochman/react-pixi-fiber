@@ -8,8 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.4.0] - 2018-02-28
+
 ### Fixed
 - Fixed DisplayObject members passed to Stage as props not being applied to root Container ([#38])
+
 
 ## [0.3.1] - 2018-02-25
 
@@ -98,7 +102,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.5...v0.3.0
 [0.2.5]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.4...v0.2.5
