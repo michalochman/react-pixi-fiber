@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed DisplayObject members passed to Stage as props not being applied to root Container ([#38])
 
 ## [0.3.1] - 2018-02-25
 
@@ -107,6 +109,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#38]: https://github.com/michalochman/react-pixi-fiber/issues/38
 [#37]: https://github.com/michalochman/react-pixi-fiber/pull/37
 [#34]: https://github.com/michalochman/react-pixi-fiber/pull/34
 [#30]: https://github.com/michalochman/react-pixi-fiber/pull/31

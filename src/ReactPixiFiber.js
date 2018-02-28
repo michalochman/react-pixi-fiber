@@ -52,6 +52,26 @@ const TYPES = {
 
 const UPDATE_SIGNAL = {};
 
+/* Helper Methods */
+
+const not = fn => (...args) => !fn(...args);
+
+const including = props => key => props.indexOf(key) !== -1;
+
+function filterByKey(inputObject, filter) {
+  const exportObject = {};
+
+  Object.keys(inputObject)
+    .filter(filter)
+    .forEach(key => {
+      exportObject[key] = inputObject[key];
+    });
+
+  return exportObject;
+}
+
+const includingReservedProps = including(Object.keys(RESERVED_PROPS));
+
 /* Inject Methods */
 
 const INJECTED_TYPES = {};
@@ -64,18 +84,20 @@ const injectType = (type, behavior) => {
 
 // TODO consider whitelisting props based on component type
 function defaultApplyProps(instance, oldProps, newProps) {
-  Object.keys(filterByKey(newProps, filterReservedProps)).forEach(propName => {
-    const value = newProps[propName];
+  Object.keys(newProps)
+    .filter(not(includingReservedProps))
+    .forEach(propName => {
+      const value = newProps[propName];
 
-    // Set value if defined
-    if (typeof value !== "undefined") {
-      setPixiValue(instance, propName, value);
-    } else if (typeof instance[propName] !== "undefined" && typeof DEFAULT_PROPS[propName] !== "undefined") {
-      // Reset to default value (if it is defined) when display object had prop set and no longer has
-      console.warn(`setting DEFAULT PROP: ${propName} was ${instance[propName]} is ${value} for`, instance);
-      setPixiValue(instance, propName, DEFAULT_PROPS[propName]);
-    }
-  });
+      // Set value if defined
+      if (typeof value !== "undefined") {
+        setPixiValue(instance, propName, value);
+      } else if (typeof instance[propName] !== "undefined" && typeof DEFAULT_PROPS[propName] !== "undefined") {
+        // Reset to default value (if it is defined) when display object had prop set and no longer has
+        console.warn(`setting DEFAULT PROP: ${propName} was ${instance[propName]} is ${value} for`, instance);
+        setPixiValue(instance, propName, DEFAULT_PROPS[propName]);
+      }
+    });
 }
 
 const applyProps = (instance, oldProps, newProps) => {
@@ -155,22 +177,6 @@ function setPixiValue(instance, propName, value) {
     instance[propName] = value;
   }
 }
-
-/* Helper Methods */
-
-function filterByKey(inputObject, filter) {
-  const exportObject = {};
-
-  Object.keys(inputObject)
-    .filter(filter)
-    .forEach(key => {
-      exportObject[key] = inputObject[key];
-    });
-
-  return exportObject;
-}
-const filterProps = props => key => props.indexOf(key) === -1;
-const filterReservedProps = filterProps(Object.keys(RESERVED_PROPS));
 
 /* PIXI.js Renderer */
 
@@ -394,7 +400,13 @@ const StagePropTypes = {
 const StageChildContextTypes = {
   app: PropTypes.object,
 };
-const filterStageProps = filterProps(Object.keys(StagePropTypes));
+
+const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS));
+const includingStageProps = including(Object.keys(StagePropTypes));
+const includingCanvasProps = key => !includingDisplayObjectProps(key) && !includingStageProps(key);
+
+const getCanvasProps = props => filterByKey(props, includingCanvasProps);
+const getDisplayObjectProps = props => filterByKey(props, includingDisplayObjectProps);
 
 class Stage extends React.Component {
   getChildContext() {
@@ -411,6 +423,10 @@ class Stage extends React.Component {
       ...options,
     });
 
+    // Apply root Container props
+    const stageProps = getDisplayObjectProps(this.props);
+    applyProps(this._app.stage, {}, stageProps);
+
     this._mountNode = ReactPixiFiber.createContainer(this._app.stage);
     ReactPixiFiber.updateContainer(children, this._mountNode, this);
 
@@ -424,6 +440,10 @@ class Stage extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { children, height, width } = this.props;
+
+    // Apply root Container props
+    const stageProps = getDisplayObjectProps(this.props);
+    applyProps(this._app.stage, {}, stageProps);
 
     // Root container has been resized - resize renderer
     if (height !== prevProps.height || width !== prevProps.width) {
@@ -439,7 +459,7 @@ class Stage extends React.Component {
 
   render() {
     const { options } = this.props;
-    const canvasProps = filterByKey(this.props, filterStageProps);
+    const canvasProps = getCanvasProps(this.props);
 
     // Do not render anything if view is passed to options
     if (typeof options !== "undefined" && options.view) {
