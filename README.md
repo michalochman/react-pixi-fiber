@@ -283,8 +283,12 @@ React Pixi Fiber has adopted a Contributor Covenant Code of Conduct that we expe
 
 Read the contributing guide to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to React Pixi Fiber.
 
+### Contact
 
-### License
+You can help others and discuss in our [gitter channel](https://gitter.im/react-pixi-fiber/Lobby).
+
+
+## License
 
 ReactPixiFiber is [MIT licensed]((https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE)).
 
