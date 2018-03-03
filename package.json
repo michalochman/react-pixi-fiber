@@ -1,21 +1,13 @@
 {
   "name": "react-pixi-fiber",
   "version": "0.4.0",
-  "description": "React Fiber renderer for PIXI.js",
+  "description": "React Fiber renderer for PixiJS",
   "main": "index.js",
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": "github:michalochman/react-pixi-fiber",
   "typings": "./index.d.ts",
-  "files": [
-    "LICENSE",
-    "README.md",
-    "index.d.ts",
-    "index.js",
-    "react-pixi-alias.js",
-    "cjs/",
-    "src/"
-  ],
+  "files": ["LICENSE", "README.md", "index.d.ts", "index.js", "react-pixi-alias.js", "cjs/", "src/"],
   "dependencies": {
     "fbjs": "^0.8.0",
     "performance-now": "^2.1.0",
@@ -29,30 +21,59 @@
   "devDependencies": {
     "@types/pixi.js": "^4.4.0",
     "@types/react": "^16.0.0",
-    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
+    "babel-jest": "^22.4.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.1",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
+    "codecov": "^3.0.0",
     "eslint": "^4.17.0",
-    "eslint-config-fbjs": "^2.0.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-react": "^7.6.1",
-    "prettier": "^1.9.2"
+    "jest": "^22.4.2",
+    "pixi.js": "^4.4.0",
+    "prettier": "^1.9.2",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-test-renderer": "^16.0.0",
+    "rollup": "^0.56.3",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-globals": "^1.1.0",
+    "rollup-plugin-node-resolve": "^3.0.3",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^3.0.0"
   },
   "scripts": {
-    "prebuild": "mkdir -p cjs",
-    "build": "npm run build:dev && npm run build:alias",
-    "build:alias": "babel src/react-pixi-alias/index.js -o cjs/react-pixi-alias.development.js",
-    "build:dev": "babel src/ReactPixiFiber.js -o cjs/react-pixi-fiber.development.js",
+    "build": "npm run build:prod && npm run build:dev",
+    "build:dev": "npm run build:index:dev && npm run build:alias:dev",
+    "build:prod": "npm run build:index:prod && npm run build:alias:prod",
+    "build:alias:dev": "NODE_ENV=development rollup -c config/rollup.alias.js",
+    "build:alias:prod": "rollup -c config/rollup.alias.js",
+    "build:index:dev": "NODE_ENV=development rollup -c config/rollup.index.js",
+    "build:index:prod": "rollup -c config/rollup.index.js",
     "eslint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
     "prepublish": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
+  },
+  "jest": {
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["lcov", "text-summary"],
+    "collectCoverageFrom": ["src/**/*.js"],
+    "globals": { "__DEV__": true },
+    "setupFiles": ["./test/jest.setupPixi.js"],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
   }
 }

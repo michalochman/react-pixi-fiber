@@ -1,22 +1,35 @@
-import * as ReactPixiFiber from "react-pixi-fiber";
+import * as ReactPixiFiber from "../index";
 import ReactDOM from "react-dom";
 
 // react-pixi like API
-// Note: ReactPIXI.factories and ReactPIXI.CustomPIXIComponent are not supported
+// Note: ReactPIXI.factories is not supported
+
+export const CustomPIXIComponent = ReactPixiFiber.CustomPIXIComponent;
+export const render = ReactDOM.render;
+export const unmountComponentAtNode = ReactDOM.unmountComponentAtNode;
+export const BitmapText = ReactPixiFiber.BitmapText;
+export const DisplayObjectContainer = ReactPixiFiber.Container;
+export const Graphics = ReactPixiFiber.Graphics;
+export const ParticleContainer = ReactPixiFiber.ParticleContainer;
+export const Sprite = ReactPixiFiber.Sprite;
+export const Stage = ReactPixiFiber.Stage;
+export const Text = ReactPixiFiber.Text;
+export const TilingSprite = ReactPixiFiber.TilingSprite;
+
 const ReactPIXI = {
   // Render methods
-  CustomPIXIComponent: ReactPixiFiber.CustomPIXIComponent,
-  render: ReactDOM.render,
-  unmountComponentAtNode: ReactDOM.unmountComponentAtNode,
+  CustomPIXIComponent,
+  render,
+  unmountComponentAtNode,
   // Components
-  BitmapText: ReactPixiFiber.BitmapText,
-  DisplayObjectContainer: ReactPixiFiber.Container,
-  Graphics: ReactPixiFiber.Graphics,
-  ParticleContainer: ReactPixiFiber.ParticleContainer,
-  Sprite: ReactPixiFiber.Sprite,
-  Stage: ReactPixiFiber.Stage,
-  Text: ReactPixiFiber.Text,
-  TilingSprite: ReactPixiFiber.TilingSprite,
+  BitmapText,
+  DisplayObjectContainer,
+  Graphics,
+  ParticleContainer,
+  Sprite,
+  Stage,
+  Text,
+  TilingSprite,
 };
 
 export default ReactPIXI;

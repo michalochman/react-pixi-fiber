@@ -1,13 +1,6 @@
 {
-  "extends": [
-    "plugin:react/recommended",
-    "prettier",
-    "prettier/react"
-  ],
-  "plugins": [
-    "react",
-    "prettier"
-  ],
+  "extends": ["plugin:react/recommended", "prettier", "prettier/react"],
+  "plugins": ["react", "prettier"],
   "parser": "babel-eslint",
   "parserOptions": {
     "sourceType": "module",
@@ -22,5 +15,8 @@
   },
   "rules": {
     "prettier/prettier": "error"
+  },
+  "globals": {
+    "__DEV__": false
   }
 }
