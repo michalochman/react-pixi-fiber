@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added unit tests ([#6])
+
+### Changed
+- Changed bundler from babel-cli to Rollup
+
 
 ## [0.4.0] - 2018-02-28
 
@@ -124,5 +130,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [#15]: https://github.com/michalochman/react-pixi-fiber/issues/15
 [#9]: https://github.com/michalochman/react-pixi-fiber/issues/9
 [#8]: https://github.com/michalochman/react-pixi-fiber/issues/8
+[#6]: https://github.com/michalochman/react-pixi-fiber/issues/6
 [#4]: https://github.com/michalochman/react-pixi-fiber/issues/4
 [#2]: https://github.com/michalochman/react-pixi-fiber/issues/2
