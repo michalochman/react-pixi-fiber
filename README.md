@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/github/license/michalochman/react-pixi-fiber.svg)](https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE)
 [![CircleCI](https://img.shields.io/circleci/project/github/michalochman/react-pixi-fiber/master.svg)](https://circleci.com/gh/michalochman/react-pixi-fiber/tree/master)
 [![codecov](https://img.shields.io/codecov/c/github/michalochman/react-pixi-fiber/master.svg)](https://codecov.io/gh/michalochman/react-pixi-fiber/branch/master)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![gitter](https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg)](https://gitter.im/react-pixi-fiber/Lobby)
 
 ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16.
