@@ -34,7 +34,7 @@ export function applyProps(instance, oldProps, newProps) {
   if (typeof instance._customApplyProps === "function") {
     instance._customApplyProps(instance, oldProps, newProps);
   } else {
-    module.exports.defaultApplyProps(instance, oldProps, newProps);
+    defaultApplyProps(instance, oldProps, newProps);
   }
 }
 
@@ -117,7 +117,7 @@ export function commitUpdate(instance, updatePayload, type, lastRawProps, nextRa
   const oldProps = filterByKey(lastRawProps, updatedPropKeys);
   const newProps = filterByKey(nextRawProps, updatedPropKeys);
 
-  module.exports.applyProps(instance, oldProps, newProps);
+  applyProps(instance, oldProps, newProps);
 }
 
 export function createInstance(type, props, internalInstanceHandle) {
@@ -187,7 +187,7 @@ export function prepareForCommit() {
 }
 
 export function prepareUpdate(pixiElement, type, oldProps, newProps, rootContainerInstance, hostContext) {
-  return module.exports.diffProps(pixiElement, type, oldProps, newProps, rootContainerInstance);
+  return diffProps(pixiElement, type, oldProps, newProps, rootContainerInstance);
 }
 
 export function resetAfterCommit() {
