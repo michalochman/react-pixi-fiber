@@ -9,7 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [0.4.1] - 2018-03-27
+## [0.4.2] - 2018-03-27
+
+### Fixed
+- Fixed cjs build
+
+
+## [0.4.1] - 2018-03-27 [YANKED]
 
 ### Added
 - Added unit tests ([#6])
@@ -114,7 +120,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.0...v0.3.1
