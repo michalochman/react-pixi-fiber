@@ -103,6 +103,24 @@ describe("ReactPixiFiber", () => {
     });
   });
 
+  describe("diffProps", () => {
+    it("returns null if props did not change", () => {
+      expect(ReactPixiFiber.diffProps({}, "Text", {}, {})).toBeNull();
+    });
+    it("returns changed prop keys and values list if props changed", () => {
+      const oldProps = { position: "0,0", scale: 2, text: "Hello World!" };
+      const newProps = { pivot: "0,0", scale: 2, text: "Goodbye World!" };
+      expect(ReactPixiFiber.diffProps({}, "Text", oldProps, newProps)).toEqual([
+        "position",
+        null,
+        "pivot",
+        "0,0",
+        "text",
+        "Goodbye World!",
+      ]);
+    });
+  });
+
   describe("appendChild", () => {
     const parent = {
       addChild: jest.fn(),
@@ -248,10 +266,11 @@ describe("ReactPixiFiber", () => {
       const instance = {};
       const oldProps = { answer: 42 };
       const newProps = { answer: 1337, scale: 2 };
-      ReactPixiFiber.commitUpdate(instance, {}, "type", oldProps, newProps);
+      const updatePayload = ["scale", 2];
+      ReactPixiFiber.commitUpdate(instance, updatePayload, "type", oldProps, newProps);
 
       expect(ReactPixiFiber.applyProps).toHaveBeenCalledTimes(1);
-      expect(ReactPixiFiber.applyProps).toHaveBeenCalledWith(instance, oldProps, newProps);
+      expect(ReactPixiFiber.applyProps).toHaveBeenCalledWith(instance, {}, { scale: 2 });
     });
   });
 
@@ -381,8 +400,28 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("prepareUpdate", () => {
-    it("returns UPDATE_SIGNAL", () => {
-      expect(ReactPixiFiber.prepareUpdate()).toEqual(ReactPixiFiber.UPDATE_SIGNAL);
+    const diffProps = ReactPixiFiber.diffProps;
+    const returnValue = ["scale", 2];
+
+    beforeAll(() => {
+      ReactPixiFiber.diffProps = jest.fn(() => returnValue);
+    });
+
+    afterAll(() => {
+      ReactPixiFiber.diffProps = diffProps;
+    });
+
+    it("calls diffProps", () => {
+      const instance = {};
+      const type = "type";
+      const oldProps = { answer: 42 };
+      const newProps = { answer: 1337, scale: 2 };
+      const rootContainerInstance = null;
+      const result = ReactPixiFiber.prepareUpdate(instance, type, oldProps, newProps, rootContainerInstance);
+
+      expect(ReactPixiFiber.diffProps).toHaveBeenCalledTimes(1);
+      expect(ReactPixiFiber.diffProps).toHaveBeenCalledWith(instance, type, oldProps, newProps, rootContainerInstance);
+      expect(result).toEqual(returnValue);
     });
   });
 

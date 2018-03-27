@@ -4,13 +4,11 @@ import invariant from "fbjs/lib/invariant";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
 import { createInjectedTypeInstance } from "./inject";
-import { DEFAULT_PROPS } from "./props";
+import { CHILDREN, DEFAULT_PROPS } from "./props";
 import { TYPES } from "./types";
-import { includingReservedProps, not, setPixiValue } from "./utils";
+import { filterByKey, including, includingReservedProps, not, setPixiValue } from "./utils";
 
 /* Render Methods */
-
-export const UPDATE_SIGNAL = {};
 
 // TODO consider whitelisting props based on component type
 export function defaultApplyProps(instance, oldProps, newProps) {
@@ -38,6 +36,44 @@ export function applyProps(instance, oldProps, newProps) {
   } else {
     module.exports.defaultApplyProps(instance, oldProps, newProps);
   }
+}
+
+// Calculate the diff between the two objects.
+// See: https://github.com/facebook/react/blob/97e2911/packages/react-dom/src/client/ReactDOMFiberComponent.js#L546
+export function diffProps(pixiElement, type, lastRawProps, nextRawProps, rootContainerElement) {
+  let updatePayload = null;
+
+  let lastProps = lastRawProps;
+  let nextProps = nextRawProps;
+  let propKey;
+
+  for (propKey in lastProps) {
+    if (nextProps.hasOwnProperty(propKey) || !lastProps.hasOwnProperty(propKey) || lastProps[propKey] == null) {
+      continue;
+    }
+    if (propKey === CHILDREN) {
+      // Noop. Text children not supported
+    } else {
+      // For all other deleted properties we add it to the queue. We use
+      // the whitelist in the commit phase instead.
+      (updatePayload = updatePayload || []).push(propKey, null);
+    }
+  }
+  for (propKey in nextProps) {
+    const nextProp = nextProps[propKey];
+    const lastProp = lastProps != null ? lastProps[propKey] : undefined;
+    if (!nextProps.hasOwnProperty(propKey) || nextProp === lastProp || (nextProp == null && lastProp == null)) {
+      continue;
+    }
+    if (propKey === CHILDREN) {
+      // Noop. Text children not supported
+    } else {
+      // For any other property we always add it to the queue and then we
+      // filter it out using the whitelist during the commit.
+      (updatePayload = updatePayload || []).push(propKey, nextProp);
+    }
+  }
+  return updatePayload;
 }
 
 /* PixiJS Renderer */
@@ -75,7 +111,12 @@ export function insertBefore(parentInstance, child, beforeChild) {
   }
 }
 
-export function commitUpdate(instance, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
+export function commitUpdate(instance, updatePayload, type, lastRawProps, nextRawProps, internalInstanceHandle) {
+  // updatePayload is in the form of [propKey1, propValue1, ...]
+  const updatedPropKeys = including(updatePayload.filter((item, i) => i % 2 === 0));
+  const oldProps = filterByKey(lastRawProps, updatedPropKeys);
+  const newProps = filterByKey(nextRawProps, updatedPropKeys);
+
   module.exports.applyProps(instance, oldProps, newProps);
 }
 
@@ -146,7 +187,7 @@ export function prepareForCommit() {
 }
 
 export function prepareUpdate(pixiElement, type, oldProps, newProps, rootContainerInstance, hostContext) {
-  return UPDATE_SIGNAL;
+  return module.exports.diffProps(pixiElement, type, oldProps, newProps, rootContainerInstance);
 }
 
 export function resetAfterCommit() {

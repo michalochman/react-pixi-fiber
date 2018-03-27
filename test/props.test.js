@@ -1,9 +1,14 @@
-import { DEFAULT_PROPS, RESERVED_PROPS } from "../src/props";
+import { CHILDREN, DEFAULT_PROPS, RESERVED_PROPS } from "../src/props";
 
 describe("props", () => {
+  describe("CHILDREN", () => {
+    it("equals `children`", () => {
+      expect(CHILDREN).toEqual("children");
+    });
+  });
   describe("RESERVED_PROPS", () => {
     it("contain `children`", () => {
-      expect(RESERVED_PROPS).toHaveProperty("children");
+      expect(RESERVED_PROPS).toHaveProperty(CHILDREN);
     });
   });
   describe("DEFAULT_PROPS", () => {

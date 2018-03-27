@@ -1,6 +1,8 @@
+export const CHILDREN = "children";
+
 // List of props that should be handled in a specific way
 export const RESERVED_PROPS = {
-  children: true, // special handling in React
+  [CHILDREN]: true, // special handling in React
 };
 
 // List of default values for DisplayObject members
