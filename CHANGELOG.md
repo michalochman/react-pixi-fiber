@@ -8,11 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.4.1] - 2018-03-27
+
 ### Added
 - Added unit tests ([#6])
 
 ### Changed
 - Changed bundler from babel-cli to Rollup
+
+### Fixed
+- Fixed `prepareUpdate` to return diff of props ([#43])
 
 
 ## [0.4.0] - 2018-02-28
@@ -108,7 +114,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.2.5...v0.3.0
@@ -120,6 +127,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#43]: https://github.com/michalochman/react-pixi-fiber/issues/43
 [#38]: https://github.com/michalochman/react-pixi-fiber/issues/38
 [#37]: https://github.com/michalochman/react-pixi-fiber/pull/37
 [#34]: https://github.com/michalochman/react-pixi-fiber/pull/34
