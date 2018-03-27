@@ -25,6 +25,7 @@
     "babel-eslint": "^8.2.1",
     "babel-jest": "^22.4.1",
     "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-rewire": "^1.1.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
@@ -70,7 +71,9 @@
     "coverageDirectory": "coverage",
     "coverageReporters": ["lcov", "text-summary"],
     "collectCoverageFrom": ["src/**/*.js"],
-    "globals": { "__DEV__": true },
+    "globals": {
+      "__DEV__": true
+    },
     "setupFiles": ["./test/jest.setupPixi.js"],
     "transform": {
       "^.+\\.js$": "babel-jest"

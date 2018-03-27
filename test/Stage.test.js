@@ -15,12 +15,11 @@ import Stage, {
 import { DEFAULT_PROPS } from "../src/props";
 
 jest.mock("../src/ReactPixiFiber", () => {
-  return {
-    ...require.requireActual("../src/ReactPixiFiber"),
+  return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
     createContainer: jest.fn(),
     injectIntoDevTools: jest.fn(),
     updateContainer: jest.fn(),
-  };
+  });
 });
 
 describe("Stage", () => {

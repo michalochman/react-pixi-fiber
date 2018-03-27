@@ -7,13 +7,12 @@ import render, { roots } from "../src/render";
 import Stage from "../src/Stage";
 
 jest.mock("../src/ReactPixiFiber", () => {
-  return {
-    ...require.requireActual("../src/ReactPixiFiber"),
+  return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
     createContainer: jest.fn(),
     getPublicRootInstance: jest.fn(),
     injectIntoDevTools: jest.fn(),
     updateContainer: jest.fn(),
-  };
+  });
 });
 
 describe("render", () => {

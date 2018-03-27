@@ -31,7 +31,7 @@
       ]
     },
     "test": {
-      "plugins": ["transform-object-rest-spread", "transform-react-jsx", "transform-es2015-modules-commonjs"]
+      "plugins": ["rewire", "transform-object-rest-spread", "transform-react-jsx", "transform-es2015-modules-commonjs"]
     }
   }
 }
