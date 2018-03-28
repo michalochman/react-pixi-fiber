@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed entry point to load module by env 
+- Fixed `commitUpdate` for `CustomPIXIComponents` ([#44])
+
 
 ## [0.4.2] - 2018-03-27
 
@@ -134,6 +138,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#44]: https://github.com/michalochman/react-pixi-fiber/issues/44
 [#43]: https://github.com/michalochman/react-pixi-fiber/issues/43
 [#38]: https://github.com/michalochman/react-pixi-fiber/issues/38
 [#37]: https://github.com/michalochman/react-pixi-fiber/pull/37
