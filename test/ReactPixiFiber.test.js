@@ -261,13 +261,29 @@ describe("ReactPixiFiber", () => {
 
     afterAll(() => {
       ReactPixiFiberRewireAPI.__ResetDependency__("applyProps");
+      ReactPixiFiberRewireAPI.__ResetDependency__("isInjectedType");
     });
 
-    it("calls applyProps", () => {
+    it("calls applyProps with all props for injected types", () => {
+      ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", jest.fn(() => true));
+
       const instance = {};
       const oldProps = { answer: 42 };
       const newProps = { answer: 1337, scale: 2 };
-      const updatePayload = ["scale", 2];
+      const updatePayload = ReactPixiFiber.diffProps(instance, "type", oldProps, newProps);
+      ReactPixiFiber.commitUpdate(instance, updatePayload, "type", oldProps, newProps);
+
+      expect(applyProps).toHaveBeenCalledTimes(1);
+      expect(applyProps).toHaveBeenCalledWith(instance, oldProps, newProps);
+    });
+
+    it("calls applyProps with only changed props for regular types", () => {
+      ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+
+      const instance = {};
+      const oldProps = { answer: 42 };
+      const newProps = { answer: 42, scale: 2 };
+      const updatePayload = ReactPixiFiber.diffProps(instance, "type", oldProps, newProps);
       ReactPixiFiber.commitUpdate(instance, updatePayload, "type", oldProps, newProps);
 
       expect(applyProps).toHaveBeenCalledTimes(1);

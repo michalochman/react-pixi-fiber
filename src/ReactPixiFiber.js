@@ -3,7 +3,7 @@ import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
-import { createInjectedTypeInstance } from "./inject";
+import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { CHILDREN, DEFAULT_PROPS } from "./props";
 import { TYPES } from "./types";
 import { filterByKey, including, includingReservedProps, not, setPixiValue } from "./utils";
@@ -112,11 +112,18 @@ export function insertBefore(parentInstance, child, beforeChild) {
 }
 
 export function commitUpdate(instance, updatePayload, type, lastRawProps, nextRawProps, internalInstanceHandle) {
+  // injected types need to have full control over passed props
+  if (isInjectedType(type)) {
+    applyProps(instance, lastRawProps, nextRawProps);
+    return;
+  }
+
   // updatePayload is in the form of [propKey1, propValue1, ...]
   const updatedPropKeys = including(updatePayload.filter((item, i) => i % 2 === 0));
   const oldProps = filterByKey(lastRawProps, updatedPropKeys);
   const newProps = filterByKey(nextRawProps, updatedPropKeys);
 
+  // regular components only receive props that have changed
   applyProps(instance, oldProps, newProps);
 }
 
