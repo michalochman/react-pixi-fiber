@@ -1,5 +1,5 @@
 import { injectType } from "../src/ReactPixiFiber";
-import { INJECTED_TYPES, createInjectedTypeInstance } from "../src/inject";
+import { INJECTED_TYPES, createInjectedTypeInstance, isInjectedType } from "../src/inject";
 
 jest.mock("../src/ReactPixiFiber");
 
@@ -96,6 +96,20 @@ describe("inject", () => {
 
       expect(instance._customDidAttach).toEqual(behavior.customDidAttach);
       expect(instance._customWillDetach).toEqual(behavior.customWillDetach);
+    });
+  });
+
+  describe("isInjectedType", () => {
+    it("returns true if type is injected", () => {
+      const inject = require("../src/inject");
+      const type = "INJECTED_TYPE";
+      const behavior = () => ({});
+      inject.injectType(type, behavior);
+
+      expect(inject.isInjectedType(type)).toBeTruthy();
+    });
+    it("returns false if type is not injected", () => {
+      expect(isInjectedType("NOT_INJECTED_TYPE")).toBeFalsy();
     });
   });
 });

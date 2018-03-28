@@ -39,3 +39,7 @@ export function createInjectedTypeInstance(type, props, internalInstanceHandle, 
 
   return instance;
 }
+
+export function isInjectedType(type) {
+  return typeof INJECTED_TYPES[type] !== "undefined";
+}
