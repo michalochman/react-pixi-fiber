@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.4.3] - 2018-03-28
+
 ### Fixed
 - Fixed entry point to load module by env 
 - Fixed `commitUpdate` for `CustomPIXIComponents` ([#44])
@@ -124,7 +127,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.3.1...v0.4.0
