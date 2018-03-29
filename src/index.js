@@ -2,9 +2,10 @@ import CustomPIXIComponent from "./CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage, { createStageClass } from "./Stage";
 import { TYPES } from "./types";
-import { usePixiApp, usePixiTicker, usePreviousProps, usePixiAppCreator } from "./hooks";
+import { usePixiApp, usePixiTicker } from "./hooks";
 import { createRender, createUnmount } from "./render";
-import { ReactPixiFiberAsPrimaryRenderer, applyProps, unstable_batchedUpdates } from "./ReactPixiFiber";
+import { ReactPixiFiberAsPrimaryRenderer, unstable_batchedUpdates } from "./ReactPixiFiber";
+import { applyDisplayObjectProps } from "./ReactPixiFiberComponent";
 
 const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 const unmount = createUnmount(ReactPixiFiberAsPrimaryRenderer);
@@ -16,14 +17,13 @@ export {
   AppProvider,
   CustomPIXIComponent,
   Stage,
-  applyProps,
+  applyDisplayObjectProps,
   createStageClass,
   render,
   unmount,
   withApp,
   usePixiApp,
   usePixiTicker,
-  usePixiAppCreator,
   unstable_batchedUpdates,
 };
 

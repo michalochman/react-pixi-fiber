@@ -2,11 +2,11 @@ import React from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
+import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
 import { __RewireAPI__ as ReactPixiFiberRewireAPI } from "../src/ReactPixiFiber";
+import { __RewireAPI__ as ReactPixiFiberUnknownPropertyHookRewireAPI } from "../src/ReactPixiFiberUnknownPropertyHook";
 import { createRender } from "../src/render";
-import { DEFAULT_PROPS } from "../src/props";
 import { TYPES } from "../src/types";
-import * as utils from "../src/utils";
 
 jest.mock("pixi.js", () => {
   return Object.assign({}, require.requireActual("pixi.js"), {
@@ -23,7 +23,6 @@ jest.mock("pixi.js", () => {
     },
   });
 });
-
 jest.mock("../src/utils", () => {
   return Object.assign({}, require.requireActual("../src/utils.js"), {
     setPixiValue: jest.fn(),
@@ -31,163 +30,6 @@ jest.mock("../src/utils", () => {
 });
 
 describe("ReactPixiFiber", () => {
-  describe("defaultApplyProps", () => {
-    const warning = jest.fn();
-    const PIXI = require.requireActual("pixi.js");
-
-    beforeEach(() => {
-      jest.resetAllMocks();
-      ReactPixiFiberRewireAPI.__Rewire__("warning", warning);
-    });
-
-    afterEach(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("warning");
-    });
-
-    it("sets values of non-reserved props only", () => {
-      const instance = new PIXI.Container();
-      const props = {
-        answer: 42,
-        children: [1, 2, 3],
-        foo: "bar",
-      };
-      ReactPixiFiber.defaultApplyProps(instance, {}, props);
-
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(2);
-      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "answer", props.answer);
-      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "foo", props.foo);
-      expect(utils.setPixiValue).not.toHaveBeenCalledWith(instance, "children", props.children);
-      expect(warning).not.toHaveBeenCalled();
-    });
-
-    it("sets default value when current value is defined, new value is undefined and default is available", () => {
-      const instance = new PIXI.Container();
-      instance.interactive = true;
-      const oldProps = {
-        interactive: true,
-      };
-      const newProps = {
-        interactive: undefined,
-      };
-      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
-
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(1);
-      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "interactive", DEFAULT_PROPS.interactive);
-      expect(warning).toHaveBeenCalledTimes(1);
-      expect(warning).toHaveBeenCalledWith(
-        false,
-        "setting default value: interactive was true is undefined for %O",
-        instance
-      );
-    });
-
-    it("sets default value when current value is defined, new value is not provided and default is available", () => {
-      const instance = new PIXI.Container();
-      instance.interactive = true;
-      const oldProps = {
-        interactive: true,
-      };
-      const newProps = {};
-      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
-
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(1);
-      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "interactive", DEFAULT_PROPS.interactive);
-      expect(warning).toHaveBeenCalledTimes(1);
-      expect(warning).toHaveBeenCalledWith(
-        false,
-        "setting default value: interactive was true is undefined for %O",
-        instance
-      );
-    });
-
-    it("has no effect  when current value is defined, new value is undefined and default is not available", () => {
-      const instance = new PIXI.Container();
-      instance.answer = 42;
-      const oldProps = {
-        answer: 42,
-      };
-      const newProps = {
-        answer: undefined,
-      };
-      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
-
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(0);
-      expect(warning).toHaveBeenCalledTimes(1);
-      expect(warning).toHaveBeenCalledWith(false, "ignoring prop: answer was 42 is undefined for %O", instance);
-    });
-
-    it("has no effect  when current value is defined, new value is undefined and default is not available", () => {
-      const instance = new PIXI.Container();
-      instance.answer = 42;
-      const oldProps = {
-        answer: 42,
-      };
-      const newProps = {};
-      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
-
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(0);
-      expect(warning).toHaveBeenCalledTimes(1);
-      expect(warning).toHaveBeenCalledWith(false, "ignoring prop: answer was 42 is undefined for %O", instance);
-    });
-  });
-
-  describe("applyProps", () => {
-    const defaultApplyProps = jest.fn();
-
-    beforeEach(() => {
-      ReactPixiFiberRewireAPI.__Rewire__("defaultApplyProps", defaultApplyProps);
-    });
-
-    afterEach(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("defaultApplyProps");
-    });
-
-    it("delegates to custom component if _customApplyProps is defined", () => {
-      const instance = {
-        _customApplyProps: jest.fn(),
-      };
-      const props = {
-        scale: 2,
-      };
-      ReactPixiFiber.applyProps(instance, {}, props);
-
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, {}, props);
-      expect(defaultApplyProps).not.toHaveBeenCalled();
-    });
-
-    it("delegates to defaultApplyProps if _customApplyProps is not defined", () => {
-      const instance = {};
-      const props = {
-        mask: null,
-        scale: 2,
-      };
-      ReactPixiFiber.applyProps(instance, {}, props);
-
-      expect(defaultApplyProps).toHaveBeenCalledTimes(1);
-      expect(defaultApplyProps).toHaveBeenCalledWith(instance, {}, props);
-    });
-  });
-
-  describe("diffProps", () => {
-    it("returns null if props did not change", () => {
-      expect(ReactPixiFiber.diffProps({}, "Text", {}, {})).toBeNull();
-    });
-
-    it("returns changed prop keys and values list if props changed", () => {
-      const oldProps = { position: "0,0", scale: 2, text: "Hello World!" };
-      const newProps = { pivot: "0,0", scale: 2, text: "Goodbye World!" };
-      expect(ReactPixiFiber.diffProps({}, "Text", oldProps, newProps)).toEqual([
-        "position",
-        null,
-        "pivot",
-        "0,0",
-        "text",
-        "Goodbye World!",
-      ]);
-    });
-  });
-
   describe("appendChild", () => {
     const parent = {
       addChild: jest.fn(),
@@ -313,141 +155,81 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("commitUpdate", () => {
-    const applyProps = jest.fn();
+    const type = "type";
+    const instance = {};
+    const updateProperties = jest.fn();
 
     afterEach(() => {
-      applyProps.mockReset();
+      updateProperties.mockReset();
     });
 
     beforeAll(() => {
-      ReactPixiFiberRewireAPI.__Rewire__("applyProps", applyProps);
+      ReactPixiFiberRewireAPI.__Rewire__("updateProperties", updateProperties);
     });
 
     afterAll(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("applyProps");
       ReactPixiFiberRewireAPI.__ResetDependency__("isInjectedType");
+      ReactPixiFiberRewireAPI.__ResetDependency__("updateProperties");
+      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("isInjectedType");
     });
 
-    it("calls applyProps with all props for injected types", () => {
-      ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", jest.fn(() => true));
+    it("calls updateProperties with all props for injected types", () => {
+      const isInjectedType = jest.fn(() => true);
+      ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", isInjectedType);
+      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("isInjectedType", isInjectedType);
 
-      const instance = {};
       const oldProps = { answer: 42 };
       const newProps = { answer: 1337, scale: 2 };
-      const updatePayload = ReactPixiFiber.diffProps(instance, "type", oldProps, newProps);
-      ReactPixiFiber.commitUpdate(instance, updatePayload, "type", oldProps, newProps);
+      const updatePayload = ReactPixiFiberComponent.diffProperties(type, instance, oldProps, newProps);
+      ReactPixiFiber.commitUpdate(instance, updatePayload, type, oldProps, newProps);
 
-      expect(applyProps).toHaveBeenCalledTimes(1);
-      expect(applyProps).toHaveBeenCalledWith(instance, oldProps, newProps);
+      expect(updateProperties).toHaveBeenCalledTimes(1);
+      expect(updateProperties).toHaveBeenCalledWith(type, instance, updatePayload, oldProps, newProps, undefined);
     });
 
-    it("calls applyProps with only changed props for regular types", () => {
+    it("calls updateProperties with only changed props for regular types", () => {
       ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
 
-      const instance = {};
-      const oldProps = { answer: 42 };
-      const newProps = { answer: 42, scale: 2 };
-      const updatePayload = ReactPixiFiber.diffProps(instance, "type", oldProps, newProps);
-      ReactPixiFiber.commitUpdate(instance, updatePayload, "type", oldProps, newProps);
+      const type = TYPES.TEXT;
+      const oldProps = { text: "42" };
+      const newProps = { text: "42", scale: 2 };
+      const updatePayload = ReactPixiFiberComponent.diffProperties(type, instance, oldProps, newProps);
+      ReactPixiFiber.commitUpdate(instance, updatePayload, type, oldProps, newProps);
 
-      expect(applyProps).toHaveBeenCalledTimes(1);
-      expect(applyProps).toHaveBeenCalledWith(instance, {}, { scale: 2 });
-    });
-  });
-
-  describe("createInstance", () => {
-    beforeEach(() => {
-      jest.resetAllMocks();
-    });
-
-    it("returns PIXI.BitmapText if type is BITMAP_TEXT", () => {
-      const text = "Hello World";
-      const style = { font: "16 Arial" };
-      ReactPixiFiber.createInstance(TYPES.BITMAP_TEXT, { text, style });
-
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);
-    });
-
-    it("returns PIXI.Container if type is CONTAINER", () => {
-      ReactPixiFiber.createInstance(TYPES.CONTAINER, {});
-
-      expect(PIXI.Container).toHaveBeenCalledTimes(1);
-      expect(PIXI.Container).toHaveBeenCalledWith();
-    });
-
-    it("returns PIXI.Graphics if type is GRAPHICS", () => {
-      ReactPixiFiber.createInstance(TYPES.GRAPHICS, {});
-
-      expect(PIXI.Graphics).toHaveBeenCalledTimes(1);
-      expect(PIXI.Graphics).toHaveBeenCalledWith();
-    });
-
-    it("returns PIXI.ParticleContainer if type is PARTICLE_CONTAINER", () => {
-      const maxSize = 1024;
-      const properties = { rotation: true };
-      const batchSize = 128;
-      const autoResize = false;
-      ReactPixiFiber.createInstance(TYPES.PARTICLE_CONTAINER, { autoResize, batchSize, maxSize, properties });
-
-      expect(PIXI.particles.ParticleContainer).toHaveBeenCalledTimes(1);
-      expect(PIXI.particles.ParticleContainer).toHaveBeenCalledWith(maxSize, properties, batchSize, autoResize);
-    });
-
-    it("returns PIXI.Sprite if type is SPRITE", () => {
-      const texture = "TEXTURE";
-      ReactPixiFiber.createInstance(TYPES.SPRITE, { texture });
-
-      expect(PIXI.Sprite).toHaveBeenCalledTimes(1);
-      expect(PIXI.Sprite).toHaveBeenCalledWith(texture);
-    });
-
-    it("returns PIXI.Text if type is TEXT", () => {
-      const text = "Hello World";
-      const style = { fontFamily: "Arial" };
-      const canvas = document.createElement("canvas");
-      ReactPixiFiber.createInstance(TYPES.TEXT, { text, style, canvas });
-
-      expect(PIXI.Text).toHaveBeenCalledTimes(1);
-      expect(PIXI.Text).toHaveBeenCalledWith(text, style, canvas);
-    });
-
-    it("returns PIXI.TilingSprite if type is TILING_SPRITE", () => {
-      const texture = "TEXTURE";
-      const height = 16;
-      const width = 32;
-      ReactPixiFiber.createInstance(TYPES.TILING_SPRITE, { height, texture, width });
-
-      expect(PIXI.extras.TilingSprite).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.TilingSprite).toHaveBeenCalledWith(texture, width, height);
-    });
-
-    it("returns injected instance if type was injected", () => {
-      const instance = {};
-      const createInjectedTypeInstance = jest.fn(() => instance);
-      ReactPixiFiberRewireAPI.__Rewire__("createInjectedTypeInstance", createInjectedTypeInstance);
-      expect(() => ReactPixiFiber.createInstance("INJECTED_TYPE", {})).not.toThrow();
-      ReactPixiFiberRewireAPI.__ResetDependency__("createInjectedTypeInstance");
-    });
-
-    it("throws if type is not supported", () => {
-      expect(() => ReactPixiFiber.createInstance("INJECTED_TYPE", {})).toThrow(
-        "ReactPixiFiber does not support the type: `INJECTED_TYPE`."
-      );
+      expect(updateProperties).toHaveBeenCalledTimes(1);
+      expect(updateProperties).toHaveBeenCalledWith(type, instance, updatePayload, oldProps, newProps, undefined);
     });
   });
 
   describe("createTextInstance", () => {
     it("throws", () => {
       expect(() => ReactPixiFiber.createTextInstance()).toThrow(
-        "ReactPixiFiber does not support text instances. Use Text component instead."
+        "ReactPixiFiber does not support text instances. Use `Text` component instead."
       );
     });
   });
 
   describe("finalizeInitialChildren", () => {
+    const instance = {};
+    const type = "type";
+    const props = {};
+    const rootContainerInstance = {};
+    const setInitialProperties = jest.fn();
+
+    afterEach(() => {
+      setInitialProperties.mockReset();
+    });
+
     it("returns false", () => {
-      expect(ReactPixiFiber.finalizeInitialChildren()).toBeFalsy();
+      expect(ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainerInstance)).toBeFalsy();
+    });
+
+    it("calls setInitialProperties", () => {
+      ReactPixiFiberRewireAPI.__Rewire__("setInitialProperties", setInitialProperties);
+      ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainerInstance);
+      expect(setInitialProperties).toHaveBeenCalledTimes(1);
+      expect(setInitialProperties).toHaveBeenCalledWith(type, instance, props, rootContainerInstance);
+      ReactPixiFiberRewireAPI.__ResetDependency__("setInitialProperties");
     });
   });
 
@@ -483,32 +265,31 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("prepareUpdate", () => {
+    const instance = {};
+    const type = "type";
     const returnValue = ["scale", 2];
-    const diffProps = jest.fn(() => returnValue);
+    const diffProperties = jest.fn(() => returnValue);
 
     afterEach(() => {
-      diffProps.mockReset();
+      diffProperties.mockReset();
     });
 
     beforeAll(() => {
-      ReactPixiFiberRewireAPI.__Rewire__("diffProps", diffProps);
+      ReactPixiFiberRewireAPI.__Rewire__("diffProperties", diffProperties);
     });
 
     afterAll(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("diffProps");
+      ReactPixiFiberRewireAPI.__ResetDependency__("diffProperties");
     });
 
-    it("calls diffProps", () => {
-      const instance = {};
-      const type = "type";
+    it("calls diffProperties", () => {
       const oldProps = { answer: 42 };
       const newProps = { answer: 1337, scale: 2 };
       const rootContainerInstance = null;
       const result = ReactPixiFiber.prepareUpdate(instance, type, oldProps, newProps, rootContainerInstance);
 
-      // expect(result).toEqual(returnValue);
-      expect(diffProps).toHaveBeenCalledTimes(1);
-      expect(diffProps).toHaveBeenCalledWith(instance, type, oldProps, newProps, rootContainerInstance);
+      expect(diffProperties).toHaveBeenCalledTimes(1);
+      expect(diffProperties).toHaveBeenCalledWith(type, instance, oldProps, newProps, rootContainerInstance);
     });
   });
 

@@ -1,6 +1,6 @@
 import invariant from "fbjs/lib/invariant";
 import * as PIXI from "pixi.js";
-import { RESERVED_PROPS } from "./props";
+import { getStackAddendum } from "./ReactGlobalSharedState";
 
 /* Helper Methods */
 
@@ -21,10 +21,6 @@ export function filterByKey(inputObject, filter) {
 
   return exportObject;
 }
-
-/* Concrete Helper Methods */
-
-export const includingReservedProps = including(Object.keys(RESERVED_PROPS));
 
 /* PIXI related Methods */
 
@@ -81,10 +77,9 @@ export function setPixiValue(instance, propName, value) {
       typeof coordinateData !== "undefined" && coordinateData.length > 0 && coordinateData.length < 3,
       "The property `%s` is a PIXI.Point or PIXI.ObservablePoint and must be set to a comma-separated string of " +
         "either 1 or 2 coordinates, a 1 or 2 element array containing coordinates, or a PIXI Point/ObservablePoint. " +
-        "If only one coordinate is given then X and Y will be set to the provided value. Received: `%s` of type `%s`.",
+        "If only one coordinate is given then X and Y will be set to the provided value.%s",
       propName,
-      JSON.stringify(value),
-      typeof value
+      getStackAddendum()
     );
 
     instance[propName].set(coordinateData.shift(), coordinateData.shift());

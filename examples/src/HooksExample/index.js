@@ -1,12 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { Stage, Text, usePixiTicker } from "react-pixi-fiber";
 import Circle from "../CustomPIXIComponentExample/Circle";
 import Rect from "../CustomPIXIComponentExample/Rect";
@@ -53,14 +45,14 @@ function useAnimatedValue({ direction, max, min, value }) {
 const AnimationContext = React.createContext();
 
 /**
- * implements `useContext`, `useLayoutEffect` and `useRef`.
+ * implements `useContext`, `useEffect` and `useRef`.
  */
 const Title = () => {
   const { title } = useContext(AnimationContext);
   const pixiText = useRef(null);
 
   // horizontally center the title's pivot point. this also works fine with `useEffect`.
-  useLayoutEffect(() => {
+  useEffect(() => {
     pixiText.current.pivot.set(pixiText.current.width / 2, 0);
   }, [title]);
 
@@ -94,13 +86,13 @@ const HooksExample = () => {
   if (typeof useState === "function") {
     return (
       <Stage width={800} height={600} options={{ backgroundColor: 0xff0000 }}>
-        <AnimationContext.Provider value={{ title: 'animation' }}>
+        <AnimationContext.Provider value={{ title: "animation" }}>
           <Animation />
         </AnimationContext.Provider>
       </Stage>
     );
   } else {
-    return(
+    return (
       <Stage width={800} height={600} options={{ backgroundColor: 0xff0000 }}>
         <Text text={`Sorry, your version of React (${React.version}) doesn't support hooks.`} x={0} y={500} />
       </Stage>

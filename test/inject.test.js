@@ -92,7 +92,7 @@ describe("inject", () => {
 
       context.applyDisplayObjectProps(oldProps, newProps);
       expect(applyDisplayObjectProps).toHaveBeenCalledTimes(1);
-      expect(applyDisplayObjectProps).toHaveBeenCalledWith(instance, oldProps, newProps);
+      expect(applyDisplayObjectProps).toHaveBeenCalledWith(type, instance, oldProps, newProps);
 
       expect(instance._customDidAttach).toEqual(behavior.customDidAttach);
       expect(instance._customWillDetach).toEqual(behavior.customWillDetach);

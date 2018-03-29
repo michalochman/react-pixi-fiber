@@ -28,7 +28,7 @@ class RotatingBunny extends Component {
   };
 
   render() {
-    const { step, ...props } = this.props;
+    const { app, step, ...props } = this.props;
     return <Bunny {...props} rotation={this.state.rotation} />;
   }
 }

@@ -56,12 +56,13 @@ describe("render", () => {
     render(element, root, callback);
 
     expect(ReactPixiFiber.injectIntoDevTools).toHaveBeenCalledTimes(1);
+
     expect(ReactPixiFiber.injectIntoDevTools).toHaveBeenCalledWith(
       expect.objectContaining({
         findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
-        bundleType: 1,
+        bundleType: __DEV__ ? 1 : 0,
         version: getDevToolsVersion(),
-        rendererPackageName: pkg.name,
+        rendererPackageName: __PACKAGE_NAME__,
       })
     );
   });

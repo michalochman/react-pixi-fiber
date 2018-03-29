@@ -10,7 +10,7 @@ class BunnyExample extends Component {
   render() {
     return (
       <Stage width={800} height={600} options={OPTIONS}>
-        <Container ref={c => (window.example = c)}>
+        <Container>
           <RotatingBunny x={400} y={300} texture={0} name="regular" step={0.1} />
           <RotatingBunny x={200} y={200} texture={1} name="cool" step={0.2} />
           <RotatingBunny x={200} y={400} texture={2} name="sport" step={-0.25} />
