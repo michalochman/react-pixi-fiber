@@ -16,7 +16,7 @@ class CustomComponentExample extends Component {
     position: 0,
   };
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.timer = setInterval(() => {
       this.setState(state => ({
         ...state,
@@ -24,7 +24,7 @@ class CustomComponentExample extends Component {
         position: (state.position + 1) % POSITIONS.length,
       }));
     }, 2000);
-  };
+  }
 
   componentWillUnmount() {
     clearInterval(this.timer);

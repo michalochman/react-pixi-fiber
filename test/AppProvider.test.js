@@ -5,8 +5,8 @@ import { AppContext, AppProvider, Container, withApp } from "../src";
 import { createStageClass, createStageFunction } from "../src/Stage";
 import { createRender } from "../src/render";
 import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
-import { __RewireAPI__ as HooksRewireAPI } from "../src/hooks";
-import { __RewireAPI__ as StageRewireAPI } from "../src/Stage";
+import { __RewireAPI__ as HooksRewireAPI } from "../src/Stage/hooks";
+import { __RewireAPI__ as StageRewireAPI } from "../src/Stage/legacy";
 import * as PIXI from "pixi.js";
 
 const render = createRender(ReactPixiFiberAsPrimaryRenderer);

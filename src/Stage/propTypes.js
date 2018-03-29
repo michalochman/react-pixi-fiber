@@ -1,30 +1,8 @@
 import PropTypes from "prop-types";
 import warning from "fbjs/lib/warning";
-import { filterByKey, including } from "./utils";
-import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
-import * as PIXI from "pixi.js";
-
-export function validateApp(props, propName, componentName) {
-  const app = props[propName];
-  if (typeof app === "undefined") {
-    return;
-  }
-
-  if (props.options != null) {
-    warning(
-      false,
-      `'options' property of '${componentName}' has no effect when 'app' property is provided. Only use 'app' or 'options', never both.`
-    );
-  }
-
-  const isPixiApplication = app instanceof PIXI.Application;
-  if (!isPixiApplication) {
-    const propType = typeof app;
-    return new Error(
-      `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected 'PIXI.Application'.`
-    );
-  }
-}
+import possibleStandardNames from "../possibleStandardNames";
+import { TYPES } from "../types";
+import { filterByKey, including } from "../utils";
 
 export function validateCanvas(props, propName, componentName) {
   // Let's assume that element is canvas if the element is Element and implements getContext
@@ -59,7 +37,6 @@ export function deprecated(propType, explanation) {
 }
 
 export const propTypes = {
-  app: validateApp,
   options: PropTypes.shape({
     antialias: PropTypes.bool,
     autoStart: PropTypes.bool,
@@ -84,9 +61,13 @@ export const propTypes = {
   width: deprecated(PropTypes.number, "Pass `height` in `options` prop instead."),
 };
 
-export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS).concat(EVENT_PROPS));
+export const defaultProps = {
+  options: {},
+};
+
+export const includingContainerProps = including(Object.keys(possibleStandardNames[TYPES.CONTAINER]));
 export const includingStageProps = including(Object.keys(propTypes));
-export const includingCanvasProps = key => !includingDisplayObjectProps(key) && !includingStageProps(key);
+export const includingCanvasProps = key => !includingContainerProps(key) && !includingStageProps(key);
 
 export const getCanvasProps = props => filterByKey(props, includingCanvasProps);
-export const getDisplayObjectProps = props => filterByKey(props, includingDisplayObjectProps);
+export const getContainerProps = props => filterByKey(props, includingContainerProps);

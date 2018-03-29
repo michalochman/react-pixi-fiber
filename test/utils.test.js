@@ -1,15 +1,5 @@
 import * as PIXI from "pixi.js";
-import {
-  filterByKey,
-  including,
-  includingReservedProps,
-  isPointType,
-  not,
-  parsePoint,
-  setPixiValue,
-  copyPoint,
-} from "../src/utils";
-import { RESERVED_PROPS } from "../src/props";
+import { filterByKey, including, isPointType, not, parsePoint, setPixiValue, copyPoint } from "../src/utils";
 
 describe("not", () => {
   it("returns a function", () => {
@@ -74,20 +64,6 @@ describe("including", () => {
     const notHavingBaz = ["foo", "bar"];
 
     expect(including(Object.keys(notHavingBaz))("baz")).toBeFalsy();
-  });
-});
-
-describe("includingReservedProps", () => {
-  it("returns true if prop is not one of DisplayObject members", () => {
-    Object.keys(RESERVED_PROPS).forEach(propName => {
-      expect(includingReservedProps(propName)).toBeTruthy();
-    });
-  });
-
-  it("returns false if prop is not one of RESERVED_PROPS", () => {
-    expect(includingReservedProps("anchor")).toBeFalsy();
-    expect(includingReservedProps("style")).toBeFalsy();
-    expect(includingReservedProps("width")).toBeFalsy();
   });
 });
 

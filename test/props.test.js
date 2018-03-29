@@ -1,20 +1,11 @@
-import { CHILDREN, DEFAULT_PROPS, RESERVED_PROPS, EVENT_PROPS } from "../src/props";
+import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
 
 describe("props", () => {
-  describe("CHILDREN", () => {
-    it("equals `children`", () => {
-      expect(CHILDREN).toEqual("children");
-    });
-  });
-  describe("RESERVED_PROPS", () => {
-    it("contain `children`", () => {
-      expect(RESERVED_PROPS).toHaveProperty(CHILDREN);
-    });
-  });
   describe("DEFAULT_PROPS", () => {
     it("should be an object defining default values for DisplayObject props", () => {
       expect(DEFAULT_PROPS).toEqual({
         alpha: 1,
+        anchor: 0,
         buttonMode: false,
         cacheAsBitmap: false,
         cursor: "auto",
@@ -29,6 +20,7 @@ describe("props", () => {
         rotation: 0,
         scale: 1,
         skew: 0,
+        tint: 0xffffff,
         transform: null,
         visible: true,
         x: 0,
@@ -41,7 +33,6 @@ describe("props", () => {
     it("should be a list containing all DisplayObject events", () => {
       expect(EVENT_PROPS).toEqual([
         "added",
-        "removed",
         "click",
         "mousedown",
         "mousemove",
@@ -57,6 +48,7 @@ describe("props", () => {
         "pointertap",
         "pointerup",
         "pointerupoutside",
+        "removed",
         "rightclick",
         "rightdown",
         "rightup",

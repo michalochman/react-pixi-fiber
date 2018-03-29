@@ -6,7 +6,7 @@ export const behavior = {
   customDisplayObject: props => new PIXI.Graphics(),
   customApplyProps: function(instance, oldProps, newProps) {
     const { fill, x, y, width, height, ...newPropsRest } = newProps;
-    const { fill: oldFill, x: oldX, y: oldY, width: oldWidth, height: oldHeight, ...oldPropsRest } = oldProps;
+    const { fill: oldFill, x: oldX, y: oldY, width: oldWidth, height: oldHeight, ...oldPropsRest } = oldProps || {};
     if (typeof oldProps !== "undefined") {
       instance.clear();
     }

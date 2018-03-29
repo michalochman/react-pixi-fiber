@@ -5,7 +5,7 @@ describe("ReactPixiFiber public API", () => {
     expect(ReactPixiFiber.AppContext).toBeDefined();
     expect(ReactPixiFiber.AppProvider).toBeDefined();
     expect(ReactPixiFiber.CustomPIXIComponent).toBeDefined();
-    expect(ReactPixiFiber.applyProps).toBeDefined();
+    expect(ReactPixiFiber.applyDisplayObjectProps).toBeDefined();
     expect(ReactPixiFiber.createStageClass).toBeDefined();
     expect(ReactPixiFiber.render).toBeDefined();
     expect(ReactPixiFiber.unmount).toBeDefined();
@@ -15,9 +15,8 @@ describe("ReactPixiFiber public API", () => {
 
   it("provides expected hooks", () => {
     expect(ReactPixiFiber.usePixiApp).toBeDefined();
-    expect(ReactPixiFiber.usePixiAppCreator).toBeDefined();
     expect(ReactPixiFiber.usePixiTicker).toBeDefined();
-  })
+  });
 
   it("provides expected components", () => {
     expect(ReactPixiFiber.BitmapText).toBeDefined();

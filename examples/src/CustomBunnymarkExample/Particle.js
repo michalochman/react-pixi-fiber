@@ -5,7 +5,7 @@ const PARTICLE = "Particle";
 export const behavior = {
   customDisplayObject: props => new PIXI.Sprite(props.texture),
   customApplyProps: function(instance, oldProps, newProps) {
-    if (Object.keys(oldProps).length !== 0) {
+    if (typeof oldProps !== "undefined" && Object.keys(oldProps).length === 0) {
       return;
     }
 

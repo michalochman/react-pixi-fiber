@@ -1,0 +1,20 @@
+{
+  "coverageDirectory": "coverage/dev",
+  "coverageReporters": ["json", "lcov", "text-summary"],
+  "collectCoverageFrom": ["src/**/*.js"],
+  "globals": {
+    "__DEV__": true
+  },
+  "moduleNameMapper": {
+    "pixi.js$": "pixi.js-legacy"
+  },
+  "rootDir": "..",
+  "setupFiles": [
+    "./config/jest/setupGlobals.js",
+    "./config/jest/setupPixi.js"
+  ],
+  "testEnvironment": "jest-environment-jsdom-with-canvas",
+  "transform": {
+    "^.+\\.js$": "babel-jest"
+  }
+}
