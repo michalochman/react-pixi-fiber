@@ -26,4 +26,4 @@ function render(element, containerTag, callback) {
   return ReactPixiFiber.getPublicRootInstance(root);
 }
 
-export default render
+export default render;

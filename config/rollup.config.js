@@ -8,10 +8,14 @@ const uglify = require("rollup-plugin-uglify");
 
 const NODE_ENV = process.env.NODE_ENV || "production";
 const isProduction = NODE_ENV === "production";
+const entries = (process.env.entry || "index,alias").split(",");
 
-const outputFile = isProduction ? "cjs/react-pixi-fiber.production.min.js" : "cjs/react-pixi-fiber.development.js";
+const getOutputFile = name => {
+  const suffix = isProduction ? "production.min" : "development";
+  return `cjs/${name}.${suffix}.js`;
+};
 
-const plugins = [
+const getPlugins = () => [
   json({
     preferConst: true,
     indent: "  ",
@@ -44,14 +48,33 @@ const plugins = [
   isProduction && uglify(),
 ];
 
-module.exports = {
-  input: "src/index.js",
-  output: {
-    file: outputFile,
-    name: "ReactPixiFiber",
-    exports: "named",
-    format: "cjs",
+const configs = {
+  index: {
+    input: "src/index.js",
+    output: {
+      file: getOutputFile("react-pixi-fiber"),
+      name: "ReactPixiFiber",
+      exports: "named",
+      format: "cjs",
+    },
+    plugins: getPlugins(),
+    external: ["pixi.js", "prop-types", "react", "react-dom"],
   },
-  plugins: plugins,
-  external: ["pixi.js", "react", "react-dom"],
+  alias: {
+    input: "src/react-pixi-alias/index.js",
+    output: {
+      file: getOutputFile("react-pixi-alias"),
+      name: "ReactPixiFiber",
+      exports: "named",
+      format: "cjs",
+    },
+    plugins: getPlugins(),
+    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
+  },
 };
+
+const config = Object.keys(configs)
+  .filter(key => entries.indexOf(key) !== -1)
+  .map(key => configs[key]);
+
+export default config;
