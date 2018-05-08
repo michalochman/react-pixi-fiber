@@ -13,6 +13,7 @@ import CustomBunnymarkExample from "../CustomBunnymarkExample";
 import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
+import Stats from "../Stats";
 
 const examples = [
   {
@@ -71,6 +72,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <Stats />
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">react-pixi-fiber Examples</h1>

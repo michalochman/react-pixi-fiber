@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import { ParticleContainer, Sprite, Text } from "react-pixi-fiber";
-import Stats from "stats.js/src/Stats";
 import * as PIXI from "pixi.js";
 import bunnys from "./bunnys.png";
 
@@ -67,9 +66,6 @@ class Bunnymark extends Component {
   };
 
   componentDidMount() {
-    this.stats = new Stats();
-    document.body.appendChild(this.stats.domElement);
-
     const bunnyTextures = new PIXI.Texture.fromImage(bunnys);
     const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
     const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
@@ -94,8 +90,6 @@ class Bunnymark extends Component {
   animate = () => {
     const { bunnys, currentTexture, isAdding } = this.state;
     const addedBunnys = [];
-
-    this.stats.update();
 
     if (isAdding) {
       if (bunnys.length < maxSize) {
