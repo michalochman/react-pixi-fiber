@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "animated": "^0.2.2",
-    "pixi.js": "^4.4.0",
+    "pixi-layers": "^0.1.9",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-pixi-fiber": "0.4.3",

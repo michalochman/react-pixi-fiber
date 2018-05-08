@@ -11,6 +11,7 @@ import CanvasPropsExample from "../CanvasPropsExample";
 import ClickExample from "../ClickExample";
 import CustomBunnymarkExample from "../CustomBunnymarkExample";
 import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
+import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
 
 const examples = [
@@ -53,6 +54,11 @@ const examples = [
     name: "CustomPIXIComponent",
     slug: "custompixicomponent",
     component: CustomPIXIComponentExample,
+  },
+  {
+    name: "Layers",
+    slug: "layers",
+    component: LayersExample,
   },
   {
     name: "Point-like props",
