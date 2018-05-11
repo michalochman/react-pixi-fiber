@@ -5,6 +5,7 @@ const globals = require("rollup-plugin-node-globals");
 const replace = require("rollup-plugin-replace");
 const resolve = require("rollup-plugin-node-resolve");
 const uglify = require("rollup-plugin-uglify");
+const visualizer = require("rollup-plugin-visualizer");
 
 const NODE_ENV = process.env.NODE_ENV || "production";
 const isProduction = NODE_ENV === "production";
@@ -46,6 +47,7 @@ const getPlugins = () => [
   }),
   globals(),
   isProduction && uglify(),
+  visualizer(),
 ];
 
 const configs = {
