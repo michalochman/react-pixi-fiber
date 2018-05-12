@@ -155,5 +155,5 @@ declare module 'react-pixi-fiber' {
      * The name of this custom component.
      */
     type: string
-  ): React.Component<T>;
+  ): string;
 }
