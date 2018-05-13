@@ -9,6 +9,7 @@ import {
   Stage,
   Text,
   TilingSprite,
+  CustomPIXIComponent
 } from 'react-pixi-fiber';
 
 const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
@@ -21,8 +22,16 @@ const CompositionExample: React.SFC = () => (
   </Container>
 );
 
+const AnimatedSprite: React.ReactType = CustomPIXIComponent({
+  customDisplayObject: (props: any) => new PIXI.extras.AnimatedSprite(props.textures),
+  customApplyProps: (animatedSprite: PIXI.extras.AnimatedSprite, oldProps: any, newProps: any) => {},
+  customDidAttach: (animatedSprite: PIXI.extras.AnimatedSprite) => {},
+  customWillDetach: (animatedSprite: PIXI.extras.AnimatedSprite) => {},
+}, 'AnimatedSprite');
+const CustomPIXIComponentExample: React.SFC = () => <AnimatedSprite />;
+
 const StageExample: React.SFC = () => (
-  <Stage>
+  <Stage options={{backgroundColor: 0xffffff}}>
     <BitmapText text="" />
     <Container>
       <BitmapText text="" />
