@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import * as React from 'react';
-import { CustomPIXIComponent } from '../../index';
 import {
   BitmapText,
   Container,
@@ -10,6 +9,7 @@ import {
   Stage,
   Text,
   TilingSprite,
+  CustomPIXIComponent
 } from 'react-pixi-fiber';
 
 const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
