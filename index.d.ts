@@ -113,7 +113,9 @@ declare module 'react-pixi-fiber' {
   export class TilingSprite extends React.Component<TilingSpriteProperties> {}
 
   /** `Stage` component properties." */
-  export interface StageProperties extends Component<PIXI.Container> {}
+  export interface StageProperties extends Component<PIXI.Container> {
+    options?: PIXI.ApplicationOptions
+  }
 
   /**
    * A component wrapper for `PIXI.Application`.
@@ -155,5 +157,5 @@ declare module 'react-pixi-fiber' {
      * The name of this custom component.
      */
     type: string
-  ): string;
+  ): React.ReactType<T>;
 }
