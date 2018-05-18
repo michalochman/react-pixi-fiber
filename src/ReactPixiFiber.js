@@ -240,7 +240,6 @@ const ReactPixiFiber = ReactFiberReconciler({
   resetTextContent: resetTextContent,
   shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
   shouldSetTextContent: shouldSetTextContent,
-  useSyncScheduling: true,
   mutation: {
     appendChild: appendChild,
     appendChildToContainer: appendChild,
