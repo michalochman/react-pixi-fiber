@@ -173,7 +173,7 @@ export function createTextInstance(text, rootContainerInstance, internalInstance
   invariant(false, "ReactPixiFiber does not support text instances. Use Text component instead.");
 }
 
-export function finalizeInitialChildren(pixiElement, type, props, rootContainerInstance) {
+export function finalizeInitialChildren(pixiElement, type, props, rootContainerInstance, hostContext) {
   return false;
 }
 
@@ -240,7 +240,6 @@ const ReactPixiFiber = ReactFiberReconciler({
   resetTextContent: resetTextContent,
   shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
   shouldSetTextContent: shouldSetTextContent,
-  useSyncScheduling: true,
   mutation: {
     appendChild: appendChild,
     appendChildToContainer: appendChild,
