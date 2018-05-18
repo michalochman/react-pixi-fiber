@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.4.5] - 2018-05-18
+
+### Changed
+- Updated `react-reconciler` to `0.10.0` (#53)
+
+
 ## [0.4.4] - 2018-05-09
 
 ### Fixed
@@ -133,7 +139,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.5...HEAD
+[0.4.5]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.1...v0.4.2
@@ -149,6 +156,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#53]: https://github.com/michalochman/react-pixi-fiber/pull/53
 [#44]: https://github.com/michalochman/react-pixi-fiber/issues/44
 [#43]: https://github.com/michalochman/react-pixi-fiber/issues/43
 [#38]: https://github.com/michalochman/react-pixi-fiber/issues/38

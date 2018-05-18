@@ -1,13 +1,13 @@
 {
   "name": "examples",
-  "version": "0.4.4",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "animated": "^0.2.2",
     "pixi-layers": "^0.1.9",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-pixi-fiber": "0.4.4",
+    "react-pixi-fiber": "0.4.5",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "stats.js": "^0.17.0"

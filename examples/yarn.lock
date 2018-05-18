@@ -5185,17 +5185,17 @@ react-error-overlay@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
 
-react-pixi-fiber@0.4.4:
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.4.4.tgz#87687d7eac1809803356b3fab20cfd2be959aaf0"
+react-pixi-fiber@0.4.5:
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.4.5.tgz#c4129881f64e196732702521724ff9ee330adbca"
   dependencies:
     fbjs "^0.8.0"
     performance-now "^2.1.0"
-    react-reconciler "^0.7.0"
+    react-reconciler "^0.10.0"
 
-react-reconciler@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.7.0.tgz#9614894103e5f138deeeb5eabaf3ee80eb1d026d"
+react-reconciler@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.10.0.tgz#5dc75e73348de97b992deaba75ec72019918f71b"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"
