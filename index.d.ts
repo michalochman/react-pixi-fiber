@@ -1,14 +1,14 @@
-import * as React from 'react';
-import * as PIXI from 'pixi.js';
+import * as React from "react";
+import * as PIXI from "pixi.js";
 
-declare module 'react-pixi-fiber' {
-
+declare module "react-pixi-fiber" {
   /**
    * The set of object keys in T not in U.
    *
    * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766:
    */
-  export type Diff<T extends string, U extends string> = ({ [P in T]: P } & { [P in U]: never } & { [x: string]: never })[T];
+  export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
+    { [P in U]: never } & { [x: string]: never })[T];
 
   /**
    * An object with keys in T not in U.
@@ -18,10 +18,12 @@ declare module 'react-pixi-fiber' {
   export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
 
   /** The shape of an object that has an optional `children` property of any type. */
-  interface ObjectWithChildren { children?: any; }
+  interface ObjectWithChildren {
+    children?: any;
+  }
 
   /** The shape of `T` without it's `children` property. */
-  export type Childless<T extends ObjectWithChildren> = Omit<T, 'children'>;
+  export type Childless<T extends ObjectWithChildren> = Omit<T, "children">;
 
   /** The shape of a component that has an optional `children` property. */
   export interface ChildrenProperties {
@@ -114,7 +116,7 @@ declare module 'react-pixi-fiber' {
 
   /** `Stage` component properties." */
   export interface StageProperties extends Component<PIXI.Container> {
-    options?: PIXI.ApplicationOptions
+    options?: PIXI.ApplicationOptions;
   }
 
   /**
@@ -125,7 +127,11 @@ declare module 'react-pixi-fiber' {
   export class Stage extends React.Component<StageProperties> {}
 
   /** Custom React Reconciler render method. */
-  export function render(pixiElement: PIXI.DisplayObject | PIXI.DisplayObject[], stage: PIXI.Container, callback?: Function): void;
+  export function render(
+    pixiElement: PIXI.DisplayObject | PIXI.DisplayObject[],
+    stage: PIXI.Container,
+    callback?: Function
+  ): void;
 
   /**
    * Custom component properties.
@@ -151,7 +157,7 @@ declare module 'react-pixi-fiber' {
   /**
    * Create a custom component.
    */
-  namespace CustomPIXIComponent {
+  namespace CustomPIXIComponentNamespace {
     export function CustomPIXIComponent<T, U extends PIXI.DisplayObject>(
       behavior: Behavior<T, U>,
       /**
