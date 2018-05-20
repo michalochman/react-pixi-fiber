@@ -151,11 +151,13 @@ declare module 'react-pixi-fiber' {
   /**
    * Create a custom component.
    */
-  export function CustomPIXIComponent<T, U extends PIXI.DisplayObject>(
-    behavior: Behavior<T, U>,
-    /**
-     * The name of this custom component.
-     */
-    type: string
-  ): React.ReactType<T>;
+  namespace CustomPIXIComponent {
+    export function CustomPIXIComponent<T, U extends PIXI.DisplayObject>(
+      behavior: Behavior<T, U>,
+      /**
+       * The name of this custom component.
+       */
+      type: string
+    ): React.ReactType<T>;
+  }
 }
