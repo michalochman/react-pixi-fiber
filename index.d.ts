@@ -151,7 +151,7 @@ declare module 'react-pixi-fiber' {
   /**
    * Create a custom component.
    */
-  namespace CustomPIXIComponent {
+  namespace CustomPIXIComponentNamespace {
     export function CustomPIXIComponent<T, U extends PIXI.DisplayObject>(
       behavior: Behavior<T, U>,
       /**
