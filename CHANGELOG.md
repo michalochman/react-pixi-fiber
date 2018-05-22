@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.4.6] - 2018-05-22
+
+### Fixed
+- Fixed TypeScript definitions ([#54])
+
+
 ## [0.4.5] - 2018-05-18
 
 ### Changed
@@ -139,7 +145,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.5...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.6...HEAD
+[0.4.6]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.2...v0.4.3
@@ -156,6 +163,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#54]: https://github.com/michalochman/react-pixi-fiber/issues/54
 [#53]: https://github.com/michalochman/react-pixi-fiber/pull/53
 [#44]: https://github.com/michalochman/react-pixi-fiber/issues/44
 [#43]: https://github.com/michalochman/react-pixi-fiber/issues/43
