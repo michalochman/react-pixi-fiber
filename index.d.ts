@@ -4,18 +4,11 @@ import * as PIXI from 'pixi.js';
 declare module 'react-pixi-fiber' {
 
   /**
-   * The set of object keys in T not in U.
-   *
-   * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766:
-   */
-  export type Diff<T extends string, U extends string> = ({ [P in T]: P } & { [P in U]: never } & { [x: string]: never })[T];
-
-  /**
    * An object with keys in T not in U.
    *
-   * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-311923766:
+   * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-377567046
    */
-  export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
+  export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
   /** The shape of an object that has an optional `children` property of any type. */
   interface ObjectWithChildren { children?: any; }
