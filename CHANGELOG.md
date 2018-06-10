@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.4.7] - 2018-06-10
+
+### Changed
+- Changed `<Stage />` to support `width` and `height` passed in `options` prop ([#60])
+
+### Fixed
+- Fixed TypeScript definitions to support TypeScript 2.9 ([#58])
+- Fixed memory leak when mounting/unmounting `<Stage />` ([#61])
+
+
 ## [0.4.6] - 2018-05-22
 
 ### Fixed
@@ -145,7 +155,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.6...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.7...HEAD
+[0.4.7]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.3...v0.4.4
@@ -163,6 +174,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#61]: https://github.com/michalochman/react-pixi-fiber/pull/61
+[#60]: https://github.com/michalochman/react-pixi-fiber/pull/60
+[#58]: https://github.com/michalochman/react-pixi-fiber/issues/58
 [#54]: https://github.com/michalochman/react-pixi-fiber/issues/54
 [#53]: https://github.com/michalochman/react-pixi-fiber/pull/53
 [#44]: https://github.com/michalochman/react-pixi-fiber/issues/44
