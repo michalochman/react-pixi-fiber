@@ -67,7 +67,9 @@ class Stage extends React.Component {
   componentDidMount() {
     const { children, height, options, width } = this.props;
 
-    this._app = new PIXI.Application(width, height, {
+    this._app = new PIXI.Application({
+      height,
+      width,
       view: this._canvas,
       ...options,
     });
@@ -92,15 +94,20 @@ class Stage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { children, height, width } = this.props;
+    const { children, height, options, width } = this.props;
+    const { options: prevOptions } = prevProps;
 
     // Apply root Container props
     const stageProps = getDisplayObjectProps(this.props);
     applyProps(this._app.stage, {}, stageProps);
 
     // Root container has been resized - resize renderer
-    if (height !== prevProps.height || width !== prevProps.width) {
-      this._app.renderer.resize(width, height);
+    const currentHeight = (options && options.height) || height;
+    const currentWidth = (options && options.width) || width;
+    const prevHeight = (prevOptions && prevOptions.height) || prevProps.height;
+    const prevWidth = (prevOptions && prevOptions.width) || prevProps.width;
+    if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
+      this._app.renderer.resize(currentWidth, currentHeight);
     }
 
     ReactPixiFiber.updateContainer(children, this._mountNode, this);

@@ -80,6 +80,22 @@ describe("Stage", () => {
     });
   });
 
+  it("creates PIXI.Application instance with 'height' and 'width' in options", () => {
+    const options = {
+      backgroundColor: 0xff00ff,
+      height: 300,
+      sharedTicker: true,
+      width: 400,
+    };
+
+    const element = renderer.create(<Stage options={options} />);
+    const instance = element.getInstance();
+    const app = instance._app;
+
+    expect(app instanceof PIXI.Application).toBeTruthy();
+    expect(app._options).toMatchObject(options);
+  });
+
   it("creates root Container", () => {
     const element = renderer.create(<Stage height={300} width={400} scale={2} position="40,20" />);
     const instance = element.getInstance();
