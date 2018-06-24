@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import StatsJS from "stats.js/src/Stats";
 
 class Stats extends Component {
