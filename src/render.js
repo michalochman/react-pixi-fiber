@@ -1,5 +1,5 @@
 import pkg from "../package.json";
-import ReactPixiFiber from "../src/ReactPixiFiber";
+import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 
 export const roots = new Map();
 

@@ -3295,9 +3295,9 @@ react-dom@^16.0.0:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-reconciler@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.10.0.tgz#5dc75e73348de97b992deaba75ec72019918f71b"
+react-reconciler@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.12.0.tgz#dd3ecd98f64a2d8449298dadab041910cafd2849"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"

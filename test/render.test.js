@@ -1,17 +1,18 @@
 import React from "react";
-import renderer from "react-test-renderer";
 import pkg from "../package.json";
-import { Text } from "../src/index";
-import ReactPixiFiber from "../src/ReactPixiFiber";
+import { Container, Text } from "../src/index";
+import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 import render, { roots } from "../src/render";
-import Stage from "../src/Stage";
 
 jest.mock("../src/ReactPixiFiber", () => {
-  return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
-    createContainer: jest.fn(),
-    getPublicRootInstance: jest.fn(),
-    injectIntoDevTools: jest.fn(),
-    updateContainer: jest.fn(),
+  const actual = require.requireActual("../src/ReactPixiFiber");
+  return Object.assign({}, actual, {
+    ReactPixiFiberAsPrimaryRenderer: Object.assign({}, actual.ReactPixiFiberAsPrimaryRenderer, {
+      createContainer: jest.fn(),
+      getPublicRootInstance: jest.fn(),
+      injectIntoDevTools: jest.fn(),
+      updateContainer: jest.fn(),
+    }),
   });
 });
 
@@ -24,9 +25,9 @@ describe("render", () => {
   const callback = jest.fn();
   const root = app.stage;
   const element = (
-    <Stage>
+    <Container>
       <Text text="Hello World!" />
-    </Stage>
+    </Container>
   );
 
   it("calls ReactPixiFiber.createContainer", () => {

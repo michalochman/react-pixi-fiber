@@ -225,32 +225,39 @@ export function commitMount(instance, type, newProps) {
   // Noop
 }
 
-const ReactPixiFiber = ReactFiberReconciler({
+export const supportsMutation = true;
+
+const hostConfig = {
+  appendChild: appendChild,
+  appendChildToContainer: appendChild,
   appendInitialChild: appendChild,
+  commitMount: commitMount,
+  commitTextUpdate: commitTextUpdate,
+  commitUpdate: commitUpdate,
   createInstance: createInstance,
   createTextInstance: createTextInstance,
   finalizeInitialChildren: finalizeInitialChildren,
   getChildHostContext: getChildHostContext,
   getRootHostContext: getRootHostContext,
   getPublicInstance: getPublicInstance,
+  insertBefore: insertBefore,
+  insertInContainerBefore: insertBefore,
   now: now,
   prepareForCommit: prepareForCommit,
   prepareUpdate: prepareUpdate,
+  removeChild: removeChild,
+  removeChildFromContainer: removeChild,
   resetAfterCommit: resetAfterCommit,
   resetTextContent: resetTextContent,
   shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
   shouldSetTextContent: shouldSetTextContent,
-  mutation: {
-    appendChild: appendChild,
-    appendChildToContainer: appendChild,
-    commitMount: commitMount,
-    commitTextUpdate: commitTextUpdate,
-    commitUpdate: commitUpdate,
-    insertBefore: insertBefore,
-    insertInContainerBefore: insertBefore,
-    removeChild: removeChild,
-    removeChildFromContainer: removeChild,
-  },
-});
+  supportsMutation: supportsMutation,
+};
 
-export default ReactPixiFiber;
+// React Pixi Fiber renderer is primary if used without React DOM
+export const ReactPixiFiberAsPrimaryRenderer = ReactFiberReconciler({ ...hostConfig, isPrimaryRenderer: true });
+
+// React Pixi Fiber renderer is secondary to React DOM renderer if used together
+export const ReactPixiFiberAsSecondaryRenderer = ReactFiberReconciler({ ...hostConfig, isPrimaryRenderer: false });
+
+export default ReactPixiFiberAsSecondaryRenderer;
