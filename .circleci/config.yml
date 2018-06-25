@@ -26,6 +26,7 @@ jobs:
 
       # run tests
       - run: yarn test --coverage --ci --silent
+      - run: yarn test:ts
 
       # upload coverage report
       - run: yarn codecov
