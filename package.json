@@ -74,7 +74,7 @@
     "build:index:prod": "NODE_ENV=production rollup -c config/rollup.config.js --environment entry:index",
     "eslint": "eslint src",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "jest",
     "test:ts": "tsc -p tsconfig.json"
   },
