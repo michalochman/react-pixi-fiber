@@ -24,6 +24,9 @@ jobs:
             - node_modules
           key: npm-dependencies-{{ checksum "package.json" }}
 
+      # run build
+      - run: yarn build
+
       # run tests
       - run: yarn test --coverage --ci --silent
       - run: yarn test:ts
