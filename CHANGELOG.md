@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.4.9] - 2018-07-09
+
+### Changed
+- Changed `defaultApplyProps` to wrap console warnings in dev flag ([#67]) 
+
+
 ## [0.4.8] - 2018-06-25
 
 ### Changed
@@ -164,7 +170,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.8...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.9...HEAD
+[0.4.9]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.5...v0.4.6
@@ -184,6 +191,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#67]: https://github.com/michalochman/react-pixi-fiber/pull/67
 [#65]: https://github.com/michalochman/react-pixi-fiber/pull/65
 [#64]: https://github.com/michalochman/react-pixi-fiber/pull/64
 [#61]: https://github.com/michalochman/react-pixi-fiber/pull/61
