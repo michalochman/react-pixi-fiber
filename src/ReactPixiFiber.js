@@ -22,10 +22,14 @@ export function defaultApplyProps(instance, oldProps, newProps) {
         setPixiValue(instance, propName, value);
       } else if (typeof instance[propName] !== "undefined" && typeof DEFAULT_PROPS[propName] !== "undefined") {
         // Reset to default value (if it is defined) when display object had prop set and no longer has
-        console.warn(`setting default value: ${propName} was ${instance[propName]} is ${value} for`, instance);
+        if (__DEV__) {
+          console.warn(`setting default value: ${propName} was ${instance[propName]} is ${value} for`, instance);
+        }
         setPixiValue(instance, propName, DEFAULT_PROPS[propName]);
       } else {
-        console.warn(`ignoring prop: ${propName} was ${instance[propName]} is ${value} for`, instance);
+        if (__DEV__) {
+          console.warn(`ignoring prop: ${propName} was ${instance[propName]} is ${value} for`, instance);
+        }
       }
     });
 }
