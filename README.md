@@ -132,13 +132,6 @@ Expects the following props:
 * `height` (can be also passed in `options`),
 * `options` - see [`PIXI.Application`] options.
 
-Provides the following context:
-* `app` – an instance of PixiJS Application, with properties like:
-  * `loader` – Loader instance to help with asset loading,
-  * `renderer` – WebGL or CanvasRenderer,
-  * `ticker` – Ticker for doing render updates,
-  * `view` – reference to the renderer's canvas element.
-
 #### `<Container />`
 
 Renders [`PIXI.Container`].
@@ -184,6 +177,173 @@ applied to the `y` coordinate. In the case where a single integer if provided, i
 
 You can still create your own PIXI `Point` or `ObservablePoint` objects and assign them directly to the property. 
 These won't actually replace the property but they will be applied using the original object's `.copy()` method.
+
+### Context – Accessing `PIXI.Application` instance created by `<Stage />`
+
+`PIXI.Application` is automatically provided using the following definition (either as a prop or in context):
+* `app` – an instance of PixiJS Application, with properties like:
+  * `loader` – Loader instance to help with asset loading,
+  * `renderer` – WebGL or CanvasRenderer,
+  * `ticker` – Ticker for doing render updates,
+  * `view` – reference to the renderer's canvas element. 
+
+#### Using `withApp` Higher-Order Component
+
+To get `app` prop in your component you may wrap it with `withApp` higher-order component:
+
+```
+import { render } from "react-dom";
+import { Sprite, Stage, withApp } from "react-pixi-fiber";
+import bunny from "./bunny.png";
+
+class RotatingBunny extends Component {
+  state = {
+    rotation: 0,
+  };
+
+  componentDidMount() {
+    // Note that `app` prop is coming through `withApp` HoC
+    this.props.app.ticker.add(this.animate);
+  }
+
+  componentWillUnmount() {
+    this.props.app.ticker.remove(this.animate);
+  }
+
+  animate = delta => {
+    this.setState(state => ({
+      rotation: state.rotation + 0.1 * delta,
+    }));
+  };
+
+  render() {
+    return (
+      <Sprite 
+        {...this.props}
+        texture={PIXI.Texture.fromImage(bunny)}
+        rotation={this.state.rotation} 
+      />
+    );
+  }
+}
+RotatingBunny.propTypes = {
+  app: PropTypes.object.isRequired,
+};
+
+const RotatingBunnyWithApp = withApp(RotatingBunny);
+
+render(
+  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+    <RotatingBunnyWithApp x={200} y={200} />
+  </Stage>,
+  document.getElementById("container")
+);
+```
+
+#### Using New Context API directly (React >=16.3.0)
+
+```
+import { render } from "react-dom";
+import { AppContext, Sprite, Stage } from "react-pixi-fiber";
+import bunny from "./bunny.png";
+
+class RotatingBunny extends Component {
+  state = {
+    rotation: 0,
+  };
+
+  componentDidMount() {
+    // Note that `app` prop is coming directly from AppContext.Consumer
+    this.props.app.ticker.add(this.animate);
+  }
+
+  componentWillUnmount() {
+    this.props.app.ticker.remove(this.animate);
+  }
+
+  animate = delta => {
+    this.setState(state => ({
+      rotation: state.rotation + 0.1 * delta,
+    }));
+  };
+
+  render() {
+    return (
+      <Sprite 
+        {...this.props}
+        texture={PIXI.Texture.fromImage(bunny)}
+        rotation={this.state.rotation} 
+      />
+    );
+  }
+}
+RotatingBunny.propTypes = {
+  app: PropTypes.object.isRequired,
+};
+
+render(
+  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+    <AppContext.Consumer>
+      {app => (
+        <RotatingBunny app={app} x={200} y={200} />
+      )}
+    </AppContext>
+  </Stage>,
+  document.getElementById("container")
+);
+```
+
+#### Using Legacy Context API directly (React <16.3.0)
+
+This approach is not recommended as it is easier to just use `withApp` HoC mentioned above.
+
+```
+import { render } from "react-dom";
+import { Sprite, Stage } from "react-pixi-fiber";
+import bunny from "./bunny.png";
+
+class RotatingBunny extends Component {
+  state = {
+    rotation: 0,
+  };
+
+  componentDidMount() {
+    // Note that `app` is coming from context, NOT from props
+    this.context.app.ticker.add(this.animate);
+  }
+
+  componentWillUnmount() {
+    this.context.app.ticker.remove(this.animate);
+  }
+
+  animate = delta => {
+    this.setState(state => ({
+      rotation: state.rotation + 0.1 * delta,
+    }));
+  };
+
+  render() {
+    return (
+      <Sprite 
+        {...this.props}
+        texture={PIXI.Texture.fromImage(bunny)}
+        rotation={this.state.rotation} 
+      />
+    );
+  }
+}
+// Note that here we tell React to apply `app` via legacy Context API
+RotatingBunny.childContextTypes = {
+  app: PropTypes.object,
+};
+
+render(
+  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+    <RotatingBunny x={200} y={200} />
+  </Stage>,
+  document.getElementById("container")
+);
+```
 
 ### Custom Components
 

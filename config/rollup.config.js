@@ -1,4 +1,4 @@
-import json from "rollup-plugin-json";
+const json = require("rollup-plugin-json");
 const babel = require("rollup-plugin-babel");
 const commonjs = require("rollup-plugin-commonjs");
 const globals = require("rollup-plugin-node-globals");
@@ -43,6 +43,7 @@ const getPlugins = () => [
       "node_modules/react/**",
       "node_modules/react-dom/**",
       "node_modules/react-reconciler/**",
+      "node_modules/schedule/**",
     ],
   }),
   globals(),
