@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added support for New Context API
+
+### Fixed
+- Fixed React 16.5.0 compatibility ([#71])
+
 
 ## [0.4.9] - 2018-07-09
 
@@ -191,6 +197,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#71]: https://github.com/michalochman/react-pixi-fiber/issues/71
 [#67]: https://github.com/michalochman/react-pixi-fiber/pull/67
 [#65]: https://github.com/michalochman/react-pixi-fiber/pull/65
 [#64]: https://github.com/michalochman/react-pixi-fiber/pull/64
