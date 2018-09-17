@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const propTypes = {
   app: PropTypes.object.isRequired,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };
 const childContextTypes = {
   app: PropTypes.object,

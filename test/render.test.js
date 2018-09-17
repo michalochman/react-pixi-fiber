@@ -2,7 +2,7 @@ import React from "react";
 import pkg from "../package.json";
 import { Container, Text } from "../src/index";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
-import render, { roots } from "../src/render";
+import { render, roots, unmount } from "../src/render";
 
 jest.mock("../src/ReactPixiFiber", () => {
   const actual = require.requireActual("../src/ReactPixiFiber");
@@ -63,5 +63,28 @@ describe("render", () => {
     render(element, root, callback);
 
     expect(ReactPixiFiber.createContainer).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe("unmount", () => {
+  beforeEach(() => {
+    roots.clear();
+    jest.resetAllMocks();
+  });
+
+  const app = new PIXI.Application();
+  const root = app.stage;
+
+  it("calls ReactPixiFiber.updateContainer if it was mounted", () => {
+    roots.set(root, app.stage);
+    unmount(root);
+
+    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledTimes(1);
+    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledWith(null, roots.get(root));
+  });
+
+  it("does not update root if it is not present", () => {
+    expect(() => unmount(root)).toThrow("ReactPixiFiber did not render into container provided");
+    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledTimes(0);
   });
 });

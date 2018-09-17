@@ -1,10 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as PIXI from "pixi.js";
-import pkg from "../package.json";
 import { AppProvider } from "./AppProvider";
 import { DEFAULT_PROPS } from "./props";
-import ReactPixiFiber, { applyProps } from "./ReactPixiFiber";
+import { applyProps } from "./ReactPixiFiber";
 import { render, unmount } from "./render";
 import { filterByKey, including } from "./utils";
 
