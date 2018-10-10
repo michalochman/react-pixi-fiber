@@ -28,10 +28,8 @@ function createAppProvider() {
     AppProvider.propTypes = propTypes;
 
     const withApp = WrappedComponent => {
-      class WithApp extends React.Component {
-        render() {
-          return <AppContext.Consumer>{app => <WrappedComponent {...this.props} app={app} />}</AppContext.Consumer>;
-        }
+      function WithApp(props) {
+        return <AppContext.Consumer>{app => <WrappedComponent {...props} app={app} />}</AppContext.Consumer>;
       }
       WithApp.displayName = `withApp(${WrappedComponent})`;
 
@@ -57,10 +55,8 @@ function createAppProvider() {
     AppProvider.childContextTypes = childContextTypes;
 
     const withApp = WrappedComponent => {
-      class WithApp extends React.Component {
-        render() {
-          return <WrappedComponent {...this.props} app={this.context.app} />;
-        }
+      function WithApp(props, context) {
+        return <WrappedComponent {...props} app={context.app} />;
       }
       WithApp.displayName = `withApp(${WrappedComponent})`;
       WithApp.contextTypes = childContextTypes;

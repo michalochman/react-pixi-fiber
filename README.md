@@ -187,7 +187,7 @@ These won't actually replace the property but they will be applied using the ori
   * `ticker` – Ticker for doing render updates,
   * `view` – reference to the renderer's canvas element. 
 
-#### Using `withApp` Higher-Order Component
+#### Using `withApp` Higher-Order Component (with React <16.3.0 and React >=16.3.0)
 
 To get `app` prop in your component you may wrap it with `withApp` higher-order component:
 
