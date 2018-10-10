@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.5.0] - 2018-10-10
+
 ### Added
-- Added support for New Context API
+- Added support for New Context API ([#72])
 
 ### Fixed
 - Fixed React 16.5.0 compatibility ([#71])
@@ -176,7 +179,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<Text />` component
 - Added `<TilingSprite />` component
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.9...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.9...v0.5.0
 [0.4.9]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.6...v0.4.7
@@ -197,6 +201,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#72]: https://github.com/michalochman/react-pixi-fiber/pull/72
 [#71]: https://github.com/michalochman/react-pixi-fiber/issues/71
 [#67]: https://github.com/michalochman/react-pixi-fiber/pull/67
 [#65]: https://github.com/michalochman/react-pixi-fiber/pull/65
