@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { withApp } from "react-pixi-fiber";
 import Bunny from "../Bunny";
 
 // http://pixijs.io/examples/#/basics/basic.js
@@ -9,11 +10,11 @@ class RotatingBunny extends Component {
   };
 
   componentDidMount() {
-    this.context.app.ticker.add(this.animate);
+    this.props.app.ticker.add(this.animate);
   }
 
   componentWillUnmount() {
-    this.context.app.ticker.remove(this.animate);
+    this.props.app.ticker.remove(this.animate);
   }
 
   animate = delta => {
@@ -30,8 +31,8 @@ class RotatingBunny extends Component {
     return <Bunny {...this.props} rotation={this.state.rotation} />;
   }
 }
-RotatingBunny.contextTypes = {
-  app: PropTypes.object,
+RotatingBunny.propTypes = {
+  app: PropTypes.object.isRequired,
 };
 
-export default RotatingBunny;
+export default withApp(RotatingBunny);

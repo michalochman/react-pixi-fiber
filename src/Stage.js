@@ -1,9 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as PIXI from "pixi.js";
-import pkg from "../package.json";
+import { AppProvider } from "./AppProvider";
 import { DEFAULT_PROPS } from "./props";
-import ReactPixiFiber, { applyProps } from "./ReactPixiFiber";
+import { applyProps } from "./ReactPixiFiber";
+import { render, unmount } from "./render";
 import { filterByKey, including } from "./utils";
 
 export function validateCanvas(props, propName, componentName) {
@@ -46,9 +47,6 @@ const propTypes = {
   height: PropTypes.number,
   width: PropTypes.number,
 };
-const childContextTypes = {
-  app: PropTypes.object,
-};
 
 export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS));
 export const includingStageProps = including(Object.keys(propTypes));
@@ -58,12 +56,6 @@ export const getCanvasProps = props => filterByKey(props, includingCanvasProps);
 export const getDisplayObjectProps = props => filterByKey(props, includingDisplayObjectProps);
 
 class Stage extends React.Component {
-  getChildContext() {
-    return {
-      app: this._app,
-    };
-  }
-
   componentDidMount() {
     const { children, height, options, width } = this.props;
 
@@ -78,19 +70,7 @@ class Stage extends React.Component {
     const stageProps = getDisplayObjectProps(this.props);
     applyProps(this._app.stage, {}, stageProps);
 
-    // Perhaps this should use the standalone render method somehow, the only differences now are:
-    // - parentContainer
-    // - callback
-    // - return value
-    this._mountNode = ReactPixiFiber.createContainer(this._app.stage);
-    ReactPixiFiber.updateContainer(children, this._mountNode, this);
-
-    ReactPixiFiber.injectIntoDevTools({
-      findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
-      bundleType: __DEV__ ? 1 : 0,
-      version: pkg.version,
-      rendererPackageName: pkg.name,
-    });
+    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -110,11 +90,11 @@ class Stage extends React.Component {
       this._app.renderer.resize(currentWidth, currentHeight);
     }
 
-    ReactPixiFiber.updateContainer(children, this._mountNode, this);
+    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage);
   }
 
   componentWillUnmount() {
-    ReactPixiFiber.updateContainer(null, this._mountNode, this);
+    unmount(this._app.stage);
     this._app.destroy();
   }
 
@@ -132,6 +112,5 @@ class Stage extends React.Component {
 }
 
 Stage.propTypes = propTypes;
-Stage.childContextTypes = childContextTypes;
 
 export default Stage;

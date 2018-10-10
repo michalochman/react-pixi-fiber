@@ -1,11 +1,12 @@
 import CustomPIXIComponent from "./CustomPIXIComponent";
+import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage from "./Stage";
 import { TYPES } from "./types";
-import render from "./render";
+import { render } from "./render";
 
 /* Public API */
 
-export { CustomPIXIComponent, Stage, render };
+export { AppContext, AppProvider, CustomPIXIComponent, Stage, render, withApp };
 
 export const BitmapText = TYPES.BITMAP_TEXT;
 export const Container = TYPES.CONTAINER;

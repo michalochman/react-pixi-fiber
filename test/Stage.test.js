@@ -1,7 +1,6 @@
 import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
-import pkg from "../package.json";
 import { Text } from "../src/index";
 import ReactPixiFiber from "../src/ReactPixiFiber";
 import Stage, {
@@ -12,6 +11,8 @@ import Stage, {
   includingStageProps,
   validateCanvas,
 } from "../src/Stage";
+import { render, unmount } from "../src/render";
+import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS } from "../src/props";
 
 jest.mock("../src/ReactPixiFiber", () => {
@@ -20,6 +21,12 @@ jest.mock("../src/ReactPixiFiber", () => {
     injectIntoDevTools: jest.fn(),
     updateContainer: jest.fn(),
   });
+});
+jest.mock("../src/render", () => {
+  return {
+    render: jest.fn(),
+    unmount: jest.fn(),
+  };
 });
 
 describe("Stage", () => {
@@ -161,66 +168,40 @@ describe("Stage", () => {
     expect(() => element.unmount()).not.toThrow();
   });
 
-  it("calls ReactPixiFiber.createContainer on componentDidMount", () => {
-    ReactPixiFiber.createContainer.mockClear();
-    const element = renderer.create(<Stage />);
+  it("calls render on componentDidMount", () => {
+    render.mockClear();
+    const children = <Text text="Hello World!" />;
+    const element = renderer.create(<Stage>{children}</Stage>);
     const instance = element.getInstance();
     const stage = instance._app.stage;
 
-    expect(ReactPixiFiber.createContainer).toHaveBeenCalledTimes(1);
-    expect(ReactPixiFiber.createContainer).toHaveBeenCalledWith(stage);
+    expect(render).toHaveBeenCalledTimes(1);
+    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children}</AppProvider>, stage);
   });
 
-  it("calls ReactPixiFiber.updateContainer on componentDidMount", () => {
-    ReactPixiFiber.updateContainer.mockClear();
-    const element = renderer.create(
-      <Stage>
-        <Text text="Hello World!" />
-      </Stage>
-    );
+  it("calls render on componentDidUpdate", () => {
+    const children1 = <Text text="Hello World!" />;
+    const element = renderer.create(<Stage>{children1}</Stage>);
     const instance = element.getInstance();
+    const stage = instance._app.stage;
 
-    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledTimes(1);
-    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledWith(
-      <Text text="Hello World!" />,
-      instance._mountNode,
-      instance
-    );
+    render.mockClear();
+    const children2 = <Text text="World Hello!" />;
+    element.update(<Stage>{children2}</Stage>);
+
+    expect(render).toHaveBeenCalledTimes(1);
+    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children2}</AppProvider>, stage);
   });
 
-  it("calls ReactPixiFiber.injectIntoDevTools on componentDidMount", () => {
-    ReactPixiFiber.injectIntoDevTools.mockClear();
-    const element = renderer.create(<Stage />);
-
-    expect(ReactPixiFiber.injectIntoDevTools).toHaveBeenCalledTimes(1);
-    expect(ReactPixiFiber.injectIntoDevTools).toHaveBeenCalledWith(
-      expect.objectContaining({
-        findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
-        bundleType: 1,
-        version: pkg.version,
-        rendererPackageName: pkg.name,
-      })
-    );
-  });
-
-  it("calls ReactPixiFiber.updateContainer on componentDidUpdate", () => {
+  it("calls unmount on componentWillUnmount", () => {
     const element = renderer.create(<Stage />);
     const instance = element.getInstance();
-    ReactPixiFiber.updateContainer.mockClear();
-    element.update(<Stage />);
-
-    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledTimes(1);
-    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledWith(undefined, instance._mountNode, instance);
-  });
-
-  it("calls ReactPixiFiber.updateContainer on componentWillUnmount", () => {
-    const element = renderer.create(<Stage />);
-    const instance = element.getInstance();
-    ReactPixiFiber.updateContainer.mockClear();
+    const stage = instance._app.stage;
+    unmount.mockClear();
     element.unmount();
 
-    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledTimes(1);
-    expect(ReactPixiFiber.updateContainer).toHaveBeenCalledWith(null, instance._mountNode, instance);
+    expect(unmount).toHaveBeenCalledTimes(1);
+    expect(unmount).toHaveBeenCalledWith(stage);
   });
 });
 

@@ -1,4 +1,5 @@
 import pkg from "../package.json";
+import invariant from "fbjs/lib/invariant";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 
 export const roots = new Map();
@@ -7,7 +8,7 @@ export const roots = new Map();
  * element should be any instance of PIXI DisplayObject
  * containerTag should be an instance of PIXI root Container (i.e. the Stage)
  */
-function render(element, containerTag, callback) {
+export function render(element, containerTag, callback) {
   let root = roots.get(containerTag);
   if (!root) {
     root = ReactPixiFiber.createContainer(containerTag);
@@ -26,4 +27,10 @@ function render(element, containerTag, callback) {
   return ReactPixiFiber.getPublicRootInstance(root);
 }
 
-export default render;
+export function unmount(containerTag) {
+  const root = roots.get(containerTag);
+
+  invariant(root, "ReactPixiFiber did not render into container provided");
+
+  ReactPixiFiber.updateContainer(null, root);
+}
