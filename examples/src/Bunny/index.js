@@ -15,9 +15,9 @@ const textures = [
   new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 2, 26, 37)),
 ];
 
-function Bunny({ as: Component, ...props }) {
-  const texture = textures[props.texture];
-  return <Component anchor={centerAnchor} {...props} texture={texture} />;
+function Bunny({ as: Component, ...passedProps }) {
+  const texture = textures[passedProps.texture];
+  return <Component anchor={centerAnchor} {...passedProps} texture={texture} />;
 }
 Bunny.propTypes = {
   as: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
