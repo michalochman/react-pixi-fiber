@@ -118,7 +118,7 @@ declare module 'react-pixi-fiber' {
   export class Stage extends React.Component<StageProperties> {}
 
   /** Custom React Reconciler render method. */
-  export function render(pixiElement: PIXI.DisplayObject | PIXI.DisplayObject[], stage: PIXI.Container, callback?: Function): void;
+  export function render(pixiElement: React.ReactElement<any> | React.ReactElement<any>[] | PIXI.DisplayObject | PIXI.DisplayObject[], stage: PIXI.Container, callback?: Function): void;
 
   /**
    * Custom component properties.
