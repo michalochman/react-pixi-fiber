@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-import { ParticleContainer, Sprite, Text } from "react-pixi-fiber";
+import { withApp, ParticleContainer, Sprite, Text } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 import bunnys from "./bunnys.png";
 
@@ -80,11 +80,11 @@ class Bunnymark extends Component {
       currentTexture: currentTexture,
     });
 
-    this.context.app.ticker.add(this.animate);
+    this.props.app.ticker.add(this.animate);
   }
 
   componentWillUnmount() {
-    this.context.app.ticker.remove(this.animate);
+    this.props.app.ticker.remove(this.animate);
   }
 
   animate = () => {
@@ -141,8 +141,8 @@ class Bunnymark extends Component {
     );
   }
 }
-Bunnymark.contextTypes = {
+Bunnymark.propTypes = {
   app: PropTypes.object,
 };
 
-export default Bunnymark;
+export default withApp(Bunnymark);
