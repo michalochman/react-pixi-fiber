@@ -287,7 +287,7 @@ render(
       {app => (
         <RotatingBunny app={app} x={200} y={200} />
       )}
-    </AppContext>
+    </AppContext.Consumer>
   </Stage>,
   document.getElementById("container")
 );
