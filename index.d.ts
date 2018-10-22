@@ -151,4 +151,17 @@ declare module 'react-pixi-fiber' {
      */
     type: string
   ): React.ReactType<T>;
+
+  /**
+   * AppContext
+   */
+  export const AppContext: React.Context<AppContextProps>;
+
+  /**
+   * AppContext default value
+   */
+  export interface AppContextProps {
+      children: React.ReactChildren,
+      app: PIXI.Application
+  }
 }
