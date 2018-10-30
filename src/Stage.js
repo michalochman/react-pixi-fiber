@@ -90,35 +90,37 @@ export function usePixiApp(props) {
   return { app, canvas };
 }
 
+const applyUpdate = (app, props) => {
+  const provider = <AppProvider app={app}>{props.children}</AppProvider>;
+  const stageProps = getDisplayObjectProps(props);
+
+  applyProps(app.stage, {}, stageProps);
+  render(provider, app.stage);
+};
+
+const resizeRenderer = (app, prevProps, nextProps) => {
+  const { options, width, height } = nextProps;
+  const currentHeight = (options && options.height) || height;
+  const currentWidth = (options && options.width) || width;
+  const prevHeight = (prevProps.options && prevProps.options.height) || prevProps.height;
+  const prevWidth = (prevProps.options && prevProps.options.width) || prevProps.width;
+
+  if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
+    app.renderer.resize(currentWidth, currentHeight);
+  }
+};
+
 function Stage(props) {
-  const { children, height, options, width } = props;
+  const { height, options, width } = props;
   const { app, canvas } = usePixiApp(props);
   const prevProps = usePreviousProps(props);
-  const update = () => {
-    const provider = <AppProvider app={app}>{children}</AppProvider>;
-    const stageProps = getDisplayObjectProps(props);
-
-    applyProps(app.stage, {}, stageProps);
-    render(provider, app.stage);
-  };
-  const resize = () => {
-    // Root container has been resized - resize renderer
-    const currentHeight = (options && options.height) || height;
-    const currentWidth = (options && options.width) || width;
-    const prevHeight = (prevProps.options && prevProps.options.height) || prevProps.height;
-    const prevWidth = (prevProps.options && prevProps.options.width) || prevProps.width;
-
-    if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
-      app.renderer.resize(currentWidth, currentHeight);
-    }
-  };
 
   // Update and resize stage on component update
   useLayoutEffect(() => {
     if (!app) return;
 
-    update();
-    resize();
+    applyUpdate(app, props);
+    resizeRenderer(app, prevProps, props);
   });
 
   return canvas;
