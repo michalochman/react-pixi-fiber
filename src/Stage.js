@@ -116,28 +116,30 @@ const resizeRenderer = (app, prevProps, props) => {
   }
 };
 
-function createStage() {
-  if (typeof useState === "function") {
-    // Hooks API is supported (React >=16.7.0, use a function component to allow
-    // support for hooks in child components
-    return function Stage(props) {
-      const { height, options, width } = props;
-      const { app, canvas } = usePixiApp(props);
-      const prevProps = usePreviousProps(props);
+function createStageFunction() {
+  function Stage(props) {
+    const { height, options, width } = props;
+    const { app, canvas } = usePixiApp(props);
+    const prevProps = usePreviousProps(props);
 
-      // Re-render and resize stage on component update
-      useLayoutEffect(() => {
-        if (!app) return;
+    // Re-render and resize stage on component update
+    useLayoutEffect(() => {
+      if (!app) return;
 
-        applyUpdate(app, props);
-        resizeRenderer(app, prevProps, props);
-      });
+      applyUpdate(app, props);
+      resizeRenderer(app, prevProps, props);
+    });
 
-      return canvas;
-    };
+    return canvas;
   }
-  // Hooks API is not supported (React <16.7.0), fall back to class component
-  return class Stage extends React.Component {
+
+  Stage.propTypes = propTypes;
+
+  return Stage;
+}
+
+function createStageClass() {
+  class Stage extends React.Component {
     componentDidMount() {
       const { children, height, options, width } = this.props;
 
@@ -179,9 +181,13 @@ function createStage() {
       }
     }
   }
+
+  Stage.propTypes = propTypes;
+
+  return Stage;
 }
 
-const Stage = createStage();
+const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
 
 Stage.propTypes = propTypes;
 
