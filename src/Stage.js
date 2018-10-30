@@ -142,15 +142,9 @@ function createStageClass() {
   class Stage extends React.Component {
     componentDidMount() {
       const { children, height, options, width } = this.props;
+      const view = this._canvas;
 
-      this._app = new PIXI.Application({
-        height,
-        width,
-        view: this._canvas,
-        ...options,
-      });
-
-      appTestHook = this._app;
+      this._app = appTestHook = new PIXI.Application({ height, width, view, ...options });
 
       // Apply root Container props
       applyUpdate(this._app, this.props);
