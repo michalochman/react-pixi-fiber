@@ -98,12 +98,19 @@ const applyUpdate = (app, props) => {
   render(provider, app.stage);
 };
 
-const resizeRenderer = (app, prevProps, nextProps) => {
-  const { options, width, height } = nextProps;
-  const currentHeight = (options && options.height) || height;
-  const currentWidth = (options && options.width) || width;
-  const prevHeight = (prevProps.options && prevProps.options.height) || prevProps.height;
-  const prevWidth = (prevProps.options && prevProps.options.width) || prevProps.width;
+const getDimensions = (props) => {
+  const { options, width, height } = props;
+
+  return [
+    (options && options.width) || width,
+    (options && options.height) || height,
+  ];
+};
+
+const resizeRenderer = (app, prevProps, props) => {
+  const { options, width, height } = props;
+  const [prevWidth, prevHeight] = getDimensions(prevProps);
+  const [currentWidth, currentHeight] = getDimensions(props);
 
   if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
     app.renderer.resize(currentWidth, currentHeight);
@@ -115,7 +122,7 @@ function Stage(props) {
   const { app, canvas } = usePixiApp(props);
   const prevProps = usePreviousProps(props);
 
-  // Update and resize stage on component update
+  // Re-render and resize stage on component update
   useLayoutEffect(() => {
     if (!app) return;
 
