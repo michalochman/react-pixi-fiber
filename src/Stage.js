@@ -116,21 +116,72 @@ const resizeRenderer = (app, prevProps, props) => {
   }
 };
 
-function Stage(props) {
-  const { height, options, width } = props;
-  const { app, canvas } = usePixiApp(props);
-  const prevProps = usePreviousProps(props);
+function createStage() {
+  if (typeof useState === "function") {
+    // Hooks API is supported (React >=16.7.0, use a function component to allow
+    // support for hooks in child components
+    return function Stage(props) {
+      const { height, options, width } = props;
+      const { app, canvas } = usePixiApp(props);
+      const prevProps = usePreviousProps(props);
 
-  // Re-render and resize stage on component update
-  useLayoutEffect(() => {
-    if (!app) return;
+      // Re-render and resize stage on component update
+      useLayoutEffect(() => {
+        if (!app) return;
 
-    applyUpdate(app, props);
-    resizeRenderer(app, prevProps, props);
-  });
+        applyUpdate(app, props);
+        resizeRenderer(app, prevProps, props);
+      });
 
-  return canvas;
+      return canvas;
+    };
+  }
+  // Hooks API is not supported (React <16.7.0), fall back to class component
+  return class Stage extends React.Component {
+    componentDidMount() {
+      const { children, height, options, width } = this.props;
+
+      this._app = new PIXI.Application({
+        height,
+        width,
+        view: this._canvas,
+        ...options,
+      });
+
+      appTestHook = this._app;
+
+      // Apply root Container props
+      applyUpdate(this._app, this.props);
+    }
+
+    componentDidUpdate(prevProps) {
+      const { children, height, options, width } = this.props;
+      const { options: prevOptions } = prevProps;
+
+      resizeRenderer(this._app, prevProps, this.props);
+      applyUpdate(this._app, this.props);
+    }
+
+    componentWillUnmount() {
+      unmount(this._app.stage);
+      this._app.destroy();
+    }
+
+    render() {
+      const { options } = this.props;
+      const canvasProps = getCanvasProps(this.props);
+
+      // Do not render anything if view is passed to options
+      if (typeof options !== "undefined" && options.view) {
+        return null;
+      } else {
+        return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
+      }
+    }
+  }
 }
+
+const Stage = createStage();
 
 Stage.propTypes = propTypes;
 
