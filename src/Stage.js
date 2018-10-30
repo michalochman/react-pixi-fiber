@@ -98,13 +98,12 @@ const applyUpdate = (app, props) => {
   render(provider, app.stage);
 };
 
-const getDimensions = (props) => {
+const getDimensions = props => {
   const { options, width, height } = props;
+  const realWidth = (options && options.width) || width;
+  const realHeight = (options && options.height) || height;
 
-  return [
-    (options && options.width) || width,
-    (options && options.height) || height,
-  ];
+  return [realWidth, realHeight];
 };
 
 const resizeRenderer = (app, prevProps, props) => {
