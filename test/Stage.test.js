@@ -10,6 +10,7 @@ import Stage, {
   includingDisplayObjectProps,
   includingStageProps,
   validateCanvas,
+  appTestHook,
 } from "../src/Stage";
 import { render, unmount } from "../src/render";
 import { AppProvider } from "../src/AppProvider";
@@ -77,10 +78,9 @@ describe("Stage", () => {
 
     const element = renderer.create(<Stage height={height} width={width} options={options} />);
     const instance = element.getInstance();
-    const app = instance._app;
 
-    expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app._options).toMatchObject({
+    expect(appTestHook instanceof PIXI.Application).toBeTruthy();
+    expect(appTestHook._options).toMatchObject({
       height,
       width,
       ...options,
@@ -97,17 +97,15 @@ describe("Stage", () => {
 
     const element = renderer.create(<Stage options={options} />);
     const instance = element.getInstance();
-    const app = instance._app;
 
-    expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app._options).toMatchObject(options);
+    expect(appTestHook instanceof PIXI.Application).toBeTruthy();
+    expect(appTestHook._options).toMatchObject(options);
   });
 
   it("creates root Container", () => {
     const element = renderer.create(<Stage height={300} width={400} scale={2} position="40,20" />);
     const instance = element.getInstance();
-    const app = instance._app;
-    const stage = app.stage;
+    const stage = appTestHook.stage;
 
     expect(stage instanceof PIXI.Container).toBeTruthy();
   });
@@ -118,8 +116,7 @@ describe("Stage", () => {
     const y = 20;
     const element = renderer.create(<Stage height={300} position={`${x},${y}`} scale={scale} width={400} />);
     const instance = element.getInstance();
-    const app = instance._app;
-    const stage = app.stage;
+    const stage = appTestHook.stage;
 
     expect(stage.position.x).toEqual(x);
     expect(stage.position.y).toEqual(y);
@@ -131,8 +128,7 @@ describe("Stage", () => {
     const scale = 2;
     const element = renderer.create(<Stage height={300} scale={scale} width={400} />);
     const instance = element.getInstance();
-    const app = instance._app;
-    const stage = app.stage;
+    const stage = appTestHook.stage;
 
     expect(stage.scale.x).toEqual(scale);
     expect(stage.scale.y).toEqual(scale);
@@ -149,17 +145,16 @@ describe("Stage", () => {
     const width = 400;
     const element = renderer.create(<Stage height={height} width={width} />);
     const instance = element.getInstance();
-    const app = instance._app;
 
-    expect(app.renderer.height).toEqual(height);
-    expect(app.renderer.width).toEqual(width);
+    expect(appTestHook.renderer.height).toEqual(height);
+    expect(appTestHook.renderer.width).toEqual(width);
 
     const newHeight = 600;
     const newWidth = 800;
     element.update(<Stage height={newHeight} width={newWidth} />);
 
-    expect(app.renderer.height).toEqual(newHeight);
-    expect(app.renderer.width).toEqual(newWidth);
+    expect(appTestHook.renderer.height).toEqual(newHeight);
+    expect(appTestHook.renderer.width).toEqual(newWidth);
   });
 
   it("can be umounted", () => {
@@ -173,30 +168,31 @@ describe("Stage", () => {
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children}</Stage>);
     const instance = element.getInstance();
-    const stage = instance._app.stage;
+    const stage = appTestHook.stage;
 
     expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children}</AppProvider>, stage);
+    expect(render).toHaveBeenCalledWith(<AppProvider app={appTestHook}>{children}</AppProvider>, stage);
   });
 
   it("calls render on componentDidUpdate", () => {
     const children1 = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children1}</Stage>);
     const instance = element.getInstance();
-    const stage = instance._app.stage;
+    const stage = appTestHook.stage;
 
     render.mockClear();
     const children2 = <Text text="World Hello!" />;
     element.update(<Stage>{children2}</Stage>);
 
     expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children2}</AppProvider>, stage);
+    expect(render).toHaveBeenCalledWith(<AppProvider app={appTestHook}>{children2}</AppProvider>, stage);
   });
 
   it("calls unmount on componentWillUnmount", () => {
     const element = renderer.create(<Stage />);
     const instance = element.getInstance();
-    const stage = instance._app.stage;
+    const { stage } = appTestHook;
+
     unmount.mockClear();
     element.unmount();
 

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, Stage, withApp } from "../src";
+import { appTestHook } from "../src/Stage";
 import { render } from "../src/render";
 import * as PIXI from "pixi.js";
 
@@ -70,7 +71,7 @@ if (typeof React.createContext === "function") {
         document.createElement("div")
       );
 
-      expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app: stage._app });
+      expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app: appTestHook });
     });
   });
 }
@@ -97,14 +98,13 @@ describe("withApp", () => {
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
-    let stage;
     ReactDOM.render(
-      <Stage ref={c => (stage = c)}>
+      <Stage>
         <TestComponentWithApp foo="bar" />
       </Stage>,
       document.createElement("div")
     );
 
-    expect(TestComponent).toHaveBeenCalledWith({ app: stage._app, foo: "bar" }, {});
+    expect(TestComponent).toHaveBeenCalledWith({ app: appTestHook, foo: "bar" }, {});
   });
 });
