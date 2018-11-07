@@ -191,7 +191,7 @@ These won't actually replace the property but they will be applied using the ori
 
 To get `app` prop in your component you may wrap it with `withApp` higher-order component:
 
-```
+```jsx harmony
 import { render } from "react-dom";
 import { Sprite, Stage, withApp } from "react-pixi-fiber";
 import bunny from "./bunny.png";
@@ -242,7 +242,7 @@ render(
 
 #### Using New Context API directly (React >=16.3.0)
 
-```
+```jsx harmony
 import { render } from "react-dom";
 import { AppContext, Sprite, Stage } from "react-pixi-fiber";
 import bunny from "./bunny.png";
@@ -297,7 +297,7 @@ render(
 
 This approach is not recommended as it is easier to just use `withApp` HoC mentioned above.
 
-```
+```jsx harmony
 import { render } from "react-dom";
 import { Sprite, Stage } from "react-pixi-fiber";
 import bunny from "./bunny.png";
