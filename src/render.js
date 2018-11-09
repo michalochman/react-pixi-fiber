@@ -8,14 +8,14 @@ export const roots = new Map();
  * element should be any instance of PIXI DisplayObject
  * containerTag should be an instance of PIXI root Container (i.e. the Stage)
  */
-export function render(element, containerTag, callback) {
+export function render(element, containerTag, callback, parentComponent) {
   let root = roots.get(containerTag);
   if (!root) {
     root = ReactPixiFiber.createContainer(containerTag);
     roots.set(containerTag, root);
   }
 
-  ReactPixiFiber.updateContainer(element, root, undefined, callback);
+  ReactPixiFiber.updateContainer(element, root, parentComponent, callback);
 
   ReactPixiFiber.injectIntoDevTools({
     findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,

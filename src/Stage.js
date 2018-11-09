@@ -70,7 +70,7 @@ class Stage extends React.Component {
     const stageProps = getDisplayObjectProps(this.props);
     applyProps(this._app.stage, {}, stageProps);
 
-    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage);
+    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage, undefined, this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -90,7 +90,7 @@ class Stage extends React.Component {
       this._app.renderer.resize(currentWidth, currentHeight);
     }
 
-    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage);
+    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage, undefined, this);
   }
 
   componentWillUnmount() {

@@ -176,7 +176,12 @@ describe("Stage", () => {
     const stage = instance._app.stage;
 
     expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children}</AppProvider>, stage);
+    expect(render).toHaveBeenCalledWith(
+      <AppProvider app={instance._app}>{children}</AppProvider>,
+      stage,
+      undefined,
+      instance
+    );
   });
 
   it("calls render on componentDidUpdate", () => {
@@ -190,7 +195,12 @@ describe("Stage", () => {
     element.update(<Stage>{children2}</Stage>);
 
     expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children2}</AppProvider>, stage);
+    expect(render).toHaveBeenCalledWith(
+      <AppProvider app={instance._app}>{children2}</AppProvider>,
+      stage,
+      undefined,
+      instance
+    );
   });
 
   it("calls unmount on componentWillUnmount", () => {
