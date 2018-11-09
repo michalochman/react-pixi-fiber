@@ -43,7 +43,7 @@ const getPlugins = () => [
       "node_modules/react/**",
       "node_modules/react-dom/**",
       "node_modules/react-reconciler/**",
-      "node_modules/schedule/**",
+      "node_modules/scheduler/**",
     ],
   }),
   globals(),

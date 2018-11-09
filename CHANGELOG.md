@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Fixed React 16.6.0 compatibility ([#71])
+
 
 ## [0.5.1] - 2018-11-02
 
