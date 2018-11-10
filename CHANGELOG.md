@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Changed
-- Fixed React 16.6.0 compatibility ([#71])
+
+## [0.6.0] - 2018-11-10
+
+### Fixed
+- Fixed React 16.6.0 compatibility ([#83])
 
 
 ## [0.5.1] - 2018-11-02
@@ -192,7 +195,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.9...v0.5.0
 [0.4.9]: https://github.com/michalochman/react-pixi-fiber/compare/v0.4.8...v0.4.9
@@ -215,6 +219,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#83]: https://github.com/michalochman/react-pixi-fiber/pull/83
 [#81]: https://github.com/michalochman/react-pixi-fiber/issues/81
 [#76]: https://github.com/michalochman/react-pixi-fiber/pull/76
 [#72]: https://github.com/michalochman/react-pixi-fiber/pull/72
