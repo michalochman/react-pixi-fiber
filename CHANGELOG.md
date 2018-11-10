@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed context not passed through from primary renderer (`react-dom`) into `react-pixi-fiber`
+
 
 ## [0.6.0] - 2018-11-10
 
