@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added ReactDOM-like prop validation in development ([#47])
+
 
 ## [0.13.0] - 2020-02-03
 
@@ -57,17 +60,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.11.1] - 2019-10-25
 
+### Fixed
 - Fixed usage of Point copy/copyFrom in PixiJS v5 ([#149])
 
 
 ## [0.11.0] - 2019-10-22
 
-- Expose `createStageClass` from `Stage` ([#147])
+### Changed
+- Exposed `createStageClass` from `Stage` ([#147])
 - Changed dev tools version reported to be `React` version instead of `ReactPixiFiber` version ([#148])
 
 
 ## [0.10.0] - 2019-10-18
 
+### Added
+- Added `usePixiAppCreator`, `usePixiApp` and `usePixiTicker` hooks ([#127])
+
+### Changed
 - Improved hooks support ([#127])
 
 
@@ -421,6 +430,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [#58]: https://github.com/michalochman/react-pixi-fiber/issues/58
 [#54]: https://github.com/michalochman/react-pixi-fiber/issues/54
 [#53]: https://github.com/michalochman/react-pixi-fiber/pull/53
+[#47]: https://github.com/michalochman/react-pixi-fiber/pull/47
 [#44]: https://github.com/michalochman/react-pixi-fiber/issues/44
 [#43]: https://github.com/michalochman/react-pixi-fiber/issues/43
 [#38]: https://github.com/michalochman/react-pixi-fiber/issues/38
