@@ -19,7 +19,7 @@
   "dependencies": {
     "fbjs": "^0.8.0",
     "performance-now": "^2.1.0",
-    "react-reconciler": "^0.13.0"
+    "react-reconciler": "^0.17.0"
   },
   "peerDependencies": {
     "pixi.js": "^4.4.0",

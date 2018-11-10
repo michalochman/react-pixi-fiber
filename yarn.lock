@@ -3304,14 +3304,15 @@ react-dom@^16.0.0:
     prop-types "^15.6.2"
     schedule "^0.3.0"
 
-react-reconciler@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.13.0.tgz#89a5ff1403d03fee2b8760d515b133ff3d87a044"
+react-reconciler@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.17.0.tgz#7ea99b61290956efb895bdb8a3a288dafeb585b5"
+  integrity sha512-gDcWwagjyNldniQ4TrekdBUAYB6GtZ/PhMCN92G521HcbmKPq/sGd8HI41gEK9/lqeTSR/YFUFEndSIlmS5wLA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.2"
-    schedule "^0.3.0"
+    scheduler "^0.11.0"
 
 react-test-renderer@^16.0.0:
   version "16.2.0"
@@ -3762,6 +3763,14 @@ schedule@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/schedule/-/schedule-0.3.0.tgz#1be2ab2fc2e768536269ce7326efb478d6c045e8"
   dependencies:
+    object-assign "^4.1.1"
+
+scheduler@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.11.0.tgz#def1f1bfa6550cc57981a87106e65e8aea41a6b5"
+  integrity sha512-MAYbBfmiEHxF0W+c4CxMpEqMYK+rYF584VP/qMKSiHM6lTkBKKYOJaDiSILpJHla6hBOsVd6GucPL46o2Uq3sg==
+  dependencies:
+    loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
 "semver@2 || 3 || 4 || 5":
