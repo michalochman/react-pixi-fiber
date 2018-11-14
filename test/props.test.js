@@ -1,4 +1,4 @@
-import { CHILDREN, DEFAULT_PROPS, RESERVED_PROPS } from "../src/props";
+import { CHILDREN, DEFAULT_PROPS, RESERVED_PROPS, EVENT_PROPS } from "../src/props";
 
 describe("props", () => {
   describe("CHILDREN", () => {
@@ -36,4 +36,38 @@ describe("props", () => {
       });
     });
   });
+
+  describe("EVENT_PROPS", () => {
+    it("contain all DisplayObject events", () => {
+      expect(EVENT_PROPS).toEqual([
+        "added",
+        "removed",
+        "click",
+        "mousedown",
+        "mousemove",
+        "mouseout",
+        "mouseover",
+        "mouseup",
+        "mouseupoutside",
+        "pointercancel",
+        "pointerdown",
+        "pointermove",
+        "pointerout",
+        "pointerover",
+        "pointertap",
+        "pointerup",
+        "pointerupoutside",
+        "rightclick",
+        "rightdown",
+        "rightup",
+        "rightupoutside",
+        "tap",
+        "touchcancel",
+        "touchend",
+        "touchendoutside",
+        "touchmove",
+        "touchstart",
+      ]);
+    });
+  })
 });
