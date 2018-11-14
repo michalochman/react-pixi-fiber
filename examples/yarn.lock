@@ -6061,10 +6061,10 @@ react-error-overlay@^3.0.0:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
   integrity sha512-XzgvowFrwDo6TWcpJ/WTiarb9UI6lhA4PMzS7n1joK3sHfBBBOQHUc0U4u57D6DWO9vHv6lVSWx2Q/Ymfyv4hw==
 
-react-pixi-fiber@0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.6.1.tgz#270f0a0dafa1b80f00fd62db3d8e6bb60470b19d"
-  integrity sha512-yWTJz+JChX7Geh9X3wqYBnIDRXzUdGAZjkQBqREcTJ7s76z0C0bZMQIAEmI1FCbmGt3v9Tg/B7ckXBoJKNHp1g==
+react-pixi-fiber@0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.6.2.tgz#814e1316135d2033452aa9fa9eb1fa515eea1481"
+  integrity sha512-ZmcgW7gzTXdTLVei/mYHRf12Q+Tbf8wGt+ZnMo1UgtBiwHrphJSd2BpiOeypbVLNpxxiJXkPU1Lvgw72sN6XGA==
   dependencies:
     fbjs "^0.8.0"
     performance-now "^2.1.0"
