@@ -33,3 +33,12 @@ export const DEFAULT_PROPS = {
   x: 0,
   y: 0,
 };
+
+// List of all Pixi events
+export const EVENT_PROPS = ['added', 'click', 'mousedown', 'mousemove', 'mouseout',
+  'mouseover', 'mouseup', 'mouseupoutside', 'pointercancel', 'pointerdown',
+  'pointermove', 'pointerout', 'pointerover', 'pointertap', 'pointerup',
+  'pointerupoutside', 'removed', 'rightclick', 'rightdown', 'rightup',
+  'rightupoutside', 'tap', 'touchcancel', 'touchend', 'touchendoutside',
+  'touchmove', 'touchstart'
+];
