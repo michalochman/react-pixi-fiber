@@ -38,7 +38,7 @@ describe("props", () => {
   });
 
   describe("EVENT_PROPS", () => {
-    it("contain all DisplayObject events", () => {
+    it("should be a list containing all DisplayObject events", () => {
       expect(EVENT_PROPS).toEqual([
         "added",
         "removed",
