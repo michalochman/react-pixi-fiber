@@ -15,3 +15,5 @@ export const ParticleContainer = TYPES.PARTICLE_CONTAINER;
 export const Sprite = TYPES.SPRITE;
 export const Text = TYPES.TEXT;
 export const TilingSprite = TYPES.TILING_SPRITE;
+
+export { usePixi, usePixiTicker, usePreviousProps, usePixiApp } from "./hooks";

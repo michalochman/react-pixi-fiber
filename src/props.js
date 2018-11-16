@@ -33,3 +33,4 @@ export const DEFAULT_PROPS = {
   x: 0,
   y: 0,
 };
+
