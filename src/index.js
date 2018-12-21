@@ -3,10 +3,11 @@ import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage from "./Stage";
 import { TYPES } from "./types";
 import { render } from "./render";
+import { unstable_batchedUpdates } from "./ReactPixiFiber";
 
 /* Public API */
 
-export { AppContext, AppProvider, CustomPIXIComponent, Stage, render, withApp };
+export { AppContext, AppProvider, CustomPIXIComponent, Stage, render, withApp, unstable_batchedUpdates };
 
 export const BitmapText = TYPES.BITMAP_TEXT;
 export const Container = TYPES.CONTAINER;

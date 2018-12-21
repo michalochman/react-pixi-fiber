@@ -156,4 +156,11 @@ declare module 'react-pixi-fiber' {
    * AppContext
    */
   export const AppContext: React.Context<PIXI.Application>;
+
+  /**
+   * BatchedUpdates same as ReactDOM
+   */
+  export function unstable_batchedUpdates<A, B>(callback: (a: A, b: B) => any, a: A, b: B): void;
+  export function unstable_batchedUpdates<A>(callback: (a: A) => any, a: A): void;
+  export function unstable_batchedUpdates(callback: () => any): void;
 }
