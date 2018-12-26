@@ -47,7 +47,7 @@ declare module 'react-pixi-fiber' {
   export interface ContainerProperties extends ChildlessComponent<PIXI.Container> {}
 
   /**
-   * A component wrapper for `PIXI.extras.BitmapText`.
+   * A component wrapper for `PIXI.Container`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Container.html
    */
