@@ -264,4 +264,7 @@ export const ReactPixiFiberAsPrimaryRenderer = ReactFiberReconciler({ ...hostCon
 // React Pixi Fiber renderer is secondary to React DOM renderer if used together
 export const ReactPixiFiberAsSecondaryRenderer = ReactFiberReconciler({ ...hostConfig, isPrimaryRenderer: false });
 
+// If use ReactDOM to render, try use ReactDOM.unstable_batchedUpdates
+export const unstable_batchedUpdates = ReactPixiFiberAsPrimaryRenderer.batchedUpdates;
+
 export default ReactPixiFiberAsSecondaryRenderer;

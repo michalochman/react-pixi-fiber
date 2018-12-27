@@ -1,7 +1,9 @@
+import React from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import { __RewireAPI__ as ReactPixiFiberRewireAPI } from "../src/ReactPixiFiber";
+import { render } from "../src/render";
 import { DEFAULT_PROPS } from "../src/props";
 import { TYPES } from "../src/types";
 import * as utils from "../src/utils";
@@ -497,6 +499,39 @@ describe("ReactPixiFiber", () => {
     it("does nothing", () => {
       expect(() => ReactPixiFiber.commitMount()).not.toThrow();
       expect(ReactPixiFiber.commitMount()).toBeUndefined();
+    });
+  });
+
+  describe("unstable_batchedUpdates", () => {
+    it("should render one time when call setState many times", () => {
+      const app = new PIXI.Application();
+      const root = app.stage;
+      const nextState = {};
+      const fooRender = jest.fn();
+      let foo = null;
+
+      class Foo extends React.Component {
+        constructor() {
+          super();
+          this.state = { bar: 1 };
+          this.render = fooRender;
+        }
+        componentDidMount() {
+          foo = this;
+        }
+      }
+
+      render(<Foo />, root);
+
+      // first render
+      expect(fooRender).toHaveBeenCalledTimes(1);
+
+      ReactPixiFiber.unstable_batchedUpdates(() => {
+        foo.setState(nextState);
+        foo.setState(nextState);
+      });
+
+      expect(fooRender).toHaveBeenCalledTimes(2);
     });
   });
 });
