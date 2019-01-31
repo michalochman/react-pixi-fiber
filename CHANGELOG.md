@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed `customDidAttach` of example `<DraggableContainer />` component ([#91])
+
 
 ## [0.7.0] - 2018-12-27
 
@@ -240,6 +243,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#91]: https://github.com/michalochman/react-pixi-fiber/issues/91
 [#89]: https://github.com/michalochman/react-pixi-fiber/pull/89
 [#85]: https://github.com/michalochman/react-pixi-fiber/issues/85
 [#84]: https://github.com/michalochman/react-pixi-fiber/pull/84
