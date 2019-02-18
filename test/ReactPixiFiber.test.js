@@ -196,9 +196,6 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("insertBefore", () => {
-    const parent = {
-      getChildIndex: jest.fn(),
-    };
     const child1 = {
       idx: 0,
     };
@@ -210,34 +207,31 @@ describe("ReactPixiFiber", () => {
       jest.resetAllMocks();
     });
 
-    it("sets child index if child is already added to parent", () => {
+    it("adds child at specified index if child is already added to parent", () => {
       const parent = {
         addChildAt: jest.fn(),
+        removeChild: jest.fn(),
         children: [child1, child2],
         getChildIndex: jest.fn(child => child.idx),
-        setChildIndex: jest.fn(),
       };
 
       ReactPixiFiber.insertBefore(parent, child1, child2);
-      expect(parent.setChildIndex).toHaveBeenCalledTimes(1);
-      expect(parent.setChildIndex).toHaveBeenCalledWith(child1, child2.idx);
-
-      parent.setChildIndex.mockReset();
-
-      ReactPixiFiber.insertBefore(parent, child2, child1);
-      expect(parent.setChildIndex).toHaveBeenCalledTimes(1);
-      expect(parent.setChildIndex).toHaveBeenCalledWith(child2, child1.idx);
+      expect(parent.removeChild).toHaveBeenCalledTimes(1);
+      expect(parent.removeChild).toHaveBeenCalledWith(child1);
+      expect(parent.addChildAt).toHaveBeenCalledTimes(1);
+      expect(parent.addChildAt).toHaveBeenCalledWith(child1, child2.idx);
     });
 
     it("adds child at specified index if child is not already added to parent", () => {
       const parent = {
         addChildAt: jest.fn(),
+        removeChild: jest.fn(),
         children: [child2],
         getChildIndex: jest.fn(child => child.idx),
-        setChildIndex: jest.fn(),
       };
 
       ReactPixiFiber.insertBefore(parent, child1, child2);
+      expect(parent.removeChild).not.toHaveBeenCalled();
       expect(parent.addChildAt).toHaveBeenCalledTimes(1);
       expect(parent.addChildAt).toHaveBeenCalledWith(child1, child2.idx);
     });
