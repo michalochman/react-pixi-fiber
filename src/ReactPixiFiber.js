@@ -105,8 +105,10 @@ export function removeChild(parentInstance, child) {
 export function insertBefore(parentInstance, child, beforeChild) {
   invariant(child !== beforeChild, "ReactPixiFiber cannot insert node before itself");
 
-  if (child.parent) {
-    child.parent.removeChild(child);
+  const childExists = parentInstance.children.indexOf(child) !== -1;
+
+  if (childExists) {
+    parentInstance.removeChild(child);
   }
 
   const index = parentInstance.getChildIndex(beforeChild);
