@@ -1,10 +1,10 @@
-import { Sprite, applyProps } from "react-pixi-fiber";
+import { Sprite, applyDisplayObjectProps } from "react-pixi-fiber";
 import * as Animated from "animated";
 import * as PIXI from "pixi.js";
 
 function ApplyAnimatedValues(instance, props) {
   if (instance instanceof PIXI.DisplayObject) {
-    applyProps(instance, {}, props);
+    applyDisplayObjectProps(instance, {}, props);
   } else {
     return false;
   }
