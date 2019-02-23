@@ -47,6 +47,8 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.7.0",
     "jest": "^24.1.0",
+    "jest-environment-jsdom-with-canvas": "https://github.com/arcatdmz/jest-environment-jsdom-with-canvas.git",
+    "jsdom": "^13.2.0",
     "pixi.js": "^4.4.0",
     "prettier": "^1.12.1",
     "react": "^16.0.0",
@@ -92,6 +94,7 @@
     "setupFiles": [
       "./test/jest.setupPixi.js"
     ],
+    "testEnvironment": "jest-environment-jsdom-with-canvas",
     "transform": {
       "^.+\\.js$": "babel-jest"
     }
