@@ -92,7 +92,7 @@
       "__DEV__": true
     },
     "setupFiles": [
-      "./test/jest.setupPixi.js"
+      "./config/jest/setupPixi.js"
     ],
     "testEnvironment": "jest-environment-jsdom-with-canvas",
     "transform": {
