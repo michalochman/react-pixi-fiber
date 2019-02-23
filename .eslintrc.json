@@ -18,5 +18,11 @@
   },
   "globals": {
     "__DEV__": false
+  },
+  "settings": {
+    "react": {
+      "pragma": "React",
+      "version": "detect"
+    }
   }
 }
