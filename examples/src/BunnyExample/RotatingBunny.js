@@ -23,16 +23,21 @@ class RotatingBunny extends Component {
     // creates frame-independent tranformation
     this.setState(state => ({
       ...state,
-      rotation: state.rotation + 0.1 * delta,
+      rotation: state.rotation + this.props.step * delta,
     }));
   };
 
   render() {
-    return <Bunny {...this.props} rotation={this.state.rotation} />;
+    const { step, ...props } = this.props;
+    return <Bunny {...props} rotation={this.state.rotation} />;
   }
 }
 RotatingBunny.propTypes = {
   app: PropTypes.object.isRequired,
+  step: PropTypes.number,
+};
+RotatingBunny.defaultProps = {
+  step: 0.1,
 };
 
 export default withApp(RotatingBunny);

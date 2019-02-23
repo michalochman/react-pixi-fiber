@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Stage } from "react-pixi-fiber";
 import Animated from "./animatedPixiTarget";
 import * as PIXI from "pixi.js";
-import bunny from "../Bunny/bunny.png";
+import Bunny from "../Bunny";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
@@ -26,8 +26,9 @@ class BunnyExample extends Component {
   render() {
     return (
       <Stage width={800} height={600} options={OPTIONS}>
-        <Animated.Sprite
+        <Bunny
           anchor={centerAnchor}
+          as={Animated.Sprite}
           interactive
           pointerdown={this.handleDown}
           pointerup={this.handleUp}
@@ -40,7 +41,6 @@ class BunnyExample extends Component {
             inputRange: [0, 1],
             outputRange: [1, 8],
           })}
-          texture={PIXI.Texture.fromImage(bunny)}
         />
       </Stage>
     );
