@@ -8,12 +8,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.8.0] - 2019-02-24
+
 ### Added
 - Expose `applyProps` from `ReactPixiFiber` ([#95])
 - Added example of "native" Animated target for `react-pixi-fiber` ([#95])
+- Added custom test environment for `jest` ([#97])
+
+### Changed
+- Replaced deprecated canvas-prebuilt development dependency by canvas ([#97])
 
 ### Fixed
 - Fixed `customDidAttach` of example `<DraggableContainer />` component ([#91])
+- Fixed `insertBefore` method of `ReactPixiFiber` ([#98])
 
 
 ## [0.7.0] - 2018-12-27
@@ -220,7 +228,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.0...v0.6.1
@@ -247,6 +256,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#98]: https://github.com/michalochman/react-pixi-fiber/pull/98
+[#97]: https://github.com/michalochman/react-pixi-fiber/pull/97
+[#95]: https://github.com/michalochman/react-pixi-fiber/pull/95
 [#91]: https://github.com/michalochman/react-pixi-fiber/issues/91
 [#89]: https://github.com/michalochman/react-pixi-fiber/pull/89
 [#85]: https://github.com/michalochman/react-pixi-fiber/issues/85
