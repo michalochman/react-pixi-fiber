@@ -4,13 +4,13 @@
   "private": true,
   "dependencies": {
     "animated": "^0.2.2",
-    "pixi.js": "4.8.2",
     "pixi-layers": "^0.1.9",
+    "pixi.js": "4.8.2",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-pixi-fiber": "0.8.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.0.17",
+    "react-scripts": "2.1.5",
     "stats.js": "^0.17.0"
   },
   "scripts": {
@@ -18,5 +18,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
