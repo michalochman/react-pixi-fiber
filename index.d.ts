@@ -84,7 +84,9 @@ declare module 'react-pixi-fiber' {
   export class Sprite extends React.Component<SpriteProperties> {}
 
   /** `Text` component properties */
-  export interface TextProperties extends ChildlessComponent<PIXI.Text> {}
+  export interface TextProperties extends ChildlessComponent<PIXI.Text> {
+    anchor: number[];
+  }
 
   /**
    * A component wrapper for `PIXI.Text`.
