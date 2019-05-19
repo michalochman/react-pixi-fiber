@@ -85,7 +85,7 @@ declare module 'react-pixi-fiber' {
 
   /** `Text` component properties */
   export interface TextProperties extends ChildlessComponent<PIXI.Text> {
-    anchor: number[] | PIXI.ObservablePoint;
+    anchor?: number[] | PIXI.ObservablePoint;
   }
 
   /**
