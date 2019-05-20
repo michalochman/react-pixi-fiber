@@ -13,7 +13,7 @@ import Stage, {
 } from "../src/Stage";
 import { render, unmount } from "../src/render";
 import { AppProvider } from "../src/AppProvider";
-import { DEFAULT_PROPS } from "../src/props";
+import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
 
 jest.mock("../src/ReactPixiFiber", () => {
   return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
@@ -176,7 +176,12 @@ describe("Stage", () => {
     const stage = instance._app.stage;
 
     expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children}</AppProvider>, stage);
+    expect(render).toHaveBeenCalledWith(
+      <AppProvider app={instance._app}>{children}</AppProvider>,
+      stage,
+      undefined,
+      instance
+    );
   });
 
   it("calls render on componentDidUpdate", () => {
@@ -190,7 +195,12 @@ describe("Stage", () => {
     element.update(<Stage>{children2}</Stage>);
 
     expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app}>{children2}</AppProvider>, stage);
+    expect(render).toHaveBeenCalledWith(
+      <AppProvider app={instance._app}>{children2}</AppProvider>,
+      stage,
+      undefined,
+      instance
+    );
   });
 
   it("calls unmount on componentWillUnmount", () => {
@@ -235,6 +245,12 @@ describe("validateCanvas", () => {
 describe("includingDisplayObjectProps", () => {
   it("returns true if prop is one of DisplayObject members", () => {
     Object.keys(DEFAULT_PROPS).forEach(propName => {
+      expect(includingDisplayObjectProps(propName)).toBeTruthy();
+    });
+  });
+
+  it("returns true if prop is one of DisplayObject events", () => {
+    EVENT_PROPS.forEach(propName => {
       expect(includingDisplayObjectProps(propName)).toBeTruthy();
     });
   });

@@ -106,13 +106,13 @@ export function insertBefore(parentInstance, child, beforeChild) {
   invariant(child !== beforeChild, "ReactPixiFiber cannot insert node before itself");
 
   const childExists = parentInstance.children.indexOf(child) !== -1;
-  const index = parentInstance.getChildIndex(beforeChild);
 
   if (childExists) {
-    parentInstance.setChildIndex(child, index);
-  } else {
-    parentInstance.addChildAt(child, index);
+    parentInstance.removeChild(child);
   }
+
+  const index = parentInstance.getChildIndex(beforeChild);
+  parentInstance.addChildAt(child, index);
 }
 
 export function commitUpdate(instance, updatePayload, type, lastRawProps, nextRawProps, internalInstanceHandle) {
@@ -263,5 +263,8 @@ export const ReactPixiFiberAsPrimaryRenderer = ReactFiberReconciler({ ...hostCon
 
 // React Pixi Fiber renderer is secondary to React DOM renderer if used together
 export const ReactPixiFiberAsSecondaryRenderer = ReactFiberReconciler({ ...hostConfig, isPrimaryRenderer: false });
+
+// If use ReactDOM to render, try use ReactDOM.unstable_batchedUpdates
+export const unstable_batchedUpdates = ReactPixiFiberAsPrimaryRenderer.batchedUpdates;
 
 export default ReactPixiFiberAsSecondaryRenderer;

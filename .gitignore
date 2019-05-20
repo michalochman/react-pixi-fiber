@@ -14,4 +14,4 @@ chrome-user-data
 *.swp
 *.swo
 .envrc
-/stats.html
+/stats.*.html

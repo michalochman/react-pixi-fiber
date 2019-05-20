@@ -1,12 +1,32 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Sprite } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
-import bunny from "./bunny.png";
+import bunnys from "./bunnys.png";
 
 const centerAnchor = new PIXI.Point(0.5, 0.5);
 
+const bunnyTextures = new PIXI.Texture.fromImage(bunnys);
+const textures = [
+  new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37)),
+  new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37)),
+  new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37)),
+  new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 164, 26, 37)),
+  new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 2, 26, 37)),
+];
+
 function Bunny(props) {
-  return <Sprite anchor={centerAnchor} texture={PIXI.Texture.fromImage(bunny)} {...props} />;
+  const texture = textures[props.texture];
+  const Component = props.as;
+  return <Component anchor={centerAnchor} {...props} texture={texture} />;
 }
+Bunny.propTypes = {
+  as: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  texture: PropTypes.number,
+};
+Bunny.defaultProps = {
+  as: Sprite,
+  texture: 0,
+};
 
 export default Bunny;

@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as PIXI from "pixi.js";
 import { AppProvider } from "./AppProvider";
-import { DEFAULT_PROPS } from "./props";
+import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
 import { applyProps } from "./ReactPixiFiber";
 import { render, unmount } from "./render";
 import { filterByKey, including } from "./utils";
@@ -48,7 +48,7 @@ const propTypes = {
   width: PropTypes.number,
 };
 
-export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS));
+export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS).concat(EVENT_PROPS));
 export const includingStageProps = including(Object.keys(propTypes));
 export const includingCanvasProps = key => !includingDisplayObjectProps(key) && !includingStageProps(key);
 
@@ -70,7 +70,7 @@ class Stage extends React.Component {
     const stageProps = getDisplayObjectProps(this.props);
     applyProps(this._app.stage, {}, stageProps);
 
-    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage);
+    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage, undefined, this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -90,7 +90,7 @@ class Stage extends React.Component {
       this._app.renderer.resize(currentWidth, currentHeight);
     }
 
-    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage);
+    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage, undefined, this);
   }
 
   componentWillUnmount() {

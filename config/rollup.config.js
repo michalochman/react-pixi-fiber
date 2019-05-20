@@ -4,19 +4,18 @@ const commonjs = require("rollup-plugin-commonjs");
 const globals = require("rollup-plugin-node-globals");
 const replace = require("rollup-plugin-replace");
 const resolve = require("rollup-plugin-node-resolve");
-const uglify = require("rollup-plugin-uglify");
+const { terser } = require("rollup-plugin-terser");
 const visualizer = require("rollup-plugin-visualizer");
 
 const NODE_ENV = process.env.NODE_ENV || "production";
 const isProduction = NODE_ENV === "production";
-const entries = (process.env.entry || "index,alias").split(",");
 
 const getOutputFile = name => {
   const suffix = isProduction ? "production.min" : "development";
   return `cjs/${name}.${suffix}.js`;
 };
 
-const getPlugins = () => [
+const getPlugins = entry => [
   json({
     preferConst: true,
     indent: "  ",
@@ -43,16 +42,18 @@ const getPlugins = () => [
       "node_modules/react/**",
       "node_modules/react-dom/**",
       "node_modules/react-reconciler/**",
-      "node_modules/schedule/**",
+      "node_modules/scheduler/**",
     ],
   }),
   globals(),
-  isProduction && uglify(),
-  visualizer(),
+  isProduction && terser(),
+  visualizer({
+    filename: `./stats.${entry}.${isProduction ? "production" : "development"}.html`,
+  }),
 ];
 
-const configs = {
-  index: {
+export default [
+  {
     input: "src/index.js",
     output: {
       file: getOutputFile("react-pixi-fiber"),
@@ -60,10 +61,10 @@ const configs = {
       exports: "named",
       format: "cjs",
     },
-    plugins: getPlugins(),
+    plugins: getPlugins("index"),
     external: ["pixi.js", "prop-types", "react", "react-dom"],
   },
-  alias: {
+  {
     input: "src/react-pixi-alias/index.js",
     output: {
       file: getOutputFile("react-pixi-alias"),
@@ -71,13 +72,7 @@ const configs = {
       exports: "named",
       format: "cjs",
     },
-    plugins: getPlugins(),
+    plugins: getPlugins("alias"),
     external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
   },
-};
-
-const config = Object.keys(configs)
-  .filter(key => entries.indexOf(key) !== -1)
-  .map(key => configs[key]);
-
-export default config;
+];

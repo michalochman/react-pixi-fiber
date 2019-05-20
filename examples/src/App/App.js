@@ -13,6 +13,7 @@ import CustomBunnymarkExample from "../CustomBunnymarkExample";
 import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
+import BatchedUpdatesExample from "../BatchedUpdatesExample";
 import Stats from "../Stats";
 
 const examples = [
@@ -66,6 +67,11 @@ const examples = [
     slug: "points",
     component: PointsExample,
   },
+  {
+    name: "unstable_batchedUpdates",
+    slug: "unstable_batchedUpdates",
+    component: BatchedUpdatesExample,
+  }
 ];
 
 class App extends Component {

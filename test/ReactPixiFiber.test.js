@@ -1,7 +1,9 @@
+import React from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import { __RewireAPI__ as ReactPixiFiberRewireAPI } from "../src/ReactPixiFiber";
+import { render } from "../src/render";
 import { DEFAULT_PROPS } from "../src/props";
 import { TYPES } from "../src/types";
 import * as utils from "../src/utils";
@@ -194,9 +196,6 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("insertBefore", () => {
-    const parent = {
-      getChildIndex: jest.fn(),
-    };
     const child1 = {
       idx: 0,
     };
@@ -208,34 +207,31 @@ describe("ReactPixiFiber", () => {
       jest.resetAllMocks();
     });
 
-    it("sets child index if child is already added to parent", () => {
+    it("adds child at specified index if child is already added to parent", () => {
       const parent = {
         addChildAt: jest.fn(),
+        removeChild: jest.fn(),
         children: [child1, child2],
         getChildIndex: jest.fn(child => child.idx),
-        setChildIndex: jest.fn(),
       };
 
       ReactPixiFiber.insertBefore(parent, child1, child2);
-      expect(parent.setChildIndex).toHaveBeenCalledTimes(1);
-      expect(parent.setChildIndex).toHaveBeenCalledWith(child1, child2.idx);
-
-      parent.setChildIndex.mockReset();
-
-      ReactPixiFiber.insertBefore(parent, child2, child1);
-      expect(parent.setChildIndex).toHaveBeenCalledTimes(1);
-      expect(parent.setChildIndex).toHaveBeenCalledWith(child2, child1.idx);
+      expect(parent.removeChild).toHaveBeenCalledTimes(1);
+      expect(parent.removeChild).toHaveBeenCalledWith(child1);
+      expect(parent.addChildAt).toHaveBeenCalledTimes(1);
+      expect(parent.addChildAt).toHaveBeenCalledWith(child1, child2.idx);
     });
 
     it("adds child at specified index if child is not already added to parent", () => {
       const parent = {
         addChildAt: jest.fn(),
+        removeChild: jest.fn(),
         children: [child2],
         getChildIndex: jest.fn(child => child.idx),
-        setChildIndex: jest.fn(),
       };
 
       ReactPixiFiber.insertBefore(parent, child1, child2);
+      expect(parent.removeChild).not.toHaveBeenCalled();
       expect(parent.addChildAt).toHaveBeenCalledTimes(1);
       expect(parent.addChildAt).toHaveBeenCalledWith(child1, child2.idx);
     });
@@ -497,6 +493,39 @@ describe("ReactPixiFiber", () => {
     it("does nothing", () => {
       expect(() => ReactPixiFiber.commitMount()).not.toThrow();
       expect(ReactPixiFiber.commitMount()).toBeUndefined();
+    });
+  });
+
+  describe("unstable_batchedUpdates", () => {
+    it("should render one time when call setState many times", () => {
+      const app = new PIXI.Application();
+      const root = app.stage;
+      const nextState = {};
+      const fooRender = jest.fn();
+      let foo = null;
+
+      class Foo extends React.Component {
+        constructor() {
+          super();
+          this.state = { bar: 1 };
+          this.render = fooRender;
+        }
+        componentDidMount() {
+          foo = this;
+        }
+      }
+
+      render(<Foo />, root);
+
+      // first render
+      expect(fooRender).toHaveBeenCalledTimes(1);
+
+      ReactPixiFiber.unstable_batchedUpdates(() => {
+        foo.setState(nextState);
+        foo.setState(nextState);
+      });
+
+      expect(fooRender).toHaveBeenCalledTimes(2);
     });
   });
 });
