@@ -26,7 +26,6 @@ declare module 'react-pixi-fiber' {
    * Extra properties to add to allow us to set event handlers using props
    */
   export interface InteractiveComponent {
-    interactive?: boolean;
     pointerdown?: (event: PIXI.interaction.InteractionEvent) => void;
     pointercancel?: (event: PIXI.interaction.InteractionEvent) => void;
     pointerup?: (event: PIXI.interaction.InteractionEvent) => void;
@@ -52,7 +51,6 @@ declare module 'react-pixi-fiber' {
     mousemove?: (event: PIXI.interaction.InteractionEvent) => void;
     mouseover?: (event: PIXI.interaction.InteractionEvent) => void;
     mouseout?: (event: PIXI.interaction.InteractionEvent) => void;
-    mouseover?: (event: PIXI.interaction.InteractionEvent) => void;
   }
 
   /**
