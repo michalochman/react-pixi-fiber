@@ -220,7 +220,7 @@ class RotatingBunny extends Component {
     return (
       <Sprite 
         {...this.props}
-        texture={PIXI.Texture.fromImage(bunny)}
+        texture={PIXI.Texture.from(bunny)}
         rotation={this.state.rotation} 
       />
     );
