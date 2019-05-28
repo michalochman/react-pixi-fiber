@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as PIXI from 'pixi.js';
+import {InteractiveComponent} from "react-pixi-fiber";
 
 declare module 'react-pixi-fiber' {
 
@@ -22,6 +23,37 @@ declare module 'react-pixi-fiber' {
   }
 
   /**
+   * Extra properties to add to allow us to set event handlers using props
+   */
+  export interface InteractiveComponent {
+    pointerdown?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointercancel?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointerup?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointertap?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointerupoutside?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointermove?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointerover?: (event: PIXI.interaction.InteractionEvent) => void;
+    pointerout?: (event: PIXI.interaction.InteractionEvent) => void;
+    touchstart?: (event: PIXI.interaction.InteractionEvent) => void;
+    touchcancel?: (event: PIXI.interaction.InteractionEvent) => void;
+    touchend?: (event: PIXI.interaction.InteractionEvent) => void;
+    touchendoutside?: (event: PIXI.interaction.InteractionEvent) => void;
+    touchmove?: (event: PIXI.interaction.InteractionEvent) => void;
+    tap?: (event: PIXI.interaction.InteractionEvent) => void;
+    rightdown?: (event: PIXI.interaction.InteractionEvent) => void;
+    mousedown?: (event: PIXI.interaction.InteractionEvent) => void;
+    rightup?: (event: PIXI.interaction.InteractionEvent) => void;
+    mouseup?: (event: PIXI.interaction.InteractionEvent) => void;
+    rightclick?: (event: PIXI.interaction.InteractionEvent) => void;
+    click?: (event: PIXI.interaction.InteractionEvent) => void;
+    rightupoutside?: (event: PIXI.interaction.InteractionEvent) => void;
+    mouseupoutside?: (event: PIXI.interaction.InteractionEvent) => void;
+    mousemove?: (event: PIXI.interaction.InteractionEvent) => void;
+    mouseover?: (event: PIXI.interaction.InteractionEvent) => void;
+    mouseout?: (event: PIXI.interaction.InteractionEvent) => void;
+  }
+
+  /**
    * A PIXI Component with no children.
    */
   export type ChildlessComponent<T extends ObjectWithChildren> = Partial<Childless<T>>;
@@ -32,7 +64,7 @@ declare module 'react-pixi-fiber' {
   export type Component<T extends ObjectWithChildren> = ChildlessComponent<T> & ChildrenProperties;
 
   /** `BitmapText` component properties. */
-  export interface BitmapTextProperties extends ChildlessComponent<PIXI.extras.BitmapText> {
+  export interface BitmapTextProperties extends ChildlessComponent<PIXI.extras.BitmapText & InteractiveComponent> {
     text: string;
   }
 
@@ -44,7 +76,7 @@ declare module 'react-pixi-fiber' {
   export class BitmapText extends React.Component<BitmapTextProperties> {}
 
   /** `Container` component properties. */
-  export interface ContainerProperties extends ChildlessComponent<PIXI.Container> {}
+  export interface ContainerProperties extends ChildlessComponent<PIXI.Container & InteractiveComponent> {}
 
   /**
    * A component wrapper for `PIXI.Container`.
@@ -54,7 +86,7 @@ declare module 'react-pixi-fiber' {
   export class Container extends React.Component<ContainerProperties> {}
 
   /** `Graphics` component properties. */
-  export interface GraphicsProperties extends Component<PIXI.Graphics> {}
+  export interface GraphicsProperties extends Component<PIXI.Graphics & InteractiveComponent> {}
 
   /**
    * A component wrapper for `PIXI.Graphics`.
@@ -64,7 +96,7 @@ declare module 'react-pixi-fiber' {
   export class Graphics extends React.Component<GraphicsProperties> {}
 
   /** `ParticleContainer` component properties. */
-  export interface ParticleContainerProperties extends ChildlessComponent<PIXI.particles.ParticleContainer> {}
+  export interface ParticleContainerProperties extends ChildlessComponent<PIXI.particles.ParticleContainer & InteractiveComponent> {}
 
   /**
    * A component wrapper for `PIXI.particles.ParticleContainer`.
@@ -74,7 +106,7 @@ declare module 'react-pixi-fiber' {
   export class ParticleContainer extends React.Component<TilingSpriteProperties> {}
 
   /** `Sprite` component properties. */
-  export interface SpriteProperties extends ChildlessComponent<PIXI.Sprite> {}
+  export interface SpriteProperties extends ChildlessComponent<PIXI.Sprite & InteractiveComponent> {}
 
   /**
    * A component wrapper for `PIXI.Sprite`.
@@ -84,7 +116,7 @@ declare module 'react-pixi-fiber' {
   export class Sprite extends React.Component<SpriteProperties> {}
 
   /** `Text` component properties */
-  export interface TextProperties extends ChildlessComponent<Omit<PIXI.Text, 'anchor'>> {
+  export interface TextProperties extends ChildlessComponent<Omit<PIXI.Text, 'anchor'> & InteractiveComponent> {
     anchor?: string | number[] | PIXI.ObservablePoint;
   }
 
@@ -96,7 +128,7 @@ declare module 'react-pixi-fiber' {
   export class Text extends React.Component<TextProperties> {}
 
   /** `TilingSprite` component properties. */
-  export interface TilingSpriteProperties extends ChildlessComponent<PIXI.extras.TilingSprite> {
+  export interface TilingSpriteProperties extends ChildlessComponent<PIXI.extras.TilingSprite & InteractiveComponent> {
     texture: PIXI.Texture;
   }
 
@@ -108,7 +140,7 @@ declare module 'react-pixi-fiber' {
   export class TilingSprite extends React.Component<TilingSpriteProperties> {}
 
   /** `Stage` component properties." */
-  export interface StageProperties extends Component<PIXI.Container> {
+  export interface StageProperties extends Component<PIXI.Container & InteractiveComponent> {
     options?: PIXI.ApplicationOptions
   }
 
@@ -146,7 +178,7 @@ declare module 'react-pixi-fiber' {
   /**
    * Create a custom component.
    */
-  export function CustomPIXIComponent<T, U extends PIXI.DisplayObject>(
+  export function CustomPIXIComponent<T, U extends PIXI.DisplayObject & InteractiveComponent>(
     behavior: Behavior<T, U>,
     /**
      * The name of this custom component.
@@ -166,3 +198,4 @@ declare module 'react-pixi-fiber' {
   export function unstable_batchedUpdates<A>(callback: (a: A) => any, a: A): void;
   export function unstable_batchedUpdates(callback: () => any): void;
 }
+
