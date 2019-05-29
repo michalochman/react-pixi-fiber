@@ -1,4 +1,3 @@
-import pkg from "../package.json";
 import invariant from "fbjs/lib/invariant";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 
@@ -20,8 +19,8 @@ export function render(element, containerTag, callback, parentComponent) {
   ReactPixiFiber.injectIntoDevTools({
     findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
     bundleType: __DEV__ ? 1 : 0,
-    version: pkg.version,
-    rendererPackageName: pkg.name,
+    version: __PACKAGE_VERSION__,
+    rendererPackageName: __PACKAGE_NAME__,
   });
 
   return ReactPixiFiber.getPublicRootInstance(root);

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+- Removed `package.json` references from bundled code
+
 
 ## [0.8.0] - 2019-02-24
 
