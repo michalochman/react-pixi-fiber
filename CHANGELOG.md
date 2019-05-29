@@ -8,8 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.8.1] - 2019-05-29
+
+### Fixed
+- Fixed interactive elements type definition ([#109])
+
 ### Removed
-- Removed `package.json` references from bundled code
+- Removed `package.json` references from bundled code ([#112])
 
 
 ## [0.8.0] - 2019-02-24
@@ -57,7 +63,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added AppContext to type definition ([#81])
 
 ### Fixed
-- Fix render function type definition ([#76])
+- Fixed render function type definition ([#76])
 
 
 ## [0.5.0] - 2018-10-10
@@ -231,7 +237,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.1...v0.6.2
@@ -259,6 +266,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#112]: https://github.com/michalochman/react-pixi-fiber/pull/112
+[#109]: https://github.com/michalochman/react-pixi-fiber/pull/109
 [#98]: https://github.com/michalochman/react-pixi-fiber/pull/98
 [#97]: https://github.com/michalochman/react-pixi-fiber/pull/97
 [#95]: https://github.com/michalochman/react-pixi-fiber/pull/95
