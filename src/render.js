@@ -12,16 +12,16 @@ export function render(element, containerTag, callback, parentComponent) {
   if (!root) {
     root = ReactPixiFiber.createContainer(containerTag);
     roots.set(containerTag, root);
+
+    ReactPixiFiber.injectIntoDevTools({
+      findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
+      bundleType: __DEV__ ? 1 : 0,
+      version: __PACKAGE_VERSION__,
+      rendererPackageName: __PACKAGE_NAME__,
+    });
   }
 
   ReactPixiFiber.updateContainer(element, root, parentComponent, callback);
-
-  ReactPixiFiber.injectIntoDevTools({
-    findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
-    bundleType: __DEV__ ? 1 : 0,
-    version: __PACKAGE_VERSION__,
-    rendererPackageName: __PACKAGE_NAME__,
-  });
 
   return ReactPixiFiber.getPublicRootInstance(root);
 }
