@@ -1,3 +1,4 @@
+const pkg = require("../package.json");
 const json = require("rollup-plugin-json");
 const babel = require("rollup-plugin-babel");
 const commonjs = require("rollup-plugin-commonjs");
@@ -29,8 +30,10 @@ const getPlugins = entry => [
     exclude: "node_modules/**",
   }),
   replace({
-    __DEV__: isProduction ? "false" : "true",
-    "process.env.NODE_ENV": isProduction ? "'production'" : "'development'",
+    __DEV__: isProduction ? JSON.stringify(false) : JSON.stringify(true),
+    __PACKAGE_NAME__: JSON.stringify(pkg.name),
+    __PACKAGE_VERSION__: JSON.stringify(pkg.version),
+    "process.env.NODE_ENV": isProduction ? JSON.stringify("production") : JSON.stringify("development"),
   }),
   commonjs({
     ignoreGlobal: false,

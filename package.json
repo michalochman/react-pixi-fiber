@@ -92,6 +92,7 @@
       "__DEV__": true
     },
     "setupFiles": [
+      "./config/jest/setupGlobals.js",
       "./config/jest/setupPixi.js"
     ],
     "testEnvironment": "jest-environment-jsdom-with-canvas",
