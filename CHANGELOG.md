@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Changed `render` to inject into dev tools once per `containerTag`
+
 
 ## [0.8.1] - 2019-05-29
 
