@@ -146,7 +146,8 @@ declare module 'react-pixi-fiber' {
 
   /** `Stage` component properties." */
   export interface StageProperties extends Component<PIXI.Container & InteractiveComponent> {
-    options?: {}
+    options?: {};
+    style?: React.CSSProperties;
   }
 
   /**
