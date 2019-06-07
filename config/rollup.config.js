@@ -11,9 +11,9 @@ const visualizer = require("rollup-plugin-visualizer");
 const NODE_ENV = process.env.NODE_ENV || "production";
 const isProduction = NODE_ENV === "production";
 
-const getOutputFile = name => {
+const getOutputFile = (name, format = "cjs") => {
   const suffix = isProduction ? "production.min" : "development";
-  return `cjs/${name}.${suffix}.js`;
+  return `${format}/${name}.${suffix}.js`;
 };
 
 const getPlugins = entry => [
@@ -77,5 +77,22 @@ export default [
     },
     plugins: getPlugins("alias"),
     external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
+  },
+  {
+    input: "src/index.js",
+    output: {
+      file: getOutputFile("react-pixi-fiber", "umd"),
+      name: "ReactPixiFiber",
+      exports: "named",
+      format: "umd",
+      globals: {
+        react: "React",
+        "react-dom": "ReactDOM",
+        "prop-types": "PropTypes",
+        "pixi.js": "PIXI",
+      },
+    },
+    plugins: getPlugins("index"),
+    external: ["pixi.js", "prop-types", "react", "react-dom"],
   },
 ];
