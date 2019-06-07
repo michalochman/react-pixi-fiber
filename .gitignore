@@ -2,6 +2,7 @@
 node_modules
 *~
 cjs/
+umd/
 coverage/
 .module-cache
 *.log*
