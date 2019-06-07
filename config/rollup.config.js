@@ -95,4 +95,22 @@ export default [
     plugins: getPlugins("index"),
     external: ["pixi.js", "prop-types", "react", "react-dom"],
   },
+  {
+    input: "src/react-pixi-alias/index.js",
+    output: {
+      file: getOutputFile("react-pixi-alias", "umd"),
+      name: "ReactPixiFiber",
+      exports: "named",
+      format: "umd",
+      globals: {
+        react: "React",
+        "react-dom": "ReactDOM",
+        "prop-types": "PropTypes",
+        "pixi.js": "PIXI",
+        "react-pixi-fiber": "ReactPixiFiber",
+      },
+    },
+    plugins: getPlugins("alias"),
+    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
+  },
 ];
