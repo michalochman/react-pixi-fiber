@@ -7,6 +7,7 @@ import {
   not,
   parsePoint,
   setPixiValue,
+  hasCopyFunction,
 } from "../src/utils";
 import { RESERVED_PROPS } from "../src/props";
 
@@ -171,5 +172,18 @@ describe("setPixiValue", () => {
       test: new PIXI.Point(0, 0),
     };
     expect(() => setPixiValue(obj, "test", false)).toThrow();
+  });
+});
+
+// The copy method has been deprecated in PIXI 5.0.
+// Should react-pixi-fiber ever be updated to use 5.0,
+// this test should probably be updated test for existance of copyForm instead.
+describe("hasCopyFunction", () => {
+  it("returns true if copy method exists", () => {
+    class JestPoint extends PIXI.Point {}
+    JestPoint.prototype.copy = jest.fn(PIXI.Point.prototype.copy);
+    const point = new JestPoint(0, 0);
+
+    expect(hasCopyFunction(point)).toBeTruthy();
   });
 });
