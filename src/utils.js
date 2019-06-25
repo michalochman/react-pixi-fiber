@@ -57,7 +57,7 @@ export function isPointType(value) {
 export function setPixiValue(instance, propName, value) {
   if (isPointType(instance[propName]) && isPointType(value)) {
     // Just copy the data if a Point type is being assigned to a Point type
-    instance[propName].copy(value);
+    instance[propName].copyFrom(value);
   } else if (isPointType(instance[propName])) {
     // Parse value if a non-Point type is being assigned to a Point type
     const coordinateData = parsePoint(value);
