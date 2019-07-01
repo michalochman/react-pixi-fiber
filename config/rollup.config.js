@@ -65,7 +65,7 @@ export default [
       format: "cjs",
     },
     plugins: getPlugins("index"),
-    external: ["pixi.js", "prop-types", "react", "react-dom"],
+    external: ["pixi.js", "prop-types", "react", "react-dom", "scheduler"],
   },
   {
     input: "src/react-pixi-alias/index.js",
@@ -76,7 +76,7 @@ export default [
       format: "cjs",
     },
     plugins: getPlugins("alias"),
-    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
+    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber", "scheduler"],
   },
   {
     input: "src/index.js",
@@ -93,7 +93,7 @@ export default [
       },
     },
     plugins: getPlugins("index"),
-    external: ["pixi.js", "prop-types", "react", "react-dom"],
+    external: ["pixi.js", "prop-types", "react", "react-dom", "scheduler"],
   },
   {
     input: "src/react-pixi-alias/index.js",
@@ -111,6 +111,6 @@ export default [
       },
     },
     plugins: getPlugins("alias"),
-    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
+    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber", "scheduler"],
   },
 ];
