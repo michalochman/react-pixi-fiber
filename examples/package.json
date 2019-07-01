@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "animated": "^0.2.2",
-    "pixi-layers": "^0.1.9",
-    "pixi.js": "4.8.2",
+    "pixi-layers": "^0.2.1",
+    "pixi.js": "^5.0.4",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-pixi-fiber": "0.8.2",

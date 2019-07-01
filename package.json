@@ -20,10 +20,10 @@
   "dependencies": {
     "fbjs": "^0.8.0",
     "performance-now": "^2.1.0",
-    "react-reconciler": "^0.17.0"
+    "react-reconciler": "^0.20.4"
   },
   "peerDependencies": {
-    "pixi.js": "^4.4.0",
+    "pixi.js": "^4.4.0 || ^5.0.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0"
   },
@@ -33,7 +33,6 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",
-    "@types/pixi.js": "^4.7.3",
     "@types/react": "^16.0.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-rewire": "^1.2.0",
@@ -50,7 +49,8 @@
     "jest": "^24.1.0",
     "jest-environment-jsdom-with-canvas": "https://github.com/arcatdmz/jest-environment-jsdom-with-canvas.git",
     "jsdom": "^13.2.0",
-    "pixi.js": "^4.4.0",
+    "pixi.js": "^5.0.4",
+    "pixi.js-legacy": "^5.0.4",
     "prettier": "^1.12.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
@@ -91,6 +91,9 @@
     ],
     "globals": {
       "__DEV__": true
+    },
+    "moduleNameMapper": {
+      "pixi.js$": "pixi.js-legacy"
     },
     "setupFiles": [
       "./config/jest/setupGlobals.js",

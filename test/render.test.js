@@ -3,6 +3,7 @@ import pkg from "../package.json";
 import { Container, Text } from "../src/index";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 import { render, roots, unmount } from "../src/render";
+import * as PIXI from 'pixi.js'
 
 jest.mock("../src/ReactPixiFiber", () => {
   const actual = require.requireActual("../src/ReactPixiFiber");

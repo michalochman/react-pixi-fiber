@@ -14,7 +14,7 @@ import {
 
 const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
 
-const texture = PIXI.Texture.fromImage('https://i.imgur.com/IaUrttj.png');
+const texture = PIXI.Texture.from('https://i.imgur.com/IaUrttj.png');
 
 const CompositionExample: React.SFC = () => (
   <Container>
@@ -23,10 +23,10 @@ const CompositionExample: React.SFC = () => (
 );
 
 const AnimatedSprite: React.ReactType = CustomPIXIComponent({
-  customDisplayObject: (props: any) => new PIXI.extras.AnimatedSprite(props.textures),
-  customApplyProps: (animatedSprite: PIXI.extras.AnimatedSprite, oldProps: any, newProps: any) => {},
-  customDidAttach: (animatedSprite: PIXI.extras.AnimatedSprite) => {},
-  customWillDetach: (animatedSprite: PIXI.extras.AnimatedSprite) => {},
+  customDisplayObject: (props: any) => new PIXI.AnimatedSprite(props.textures),
+  customApplyProps: (animatedSprite: PIXI.AnimatedSprite, oldProps: any, newProps: any) => {},
+  customDidAttach: (animatedSprite: PIXI.AnimatedSprite) => {},
+  customWillDetach: (animatedSprite: PIXI.AnimatedSprite) => {},
 }, 'AnimatedSprite');
 const CustomPIXIComponentExample: React.SFC = () => <AnimatedSprite />;
 

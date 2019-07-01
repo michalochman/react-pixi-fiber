@@ -61,7 +61,7 @@ class CustomBunnymark extends Component {
   };
 
   componentDidMount() {
-    const bunnyTextures = new PIXI.Texture.fromImage(bunnys);
+    const bunnyTextures = new PIXI.Texture.from(bunnys);
     const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
     const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
     const bunny3 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37));
