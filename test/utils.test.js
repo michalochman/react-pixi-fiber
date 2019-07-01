@@ -7,6 +7,7 @@ import {
   not,
   parsePoint,
   setPixiValue,
+  copyPoint,
 } from "../src/utils";
 import { RESERVED_PROPS } from "../src/props";
 
@@ -171,5 +172,35 @@ describe("setPixiValue", () => {
       test: new PIXI.Point(0, 0),
     };
     expect(() => setPixiValue(obj, "test", false)).toThrow();
+  });
+});
+
+// The copy method has been deprecated in PIXI 5.0.
+// Should react-pixi-fiber ever be updated to use 5.0,
+// this test should probably be updated test for existance of copyForm instead.
+describe("copyPoint", () => {
+  const PixiJSv4Point = { copy: jest.fn() };
+  const PixiJSv5Point = { copyFrom: jest.fn() };
+
+  it("copies value using copy method when using PixiJS v4", () => {
+    const instance = {
+      position: PixiJSv4Point,
+    };
+    const position = new PIXI.Point(13, 37);
+
+    copyPoint(instance, "position", position);
+    expect(PixiJSv4Point.copy).toHaveBeenCalledTimes(1);
+    expect(PixiJSv4Point.copy).toHaveBeenCalledWith(position);
+  });
+
+  it("copies value using copyFrom method when using PixiJS v5", () => {
+    const instance = {
+      position: PixiJSv5Point,
+    };
+    const position = new PIXI.Point(13, 37);
+
+    copyPoint(instance, "position", position);
+    expect(PixiJSv5Point.copyFrom).toHaveBeenCalledTimes(1);
+    expect(PixiJSv5Point.copyFrom).toHaveBeenCalledWith(position);
   });
 });

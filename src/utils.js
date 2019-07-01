@@ -49,6 +49,16 @@ export function isPointType(value) {
   return value instanceof PIXI.Point || value instanceof PIXI.ObservablePoint;
 }
 
+// Point.copy was deprecated and renamed to copyForm in PIXI 5.0,
+// use whichever exists
+export function copyPoint(instance, propName, value) {
+  if (typeof instance[propName].copy === "function") {
+    instance[propName].copy(value);
+  } else {
+    instance[propName].copyFrom(value);
+  }
+}
+
 // Set props on a DisplayObject by checking the type. If a PIXI.Point or
 // a PIXI.ObservablePoint is having its value set, then either a comma-separated
 // string with in the form of "x,y" or a size 2 array with index 0 being the x
@@ -57,7 +67,7 @@ export function isPointType(value) {
 export function setPixiValue(instance, propName, value) {
   if (isPointType(instance[propName]) && isPointType(value)) {
     // Just copy the data if a Point type is being assigned to a Point type
-    instance[propName].copy(value);
+    copyPoint(instance, propName, value);
   } else if (isPointType(instance[propName])) {
     // Parse value if a non-Point type is being assigned to a Point type
     const coordinateData = parsePoint(value);
