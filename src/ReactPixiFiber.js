@@ -3,6 +3,10 @@ import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
+import {
+  unstable_scheduleCallback as scheduleDeferredCallback,
+  unstable_cancelCallback as cancelDeferredCallback,
+} from "scheduler";
 import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { CHILDREN, DEFAULT_PROPS } from "./props";
 import { TYPES } from "./types";
@@ -247,6 +251,7 @@ const hostConfig = {
   appendChild: appendChild,
   appendChildToContainer: appendChild,
   appendInitialChild: appendChild,
+  cancelPassiveEffects: cancelDeferredCallback,
   commitMount: commitMount,
   commitTextUpdate: commitTextUpdate,
   commitUpdate: commitUpdate,
@@ -265,6 +270,8 @@ const hostConfig = {
   removeChildFromContainer: removeChild,
   resetAfterCommit: resetAfterCommit,
   resetTextContent: resetTextContent,
+  scheduleDeferredCallback: scheduleDeferredCallback,
+  schedulePassiveEffects: scheduleDeferredCallback,
   shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
   shouldSetTextContent: shouldSetTextContent,
   supportsMutation: supportsMutation,
