@@ -179,33 +179,28 @@ describe("setPixiValue", () => {
 // Should react-pixi-fiber ever be updated to use 5.0,
 // this test should probably be updated test for existance of copyForm instead.
 describe("copyPoint", () => {
-  const version = PIXI.VERSION;
-  const v4 = version.substr(0, 1) === "4";
-  if (v4) {
-    it("copies value using copy method", () => {
-      class JestPoint extends PIXI.Point {}
-      JestPoint.prototype.copy = jest.fn(PIXI.Point.prototype.copy);
-      const obj = {
-        test: new JestPoint(0, 0),
-      };
-      const test = new PIXI.Point(13, 37);
+  const PixiJSv4Point = { copy: jest.fn() };
+  const PixiJSv5Point = { copyFrom: jest.fn() };
 
-      copyPoint(obj, "test", test);
-      expect(typeof JestPoint.prototype.copy).toBe("function");
-      expect(JestPoint.prototype.copy).toHaveBeenCalledTimes(1);
-    });
-  } else {
-    it("copies value using copyFrom method", () => {
-      class JestPoint extends PIXI.Point {}
-      JestPoint.prototype.copyFrom = jest.fn(PIXI.Point.prototype.copyFrom);
-      const obj = {
-        test: new JestPoint(0, 0),
-      };
-      const test = new PIXI.Point(13, 37);
+  it("copies value using copy method when using PixiJS v4", () => {
+    const instance = {
+      position: PixiJSv4Point,
+    };
+    const position = new PIXI.Point(13, 37);
 
-      copyPoint(obj, "test", test);
-      expect(typeof JestPoint.prototype.copyFrom).toBe("function");
-      expect(JestPoint.prototype.copyFrom).toHaveBeenCalledTimes(1);
-    });
-  }
+    copyPoint(instance, "position", position);
+    expect(PixiJSv4Point.copy).toHaveBeenCalledTimes(1);
+    expect(PixiJSv4Point.copy).toHaveBeenCalledWith(position);
+  });
+
+  it("copies value using copyFrom method when using PixiJS v5", () => {
+    const instance = {
+      position: PixiJSv5Point,
+    };
+    const position = new PIXI.Point(13, 37);
+
+    copyPoint(instance, "position", position);
+    expect(PixiJSv5Point.copyFrom).toHaveBeenCalledTimes(1);
+    expect(PixiJSv5Point.copyFrom).toHaveBeenCalledWith(position);
+  });
 });
