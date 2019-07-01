@@ -135,15 +135,15 @@ describe("isPointType", () => {
 describe("setPixiValue", () => {
   it("copies value if current and next value are point types", () => {
     class JestPoint extends PIXI.Point {}
-    JestPoint.prototype.copy = jest.fn(PIXI.Point.prototype.copy);
+    JestPoint.prototype.copyFrom = jest.fn(PIXI.Point.prototype.copyFrom);
     const obj = {
       test: new JestPoint(0, 0),
     };
     const test = new PIXI.Point(13, 37);
 
     setPixiValue(obj, "test", test);
-    expect(JestPoint.prototype.copy).toHaveBeenCalledTimes(1);
-    expect(JestPoint.prototype.copy).toHaveBeenCalledWith(test);
+    expect(JestPoint.prototype.copyFrom).toHaveBeenCalledTimes(1);
+    expect(JestPoint.prototype.copyFrom).toHaveBeenCalledWith(test);
     expect(obj.test).toEqual(new PIXI.Point(13, 37));
   });
 

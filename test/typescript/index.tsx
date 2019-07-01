@@ -14,7 +14,7 @@ import {
 
 const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
 
-const texture = PIXI.Texture.fromImage('https://i.imgur.com/IaUrttj.png');
+const texture = PIXI.Texture.from('https://i.imgur.com/IaUrttj.png');
 
 const CompositionExample: React.SFC = () => (
   <Container>
