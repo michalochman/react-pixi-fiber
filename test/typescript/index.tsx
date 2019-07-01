@@ -23,10 +23,10 @@ const CompositionExample: React.SFC = () => (
 );
 
 const AnimatedSprite: React.ReactType = CustomPIXIComponent({
-  customDisplayObject: (props: any) => new PIXI.extras.AnimatedSprite(props.textures),
-  customApplyProps: (animatedSprite: PIXI.extras.AnimatedSprite, oldProps: any, newProps: any) => {},
-  customDidAttach: (animatedSprite: PIXI.extras.AnimatedSprite) => {},
-  customWillDetach: (animatedSprite: PIXI.extras.AnimatedSprite) => {},
+  customDisplayObject: (props: any) => new PIXI.AnimatedSprite(props.textures),
+  customApplyProps: (animatedSprite: PIXI.AnimatedSprite, oldProps: any, newProps: any) => {},
+  customDidAttach: (animatedSprite: PIXI.AnimatedSprite) => {},
+  customWillDetach: (animatedSprite: PIXI.AnimatedSprite) => {},
 }, 'AnimatedSprite');
 const CustomPIXIComponentExample: React.SFC = () => <AnimatedSprite />;
 
