@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Changed `render` to inject into dev tools once per `containerTag`
 
+### Fixed
+- Fixed `setPixiValue` for Point values when using PixiJS v5 ([#120])
+
 
 ## [0.8.1] - 2019-05-29
 
@@ -269,6 +272,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#120]: https://github.com/michalochman/react-pixi-fiber/issues/120
 [#112]: https://github.com/michalochman/react-pixi-fiber/pull/112
 [#109]: https://github.com/michalochman/react-pixi-fiber/pull/109
 [#98]: https://github.com/michalochman/react-pixi-fiber/pull/98
