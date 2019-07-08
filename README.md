@@ -26,7 +26,7 @@ import bunny from "./bunny.png";
 
 function Bunny(props) {
   return (
-    <Sprite texture={PIXI.Texture.fromImage(bunny)} {...props} />
+    <Sprite texture={PIXI.Texture.from(bunny)} {...props} />
   );
 }
 
@@ -220,7 +220,7 @@ class RotatingBunny extends Component {
     return (
       <Sprite 
         {...this.props}
-        texture={PIXI.Texture.fromImage(bunny)}
+        texture={PIXI.Texture.from(bunny)}
         rotation={this.state.rotation} 
       />
     );
@@ -271,7 +271,7 @@ class RotatingBunny extends Component {
     return (
       <Sprite 
         {...this.props}
-        texture={PIXI.Texture.fromImage(bunny)}
+        texture={PIXI.Texture.from(bunny)}
         rotation={this.state.rotation} 
       />
     );
@@ -326,7 +326,7 @@ class RotatingBunny extends Component {
     return (
       <Sprite 
         {...this.props}
-        texture={PIXI.Texture.fromImage(bunny)}
+        texture={PIXI.Texture.from(bunny)}
         rotation={this.state.rotation} 
       />
     );

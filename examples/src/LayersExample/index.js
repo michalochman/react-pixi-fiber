@@ -9,6 +9,7 @@ import Layer from "./Layer";
 import LayeredStage from "./LayeredStage";
 import Rect from "../CustomPIXIComponentExample/Rect";
 const PIXI = require("pixi.js");
+window.PIXI = PIXI
 require("pixi-layers/dist/pixi-layers.js");
 
 const OPTIONS = {
@@ -23,14 +24,14 @@ const greenGroup = new PIXI.display.Group(0, true);
 // green bunnies go down
 greenGroup.on("sort", bunny => {
   // we are dragging bunny parent, not the bunny itself
-  bunny.zOrder = -bunny.parent.y;
+  bunny.zOrder = bunny.parent.y;
 });
 
 // blue bunnies go up
 // z-index = 1, sorting = true, we can provide zOrder function directly in constructor
 const blueGroup = new PIXI.display.Group(1, bunny => {
   // we are dragging bunny parent, not the bunny itself
-  bunny.zOrder = +bunny.parent.y;
+  bunny.zOrder = -bunny.parent.y;
 });
 
 // Drag is the best layer, dragged element is above everything else

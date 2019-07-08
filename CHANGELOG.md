@@ -8,8 +8,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.9.0] - 2019-07-01
+
+### Added
+- Added `scheduler`
+
+### Changed
+- Updated `react-reconciler` to `0.20.4` ([#122])
+
+### Fixed
+- Fixed PixiJS v5 compatibility issues ([#118])
+
+
+## [0.8.2] - 2019-07-01
+
 ### Changed
 - Changed `render` to inject into dev tools once per `containerTag`
+
+### Fixed
+- Fixed `setPixiValue` for Point values when using PixiJS v5 ([#120])
 
 
 ## [0.8.1] - 2019-05-29
@@ -240,7 +258,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.2...v0.9.0
+[0.8.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.6.2...v0.7.0
@@ -269,6 +289,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#122]: https://github.com/michalochman/react-pixi-fiber/issues/122
+[#120]: https://github.com/michalochman/react-pixi-fiber/issues/120
+[#118]: https://github.com/michalochman/react-pixi-fiber/issues/118
 [#112]: https://github.com/michalochman/react-pixi-fiber/pull/112
 [#109]: https://github.com/michalochman/react-pixi-fiber/pull/109
 [#98]: https://github.com/michalochman/react-pixi-fiber/pull/98

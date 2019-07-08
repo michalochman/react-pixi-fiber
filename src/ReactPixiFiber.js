@@ -3,6 +3,10 @@ import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
+import {
+  unstable_scheduleCallback as scheduleDeferredCallback,
+  unstable_cancelCallback as cancelDeferredCallback,
+} from "scheduler";
 import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { CHILDREN, DEFAULT_PROPS } from "./props";
 import { TYPES } from "./types";
@@ -136,7 +140,11 @@ export function createInstance(type, props, internalInstanceHandle) {
 
   switch (type) {
     case TYPES.BITMAP_TEXT:
-      instance = new PIXI.extras.BitmapText(props.text, props.style);
+      try {
+        instance = new PIXI.extras.BitmapText(props.text, props.style);
+      } catch (e) {
+        instance = new PIXI.BitmapText(props.text, props.style);
+      }
       break;
     case TYPES.CONTAINER:
       instance = new PIXI.Container();
@@ -145,12 +153,16 @@ export function createInstance(type, props, internalInstanceHandle) {
       instance = new PIXI.Graphics();
       break;
     case TYPES.PARTICLE_CONTAINER:
-      instance = new PIXI.particles.ParticleContainer(
-        props.maxSize,
-        props.properties,
-        props.batchSize,
-        props.autoResize
-      );
+      try {
+        instance = new PIXI.particles.ParticleContainer(
+          props.maxSize,
+          props.properties,
+          props.batchSize,
+          props.autoResize
+        );
+      } catch (e) {
+        instance = new PIXI.ParticleContainer(props.maxSize, props.properties, props.batchSize, props.autoResize);
+      }
       break;
     case TYPES.SPRITE:
       instance = new PIXI.Sprite(props.texture);
@@ -159,7 +171,11 @@ export function createInstance(type, props, internalInstanceHandle) {
       instance = new PIXI.Text(props.text, props.style, props.canvas);
       break;
     case TYPES.TILING_SPRITE:
-      instance = new PIXI.extras.TilingSprite(props.texture, props.width, props.height);
+      try {
+        instance = new PIXI.extras.TilingSprite(props.texture, props.width, props.height);
+      } catch (e) {
+        instance = new PIXI.TilingSprite(props.texture, props.width, props.height);
+      }
       break;
     default:
       instance = createInjectedTypeInstance(type, props, internalInstanceHandle, defaultApplyProps);
@@ -235,6 +251,7 @@ const hostConfig = {
   appendChild: appendChild,
   appendChildToContainer: appendChild,
   appendInitialChild: appendChild,
+  cancelPassiveEffects: cancelDeferredCallback,
   commitMount: commitMount,
   commitTextUpdate: commitTextUpdate,
   commitUpdate: commitUpdate,
@@ -253,6 +270,8 @@ const hostConfig = {
   removeChildFromContainer: removeChild,
   resetAfterCommit: resetAfterCommit,
   resetTextContent: resetTextContent,
+  scheduleDeferredCallback: scheduleDeferredCallback,
+  schedulePassiveEffects: scheduleDeferredCallback,
   shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
   shouldSetTextContent: shouldSetTextContent,
   supportsMutation: supportsMutation,

@@ -6,7 +6,7 @@ import bunnys from "./bunnys.png";
 
 const centerAnchor = new PIXI.Point(0.5, 0.5);
 
-const bunnyTextures = new PIXI.Texture.fromImage(bunnys);
+const bunnyTextures = new PIXI.Texture.from(bunnys);
 const textures = [
   new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37)),
   new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37)),

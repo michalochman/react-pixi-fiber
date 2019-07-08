@@ -5,7 +5,7 @@ const TYPE = "LayeredStage";
 const behavior = {
   customDisplayObject: ({ enableSort = false }) => {
     const stage = new PIXI.display.Stage();
-    stage.group.enableSort = enableSort;
+    stage.sortableChildren = true;
     return stage;
   },
   customDidAttach: instance => {

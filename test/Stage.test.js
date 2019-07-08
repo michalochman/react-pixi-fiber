@@ -80,7 +80,7 @@ describe("Stage", () => {
     const app = instance._app;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app._options).toMatchObject({
+    expect(app.renderer.options).toMatchObject({
       height,
       width,
       ...options,
@@ -100,7 +100,7 @@ describe("Stage", () => {
     const app = instance._app;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app._options).toMatchObject(options);
+    expect(app.renderer.options).toMatchObject(options);
   });
 
   it("creates root Container", () => {
