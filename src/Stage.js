@@ -53,13 +53,17 @@ function createStageFunction() {
     });
 
     return canvas;
-  };
+  }
+
+  Stage.propTypes = propTypes;
 
   return Stage;
-};
+}
 
 function createStageClass() {
   class Stage extends React.Component {
+    static propTypes = propTypes;
+
     componentDidMount() {
       const { children, height, options, width } = this.props;
       const view = this._canvas;
@@ -96,10 +100,8 @@ function createStageClass() {
   }
 
   return Stage;
-};
+}
 
 const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
-
-Stage.propTypes = propTypes;
 
 export default Stage;
