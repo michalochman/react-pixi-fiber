@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, Stage, withApp } from "../src";
+import { appTestHook } from "../src/Stage";
 import { render } from "../src/render";
 import * as PIXI from "pixi.js";
 
@@ -105,6 +106,6 @@ describe("withApp", () => {
       document.createElement("div")
     );
 
-    expect(TestComponent).toHaveBeenCalledWith({ app: stage._app, foo: "bar" }, {});
+    expect(TestComponent).toHaveBeenCalledWith({ app: appTestHook, foo: "bar" }, {});
   });
 });
