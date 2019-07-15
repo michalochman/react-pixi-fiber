@@ -11,12 +11,18 @@ import { including } from "./utils";
 
 export let appTestHook = null;
 
-const applyUpdate = (app, props) => {
+const applyUpdate = (app, props, instance) => {
   const provider = <AppProvider app={app}>{props.children}</AppProvider>;
   const stageProps = getDisplayObjectProps(props);
 
   applyProps(app.stage, {}, stageProps);
-  render(provider, app.stage);
+
+  // a stage class component instance has been passed.
+  if (typeof parentComponent === 'object') {
+    render(provider, app.stage, undefined, parentComponent);
+  } else {
+    render(provider, app.stage);
+  }
 };
 
 const getDimensions = props => {
@@ -71,14 +77,14 @@ export function createStageClass() {
       this._app = appTestHook = new PIXI.Application({ height, width, view, ...options });
 
       // Apply root Container props
-      applyUpdate(this._app, this.props);
+      applyUpdate(this._app, this.props, this);
     }
 
     componentDidUpdate(prevProps) {
       const { children, height, options, width } = this.props;
       const { options: prevOptions } = prevProps;
       resizeRenderer(this._app, prevProps, this.props);
-      applyUpdate(this._app, this.props);
+      applyUpdate(this._app, this.props, this);
     }
 
     componentWillUnmount() {
