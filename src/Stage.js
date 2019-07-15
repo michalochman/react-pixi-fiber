@@ -61,14 +61,11 @@ export function createStageFunction() {
     return canvas;
   }
 
-  // Stage.propTypes = propTypes;
-
   return Stage;
 }
 
 export function createStageClass() {
   class Stage extends React.Component {
-    // static propTypes = propTypes;
 
     componentDidMount() {
       const { children, height, options, width } = this.props;
