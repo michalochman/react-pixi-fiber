@@ -18,7 +18,7 @@ const applyUpdate = (app, props, instance) => {
   applyProps(app.stage, {}, stageProps);
 
   // a stage class component instance has been passed.
-  if (typeof instance === 'object') {
+  if (typeof instance === "object") {
     render(provider, app.stage, undefined, instance);
   } else {
     render(provider, app.stage);
@@ -61,11 +61,14 @@ export function createStageFunction() {
     return canvas;
   }
 
+  Stage.propTypes = propTypes;
+
   return Stage;
 }
 
 export function createStageClass() {
   class Stage extends React.Component {
+    static propTypes = propTypes;
 
     componentDidMount() {
       const { children, height, options, width } = this.props;
@@ -106,7 +109,5 @@ export function createStageClass() {
 }
 
 const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
-
-Stage.propTypes = propTypes;
 
 export default Stage;
