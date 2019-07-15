@@ -87,11 +87,10 @@ describe("Stage (class)", () => {
     const app = instance._app;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app._options).toMatchObject({
-      height,
-      width,
-      ...options,
-    });
+    expect(app.renderer.height).toEqual(height);
+    expect(app.renderer.width).toEqual(width);
+    expect(app.renderer.backgroundColor).toEqual(options.backgroundColor);
+    expect(app.ticker).toEqual(PIXI.Ticker.shared);
   });
 
   it("creates PIXI.Application instance with 'height' and 'width' in options", () => {
@@ -107,7 +106,10 @@ describe("Stage (class)", () => {
     const app = instance._app;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app._options).toMatchObject(options);
+    expect(app.renderer.height).toEqual(options.height);
+    expect(app.renderer.width).toEqual(options.width);
+    expect(app.renderer.backgroundColor).toEqual(options.backgroundColor);
+    expect(app.ticker).toEqual(PIXI.Ticker.shared);
   });
 
   it("creates root Container", () => {
