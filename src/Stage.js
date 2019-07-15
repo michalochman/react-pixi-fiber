@@ -18,8 +18,8 @@ const applyUpdate = (app, props, instance) => {
   applyProps(app.stage, {}, stageProps);
 
   // a stage class component instance has been passed.
-  if (typeof parentComponent === 'object') {
-    render(provider, app.stage, undefined, parentComponent);
+  if (typeof instance === 'object') {
+    render(provider, app.stage, undefined, instance);
   } else {
     render(provider, app.stage);
   }

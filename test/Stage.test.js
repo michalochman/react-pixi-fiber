@@ -4,7 +4,7 @@ import * as PIXI from "pixi.js";
 import { Text } from "../src/index";
 import ReactPixiFiber from "../src/ReactPixiFiber";
 import Stage, { appTestHook } from "../src/Stage";
-import Stage, {
+import {
   getCanvasProps,
   getDisplayObjectProps,
   includingCanvasProps,
@@ -80,11 +80,10 @@ describe("Stage (function)", () => {
     const instance = element.getInstance();
 
     expect(appTestHook instanceof PIXI.Application).toBeTruthy();
-    expect(appTestHook._options).toMatchObject({
-      height,
-      width,
-      ...options,
-    });
+    expect(appTestHook.renderer.height).toEqual(height);
+    expect(appTestHook.renderer.width).toEqual(width);
+    expect(appTestHook.renderer.backgroundColor).toEqual(options.backgroundColor);
+    expect(appTestHook.ticker).toEqual(PIXI.Ticker.shared);
   });
 
   it("creates PIXI.Application instance with 'height' and 'width' in options", () => {
@@ -98,8 +97,11 @@ describe("Stage (function)", () => {
     const element = renderer.create(<Stage options={options} />);
     const instance = element.getInstance();
 
-    expect(appTe_stHook instanceof PIXI.Application).toBeTruthy();
-    expect(appTestHook._options).toMatchObject(options);
+    expect(appTestHook instanceof PIXI.Application).toBeTruthy();
+    expect(appTestHook.renderer.height).toEqual(options.height);
+    expect(appTestHook.renderer.width).toEqual(options.width);
+    expect(appTestHook.renderer.backgroundColor).toEqual(options.backgroundColor);
+    expect(appTestHook.ticker).toEqual(PIXI.Ticker.shared);
   });
 
   it("creates root Container", () => {
@@ -167,15 +169,12 @@ describe("Stage (function)", () => {
     render.mockClear();
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children}</Stage>);
-    const instance = element.getInstance();
     const stage = appTestHook.stage;
 
     expect(render).toHaveBeenCalledTimes(1);
     expect(render).toHaveBeenCalledWith(
       <AppProvider app={appTestHook}>{children}</AppProvider>,
-      stage,
-      undefined,
-      instance
+      stage
     );
   });
 
@@ -192,9 +191,7 @@ describe("Stage (function)", () => {
     expect(render).toHaveBeenCalledTimes(1);
     expect(render).toHaveBeenCalledWith(
       <AppProvider app={appTestHook}>{children2}</AppProvider>,
-      stage,
-      undefined,
-      instance
+      stage
     );
   });
 
