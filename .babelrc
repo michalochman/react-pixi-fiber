@@ -2,11 +2,7 @@
   "env": {
     "test": {
       "presets": ["@babel/preset-env", "@babel/preset-react"],
-      "plugins": [
-        "rewire",
-        "@babel/plugin-syntax-dynamic-import",
-        "@babel/plugin-proposal-class-properties"
-      ]
+      "plugins": ["rewire", "@babel/plugin-syntax-dynamic-import"]
     }
   },
   "plugins": ["@babel/plugin-syntax-dynamic-import"],
