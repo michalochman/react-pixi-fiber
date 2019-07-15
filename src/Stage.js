@@ -37,7 +37,7 @@ const resizeRenderer = (app, prevProps, props) => {
   }
 };
 
-function createStageFunction() {
+export function createStageFunction() {
   function Stage(props) {
     const { height, options, width } = props;
     const { app, canvas } = usePixiApp(props);
@@ -55,14 +55,14 @@ function createStageFunction() {
     return canvas;
   }
 
-  Stage.propTypes = propTypes;
+  // Stage.propTypes = propTypes;
 
   return Stage;
 }
 
-function createStageClass() {
+export function createStageClass() {
   class Stage extends React.Component {
-    static propTypes = propTypes;
+    // static propTypes = propTypes;
 
     componentDidMount() {
       const { children, height, options, width } = this.props;
@@ -103,5 +103,7 @@ function createStageClass() {
 }
 
 const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
+
+Stage.propTypes = propTypes;
 
 export default Stage;

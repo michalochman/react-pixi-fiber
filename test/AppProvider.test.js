@@ -2,7 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import renderer from "react-test-renderer";
-import { AppContext, AppProvider, Container, Stage, withApp } from "../src";
+import { AppContext, AppProvider, Container, withApp } from "../src";
+import { createStageClass } from "../src/Stage";
 import { appTestHook } from "../src/Stage";
 import { render } from "../src/render";
 import * as PIXI from "pixi.js";
@@ -56,6 +57,7 @@ if (typeof React.createContext === "function") {
     });
 
     it("passess app context to component rendered inside Stage", () => {
+      const Stage = createStageClass();
       const TestComponent = jest.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
@@ -95,6 +97,7 @@ describe("withApp", () => {
   });
 
   it("passess app prop to component rendered inside Stage", () => {
+    const Stage = createStageClass();
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
