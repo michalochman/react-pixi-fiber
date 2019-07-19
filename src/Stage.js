@@ -61,6 +61,8 @@ export function createStageFunction() {
     return canvas;
   }
 
+  Stage.propTypes = propTypes;
+
   return Stage;
 }
 
@@ -101,11 +103,11 @@ export function createStageClass() {
     }
   }
 
+  Stage.propTypes = propTypes;
+
   return Stage;
 }
 
 const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
-
-Stage.propTypes = propTypes;
 
 export default Stage;
