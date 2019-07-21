@@ -4,7 +4,7 @@ import React, {
 } from "react";
 import { Stage } from "react-pixi-fiber";
 import Circle from "./Circle";
-import Rect from "./Rect";
+import Rect from "../CustomPIXIComponentExample/Rect";
 
 // returns a base 10 translation of a gray scale hex string build from a single
 // number between 0 and 255. if num is > 255 or < 0 it's clamped to the limit.
