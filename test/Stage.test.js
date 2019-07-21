@@ -77,7 +77,6 @@ describe("Stage (function)", () => {
     const width = 400;
 
     const element = renderer.create(<Stage height={height} width={width} options={options} />);
-    const instance = element.getInstance();
 
     expect(appTestHook instanceof PIXI.Application).toBeTruthy();
     expect(appTestHook.renderer.height).toEqual(height);
@@ -95,7 +94,6 @@ describe("Stage (function)", () => {
     };
 
     const element = renderer.create(<Stage options={options} />);
-    const instance = element.getInstance();
 
     expect(appTestHook instanceof PIXI.Application).toBeTruthy();
     expect(appTestHook.renderer.height).toEqual(options.height);
@@ -106,7 +104,6 @@ describe("Stage (function)", () => {
 
   it("creates root Container", () => {
     const element = renderer.create(<Stage height={300} width={400} scale={2} position="40,20" />);
-    const instance = element.getInstance();
     const stage = appTestHook.stage;
 
     expect(stage instanceof PIXI.Container).toBeTruthy();
@@ -117,7 +114,6 @@ describe("Stage (function)", () => {
     const x = 40;
     const y = 20;
     const element = renderer.create(<Stage height={300} position={`${x},${y}`} scale={scale} width={400} />);
-    const instance = element.getInstance();
     const stage = appTestHook.stage;
 
     expect(stage.position.x).toEqual(x);
@@ -129,7 +125,6 @@ describe("Stage (function)", () => {
   it("updates root Container DisplayObject props", () => {
     const scale = 2;
     const element = renderer.create(<Stage height={300} scale={scale} width={400} />);
-    const instance = element.getInstance();
     const stage = appTestHook.stage;
 
     expect(stage.scale.x).toEqual(scale);
@@ -146,7 +141,6 @@ describe("Stage (function)", () => {
     const height = 300;
     const width = 400;
     const element = renderer.create(<Stage height={height} width={width} />);
-    const instance = element.getInstance();
 
     expect(appTestHook.renderer.height).toEqual(height);
     expect(appTestHook.renderer.width).toEqual(width);
@@ -181,7 +175,6 @@ describe("Stage (function)", () => {
   it("calls render on componentDidUpdate", () => {
     const children1 = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children1}</Stage>);
-    const instance = element.getInstance();
     const stage = appTestHook.stage;
 
     render.mockClear();
@@ -197,7 +190,6 @@ describe("Stage (function)", () => {
 
   it("calls unmount on componentWillUnmount", () => {
     const element = renderer.create(<Stage />);
-    const instance = element.getInstance();
     const { stage } = appTestHook;
     unmount.mockClear();
     element.unmount();
