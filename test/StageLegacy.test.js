@@ -1,26 +1,22 @@
-jest.mock("react", () =>
-  Object.assign(require.requireActual("react"), {
-    useState: null,
-  })
-);
-
 import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Text } from "../src/index";
 import ReactPixiFiber from "../src/ReactPixiFiber";
-import Stage from "../src/Stage";
 import {
+  createStageClass,
   getCanvasProps,
   getDisplayObjectProps,
   includingCanvasProps,
   includingDisplayObjectProps,
   includingStageProps,
   validateCanvas,
-} from "../src/stageProps";
+} from "../src/Stage";
 import { render, unmount } from "../src/render";
 import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS } from "../src/props";
+
+const Stage = createStageClass();
 
 jest.mock("../src/ReactPixiFiber", () => {
   return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
@@ -29,6 +25,7 @@ jest.mock("../src/ReactPixiFiber", () => {
     updateContainer: jest.fn(),
   });
 });
+
 jest.mock("../src/render", () => {
   return {
     render: jest.fn(),

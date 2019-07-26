@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import React from "react";
 import { useContext, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { AppContext } from "./AppProvider";
-import { getCanvasProps } from "./stageProps";
+import { getCanvasProps } from "./Stage";
 import { unmount } from "./render";
 
 export function usePixi() {

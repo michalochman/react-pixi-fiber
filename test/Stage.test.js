@@ -3,18 +3,21 @@ import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Text } from "../src/index";
 import ReactPixiFiber from "../src/ReactPixiFiber";
-import Stage, { appTestHook } from "../src/Stage";
 import {
+  appTestHook,
+  createStageFunction,
   getCanvasProps,
   getDisplayObjectProps,
   includingCanvasProps,
   includingDisplayObjectProps,
   includingStageProps,
   validateCanvas,
-} from "../src/stageProps";
+} from "../src/Stage";
 import { render, unmount } from "../src/render";
 import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
+
+const Stage = createStageFunction();
 
 jest.mock("../src/ReactPixiFiber", () => {
   return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
@@ -23,6 +26,7 @@ jest.mock("../src/ReactPixiFiber", () => {
     updateContainer: jest.fn(),
   });
 });
+
 jest.mock("../src/render", () => {
   return {
     render: jest.fn(),
