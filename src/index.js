@@ -4,10 +4,10 @@ import Stage from "./Stage";
 import { TYPES } from "./types";
 import { render } from "./render";
 import {
-  usePixi,
+  usePixiApp,
   usePixiTicker,
   usePreviousProps,
-  usePixiApp,
+  usePixiAppCreator,
 } from "./hooks";
 import { applyProps, unstable_batchedUpdates } from "./ReactPixiFiber";
 
@@ -22,10 +22,10 @@ export {
   render,
   withApp,
   unstable_batchedUpdates,
-  usePixi,
+  usePixiApp,
   usePixiTicker,
   usePreviousProps,
-  usePixiApp,
+  usePixiAppCreator,
 };
 
 export const BitmapText = TYPES.BITMAP_TEXT;

@@ -5,7 +5,7 @@ import { AppProvider } from "./AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
 import { applyProps } from "./ReactPixiFiber";
 import { render, unmount } from "./render";
-import { usePreviousProps, usePixiApp } from "./hooks";
+import { usePreviousProps, usePixiAppCreator } from "./hooks";
 import { filterByKey, including } from "./utils";
 
 export let appTestHook = null;
@@ -93,7 +93,7 @@ const resizeRenderer = (app, prevProps, props) => {
 export function createStageFunction() {
   function Stage(props) {
     const { height, options, width } = props;
-    const { app, canvas } = usePixiApp(props);
+    const { app, canvas } = usePixiAppCreator(props);
     const prevProps = usePreviousProps(props);
 
     // Re-render and resize stage on component update

@@ -5,12 +5,12 @@ import { AppContext } from "./AppProvider";
 import { getCanvasProps } from "./Stage";
 import { unmount } from "./render";
 
-export function usePixi() {
+export function usePixiApp() {
   return useContext(AppContext);
 }
 
 export function usePixiTicker(fn) {
-  const app = usePixi();
+  const app = usePixiApp();
 
   useEffect(() => {
     app.ticker.add(fn);
@@ -18,7 +18,7 @@ export function usePixiTicker(fn) {
     return () => {
       app.ticker.remove(fn);
     };
-  }, []);
+  }, [fn]);
 }
 
 export function usePreviousProps(value) {
@@ -31,7 +31,7 @@ export function usePreviousProps(value) {
   return ref.current;
 }
 
-export function usePixiApp(props) {
+export function usePixiAppCreator(props) {
   const { options, width, height } = props;
   const canvasRef = useRef(null);
   const [app, setApp] = useState(null);

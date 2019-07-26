@@ -4,22 +4,22 @@ import * as PIXI from "pixi.js";
 import { Container } from "../src/index";
 import Stage, { appTestHook } from "../src/Stage";
 import {
-  usePixi,
+  usePixiApp,
   usePixiTicker,
   usePreviousProps,
-  usePixiApp,
+  usePixiAppCreator,
 } from "../src/hooks";
 import { render } from "../src/render";
 import { AppContext } from "../src/AppProvider";
 
-describe("usePixi", () => {
+describe("usePixiApp", () => {
   it("will provide app from the context above", () => {
     const app = new PIXI.Application();
 
     const TestComponent = jest.fn(() => null);
 
     const HookContainer = () => {
-      const app = usePixi();
+      const app = usePixiApp();
 
       return (
         <Container>
@@ -94,7 +94,7 @@ describe("usePreviousProps", () => {
   });
 });
 
-describe("usePixiApp", () => {
+describe("usePixiAppCreator", () => {
   it("will provide app and canvas", done => {
     const props = {
       width: 400,
@@ -103,7 +103,7 @@ describe("usePixiApp", () => {
     const TestComponent = jest.fn(() => null);
 
     const TestContainer = props => {
-      const { app, canvas } = usePixiApp(props);
+      const { app, canvas } = usePixiAppCreator(props);
 
       useLayoutEffect(() => {
         expect(TestComponent).toHaveBeenCalledWith({ app, canvas }, {});
