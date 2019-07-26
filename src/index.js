@@ -3,12 +3,7 @@ import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage from "./Stage";
 import { TYPES } from "./types";
 import { render } from "./render";
-import {
-  usePixiApp,
-  usePixiTicker,
-  usePreviousProps,
-  usePixiAppCreator,
-} from "./hooks";
+import { usePixiApp, usePixiTicker, usePreviousProps, usePixiAppCreator } from "./hooks";
 import { applyProps, unstable_batchedUpdates } from "./ReactPixiFiber";
 
 /* Public API */
