@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed renderer to be secondary when using `<Stage />` component
+
 
 ## [0.9.0] - 2019-07-01
 

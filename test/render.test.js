@@ -2,7 +2,7 @@ import React from "react";
 import pkg from "../package.json";
 import { Container, Text } from "../src/index";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
-import { render, roots, unmount } from "../src/render";
+import { createRender, createUnmount, roots } from "../src/render";
 import * as PIXI from 'pixi.js'
 
 jest.mock("../src/ReactPixiFiber", () => {
@@ -22,6 +22,7 @@ describe("render", () => {
     jest.resetAllMocks();
   });
 
+  const render = createRender(ReactPixiFiber)
   const app = new PIXI.Application();
   const callback = jest.fn();
   const root = app.stage;
@@ -73,6 +74,7 @@ describe("unmount", () => {
     jest.resetAllMocks();
   });
 
+  const unmount = createUnmount(ReactPixiFiber)
   const app = new PIXI.Application();
   const root = app.stage;
 
