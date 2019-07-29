@@ -10,7 +10,6 @@ export function createRender(ReactPixiFiber) {
   return function render(element, containerTag, callback, parentComponent) {
     let root = roots.get(containerTag);
     if (!root) {
-      // TODO should render secondary when Stage is rendering
       root = ReactPixiFiber.createContainer(containerTag);
       roots.set(containerTag, root);
 
