@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed type definition to include `withApp` ([#125])
+
 
 ## [0.9.0] - 2019-07-01
 
@@ -289,6 +292,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#125]: https://github.com/michalochman/react-pixi-fiber/issues/125
 [#122]: https://github.com/michalochman/react-pixi-fiber/issues/122
 [#120]: https://github.com/michalochman/react-pixi-fiber/issues/120
 [#118]: https://github.com/michalochman/react-pixi-fiber/issues/118
