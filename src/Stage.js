@@ -3,9 +3,12 @@ import PropTypes from "prop-types";
 import * as PIXI from "pixi.js";
 import { AppProvider } from "./AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
-import { applyProps } from "./ReactPixiFiber";
-import { render, unmount } from "./render";
+import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber";
+import { createRender, createUnmount } from "./render";
 import { filterByKey, including } from "./utils";
+
+const render = createRender(ReactPixiFiberAsSecondaryRenderer)
+const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer)
 
 export function validateCanvas(props, propName, componentName) {
   // Let's assume that element is canvas if the element is Element and implements getContext
