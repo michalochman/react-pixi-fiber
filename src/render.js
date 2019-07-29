@@ -7,7 +7,7 @@ export const roots = new Map();
  * containerTag should be an instance of PIXI root Container (i.e. the Stage)
  */
 export function createRender(ReactPixiFiber) {
-  return function render (element, containerTag, callback, parentComponent) {
+  return function render(element, containerTag, callback, parentComponent) {
     let root = roots.get(containerTag);
     if (!root) {
       // TODO should render secondary when Stage is rendering
@@ -25,15 +25,15 @@ export function createRender(ReactPixiFiber) {
     ReactPixiFiber.updateContainer(element, root, parentComponent, callback);
 
     return ReactPixiFiber.getPublicRootInstance(root);
-  }
+  };
 }
 
 export function createUnmount(ReactPixiFiber) {
-  return function unmount (containerTag) {
+  return function unmount(containerTag) {
     const root = roots.get(containerTag);
 
     invariant(root, "ReactPixiFiber did not render into container provided");
 
     ReactPixiFiber.updateContainer(null, root);
-  }
+  };
 }

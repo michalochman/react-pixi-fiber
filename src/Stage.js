@@ -7,8 +7,8 @@ import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber"
 import { createRender, createUnmount } from "./render";
 import { filterByKey, including } from "./utils";
 
-const render = createRender(ReactPixiFiberAsSecondaryRenderer)
-const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer)
+const render = createRender(ReactPixiFiberAsSecondaryRenderer);
+const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
 
 export function validateCanvas(props, propName, componentName) {
   // Let's assume that element is canvas if the element is Element and implements getContext
