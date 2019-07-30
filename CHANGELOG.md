@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed type definition to include `withApp` ([#125])
+- Fixed renderer to be secondary when using `<Stage />` component
 
 
 ## [0.9.0] - 2019-07-01

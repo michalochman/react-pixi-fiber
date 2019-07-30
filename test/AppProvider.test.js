@@ -1,10 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, Stage, withApp } from "../src";
-import { render } from "../src/render";
+import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
+import { createRender } from "../src/render";
 import * as PIXI from "pixi.js";
+
+const render = createRender(ReactPixiFiber)
 
 if (typeof React.createContext === "function") {
   // New Context API

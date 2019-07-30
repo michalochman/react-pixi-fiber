@@ -3,7 +3,7 @@ import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import { __RewireAPI__ as ReactPixiFiberRewireAPI } from "../src/ReactPixiFiber";
-import { render } from "../src/render";
+import { createRender } from "../src/render";
 import { DEFAULT_PROPS } from "../src/props";
 import { TYPES } from "../src/types";
 import * as utils from "../src/utils";
@@ -498,6 +498,7 @@ describe("ReactPixiFiber", () => {
 
   describe("unstable_batchedUpdates", () => {
     it("should render one time when call setState many times", () => {
+      const render = createRender(ReactPixiFiber.ReactPixiFiberAsPrimaryRenderer)
       const app = new PIXI.Application();
       const root = app.stage;
       const nextState = {};
