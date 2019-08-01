@@ -9,10 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [0.9.1] - 2019-07-31
+## [0.9.2] - 2019-08-01
 
 ### Fixed
 - Fixed type definition to include `withApp` ([#125])
+
+
+## [0.9.1] - 2019-07-31
+
+### Fixed
 - Fixed renderer to be secondary when using `<Stage />` component
 
 
@@ -265,7 +270,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.1...v0.8.2

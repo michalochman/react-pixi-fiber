@@ -1,6 +1,6 @@
 {
   "name": "react-pixi-fiber",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "React Fiber renderer for PixiJS",
   "main": "index.js",
   "author": "Michal Ochman",
