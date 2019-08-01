@@ -22,6 +22,11 @@ declare module 'react-pixi-fiber' {
     children?: React.ReactNode;
   }
 
+  /** The shape of a component that has app `property` that is an instance of PIXI.Application */
+  export interface PixiAppProperties {
+    app: PIXI.Application;
+  }
+
   /**
    * Extra properties to add to allow us to set event handlers using props
    */
@@ -190,6 +195,8 @@ declare module 'react-pixi-fiber' {
    * AppContext
    */
   export const AppContext: React.Context<PIXI.Application>;
+
+  const withApp: <T extends PixiAppProperties>(WrappedComponent: React.ComponentType<T>) => React.ComponentType<T>;
 
   /**
    * BatchedUpdates same as ReactDOM
