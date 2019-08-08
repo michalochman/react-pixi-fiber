@@ -13,7 +13,6 @@ import {
   includingStageProps,
   validateCanvas,
 } from "../src/Stage";
-import { render, unmount } from "../src/render";
 import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
 
@@ -28,13 +27,20 @@ jest.mock("../src/ReactPixiFiber", () => {
 });
 
 jest.mock("../src/render", () => {
+  const render = jest.fn();
+  const unmount = jest.fn();
+
   return {
-    render: jest.fn(),
-    unmount: jest.fn(),
+    createRender: jest.fn().mockReturnValue(render),
+    createUnmount: jest.fn().mockReturnValue(unmount),
+    __renderMock: render,
+    __unmounMock: unmount,
   };
 });
 
 describe("Stage (function)", () => {
+  const { __renderMock, __unmounMock } = require("../src/render");
+
   it("renders canvas element", () => {
     const tree = renderer.create(<Stage />).toJSON();
 
@@ -45,7 +51,7 @@ describe("Stage (function)", () => {
     const canvas = document.createElement("canvas");
     const options = { view: canvas };
     const tree = renderer.create(<Stage options={options} />).toJSON();
-
+ 
     expect(tree).toBeNull();
   });
 
@@ -164,13 +170,13 @@ describe("Stage (function)", () => {
   });
 
   it("calls render on componentDidMount", () => {
-    render.mockClear();
+    __renderMock.mockClear();
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children}</Stage>);
     const stage = appTestHook.stage;
 
-    expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock).toHaveBeenCalledWith(
       <AppProvider app={appTestHook}>{children}</AppProvider>,
       stage
     );
@@ -181,12 +187,12 @@ describe("Stage (function)", () => {
     const element = renderer.create(<Stage>{children1}</Stage>);
     const stage = appTestHook.stage;
 
-    render.mockClear();
+    __renderMock.mockClear();
     const children2 = <Text text="World Hello!" />;
     element.update(<Stage>{children2}</Stage>);
 
-    expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock).toHaveBeenCalledWith(
       <AppProvider app={appTestHook}>{children2}</AppProvider>,
       stage
     );
@@ -195,11 +201,11 @@ describe("Stage (function)", () => {
   it("calls unmount on componentWillUnmount", () => {
     const element = renderer.create(<Stage />);
     const { stage } = appTestHook;
-    unmount.mockClear();
+    __unmounMock.mockClear();
     element.unmount();
 
-    expect(unmount).toHaveBeenCalledTimes(1);
-    expect(unmount).toHaveBeenCalledWith(stage);
+    expect(__unmounMock).toHaveBeenCalledTimes(1);
+    expect(__unmounMock).toHaveBeenCalledWith(stage);
   });
 });
 

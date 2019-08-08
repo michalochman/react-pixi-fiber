@@ -3,10 +3,13 @@ import PropTypes from "prop-types";
 import * as PIXI from "pixi.js";
 import { AppProvider } from "./AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
-import { applyProps } from "./ReactPixiFiber";
-import { render, unmount } from "./render";
 import { usePreviousProps, usePixiAppCreator } from "./hooks";
+import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber";
+import { createRender, createUnmount } from "./render";
 import { filterByKey, including } from "./utils";
+
+const render = createRender(ReactPixiFiberAsSecondaryRenderer);
+const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
 
 export let appTestHook = null;
 

@@ -2,9 +2,12 @@ import CustomPIXIComponent from "./CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage from "./Stage";
 import { TYPES } from "./types";
-import { render } from "./render";
 import { usePixiApp, usePixiTicker, usePreviousProps, usePixiAppCreator } from "./hooks";
-import { applyProps, unstable_batchedUpdates } from "./ReactPixiFiber";
+import { createRender, createUnmount } from "./render";
+import { ReactPixiFiberAsPrimaryRenderer, applyProps, unstable_batchedUpdates } from "./ReactPixiFiber";
+
+const render = createRender(ReactPixiFiberAsPrimaryRenderer);
+const unmount = createUnmount(ReactPixiFiberAsPrimaryRenderer);
 
 /* Public API */
 
@@ -15,12 +18,13 @@ export {
   Stage,
   applyProps,
   render,
+  unmount,
   withApp,
-  unstable_batchedUpdates,
   usePixiApp,
   usePixiTicker,
   usePreviousProps,
   usePixiAppCreator,
+  unstable_batchedUpdates,
 };
 
 export const BitmapText = TYPES.BITMAP_TEXT;

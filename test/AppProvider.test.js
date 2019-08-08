@@ -5,8 +5,11 @@ import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, withApp } from "../src";
 import { createStageClass } from "../src/Stage";
 import { appTestHook } from "../src/Stage";
-import { render } from "../src/render";
+import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
+import { createRender } from "../src/render";
 import * as PIXI from "pixi.js";
+
+const render = createRender(ReactPixiFiber)
 
 if (typeof React.createContext === "function") {
   // New Context API

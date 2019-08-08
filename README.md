@@ -429,10 +429,6 @@ render(
 
 Yes, it is easy, read [migration guide](#migrating-from-react-pixi).
 
-### Is this production ready?
-
-Not yet.
-
 
 ## Contributing
 
