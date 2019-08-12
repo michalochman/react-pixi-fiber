@@ -3,7 +3,8 @@ import React from "react";
 import { useContext, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { AppContext } from "./AppProvider";
 import { getCanvasProps } from "./Stage";
-import { unmount } from "./render";
+import { createUnmount } from "./render";
+import { ReactPixiFiberAsSecondaryRenderer } from "./ReactPixiFiber";
 
 export function usePixiApp() {
   return useContext(AppContext);
@@ -41,6 +42,7 @@ export function usePixiAppCreator(props) {
 
   // Initialize pixi application on mount
   useLayoutEffect(() => {
+    const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
     const appInstance = new PIXI.Application({
       height,
       width,

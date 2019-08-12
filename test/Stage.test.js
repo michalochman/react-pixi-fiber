@@ -51,7 +51,7 @@ describe("Stage (function)", () => {
     const canvas = document.createElement("canvas");
     const options = { view: canvas };
     const tree = renderer.create(<Stage options={options} />).toJSON();
- 
+
     expect(tree).toBeNull();
   });
 
@@ -163,7 +163,7 @@ describe("Stage (function)", () => {
     expect(appTestHook.renderer.width).toEqual(newWidth);
   });
 
-  it("can be umounted", () => {
+  it("can be unmounted", () => {
     const element = renderer.create(<Stage />);
 
     expect(() => element.unmount()).not.toThrow();

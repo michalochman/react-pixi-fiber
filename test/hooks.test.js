@@ -9,8 +9,11 @@ import {
   usePreviousProps,
   usePixiAppCreator,
 } from "../src/hooks";
-import { render } from "../src/render";
 import { AppContext } from "../src/AppProvider";
+import { createRender } from "../src/render";
+import { ReactPixiFiberAsSecondaryRenderer } from "../src/ReactPixiFiber";
+
+const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 
 describe("usePixiApp", () => {
   it("will provide app from the context above", () => {

@@ -12,9 +12,8 @@ import {
   includingStageProps,
   validateCanvas,
 } from "../src/Stage";
-import { render, unmount } from "../src/render";
 import { AppProvider } from "../src/AppProvider";
-import { DEFAULT_PROPS } from "../src/props";
+import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
 
 const Stage = createStageClass();
 
@@ -27,13 +26,20 @@ jest.mock("../src/ReactPixiFiber", () => {
 });
 
 jest.mock("../src/render", () => {
+  const render = jest.fn();
+  const unmount = jest.fn();
+
   return {
-    render: jest.fn(),
-    unmount: jest.fn(),
+    createRender: jest.fn().mockReturnValue(render),
+    createUnmount: jest.fn().mockReturnValue(unmount),
+    __renderMock: render,
+    __unmounMock: unmount,
   };
 });
 
 describe("Stage (class)", () => {
+  const { __renderMock, __unmounMock } = require("../src/render");
+
   it("renders canvas element", () => {
     const tree = renderer.create(<Stage />).toJSON();
 
@@ -84,10 +90,11 @@ describe("Stage (class)", () => {
     const app = instance._app;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app.renderer.height).toEqual(height);
-    expect(app.renderer.width).toEqual(width);
-    expect(app.renderer.backgroundColor).toEqual(options.backgroundColor);
-    expect(app.ticker).toEqual(PIXI.Ticker.shared);
+    expect(app.renderer.options).toMatchObject({
+      height,
+      width,
+      ...options,
+    });
   });
 
   it("creates PIXI.Application instance with 'height' and 'width' in options", () => {
@@ -103,10 +110,7 @@ describe("Stage (class)", () => {
     const app = instance._app;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app.renderer.height).toEqual(options.height);
-    expect(app.renderer.width).toEqual(options.width);
-    expect(app.renderer.backgroundColor).toEqual(options.backgroundColor);
-    expect(app.ticker).toEqual(PIXI.Ticker.shared);
+    expect(app.renderer.options).toMatchObject(options)
   });
 
   it("creates root Container", () => {
@@ -175,14 +179,14 @@ describe("Stage (class)", () => {
   });
 
   it("calls render on componentDidMount", () => {
-    render.mockClear();
+    __renderMock.mockClear();
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children}</Stage>);
     const instance = element.getInstance();
     const stage = instance._app.stage;
 
-    expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock).toHaveBeenCalledWith(
       <AppProvider app={instance._app}>{children}</AppProvider>,
       stage,
       undefined,
@@ -196,12 +200,12 @@ describe("Stage (class)", () => {
     const instance = element.getInstance();
     const stage = instance._app.stage;
 
-    render.mockClear();
+    __renderMock.mockClear();
     const children2 = <Text text="World Hello!" />;
     element.update(<Stage>{children2}</Stage>);
 
-    expect(render).toHaveBeenCalledTimes(1);
-    expect(render).toHaveBeenCalledWith(
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock).toHaveBeenCalledWith(
       <AppProvider app={instance._app}>{children2}</AppProvider>,
       stage,
       undefined,
@@ -213,11 +217,11 @@ describe("Stage (class)", () => {
     const element = renderer.create(<Stage />);
     const instance = element.getInstance();
     const stage = instance._app.stage;
-    unmount.mockClear();
+    __unmounMock.mockClear();
     element.unmount();
 
-    expect(unmount).toHaveBeenCalledTimes(1);
-    expect(unmount).toHaveBeenCalledWith(stage);
+    expect(__unmounMock).toHaveBeenCalledTimes(1);
+    expect(__unmounMock).toHaveBeenCalledWith(stage)
   });
 });
 
@@ -251,6 +255,12 @@ describe("validateCanvas", () => {
 describe("includingDisplayObjectProps", () => {
   it("returns true if prop is one of DisplayObject members", () => {
     Object.keys(DEFAULT_PROPS).forEach(propName => {
+      expect(includingDisplayObjectProps(propName)).toBeTruthy();
+    });
+  });
+
+  it("returns true if prop is one of DisplayObject events", () => {
+    EVENT_PROPS.forEach(propName => {
       expect(includingDisplayObjectProps(propName)).toBeTruthy();
     });
   });
