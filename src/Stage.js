@@ -93,6 +93,10 @@ const resizeRenderer = (app, prevProps, props) => {
   }
 };
 
+export function createPixiApplication(height, width, view, options) {
+  return new PIXI.Application({ height, width, view, ...options });
+}
+
 export function createStageFunction() {
   function Stage(props) {
     const { height, options, width } = props;
@@ -122,7 +126,7 @@ export function createStageClass() {
       const { children, height, options, width } = this.props;
       const view = this._canvas;
 
-      this._app = appTestHook = new PIXI.Application({ height, width, view, ...options });
+      this._app = createPixiApplication(height, width, view, options);
 
       // Apply root Container props
       applyUpdate(this._app, this.props, this);
