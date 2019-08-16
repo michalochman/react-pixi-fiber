@@ -13,13 +13,16 @@ export function usePixiApp() {
 export function usePixiTicker(fn) {
   const app = usePixiApp();
 
-  useEffect(() => {
-    app.ticker.add(fn);
+  useEffect(
+    () => {
+      app.ticker.add(fn);
 
-    return () => {
-      app.ticker.remove(fn);
-    };
-  }, [fn]);
+      return () => {
+        app.ticker.remove(fn);
+      };
+    },
+    [fn]
+  );
 }
 
 export function usePreviousProps(value) {
