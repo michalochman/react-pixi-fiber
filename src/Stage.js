@@ -126,7 +126,7 @@ export function createStageClass() {
       const { children, height, options, width } = this.props;
       const view = this._canvas;
 
-      this._app = createPixiApplication(height, width, view, options);
+      this._app = appTestHook = createPixiApplication(height, width, view, options);
 
       // Apply root Container props
       applyUpdate(this._app, this.props, this);
