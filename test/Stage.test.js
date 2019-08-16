@@ -6,6 +6,7 @@ import ReactPixiFiber from "../src/ReactPixiFiber";
 import {
   appTestHook,
   createStageFunction,
+  createStageClass,
   getCanvasProps,
   getDisplayObjectProps,
   includingCanvasProps,
@@ -16,7 +17,8 @@ import {
 import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
 
-const Stage = createStageFunction();
+const StageFunction = createStageFunction();
+const StageClass = createStageClass();
 
 jest.mock("../src/ReactPixiFiber", () => {
   return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
@@ -42,7 +44,7 @@ describe("Stage (function)", () => {
   const { __renderMock, __unmounMock } = require("../src/render");
 
   it("renders canvas element", () => {
-    const tree = renderer.create(<Stage />).toJSON();
+    const tree = renderer.create(<StageFunction />).toJSON();
 
     expect(tree).toHaveProperty("type", "canvas");
   });
@@ -50,7 +52,7 @@ describe("Stage (function)", () => {
   it("renders null if canvas is already passed in options", () => {
     const canvas = document.createElement("canvas");
     const options = { view: canvas };
-    const tree = renderer.create(<Stage options={options} />).toJSON();
+    const tree = renderer.create(<StageFunction options={options} />).toJSON();
 
     expect(tree).toBeNull();
   });
@@ -59,7 +61,7 @@ describe("Stage (function)", () => {
     const className = "canvas";
     const id = "canvasApp";
     const style = { height: "100%", width: "100%" };
-    const tree = renderer.create(<Stage className={className} id={id} style={style} options={{}} />).toJSON();
+    const tree = renderer.create(<StageFunction className={className} id={id} style={style} options={{}} />).toJSON();
 
     expect(tree).toHaveProperty("type", "canvas");
     expect(tree.props).toEqual({
@@ -71,7 +73,7 @@ describe("Stage (function)", () => {
 
   it("does not pass stage props to rendered canvas element", () => {
     const style = { height: "100%", width: "100%" };
-    const tree = renderer.create(<Stage height={600} style={style} width={800} />).toJSON();
+    const tree = renderer.create(<StageFunction height={600} style={style} width={800} />).toJSON();
 
     expect(tree).toHaveProperty("type", "canvas");
     expect(tree.props).not.toHaveProperty("height");
@@ -86,7 +88,7 @@ describe("Stage (function)", () => {
     const height = 300;
     const width = 400;
 
-    const element = renderer.create(<Stage height={height} width={width} options={options} />);
+    const element = renderer.create(<StageFunction height={height} width={width} options={options} />);
 
     expect(appTestHook instanceof PIXI.Application).toBeTruthy();
     expect(appTestHook.renderer.height).toEqual(height);
@@ -103,7 +105,7 @@ describe("Stage (function)", () => {
       width: 400,
     };
 
-    const element = renderer.create(<Stage options={options} />);
+    const element = renderer.create(<StageFunction options={options} />);
 
     expect(appTestHook instanceof PIXI.Application).toBeTruthy();
     expect(appTestHook.renderer.height).toEqual(options.height);
@@ -113,7 +115,7 @@ describe("Stage (function)", () => {
   });
 
   it("creates root Container", () => {
-    const element = renderer.create(<Stage height={300} width={400} scale={2} position="40,20" />);
+    const element = renderer.create(<StageFunction height={300} width={400} scale={2} position="40,20" />);
     const stage = appTestHook.stage;
 
     expect(stage instanceof PIXI.Container).toBeTruthy();
@@ -123,7 +125,7 @@ describe("Stage (function)", () => {
     const scale = 2;
     const x = 40;
     const y = 20;
-    const element = renderer.create(<Stage height={300} position={`${x},${y}`} scale={scale} width={400} />);
+    const element = renderer.create(<StageFunction height={300} position={`${x},${y}`} scale={scale} width={400} />);
     const stage = appTestHook.stage;
 
     expect(stage.position.x).toEqual(x);
@@ -134,14 +136,14 @@ describe("Stage (function)", () => {
 
   it("updates root Container DisplayObject props", () => {
     const scale = 2;
-    const element = renderer.create(<Stage height={300} scale={scale} width={400} />);
+    const element = renderer.create(<StageFunction height={300} scale={scale} width={400} />);
     const stage = appTestHook.stage;
 
     expect(stage.scale.x).toEqual(scale);
     expect(stage.scale.y).toEqual(scale);
 
     const newScale = 1;
-    element.update(<Stage height={300} scale={newScale} width={400} />);
+    element.update(<StageFunction height={300} scale={newScale} width={400} />);
 
     expect(stage.scale.x).toEqual(newScale);
     expect(stage.scale.y).toEqual(newScale);
@@ -150,21 +152,21 @@ describe("Stage (function)", () => {
   it("resizes renderer when dimensions change", () => {
     const height = 300;
     const width = 400;
-    const element = renderer.create(<Stage height={height} width={width} />);
+    const element = renderer.create(<StageFunction height={height} width={width} />);
 
     expect(appTestHook.renderer.height).toEqual(height);
     expect(appTestHook.renderer.width).toEqual(width);
 
     const newHeight = 600;
     const newWidth = 800;
-    element.update(<Stage height={newHeight} width={newWidth} />);
+    element.update(<StageFunction height={newHeight} width={newWidth} />);
 
     expect(appTestHook.renderer.height).toEqual(newHeight);
     expect(appTestHook.renderer.width).toEqual(newWidth);
   });
 
   it("can be unmounted", () => {
-    const element = renderer.create(<Stage />);
+    const element = renderer.create(<StageFunction />);
 
     expect(() => element.unmount()).not.toThrow();
   });
@@ -172,7 +174,7 @@ describe("Stage (function)", () => {
   it("calls render on componentDidMount", () => {
     __renderMock.mockClear();
     const children = <Text text="Hello World!" />;
-    const element = renderer.create(<Stage>{children}</Stage>);
+    const element = renderer.create(<StageFunction>{children}</StageFunction>);
     const stage = appTestHook.stage;
 
     expect(__renderMock).toHaveBeenCalledTimes(1);
@@ -184,12 +186,12 @@ describe("Stage (function)", () => {
 
   it("calls render on componentDidUpdate", () => {
     const children1 = <Text text="Hello World!" />;
-    const element = renderer.create(<Stage>{children1}</Stage>);
+    const element = renderer.create(<StageFunction>{children1}</StageFunction>);
     const stage = appTestHook.stage;
 
     __renderMock.mockClear();
     const children2 = <Text text="World Hello!" />;
-    element.update(<Stage>{children2}</Stage>);
+    element.update(<StageFunction>{children2}</StageFunction>);
 
     expect(__renderMock).toHaveBeenCalledTimes(1);
     expect(__renderMock).toHaveBeenCalledWith(
@@ -199,13 +201,201 @@ describe("Stage (function)", () => {
   });
 
   it("calls unmount on componentWillUnmount", () => {
-    const element = renderer.create(<Stage />);
+    const element = renderer.create(<StageFunction />);
     const { stage } = appTestHook;
     __unmounMock.mockClear();
     element.unmount();
 
     expect(__unmounMock).toHaveBeenCalledTimes(1);
     expect(__unmounMock).toHaveBeenCalledWith(stage);
+  });
+});
+
+describe("Stage (class)", () => {
+  const { __renderMock, __unmounMock } = require("../src/render");
+
+  it("renders canvas element", () => {
+    const tree = renderer.create(<StageClass />).toJSON();
+
+    expect(tree).toHaveProperty("type", "canvas");
+  });
+
+  it("renders null if canvas is already passed in options", () => {
+    const canvas = document.createElement("canvas");
+    const options = { view: canvas };
+    const tree = renderer.create(<StageClass options={options} />).toJSON();
+
+    expect(tree).toBeNull();
+  });
+
+  it("passes canvas props to rendered canvas element", () => {
+    const className = "canvas";
+    const id = "canvasApp";
+    const style = { height: "100%", width: "100%" };
+    const tree = renderer.create(<StageClass className={className} id={id} style={style} options={{}} />).toJSON();
+
+    expect(tree).toHaveProperty("type", "canvas");
+    expect(tree.props).toEqual({
+      className,
+      id,
+      style,
+    });
+  });
+
+  it("does not pass stage props to rendered canvas element", () => {
+    const style = { height: "100%", width: "100%" };
+    const tree = renderer.create(<StageClass height={600} style={style} width={800} />).toJSON();
+
+    expect(tree).toHaveProperty("type", "canvas");
+    expect(tree.props).not.toHaveProperty("height");
+    expect(tree.props).not.toHaveProperty("width");
+  });
+
+  it("creates PIXI.Application instance with passed options", () => {
+    const options = {
+      backgroundColor: 0xff00ff,
+      sharedTicker: true,
+    };
+    const height = 300;
+    const width = 400;
+
+    const element = renderer.create(<StageClass height={height} width={width} options={options} />);
+    const instance = element.getInstance();
+    const app = instance._app;
+
+    expect(app instanceof PIXI.Application).toBeTruthy();
+    expect(app.renderer.options).toMatchObject({
+      height,
+      width,
+      ...options,
+    });
+  });
+
+  it("creates PIXI.Application instance with 'height' and 'width' in options", () => {
+    const options = {
+      backgroundColor: 0xff00ff,
+      height: 300,
+      sharedTicker: true,
+      width: 400,
+    };
+
+    const element = renderer.create(<StageClass options={options} />);
+    const instance = element.getInstance();
+    const app = instance._app;
+
+    expect(app instanceof PIXI.Application).toBeTruthy();
+    expect(app.renderer.options).toMatchObject(options)
+  });
+
+  it("creates root Container", () => {
+    const element = renderer.create(<StageClass height={300} width={400} scale={2} position="40,20" />);
+    const instance = element.getInstance();
+    const app = instance._app;
+    const stage = app.stage;
+
+    expect(stage instanceof PIXI.Container).toBeTruthy();
+  });
+
+  it("applies DisplayObject props to root Container", () => {
+    const scale = 2;
+    const x = 40;
+    const y = 20;
+    const element = renderer.create(<StageClass height={300} position={`${x},${y}`} scale={scale} width={400} />);
+    const instance = element.getInstance();
+    const app = instance._app;
+    const stage = app.stage;
+
+    expect(stage.position.x).toEqual(x);
+    expect(stage.position.y).toEqual(y);
+    expect(stage.scale.x).toEqual(scale);
+    expect(stage.scale.y).toEqual(scale);
+  });
+
+  it("updates root Container DisplayObject props", () => {
+    const scale = 2;
+    const element = renderer.create(<StageClass height={300} scale={scale} width={400} />);
+    const instance = element.getInstance();
+    const app = instance._app;
+    const stage = app.stage;
+
+    expect(stage.scale.x).toEqual(scale);
+    expect(stage.scale.y).toEqual(scale);
+
+    const newScale = 1;
+    element.update(<StageClass height={300} scale={newScale} width={400} />);
+
+    expect(stage.scale.x).toEqual(newScale);
+    expect(stage.scale.y).toEqual(newScale);
+  });
+
+  it("resizes renderer when dimensions change", () => {
+    const height = 300;
+    const width = 400;
+    const element = renderer.create(<StageClass height={height} width={width} />);
+    const instance = element.getInstance();
+    const app = instance._app;
+
+    expect(app.renderer.height).toEqual(height);
+    expect(app.renderer.width).toEqual(width);
+
+    const newHeight = 600;
+    const newWidth = 800;
+    element.update(<StageClass height={newHeight} width={newWidth} />);
+
+    expect(app.renderer.height).toEqual(newHeight);
+    expect(app.renderer.width).toEqual(newWidth);
+  });
+
+  it("can be umounted", () => {
+    const element = renderer.create(<StageClass />);
+
+    expect(() => element.unmount()).not.toThrow();
+  });
+
+  it("calls render on componentDidMount", () => {
+    __renderMock.mockClear();
+    const children = <Text text="Hello World!" />;
+    const element = renderer.create(<StageClass>{children}</StageClass>);
+    const instance = element.getInstance();
+    const stage = instance._app.stage;
+
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock).toHaveBeenCalledWith(
+      <AppProvider app={instance._app}>{children}</AppProvider>,
+      stage,
+      undefined,
+      instance
+    );
+  });
+
+  it("calls render on componentDidUpdate", () => {
+    const children1 = <Text text="Hello World!" />;
+    const element = renderer.create(<StageClass>{children1}</StageClass>);
+    const instance = element.getInstance();
+    const stage = instance._app.stage;
+
+    __renderMock.mockClear();
+    const children2 = <Text text="World Hello!" />;
+    element.update(<StageClass>{children2}</StageClass>);
+
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock).toHaveBeenCalledWith(
+      <AppProvider app={instance._app}>{children2}</AppProvider>,
+      stage,
+      undefined,
+      instance
+    );
+  });
+
+  it("calls unmount on componentWillUnmount", () => {
+    const element = renderer.create(<StageClass />);
+    const instance = element.getInstance();
+    const stage = instance._app.stage;
+    __unmounMock.mockClear();
+    element.unmount();
+
+    expect(__unmounMock).toHaveBeenCalledTimes(1);
+    expect(__unmounMock).toHaveBeenCalledWith(stage)
   });
 });
 
@@ -258,7 +448,11 @@ describe("includingDisplayObjectProps", () => {
 
 describe("includingStageProps", () => {
   it("returns true if prop is one of Stage props", () => {
-    Object.keys(Stage.propTypes).forEach(propName => {
+    Object.keys(StageFunction.propTypes).forEach(propName => {
+      expect(includingStageProps(propName)).toBeTruthy();
+    });
+
+    Object.keys(StageClass.propTypes).forEach(propName => {
       expect(includingStageProps(propName)).toBeTruthy();
     });
   });
@@ -279,7 +473,13 @@ describe("includingCanvasProps", () => {
 
   it("returns false if prop is one of DisplayObject members or Stage props", () => {
     Object.keys(DEFAULT_PROPS)
-      .concat(Object.keys(Stage.propTypes))
+      .concat(Object.keys(StageFunction.propTypes))
+      .forEach(propName => {
+        expect(includingCanvasProps(propName)).toBeFalsy();
+      });
+
+    Object.keys(DEFAULT_PROPS)
+      .concat(Object.keys(StageClass.propTypes))
       .forEach(propName => {
         expect(includingCanvasProps(propName)).toBeFalsy();
       });

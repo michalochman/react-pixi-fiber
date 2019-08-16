@@ -22,7 +22,6 @@ export {
   withApp,
   usePixiApp,
   usePixiTicker,
-  usePreviousProps,
   usePixiAppCreator,
   unstable_batchedUpdates,
 };
