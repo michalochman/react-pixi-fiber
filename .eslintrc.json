@@ -1,6 +1,6 @@
 {
   "extends": ["plugin:react/recommended", "prettier", "prettier/react"],
-  "plugins": ["react", "prettier"],
+  "plugins": ["react", "react-hooks", "prettier"],
   "parser": "babel-eslint",
   "parserOptions": {
     "sourceType": "module",
@@ -14,7 +14,9 @@
     "node": true
   },
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "warn" // Checks effect dependencies
   },
   "globals": {
     "__DEV__": false
