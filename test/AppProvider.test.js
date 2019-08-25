@@ -1,15 +1,15 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, withApp } from "../src";
-import { createStageClass } from "../src/Stage";
-import { appTestHook } from "../src/Stage";
-import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
+import { createStageClass, createStageFunction } from "../src/Stage";
 import { createRender } from "../src/render";
+import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
+import { __RewireAPI__ as HooksRewireAPI } from "../src/hooks";
+import { __RewireAPI__ as StageRewireAPI } from "../src/Stage";
 import * as PIXI from "pixi.js";
 
-const render = createRender(ReactPixiFiber)
+const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 
 if (typeof React.createContext === "function") {
   // New Context API
@@ -36,6 +36,23 @@ if (typeof React.createContext === "function") {
 } else {
   // Legacy Context API
   describe("AppProvider using Legacy Context API (React <16.3.0)", () => {
+    let app;
+    const createPixiApplication = jest.fn(options => {
+      app = new PIXI.Application(options);
+      return app;
+    });
+
+    beforeEach(() => {
+      HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+      StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+      createPixiApplication.mockClear();
+    });
+
+    afterEach(() => {
+      HooksRewireAPI.__ResetDependency__("createPixiApplication");
+      StageRewireAPI.__ResetDependency__("createPixiApplication");
+    });
+
     it("exports null AppContext", () => {
       expect(AppContext).toEqual(null);
     });
@@ -59,29 +76,62 @@ if (typeof React.createContext === "function") {
       expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app });
     });
 
-    it("passess app context to component rendered inside Stage", () => {
-      const Stage = createStageClass();
+    it("passess app context to component rendered inside Stage (class)", () => {
+      const StageClass = createStageClass();
       const TestComponent = jest.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
       };
 
-      let stage;
-      ReactDOM.render(
-        <Stage ref={c => (stage = c)}>
+      renderer.create(
+        <StageClass>
           <Container>
             <TestComponent foo="bar" />
           </Container>
-        </Stage>,
-        document.createElement("div")
+        </StageClass>
       );
 
-      expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app: stage._app });
+      expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app });
+    });
+
+    it("passess app context to component rendered inside Stage (function)", () => {
+      const StageFunction = createStageFunction();
+      const TestComponent = jest.fn(() => null);
+      TestComponent.contextTypes = {
+        app: PropTypes.object,
+      };
+
+      renderer.create(
+        <StageFunction>
+          <Container>
+            <TestComponent foo="bar" />
+          </Container>
+        </StageFunction>
+      );
+
+      expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app });
     });
   });
 }
 
 describe("withApp", () => {
+  let app;
+  const createPixiApplication = jest.fn(options => {
+    app = new PIXI.Application(options);
+    return app;
+  });
+
+  beforeEach(() => {
+    HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+    StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+    createPixiApplication.mockClear();
+  });
+
+  afterEach(() => {
+    HooksRewireAPI.__ResetDependency__("createPixiApplication");
+    StageRewireAPI.__ResetDependency__("createPixiApplication");
+  });
+
   it("passess app prop to component rendered inside AppProvider", () => {
     const app = new PIXI.Application();
     const TestComponent = jest.fn(() => null);
@@ -99,19 +149,31 @@ describe("withApp", () => {
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
 
-  it("passess app prop to component rendered inside Stage", () => {
-    const Stage = createStageClass();
+  it("passess app prop to component rendered inside Stage (class)", () => {
+    const StageClass = createStageClass();
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
-    let stage;
-    ReactDOM.render(
-      <Stage ref={c => (stage = c)}>
+    renderer.create(
+      <StageClass>
         <TestComponentWithApp foo="bar" />
-      </Stage>,
-      document.createElement("div")
+      </StageClass>
     );
 
-    expect(TestComponent).toHaveBeenCalledWith({ app: appTestHook, foo: "bar" }, {});
+    expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
+  });
+
+  it("passess app prop to component rendered inside Stage (function)", () => {
+    const StageFunction = createStageFunction();
+    const TestComponent = jest.fn(() => null);
+    const TestComponentWithApp = withApp(TestComponent);
+
+    renderer.create(
+      <StageFunction>
+        <TestComponentWithApp foo="bar" />
+      </StageFunction>
+    );
+
+    expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
 });

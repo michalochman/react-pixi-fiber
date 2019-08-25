@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Stage, Text } from "react-pixi-fiber";
+import Circle from "./Circle";
 import DraggableContainer from "./DraggableContainer";
 import Rect from "./Rect";
 
@@ -33,8 +34,8 @@ class CustomComponentExample extends Component {
     return (
       <Stage width={800} height={600} options={OPTIONS}>
         <DraggableContainer>
-          <Rect x={0} y={0} width={100} height={100} fill={0xffff00} />
-          <Text text={"drag\nme\nnow"} style={{ fontSize: 20 }} x={10} y={10} />
+          <Circle x={50} y={50} radius={50} fill={0xffff00} />
+          <Text anchor="0.5,0.5" text={"drag\nme\nnow"} style={{ align: "center", fontSize: 20 }} x={50} y={50} />
         </DraggableContainer>
         <Rect
           x={POSITIONS[this.state.position].x}

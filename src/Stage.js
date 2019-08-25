@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import * as PIXI from "pixi.js";
 import { AppProvider } from "./AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
 import { usePreviousProps, usePixiAppCreator } from "./hooks";
 import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber";
 import { createRender, createUnmount } from "./render";
-import { filterByKey, including } from "./utils";
+import { createPixiApplication, filterByKey, including } from "./utils";
 
 const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
-
-export let appTestHook = null;
 
 export function validateCanvas(props, propName, componentName) {
   // Let's assume that element is canvas if the element is Element and implements getContext
@@ -84,7 +81,6 @@ const getDimensions = props => {
 };
 
 const resizeRenderer = (app, prevProps, props) => {
-  const { options, width, height } = props;
   const [prevWidth, prevHeight] = getDimensions(prevProps);
   const [currentWidth, currentHeight] = getDimensions(props);
 
@@ -93,20 +89,14 @@ const resizeRenderer = (app, prevProps, props) => {
   }
 };
 
-export function createPixiApplication(height, width, view, options) {
-  return new PIXI.Application({ height, width, view, ...options });
-}
-
 export function createStageFunction() {
   function Stage(props) {
-    const { height, options, width } = props;
     const { app, canvas } = usePixiAppCreator(props);
     const prevProps = usePreviousProps(props);
 
     // Re-render and resize stage on component update
     useLayoutEffect(() => {
       if (!app) return;
-      appTestHook = app;
 
       applyUpdate(app, props);
       resizeRenderer(app, prevProps, props);
@@ -123,18 +113,16 @@ export function createStageFunction() {
 export function createStageClass() {
   class Stage extends React.Component {
     componentDidMount() {
-      const { children, height, options, width } = this.props;
+      const { height, options, width } = this.props;
       const view = this._canvas;
 
-      this._app = appTestHook = createPixiApplication(height, width, view, options);
+      this._app = createPixiApplication({ height, width, view, ...options });
 
       // Apply root Container props
       applyUpdate(this._app, this.props, this);
     }
 
     componentDidUpdate(prevProps) {
-      const { children, height, options, width } = this.props;
-      const { options: prevOptions } = prevProps;
       applyUpdate(this._app, this.props, this);
       resizeRenderer(this._app, prevProps, this.props);
     }

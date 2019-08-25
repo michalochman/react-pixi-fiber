@@ -1,9 +1,9 @@
-import * as PIXI from "pixi.js";
 import React from "react";
 import { useContext, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { AppContext } from "./AppProvider";
-import { getCanvasProps, createPixiApplication } from "./Stage";
+import { getCanvasProps } from "./Stage";
 import { createUnmount } from "./render";
+import { createPixiApplication } from "./utils";
 import { ReactPixiFiberAsSecondaryRenderer } from "./ReactPixiFiber";
 
 export function usePixiApp() {
@@ -13,16 +13,13 @@ export function usePixiApp() {
 export function usePixiTicker(fn) {
   const app = usePixiApp();
 
-  useEffect(
-    () => {
-      app.ticker.add(fn);
+  useEffect(() => {
+    app.ticker.add(fn);
 
-      return () => {
-        app.ticker.remove(fn);
-      };
-    },
-    [fn]
-  );
+    return () => {
+      app.ticker.remove(fn);
+    };
+  }, [fn]);
 }
 
 export function usePreviousProps(value) {
@@ -37,7 +34,7 @@ export function usePreviousProps(value) {
 
 export function usePixiAppCreator(props) {
   const { options, width, height } = props;
-  const canvasRef = useRef(null);
+  const canvasRef = useRef();
   const [app, setApp] = useState(null);
   const canvasProps = getCanvasProps(props);
   // Do not render anything if view is passed to options
@@ -46,7 +43,8 @@ export function usePixiAppCreator(props) {
   // Initialize pixi application on mount
   useLayoutEffect(() => {
     const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
-    const appInstance = createPixiApplication(height, width, canvasRef.current, options);
+    const view = canvasRef.current;
+    const appInstance = createPixiApplication({ height, width, view, ...options });
 
     setApp(appInstance);
 

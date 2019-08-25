@@ -1,9 +1,6 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-import { Stage } from "react-pixi-fiber";
-import Circle from "./Circle";
+import React, { Fragment, useState } from "react";
+import { Stage, usePixiTicker } from "react-pixi-fiber";
+import Circle from "../CustomPIXIComponentExample/Circle";
 import Rect from "../CustomPIXIComponentExample/Rect";
 
 // returns a base 10 translation of a gray scale hex string build from a single
@@ -13,44 +10,47 @@ const grayFromNum = num => {
   return parseInt(`${hex.repeat(3)}`, 16);
 };
 
-const HooksExample = props => {
+function useAnimatedValue({ direction, max, min, value }) {
   const [data, setData] = useState({
-    position: 255,
-    direction: -1
+    direction,
+    value,
   });
 
-  useEffect(() => {
-    let animationId;
-    const UP = 1;
-    const DOWN = -1;
-    const update = () => {
-      // perform all the logic inside setData so useEffect's dependency array
-      // can be empty so it will only trigger one on initial render and not
-      // request and cancel animation frames constantly.
-      setData(current => {
-        const newData = { ...current };
+  usePixiTicker(() => {
+    // perform all the logic inside setData so useEffect's dependency array
+    // can be empty so it will only trigger one on initial render and not
+    // add and remove from ticker constantly.
+    setData(current => {
+      const data = { ...current };
 
-        if (current.position >= 255 && current.direction === UP) {
-          newData.direction = DOWN;
-        } else if (current.position <= 0 && current.direction === DOWN) {
-          newData.direction = UP;
-        }
-        newData.position += newData.direction;
-        return newData;
-      });
+      if ((current.value >= max && current.direction === 1) || (current.value <= min && current.direction === -1)) {
+        data.direction *= -1;
+      }
+      data.value += data.direction;
 
-      animationId = requestAnimationFrame(update);
-    };
+      return data;
+    });
+  }, [direction, max, min, value, setData]);
 
-    animationId = requestAnimationFrame(update);
+  return data.value;
+}
 
-    return () => cancelAnimationFrame(animationId);
-  }, []);
+const Animation = () => {
+  const number1 = useAnimatedValue({ direction: 1, max: 255, min: 0, value: 0 });
+  const number2 = useAnimatedValue({ direction: -1, max: 255, min: 0, value: 255 });
 
   return (
+    <Fragment>
+      <Rect x={275} y={175} width={250} height={250} fill={grayFromNum(number1)} />
+      <Circle x={400} y={300} radius={100} fill={grayFromNum(number2)} />
+    </Fragment>
+  );
+};
+
+const HooksExample = () => {
+  return (
     <Stage width={800} height={600} options={{ backgroundColor: 0xff0000 }}>
-      <Rect x={275} y={175} width={250} height={250} fill={grayFromNum(255 - data.position)} />
-      <Circle x={400} y={300} radius={100} fill={grayFromNum(data.position)} />
+      <Animation />
     </Stage>
   );
 };

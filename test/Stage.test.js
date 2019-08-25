@@ -1,10 +1,9 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Text } from "../src/index";
-import ReactPixiFiber from "../src/ReactPixiFiber";
 import {
-  appTestHook,
   createStageFunction,
   createStageClass,
   getCanvasProps,
@@ -16,9 +15,8 @@ import {
 } from "../src/Stage";
 import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
-
-const StageFunction = createStageFunction();
-const StageClass = createStageClass();
+import { __RewireAPI__ as HooksRewireAPI } from "../src/hooks";
+import { __RewireAPI__ as StageRewireAPI } from "../src/Stage";
 
 jest.mock("../src/ReactPixiFiber", () => {
   return Object.assign({}, require.requireActual("../src/ReactPixiFiber"), {
@@ -42,6 +40,23 @@ jest.mock("../src/render", () => {
 
 describe("Stage (function)", () => {
   const { __renderMock, __unmounMock } = require("../src/render");
+  const StageFunction = createStageFunction();
+  let app;
+  const createPixiApplication = jest.fn(options => {
+    app = new PIXI.Application(options);
+    return app;
+  });
+
+  beforeEach(() => {
+    HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+    createPixiApplication.mockClear();
+    __renderMock.mockClear();
+    __unmounMock.mockClear();
+  });
+
+  afterEach(() => {
+    HooksRewireAPI.__ResetDependency__("createPixiApplication");
+  });
 
   it("renders canvas element", () => {
     const tree = renderer.create(<StageFunction />).toJSON();
@@ -88,13 +103,11 @@ describe("Stage (function)", () => {
     const height = 300;
     const width = 400;
 
-    const element = renderer.create(<StageFunction height={height} width={width} options={options} />);
+    renderer.create(<StageFunction height={height} width={width} options={options} />);
 
-    expect(appTestHook instanceof PIXI.Application).toBeTruthy();
-    expect(appTestHook.renderer.height).toEqual(height);
-    expect(appTestHook.renderer.width).toEqual(width);
-    expect(appTestHook.renderer.backgroundColor).toEqual(options.backgroundColor);
-    expect(appTestHook.ticker).toEqual(PIXI.Ticker.shared);
+    expect(createPixiApplication).toHaveBeenCalledTimes(1);
+    // FIXME
+    expect(createPixiApplication).toHaveBeenCalledWith({ height, width, view: null, ...options });
   });
 
   it("creates PIXI.Application instance with 'height' and 'width' in options", () => {
@@ -105,18 +118,16 @@ describe("Stage (function)", () => {
       width: 400,
     };
 
-    const element = renderer.create(<StageFunction options={options} />);
-
-    expect(appTestHook instanceof PIXI.Application).toBeTruthy();
-    expect(appTestHook.renderer.height).toEqual(options.height);
-    expect(appTestHook.renderer.width).toEqual(options.width);
-    expect(appTestHook.renderer.backgroundColor).toEqual(options.backgroundColor);
-    expect(appTestHook.ticker).toEqual(PIXI.Ticker.shared);
+    renderer.create(<StageFunction options={options} />);
+    expect(createPixiApplication).toHaveBeenCalledTimes(1);
+    // FIXME
+    expect(createPixiApplication).toHaveBeenCalledWith({ view: null, ...options });
   });
 
   it("creates root Container", () => {
-    const element = renderer.create(<StageFunction height={300} width={400} scale={2} position="40,20" />);
-    const stage = appTestHook.stage;
+    const app = new PIXI.Application({});
+    renderer.create(<StageFunction height={300} width={400} scale={2} position="40,20" />);
+    const { stage } = app;
 
     expect(stage instanceof PIXI.Container).toBeTruthy();
   });
@@ -125,8 +136,8 @@ describe("Stage (function)", () => {
     const scale = 2;
     const x = 40;
     const y = 20;
-    const element = renderer.create(<StageFunction height={300} position={`${x},${y}`} scale={scale} width={400} />);
-    const stage = appTestHook.stage;
+    renderer.create(<StageFunction height={300} position={`${x},${y}`} scale={scale} width={400} />);
+    const { stage } = app;
 
     expect(stage.position.x).toEqual(x);
     expect(stage.position.y).toEqual(y);
@@ -137,7 +148,7 @@ describe("Stage (function)", () => {
   it("updates root Container DisplayObject props", () => {
     const scale = 2;
     const element = renderer.create(<StageFunction height={300} scale={scale} width={400} />);
-    const stage = appTestHook.stage;
+    const { stage } = app;
 
     expect(stage.scale.x).toEqual(scale);
     expect(stage.scale.y).toEqual(scale);
@@ -154,15 +165,15 @@ describe("Stage (function)", () => {
     const width = 400;
     const element = renderer.create(<StageFunction height={height} width={width} />);
 
-    expect(appTestHook.renderer.height).toEqual(height);
-    expect(appTestHook.renderer.width).toEqual(width);
+    expect(app.renderer.height).toEqual(height);
+    expect(app.renderer.width).toEqual(width);
 
     const newHeight = 600;
     const newWidth = 800;
     element.update(<StageFunction height={newHeight} width={newWidth} />);
 
-    expect(appTestHook.renderer.height).toEqual(newHeight);
-    expect(appTestHook.renderer.width).toEqual(newWidth);
+    expect(app.renderer.height).toEqual(newHeight);
+    expect(app.renderer.width).toEqual(newWidth);
   });
 
   it("can be unmounted", () => {
@@ -172,38 +183,28 @@ describe("Stage (function)", () => {
   });
 
   it("calls render on componentDidMount", () => {
-    __renderMock.mockClear();
     const children = <Text text="Hello World!" />;
-    const element = renderer.create(<StageFunction>{children}</StageFunction>);
-    const stage = appTestHook.stage;
+    renderer.create(<StageFunction>{children}</StageFunction>);
 
     expect(__renderMock).toHaveBeenCalledTimes(1);
-    expect(__renderMock).toHaveBeenCalledWith(
-      <AppProvider app={appTestHook}>{children}</AppProvider>,
-      stage
-    );
+    expect(__renderMock).toHaveBeenCalledWith(<AppProvider app={app}>{children}</AppProvider>, app.stage);
   });
 
   it("calls render on componentDidUpdate", () => {
     const children1 = <Text text="Hello World!" />;
     const element = renderer.create(<StageFunction>{children1}</StageFunction>);
-    const stage = appTestHook.stage;
-
     __renderMock.mockClear();
+
     const children2 = <Text text="World Hello!" />;
     element.update(<StageFunction>{children2}</StageFunction>);
 
     expect(__renderMock).toHaveBeenCalledTimes(1);
-    expect(__renderMock).toHaveBeenCalledWith(
-      <AppProvider app={appTestHook}>{children2}</AppProvider>,
-      stage
-    );
+    expect(__renderMock).toHaveBeenCalledWith(<AppProvider app={app}>{children2}</AppProvider>, app.stage);
   });
 
   it("calls unmount on componentWillUnmount", () => {
     const element = renderer.create(<StageFunction />);
-    const { stage } = appTestHook;
-    __unmounMock.mockClear();
+    const { stage } = app;
     element.unmount();
 
     expect(__unmounMock).toHaveBeenCalledTimes(1);
@@ -213,6 +214,23 @@ describe("Stage (function)", () => {
 
 describe("Stage (class)", () => {
   const { __renderMock, __unmounMock } = require("../src/render");
+  const StageClass = createStageClass();
+  let app;
+  const createPixiApplication = jest.fn(options => {
+    app = new PIXI.Application(options);
+    return app;
+  });
+
+  beforeEach(() => {
+    StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+    createPixiApplication.mockClear();
+    __renderMock.mockClear();
+    __unmounMock.mockClear();
+  });
+
+  afterEach(() => {
+    StageRewireAPI.__ResetDependency__("createPixiApplication");
+  });
 
   it("renders canvas element", () => {
     const tree = renderer.create(<StageClass />).toJSON();
@@ -279,21 +297,28 @@ describe("Stage (class)", () => {
       width: 400,
     };
 
-    const element = renderer.create(<StageClass options={options} />);
-    const instance = element.getInstance();
-    const app = instance._app;
+    let stage;
+    ReactDOM.render(<StageClass options={options} ref={c => (stage = c)} />, document.createElement("div"));
 
-    expect(app instanceof PIXI.Application).toBeTruthy();
-    expect(app.renderer.options).toMatchObject(options)
+    expect(createPixiApplication).toHaveBeenCalledWith({ view: stage._canvas, ...options });
+  });
+
+  it("creates PIXI.Application instance with 'view' in options", () => {
+    const canvas = document.createElement("canvas");
+    const options = {
+      view: canvas,
+    };
+
+    ReactDOM.render(<StageClass options={options} />, document.createElement("div"));
+
+    expect(createPixiApplication).toHaveBeenCalledWith(options);
   });
 
   it("creates root Container", () => {
-    const element = renderer.create(<StageClass height={300} width={400} scale={2} position="40,20" />);
-    const instance = element.getInstance();
-    const app = instance._app;
-    const stage = app.stage;
+    let stage;
+    renderer.create(<StageClass height={300} width={400} scale={2} position="40,20" ref={c => (stage = c)} />);
 
-    expect(stage instanceof PIXI.Container).toBeTruthy();
+    expect(stage._app.stage instanceof PIXI.Container).toBeTruthy();
   });
 
   it("applies DisplayObject props to root Container", () => {
@@ -353,7 +378,6 @@ describe("Stage (class)", () => {
   });
 
   it("calls render on componentDidMount", () => {
-    __renderMock.mockClear();
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<StageClass>{children}</StageClass>);
     const instance = element.getInstance();
@@ -391,11 +415,10 @@ describe("Stage (class)", () => {
     const element = renderer.create(<StageClass />);
     const instance = element.getInstance();
     const stage = instance._app.stage;
-    __unmounMock.mockClear();
     element.unmount();
 
     expect(__unmounMock).toHaveBeenCalledTimes(1);
-    expect(__unmounMock).toHaveBeenCalledWith(stage)
+    expect(__unmounMock).toHaveBeenCalledWith(stage);
   });
 });
 
@@ -447,6 +470,9 @@ describe("includingDisplayObjectProps", () => {
 });
 
 describe("includingStageProps", () => {
+  const StageClass = createStageClass();
+  const StageFunction = createStageFunction();
+
   it("returns true if prop is one of Stage props", () => {
     Object.keys(StageFunction.propTypes).forEach(propName => {
       expect(includingStageProps(propName)).toBeTruthy();
@@ -465,6 +491,9 @@ describe("includingStageProps", () => {
 });
 
 describe("includingCanvasProps", () => {
+  const StageClass = createStageClass();
+  const StageFunction = createStageFunction();
+
   it("returns true if prop is not one of DisplayObject members", () => {
     expect(includingCanvasProps("className")).toBeTruthy();
     expect(includingCanvasProps("id")).toBeTruthy();

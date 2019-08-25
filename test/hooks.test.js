@@ -2,13 +2,8 @@ import React, { useLayoutEffect } from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Container } from "../src/index";
-import Stage, { appTestHook } from "../src/Stage";
-import {
-  usePixiApp,
-  usePixiTicker,
-  usePreviousProps,
-  usePixiAppCreator,
-} from "../src/hooks";
+import { usePixiApp, usePixiTicker, usePreviousProps, usePixiAppCreator } from "../src/hooks";
+import { __RewireAPI__ as HooksRewireAPI } from "../src/hooks";
 import { AppContext } from "../src/AppProvider";
 import { createRender } from "../src/render";
 import { ReactPixiFiberAsSecondaryRenderer } from "../src/ReactPixiFiber";
@@ -46,14 +41,12 @@ describe("usePixiTicker", () => {
   it("will add the callback to the app.ticker", () => {
     const app = new PIXI.Application();
     const fn = jest.fn();
-    const add = jest.spyOn(app.ticker, 'add');
+    const add = jest.spyOn(app.ticker, "add");
 
     const TestComponent = () => {
       usePixiTicker(fn);
 
-      return (
-        <Container />
-      );
+      return <Container />;
     };
 
     const tree = renderer.create(
@@ -66,7 +59,32 @@ describe("usePixiTicker", () => {
     // calls `app.ticker.add`
     tree.update();
 
+    expect(add).toHaveBeenCalledTimes(1);
     expect(add).toHaveBeenCalledWith(fn);
+  });
+
+  it("will remove the callback from the app.ticker as a cleanup", () => {
+    const app = new PIXI.Application();
+    const fn = jest.fn();
+    const remove = jest.spyOn(app.ticker, "remove");
+
+    const TestComponent = () => {
+      usePixiTicker(fn);
+
+      return <Container />;
+    };
+
+    const tree = renderer.create(
+      <AppContext.Provider value={app}>
+        <TestComponent />
+      </AppContext.Provider>
+    );
+
+    // trigger useEffect cleanup because that's when usePixiTicker
+    // calls `app.ticker.remove`
+    tree.unmount();
+
+    expect(remove).toHaveBeenCalledWith(fn);
   });
 });
 
@@ -74,8 +92,8 @@ describe("usePreviousProps", () => {
   it("will provide last props on rerender", () => {
     const mock = jest.fn();
     const props = {
-      prop1: 'foo',
-      prop2: 'bar',
+      prop1: "foo",
+      prop2: "bar",
     };
 
     const TestComponent = props => {
@@ -98,6 +116,17 @@ describe("usePreviousProps", () => {
 });
 
 describe("usePixiAppCreator", () => {
+  const createPixiApplication = jest.fn(options => new PIXI.Application(options));
+
+  beforeEach(() => {
+    HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+    createPixiApplication.mockClear();
+  });
+
+  afterEach(() => {
+    HooksRewireAPI.__ResetDependency__("createPixiApplication");
+  });
+
   it("will provide app and canvas", done => {
     const props = {
       width: 400,
