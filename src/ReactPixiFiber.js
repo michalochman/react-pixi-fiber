@@ -1,6 +1,7 @@
 import ReactFiberReconciler from "react-reconciler";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
+import warning from "fbjs/lib/warning";
 import now from "performance-now";
 import * as PIXI from "pixi.js";
 import {
@@ -10,30 +11,31 @@ import {
 import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { CHILDREN, DEFAULT_PROPS } from "./props";
 import { TYPES } from "./types";
-import { filterByKey, including, includingReservedProps, not, setPixiValue } from "./utils";
+import { filterByKey, including, includingReservedProps, not, setPixiValue, unique } from "./utils";
 
 /* Render Methods */
 
 // TODO consider whitelisting props based on component type
 export function defaultApplyProps(instance, oldProps, newProps) {
-  Object.keys(newProps)
+  Object.keys(oldProps)
+    .concat(Object.keys(newProps))
+    .filter(unique)
     .filter(not(includingReservedProps))
     .forEach(propName => {
-      const value = newProps[propName];
+      const defaultValue = DEFAULT_PROPS[propName];
+      const currentValue = instance[propName];
+      const newValue = newProps[propName];
 
       // Set value if defined
-      if (typeof value !== "undefined") {
-        setPixiValue(instance, propName, value);
-      } else if (typeof instance[propName] !== "undefined" && typeof DEFAULT_PROPS[propName] !== "undefined") {
-        // Reset to default value (if it is defined) when display object had prop set and no longer has
-        if (__DEV__) {
-          console.warn(`setting default value: ${propName} was ${instance[propName]} is ${value} for`, instance);
-        }
-        setPixiValue(instance, propName, DEFAULT_PROPS[propName]);
+      if (typeof newValue !== "undefined") {
+        setPixiValue(instance, propName, newValue);
+      }
+      // Reset to default value (if it is defined) when display object had prop set and no longer has
+      else if (typeof currentValue !== "undefined" && typeof defaultValue !== "undefined") {
+        warning(false, `setting default value: ${propName} was ${currentValue} is ${newValue} for %O`, instance);
+        setPixiValue(instance, propName, defaultValue);
       } else {
-        if (__DEV__) {
-          console.warn(`ignoring prop: ${propName} was ${instance[propName]} is ${value} for`, instance);
-        }
+        warning(false, `ignoring prop: ${propName} was ${instance[propName]} is ${newValue} for %O`, instance);
       }
     });
 }

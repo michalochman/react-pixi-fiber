@@ -8,6 +8,8 @@ export const not = fn => (...args) => !fn(...args);
 
 export const including = props => key => props.indexOf(key) !== -1;
 
+export const unique = (element, index, array) => array.indexOf(element) === index;
+
 export function filterByKey(inputObject, filter) {
   const exportObject = {};
 
