@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Changed `console.warn` calls into `fbjs/lib/warning` calls.
+
+### Fixed
+- Fixed setting default prop value when removing prop from instance
+
 
 ## [0.9.2] - 2019-08-01
 
