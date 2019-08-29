@@ -6,13 +6,15 @@ import { Text } from "../src/index";
 import {
   createStageFunction,
   createStageClass,
+} from "../src/Stage";
+import {
   getCanvasProps,
   getDisplayObjectProps,
   includingCanvasProps,
   includingDisplayObjectProps,
   includingStageProps,
   validateCanvas,
-} from "../src/Stage";
+} from "../src/stageProps";
 import { AppProvider } from "../src/AppProvider";
 import { DEFAULT_PROPS, EVENT_PROPS } from "../src/props";
 import { __RewireAPI__ as HooksRewireAPI } from "../src/hooks";

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { AppProvider } from "./AppProvider";
+import { getCanvasProps, getDisplayObjectProps, propTypes } from "./stageProps";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
 import { usePreviousProps, usePixiAppCreator } from "./hooks";
 import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber";
 import { createRender, createUnmount } from "./render";
-import { createPixiApplication, filterByKey, including } from "./utils";
+import { createPixiApplication, including } from "./utils";
 
 const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
@@ -26,37 +27,9 @@ export function validateCanvas(props, propName, componentName) {
   }
 }
 
-export const propTypes = {
-  options: PropTypes.shape({
-    antialias: PropTypes.bool,
-    autoStart: PropTypes.bool,
-    backgroundColor: PropTypes.number,
-    clearBeforeRender: PropTypes.bool,
-    forceCanvas: PropTypes.bool,
-    forceFXAA: PropTypes.bool,
-    height: PropTypes.number,
-    legacy: PropTypes.bool,
-    powerPreference: PropTypes.string,
-    preserveDrawingBuffer: PropTypes.bool,
-    resolution: PropTypes.number,
-    roundPixels: PropTypes.bool,
-    sharedLoader: PropTypes.bool,
-    sharedTicker: PropTypes.bool,
-    transparent: PropTypes.bool,
-    view: validateCanvas,
-    width: PropTypes.number,
-  }),
-  children: PropTypes.node,
-  height: PropTypes.number,
-  width: PropTypes.number,
-};
-
 export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS).concat(EVENT_PROPS));
 export const includingStageProps = including(Object.keys(propTypes));
 export const includingCanvasProps = key => !includingDisplayObjectProps(key) && !includingStageProps(key);
-
-export const getCanvasProps = props => filterByKey(props, includingCanvasProps);
-export const getDisplayObjectProps = props => filterByKey(props, includingDisplayObjectProps);
 
 const applyUpdate = (app, props, instance) => {
   const provider = <AppProvider app={app}>{props.children}</AppProvider>;

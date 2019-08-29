@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { AppContext } from "./AppProvider";
-import { getCanvasProps } from "./Stage";
+import { getCanvasProps } from "./stageProps";
 import { createUnmount } from "./render";
 import { createPixiApplication } from "./utils";
 import { ReactPixiFiberAsSecondaryRenderer } from "./ReactPixiFiber";
