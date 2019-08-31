@@ -11,22 +11,6 @@ import { createPixiApplication, including } from "./utils";
 const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
 
-export function validateCanvas(props, propName, componentName) {
-  // Let's assume that element is canvas if the element is Element and implements getContext
-  const element = props[propName];
-  if (typeof element === "undefined") {
-    return;
-  }
-
-  const isCanvas = element instanceof Element && typeof element.getContext === "function";
-  if (!isCanvas) {
-    const propType = typeof element;
-    return new Error(
-      `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`
-    );
-  }
-}
-
 export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS).concat(EVENT_PROPS));
 export const includingStageProps = including(Object.keys(propTypes));
 export const includingCanvasProps = key => !includingDisplayObjectProps(key) && !includingStageProps(key);
