@@ -69,7 +69,7 @@ export function createStageFunction() {
 
     // Re-render and resize stage on component update
     useLayoutEffect(() => {
-      if (!app) return;
+      if (!app || !app.stage) return;
 
       applyUpdate(app, props);
       resizeRenderer(app, prevProps, props);

@@ -11,15 +11,15 @@ export function usePixiApp() {
 }
 
 export function usePixiTicker(fn) {
-  const app = usePixiApp();
+  const { ticker } = usePixiApp();
 
   useEffect(() => {
-    app.ticker.add(fn);
+    ticker.add(fn);
 
     return () => {
-      app.ticker.remove(fn);
+      ticker.remove(fn);
     };
-  }, [fn]);
+  }, [fn, ticker]);
 }
 
 export function usePreviousProps(value) {
@@ -53,7 +53,7 @@ export function usePixiAppCreator(props) {
       unmount(appInstance.stage);
       appInstance.destroy();
     };
-  }, []);
+  }, [options, width, height]);
 
   return { app, canvas };
 }
