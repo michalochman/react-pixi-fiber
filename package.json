@@ -20,7 +20,7 @@
   "dependencies": {
     "fbjs": "^0.8.0",
     "performance-now": "^2.1.0",
-    "react-reconciler": "^0.20.4",
+    "react-reconciler": "^0.21.0",
     "scheduler": "^0.15.0"
   },
   "peerDependencies": {
