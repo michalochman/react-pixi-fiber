@@ -23,6 +23,7 @@ jest.mock("pixi.js", () => {
     },
   });
 });
+
 jest.mock("../src/utils", () => {
   return Object.assign({}, require.requireActual("../src/utils.js"), {
     setPixiValue: jest.fn(),
@@ -31,52 +32,116 @@ jest.mock("../src/utils", () => {
 
 describe("ReactPixiFiber", () => {
   describe("defaultApplyProps", () => {
+    const warning = jest.fn();
+    const PIXI = require.requireActual("pixi.js");
+
     beforeEach(() => {
       jest.resetAllMocks();
+      ReactPixiFiberRewireAPI.__Rewire__("warning", warning);
+    });
+
+    afterEach(() => {
+      ReactPixiFiberRewireAPI.__ResetDependency__("warning");
     });
 
     it("sets values of non-reserved props only", () => {
-      const instance = {};
+      const instance = new PIXI.Container();
       const props = {
         answer: 42,
         children: [1, 2, 3],
-        key: "value",
+        foo: "bar",
       };
       ReactPixiFiber.defaultApplyProps(instance, {}, props);
 
       expect(utils.setPixiValue).toHaveBeenCalledTimes(2);
       expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "answer", props.answer);
-      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "key", props.key);
+      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "foo", props.foo);
       expect(utils.setPixiValue).not.toHaveBeenCalledWith(instance, "children", props.children);
+      expect(warning).not.toHaveBeenCalled();
     });
 
     it("sets default value when current value is defined, new value is undefined and default is available", () => {
-      const instance = {
-        mask: new PIXI.Graphics(),
+      const instance = new PIXI.Container();
+      instance.interactive = true;
+      const oldProps = {
+        interactive: true,
       };
-      const props = {
-        mask: undefined,
+      const newProps = {
+        interactive: undefined,
       };
-      ReactPixiFiber.defaultApplyProps(instance, {}, props);
+      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
 
       expect(utils.setPixiValue).toHaveBeenCalledTimes(1);
-      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "mask", DEFAULT_PROPS.mask);
+      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "interactive", DEFAULT_PROPS.interactive);
+      expect(warning).toHaveBeenCalledTimes(1);
+      expect(warning).toHaveBeenCalledWith(
+        false,
+        "setting default value: interactive was true is undefined for %O",
+        instance
+      );
     });
 
-    it("has no effect when current value is defined, new value is undefined and default is not available", () => {
-      const instance = {
+    it("sets default value when current value is defined, new value is not provided and default is available", () => {
+      const instance = new PIXI.Container();
+      instance.interactive = true;
+      const oldProps = {
+        interactive: true,
+      };
+      const newProps = {};
+      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
+
+      expect(utils.setPixiValue).toHaveBeenCalledTimes(1);
+      expect(utils.setPixiValue).toHaveBeenCalledWith(instance, "interactive", DEFAULT_PROPS.interactive);
+      expect(warning).toHaveBeenCalledTimes(1);
+      expect(warning).toHaveBeenCalledWith(
+        false,
+        "setting default value: interactive was true is undefined for %O",
+        instance
+      );
+    });
+
+    it("has no effect  when current value is defined, new value is undefined and default is not available", () => {
+      const instance = new PIXI.Container();
+      instance.answer = 42;
+      const oldProps = {
         answer: 42,
       };
-      const props = {
+      const newProps = {
         answer: undefined,
       };
-      ReactPixiFiber.defaultApplyProps(instance, {}, props);
+      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
 
       expect(utils.setPixiValue).toHaveBeenCalledTimes(0);
+      expect(warning).toHaveBeenCalledTimes(1);
+      expect(warning).toHaveBeenCalledWith(false, "ignoring prop: answer was 42 is undefined for %O", instance);
+    });
+
+    it("has no effect  when current value is defined, new value is undefined and default is not available", () => {
+      const instance = new PIXI.Container();
+      instance.answer = 42;
+      const oldProps = {
+        answer: 42,
+      };
+      const newProps = {};
+      ReactPixiFiber.defaultApplyProps(instance, oldProps, newProps);
+
+      expect(utils.setPixiValue).toHaveBeenCalledTimes(0);
+      expect(warning).toHaveBeenCalledTimes(1);
+      expect(warning).toHaveBeenCalledWith(false, "ignoring prop: answer was 42 is undefined for %O", instance);
     });
   });
 
   describe("applyProps", () => {
+    const defaultApplyProps = jest.fn();
+
+    beforeEach(() => {
+      ReactPixiFiberRewireAPI.__Rewire__("defaultApplyProps", defaultApplyProps);
+    });
+
+    afterEach(() => {
+      ReactPixiFiberRewireAPI.__ResetDependency__("defaultApplyProps");
+    });
+
     it("delegates to custom component if _customApplyProps is defined", () => {
       const instance = {
         _customApplyProps: jest.fn(),
@@ -88,8 +153,9 @@ describe("ReactPixiFiber", () => {
 
       expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
       expect(instance._customApplyProps).toHaveBeenCalledWith(instance, {}, props);
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(0);
+      expect(defaultApplyProps).not.toHaveBeenCalled();
     });
+
     it("delegates to defaultApplyProps if _customApplyProps is not defined", () => {
       const instance = {};
       const props = {
@@ -98,7 +164,8 @@ describe("ReactPixiFiber", () => {
       };
       ReactPixiFiber.applyProps(instance, {}, props);
 
-      expect(utils.setPixiValue).toHaveBeenCalledTimes(Object.keys(props).length);
+      expect(defaultApplyProps).toHaveBeenCalledTimes(1);
+      expect(defaultApplyProps).toHaveBeenCalledWith(instance, {}, props);
     });
   });
 
@@ -106,6 +173,7 @@ describe("ReactPixiFiber", () => {
     it("returns null if props did not change", () => {
       expect(ReactPixiFiber.diffProps({}, "Text", {}, {})).toBeNull();
     });
+
     it("returns changed prop keys and values list if props changed", () => {
       const oldProps = { position: "0,0", scale: 2, text: "Hello World!" };
       const newProps = { pivot: "0,0", scale: 2, text: "Goodbye World!" };
@@ -498,7 +566,7 @@ describe("ReactPixiFiber", () => {
 
   describe("unstable_batchedUpdates", () => {
     it("should render one time when call setState many times", () => {
-      const render = createRender(ReactPixiFiber.ReactPixiFiberAsPrimaryRenderer)
+      const render = createRender(ReactPixiFiber.ReactPixiFiberAsPrimaryRenderer);
       const app = new PIXI.Application();
       const root = app.stage;
       const nextState = {};

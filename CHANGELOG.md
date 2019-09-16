@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.9.3] - 2019-08-29
+
+### Changed
+- Changed `console.warn` calls into `fbjs/lib/warning` calls.
+
+### Fixed
+- Fixed setting default prop value when removing prop from instance ([#141])
+
+
 ## [0.9.2] - 2019-08-01
 
 ### Fixed
@@ -270,7 +279,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.8.2...v0.9.0
@@ -303,6 +313,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#141]: https://github.com/michalochman/react-pixi-fiber/pull/141
 [#125]: https://github.com/michalochman/react-pixi-fiber/issues/125
 [#122]: https://github.com/michalochman/react-pixi-fiber/issues/122
 [#120]: https://github.com/michalochman/react-pixi-fiber/issues/120

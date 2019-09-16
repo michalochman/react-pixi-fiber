@@ -51,9 +51,11 @@ import * as PIXI from "pixi.js";
 
 // Setup PixiJS Application
 const canvasElement = document.getElementById("container")
-const app = new PIXI.Application(800, 600, {
+const app = new PIXI.Application({
   backgroundColor: 0x10bb99,
-  view: canvasElement
+  view: canvasElement,
+  width: 800,
+  height: 600,
 });
 
 render(
