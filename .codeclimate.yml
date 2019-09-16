@@ -29,7 +29,7 @@ checks:
 plugins:
   eslint:
     enabled: true
-    channel: "eslint-5"
+    channel: "eslint-4"
     config:
       config: .eslintrc.json
   fixme:
