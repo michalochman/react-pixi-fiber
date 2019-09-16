@@ -1,5 +1,5 @@
-import React, { Fragment, useState } from "react";
-import { Stage, usePixiTicker } from "react-pixi-fiber";
+import React, { Fragment, useEffect, useState } from "react";
+import { Stage, Text, usePixiTicker } from "react-pixi-fiber";
 import Circle from "../CustomPIXIComponentExample/Circle";
 import Rect from "../CustomPIXIComponentExample/Rect";
 
@@ -38,11 +38,20 @@ function useAnimatedValue({ direction, max, min, value }) {
 const Animation = () => {
   const number1 = useAnimatedValue({ direction: 1, max: 255, min: 0, value: 0 });
   const number2 = useAnimatedValue({ direction: -1, max: 255, min: 0, value: 255 });
+  const [text1, setText1] = useState(`number1: ${number1}`);
+  const [text2, setText2] = useState(`number2: ${number2}`);
+
+  useEffect(() => {
+    setText1(`number1: ${number1}`);
+    setText2(`number2: ${number2}`);
+  }, [number1, number2]);
 
   return (
     <Fragment>
       <Rect x={275} y={175} width={250} height={250} fill={grayFromNum(number1)} />
       <Circle x={400} y={300} radius={100} fill={grayFromNum(number2)} />
+      <Text text={text1} x={0} y={500} />
+      <Text text={text2} x={0} y={550} />
     </Fragment>
   );
 };
