@@ -28,6 +28,10 @@ export const includingReservedProps = including(Object.keys(RESERVED_PROPS));
 
 /* PIXI related Methods */
 
+export function createPixiApplication(options) {
+  return new PIXI.Application(options);
+}
+
 // Converts value to an array of coordinates
 export function parsePoint(value) {
   let arr = [];

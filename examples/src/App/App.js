@@ -11,6 +11,7 @@ import CanvasPropsExample from "../CanvasPropsExample";
 import ClickExample from "../ClickExample";
 import CustomBunnymarkExample from "../CustomBunnymarkExample";
 import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
+import HooksExample from "../HooksExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
 import BatchedUpdatesExample from "../BatchedUpdatesExample";
@@ -56,6 +57,11 @@ const examples = [
     name: "CustomPIXIComponent",
     slug: "custompixicomponent",
     component: CustomPIXIComponentExample,
+  },
+  {
+    name: "Hooks",
+    slug: "hooks",
+    component: HooksExample,
   },
   {
     name: "Layers",

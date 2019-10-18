@@ -2,6 +2,7 @@ import CustomPIXIComponent from "./CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage from "./Stage";
 import { TYPES } from "./types";
+import { usePixiApp, usePixiTicker, usePreviousProps, usePixiAppCreator } from "./hooks";
 import { createRender, createUnmount } from "./render";
 import { ReactPixiFiberAsPrimaryRenderer, applyProps, unstable_batchedUpdates } from "./ReactPixiFiber";
 
@@ -19,6 +20,9 @@ export {
   render,
   unmount,
   withApp,
+  usePixiApp,
+  usePixiTicker,
+  usePixiAppCreator,
   unstable_batchedUpdates,
 };
 

@@ -1,119 +1,112 @@
-import React from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import * as PIXI from "pixi.js";
 import { AppProvider } from "./AppProvider";
+import { getCanvasProps, getDisplayObjectProps, propTypes } from "./stageProps";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
+import { usePreviousProps, usePixiAppCreator } from "./hooks";
 import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber";
 import { createRender, createUnmount } from "./render";
-import { filterByKey, including } from "./utils";
+import { createPixiApplication, including } from "./utils";
 
 const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
-
-export function validateCanvas(props, propName, componentName) {
-  // Let's assume that element is canvas if the element is Element and implements getContext
-  const element = props[propName];
-  if (typeof element === "undefined") {
-    return;
-  }
-
-  const isCanvas = element instanceof Element && typeof element.getContext === "function";
-  if (!isCanvas) {
-    const propType = typeof element;
-    return new Error(
-      `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`
-    );
-  }
-}
-
-const propTypes = {
-  options: PropTypes.shape({
-    antialias: PropTypes.bool,
-    autoStart: PropTypes.bool,
-    backgroundColor: PropTypes.number,
-    clearBeforeRender: PropTypes.bool,
-    forceCanvas: PropTypes.bool,
-    forceFXAA: PropTypes.bool,
-    height: PropTypes.number,
-    legacy: PropTypes.bool,
-    powerPreference: PropTypes.string,
-    preserveDrawingBuffer: PropTypes.bool,
-    resolution: PropTypes.number,
-    roundPixels: PropTypes.bool,
-    sharedLoader: PropTypes.bool,
-    sharedTicker: PropTypes.bool,
-    transparent: PropTypes.bool,
-    view: validateCanvas,
-    width: PropTypes.number,
-  }),
-  children: PropTypes.node,
-  height: PropTypes.number,
-  width: PropTypes.number,
-};
 
 export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS).concat(EVENT_PROPS));
 export const includingStageProps = including(Object.keys(propTypes));
 export const includingCanvasProps = key => !includingDisplayObjectProps(key) && !includingStageProps(key);
 
-export const getCanvasProps = props => filterByKey(props, includingCanvasProps);
-export const getDisplayObjectProps = props => filterByKey(props, includingDisplayObjectProps);
+const applyUpdate = (app, props, instance) => {
+  const provider = <AppProvider app={app}>{props.children}</AppProvider>;
+  const stageProps = getDisplayObjectProps(props);
 
-class Stage extends React.Component {
-  componentDidMount() {
-    const { children, height, options, width } = this.props;
+  applyProps(app.stage, {}, stageProps);
 
-    this._app = new PIXI.Application({
-      height,
-      width,
-      view: this._canvas,
-      ...options,
+  // a stage class component instance has been passed.
+  if (typeof instance === "object") {
+    render(provider, app.stage, undefined, instance);
+  } else {
+    render(provider, app.stage);
+  }
+};
+
+const getDimensions = props => {
+  const { options, width, height } = props;
+  const realWidth = (options && options.width) || width;
+  const realHeight = (options && options.height) || height;
+
+  return [realWidth, realHeight];
+};
+
+const resizeRenderer = (app, prevProps, props) => {
+  const [prevWidth, prevHeight] = getDimensions(prevProps);
+  const [currentWidth, currentHeight] = getDimensions(props);
+
+  if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
+    app.renderer.resize(currentWidth, currentHeight);
+  }
+};
+
+export function createStageFunction() {
+  function Stage(props) {
+    const { app, canvas } = usePixiAppCreator(props);
+    const prevProps = usePreviousProps(props);
+
+    // Re-render and resize stage on component update
+    useLayoutEffect(() => {
+      if (!app || !app.stage) return;
+
+      applyUpdate(app, props);
+      resizeRenderer(app, prevProps, props);
     });
 
-    // Apply root Container props
-    const stageProps = getDisplayObjectProps(this.props);
-    applyProps(this._app.stage, {}, stageProps);
-
-    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage, undefined, this);
+    return canvas;
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { children, height, options, width } = this.props;
-    const { options: prevOptions } = prevProps;
+  Stage.propTypes = propTypes;
 
-    // Apply root Container props
-    const stageProps = getDisplayObjectProps(this.props);
-    applyProps(this._app.stage, {}, stageProps);
-
-    // Root container has been resized - resize renderer
-    const currentHeight = (options && options.height) || height;
-    const currentWidth = (options && options.width) || width;
-    const prevHeight = (prevOptions && prevOptions.height) || prevProps.height;
-    const prevWidth = (prevOptions && prevOptions.width) || prevProps.width;
-    if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
-      this._app.renderer.resize(currentWidth, currentHeight);
-    }
-
-    render(<AppProvider app={this._app}>{children}</AppProvider>, this._app.stage, undefined, this);
-  }
-
-  componentWillUnmount() {
-    unmount(this._app.stage);
-    this._app.destroy();
-  }
-
-  render() {
-    const { options } = this.props;
-    const canvasProps = getCanvasProps(this.props);
-
-    // Do not render anything if view is passed to options
-    if (typeof options !== "undefined" && options.view) {
-      return null;
-    } else {
-      return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
-    }
-  }
+  return Stage;
 }
 
-Stage.propTypes = propTypes;
+export function createStageClass() {
+  class Stage extends React.Component {
+    componentDidMount() {
+      const { height, options, width } = this.props;
+      const view = this._canvas;
+
+      this._app = createPixiApplication({ height, width, view, ...options });
+
+      // Apply root Container props
+      applyUpdate(this._app, this.props, this);
+    }
+
+    componentDidUpdate(prevProps) {
+      applyUpdate(this._app, this.props, this);
+      resizeRenderer(this._app, prevProps, this.props);
+    }
+
+    componentWillUnmount() {
+      unmount(this._app.stage);
+      this._app.destroy();
+    }
+
+    render() {
+      const { options } = this.props;
+      const canvasProps = getCanvasProps(this.props);
+
+      // Do not render anything if view is passed to options
+      if (typeof options !== "undefined" && options.view) {
+        return null;
+      } else {
+        return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
+      }
+    }
+  }
+
+  Stage.propTypes = propTypes;
+
+  return Stage;
+}
+
+const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
 
 export default Stage;
