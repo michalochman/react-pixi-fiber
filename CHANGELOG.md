@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.10.0] - 2019-10-18
+
+- Improved hooks support ([#127])
+- Added `usePixiAppCreator`, `usePixiApp` and `usePixiTicker` hooks ([#127])
+
 ## [0.9.3] - 2019-08-29
 
 ### Changed
@@ -279,7 +284,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.3...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.3...v0.10.0
 [0.9.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.9.0...v0.9.1
@@ -314,6 +320,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
 [#141]: https://github.com/michalochman/react-pixi-fiber/pull/141
+[#127]: https://github.com/michalochman/react-pixi-fiber/pull/127
 [#125]: https://github.com/michalochman/react-pixi-fiber/issues/125
 [#122]: https://github.com/michalochman/react-pixi-fiber/issues/122
 [#120]: https://github.com/michalochman/react-pixi-fiber/issues/120
