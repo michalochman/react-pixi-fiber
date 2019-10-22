@@ -1,6 +1,6 @@
 import CustomPIXIComponent from "./CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "./AppProvider";
-import Stage from "./Stage";
+import Stage, { createStageClass } from "./Stage";
 import { TYPES } from "./types";
 import { usePixiApp, usePixiTicker, usePreviousProps, usePixiAppCreator } from "./hooks";
 import { createRender, createUnmount } from "./render";
@@ -17,6 +17,7 @@ export {
   CustomPIXIComponent,
   Stage,
   applyProps,
+  createStageClass,
   render,
   unmount,
   withApp,
