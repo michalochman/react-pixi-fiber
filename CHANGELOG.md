@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Expose `createStageClass` from `Stage`
+
 
 ## [0.10.0] - 2019-10-18
 

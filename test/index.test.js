@@ -2,9 +2,23 @@ import * as ReactPixiFiber from "../src/index";
 
 describe("ReactPixiFiber public API", () => {
   it("provides expected utils", () => {
+    expect(ReactPixiFiber.AppContext).toBeDefined();
+    expect(ReactPixiFiber.AppProvider).toBeDefined();
     expect(ReactPixiFiber.CustomPIXIComponent).toBeDefined();
+    expect(ReactPixiFiber.applyProps).toBeDefined();
+    expect(ReactPixiFiber.createStageClass).toBeDefined();
     expect(ReactPixiFiber.render).toBeDefined();
+    expect(ReactPixiFiber.unmount).toBeDefined();
+    expect(ReactPixiFiber.unstable_batchedUpdates).toBeDefined();
+    expect(ReactPixiFiber.withApp).toBeDefined();
   });
+
+  it("provides expected hooks", () => {
+    expect(ReactPixiFiber.usePixiApp).toBeDefined();
+    expect(ReactPixiFiber.usePixiAppCreator).toBeDefined();
+    expect(ReactPixiFiber.usePixiTicker).toBeDefined();
+  })
+
   it("provides expected components", () => {
     expect(ReactPixiFiber.BitmapText).toBeDefined();
     expect(ReactPixiFiber.Container).toBeDefined();
