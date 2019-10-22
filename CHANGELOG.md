@@ -8,14 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-- Expose `createStageClass` from `Stage`
-- Changed dev tools version reported to be `React` version instead of `ReactPixiFiber` version
+
+## [0.11.0] - 2019-10-22
+
+- Expose `createStageClass` from `Stage` ([#147])
+- Changed dev tools version reported to be `React` version instead of `ReactPixiFiber` version ([#148])
 
 
 ## [0.10.0] - 2019-10-18
 
 - Improved hooks support ([#127])
 - Added `usePixiAppCreator`, `usePixiApp` and `usePixiTicker` hooks ([#127])
+
 
 ## [0.9.3] - 2019-08-29
 
@@ -322,6 +326,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#148]: https://github.com/michalochman/react-pixi-fiber/pull/148
+[#147]: https://github.com/michalochman/react-pixi-fiber/pull/147
 [#141]: https://github.com/michalochman/react-pixi-fiber/pull/141
 [#127]: https://github.com/michalochman/react-pixi-fiber/pull/127
 [#125]: https://github.com/michalochman/react-pixi-fiber/issues/125
