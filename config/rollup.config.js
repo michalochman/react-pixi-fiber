@@ -32,7 +32,6 @@ const getPlugins = entry => [
   replace({
     __DEV__: isProduction ? JSON.stringify(false) : JSON.stringify(true),
     __PACKAGE_NAME__: JSON.stringify(pkg.name),
-    __PACKAGE_VERSION__: JSON.stringify(pkg.version),
     "process.env.NODE_ENV": isProduction ? JSON.stringify("production") : JSON.stringify("development"),
   }),
   commonjs({

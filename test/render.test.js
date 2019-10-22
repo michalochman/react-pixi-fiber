@@ -2,8 +2,8 @@ import React from "react";
 import pkg from "../package.json";
 import { Container, Text } from "../src/index";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
-import { createRender, createUnmount, roots } from "../src/render";
-import * as PIXI from 'pixi.js'
+import { createRender, createUnmount, getDevToolsVersion, roots } from "../src/render";
+import * as PIXI from "pixi.js";
 
 jest.mock("../src/ReactPixiFiber", () => {
   const actual = require.requireActual("../src/ReactPixiFiber");
@@ -17,12 +17,18 @@ jest.mock("../src/ReactPixiFiber", () => {
   });
 });
 
+describe("getDevToolsVersion", () => {
+  it("should return React version", () => {
+    expect(getDevToolsVersion()).toEqual(require("react").version);
+  });
+});
+
 describe("render", () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
-  const render = createRender(ReactPixiFiber)
+  const render = createRender(ReactPixiFiber);
   const app = new PIXI.Application();
   const callback = jest.fn();
   const root = app.stage;
@@ -54,7 +60,7 @@ describe("render", () => {
       expect.objectContaining({
         findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
         bundleType: 1,
-        version: pkg.version,
+        version: getDevToolsVersion(),
         rendererPackageName: pkg.name,
       })
     );
@@ -74,7 +80,7 @@ describe("unmount", () => {
     jest.resetAllMocks();
   });
 
-  const unmount = createUnmount(ReactPixiFiber)
+  const unmount = createUnmount(ReactPixiFiber);
   const app = new PIXI.Application();
   const root = app.stage;
 

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 - Expose `createStageClass` from `Stage`
+- Changed dev tools version reported to be `React` version instead of `ReactPixiFiber` version
 
 
 ## [0.10.0] - 2019-10-18

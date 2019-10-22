@@ -1,5 +1,9 @@
 import invariant from "fbjs/lib/invariant";
 
+export function getDevToolsVersion() {
+  return require("react").version;
+}
+
 export const roots = new Map();
 
 /*
@@ -16,7 +20,7 @@ export function createRender(ReactPixiFiber) {
       ReactPixiFiber.injectIntoDevTools({
         findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
         bundleType: __DEV__ ? 1 : 0,
-        version: __PACKAGE_VERSION__,
+        version: getDevToolsVersion(),
         rendererPackageName: __PACKAGE_NAME__,
       });
     }
