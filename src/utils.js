@@ -55,13 +55,12 @@ export function isPointType(value) {
   return value instanceof PIXI.Point || value instanceof PIXI.ObservablePoint;
 }
 
-// Point.copy was deprecated and renamed to copyForm in PIXI 5.0,
-// use whichever exists
+// Use Point.copyFrom if available because Point.copy was deprecated in PIXI 5.0
 export function copyPoint(instance, propName, value) {
-  if (typeof instance[propName].copy === "function") {
-    instance[propName].copy(value);
-  } else {
+  if (typeof instance[propName].copyFrom === "function") {
     instance[propName].copyFrom(value);
+  } else {
+    instance[propName].copy(value);
   }
 }
 
