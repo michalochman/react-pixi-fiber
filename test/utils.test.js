@@ -180,7 +180,8 @@ describe("setPixiValue", () => {
 // this test should probably be updated test for existance of copyForm instead.
 describe("copyPoint", () => {
   const PixiJSv4Point = { copy: jest.fn() };
-  const PixiJSv5Point = { copyFrom: jest.fn() };
+  // Method Point.copy is still available in PixiJS v5 but it is deprecated
+  const PixiJSv5Point = { copy: jest.fn(), copyFrom: jest.fn() };
 
   it("copies value using copy method when using PixiJS v4", () => {
     const instance = {
@@ -200,6 +201,7 @@ describe("copyPoint", () => {
     const position = new PIXI.Point(13, 37);
 
     copyPoint(instance, "position", position);
+    expect(PixiJSv5Point.copy).not.toHaveBeenCalled();
     expect(PixiJSv5Point.copyFrom).toHaveBeenCalledTimes(1);
     expect(PixiJSv5Point.copyFrom).toHaveBeenCalledWith(position);
   });
