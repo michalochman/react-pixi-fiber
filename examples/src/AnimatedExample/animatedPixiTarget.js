@@ -4,7 +4,14 @@ import * as PIXI from "pixi.js";
 
 function ApplyAnimatedValues(instance, props) {
   if (instance instanceof PIXI.DisplayObject) {
-    applyDisplayObjectProps(instance, {}, props);
+    // Component has custom way of applying props - use that
+    if (typeof instance._customApplyProps === "function") {
+      instance._customApplyProps(instance, {}, props);
+    } else {
+      // TODO check if this is safe
+      const type = instance.constructor.name;
+      applyDisplayObjectProps(type, instance, {}, props);
+    }
   } else {
     return false;
   }
