@@ -9,9 +9,20 @@ import { TYPES } from "../types";
 export const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 export const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
 
-export function cleanup(app, removeView) {
+export const STAGE_OPTIONS_RECREATE = false;
+export const STAGE_OPTIONS_UNMOUNT = true;
+
+export function cleanupStage(app, stageOptions = STAGE_OPTIONS_RECREATE) {
+  // Do not remove canvas from DOM, there are two ways canvas made it's way to PIXI.Application:
+  // 1) canvas was rendered by Stage component - it will be removed by React when Stage is unmounted
+  // 2) canvas was passed in options as `view` - removing canvas created externally may have unexpected consequences
+  const removeView = false;
+
+  // Unmount stage tree
   unmount(app.stage);
-  app.destroy(removeView);
+
+  // Destroy PIXI.Application and what it rendered if necessary
+  app.destroy(removeView, stageOptions);
 }
 
 export function getDimensions(props) {
@@ -20,15 +31,6 @@ export function getDimensions(props) {
   } = props;
 
   return [width, height];
-}
-
-export function resizeRenderer(app, props, prevProps) {
-  const [prevWidth, prevHeight] = getDimensions(prevProps);
-  const [currentWidth, currentHeight] = getDimensions(props);
-
-  if (currentHeight !== prevHeight || currentWidth !== prevWidth) {
-    app.renderer.resize(currentWidth, currentHeight);
-  }
 }
 
 export function renderApp(app, props, instance) {
@@ -60,4 +62,13 @@ export function rerenderStage(app, oldProps, newProps, instance) {
   }
 
   renderApp(app, newProps, instance);
+}
+
+export function resizeRenderer(app, oldProps, newProps) {
+  const [oldWidth, oldHeight] = getDimensions(oldProps);
+  const [newWidth, newHeight] = getDimensions(newProps);
+
+  if (newHeight !== oldHeight || newWidth !== oldWidth) {
+    app.renderer.resize(newWidth, newHeight);
+  }
 }

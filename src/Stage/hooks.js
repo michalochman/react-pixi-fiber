@@ -1,110 +1,112 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { cleanup, renderStage, rerenderStage, resizeRenderer } from "./common";
+import React, { useEffect, useRef } from "react";
+import emptyObject from "fbjs/lib/emptyObject";
+import shallowEqual from "fbjs/lib/shallowEqual";
+import {
+  cleanupStage,
+  renderStage,
+  rerenderStage,
+  resizeRenderer,
+  STAGE_OPTIONS_RECREATE,
+  STAGE_OPTIONS_UNMOUNT,
+} from "./common";
 import { defaultProps, getCanvasProps, propTypes } from "./propTypes";
 import { createPixiApplication } from "../utils";
 
-export function usePixiAppCreator(props) {
-  const { options } = props;
-  const { height, width, ...otherOptions } = options;
-
-  const canvasRef = useRef();
-  const [app, setApp] = useState(null);
-
-  const canvasProps = getCanvasProps(props);
-  // Do not render anything if view is passed to options
-  // TODO should it return options.view instead of null?
-  const canvas = options && options.view ? null : <canvas ref={canvasRef} {...canvasProps} />;
-
-  // Initialize pixi application on mount
-  useLayoutEffect(
-    () => {
-      const view = canvasRef.current;
-      const appInstance = createPixiApplication({ view, ...options });
-
-      setApp(appInstance);
-
-      // Destroy pixi application on unmount
-      return () => {
-        const removeView = options.view;
-
-        // Destroy PIXI.Application and remove canvas if necessary
-        cleanup(appInstance, removeView);
-      };
-    },
-    // We need to create new Application when options other than dimensions
-    // are changed because some of the renderer settings are immutable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [...Object.values(otherOptions)]
-  );
-
-  return { app, canvas };
-}
-
 export function usePreviousProps(value) {
-  const ref = useRef({});
+  const props = useRef(emptyObject);
 
   useEffect(() => {
-    ref.current = value;
+    props.current = value;
   });
 
-  return ref.current;
+  return props.current;
 }
 
-// Render stage for the first time
-export function useStageRenderer(app, props) {
-  useLayoutEffect(
-    () => {
-      if (!app || !app.stage) return;
+export function useStageRenderer(props, appRef, canvasRef) {
+  // create app on mount
+  useEffect(() => {
+    const { options } = props;
+    const view = canvasRef.current;
 
-      renderStage(app, props);
-    },
-    // Only act if the app was created
+    // Create new PIXI.Application
+    // Canvas passed in options as `view` will be used if provided
+    appRef.current = createPixiApplication({ view, ...options });
+
+    renderStage(appRef.current, props);
+
+    // cleanup current app on unmount
+    return function cleanup() {
+      cleanupStage(appRef.current, STAGE_OPTIONS_UNMOUNT);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [app]
-  );
+  }, []);
 }
 
-// Re-render stage when component updates
-export function useStageRerenderer(app, props) {
+export function useStageRerenderer(props, appRef, canvasRef) {
   const prevProps = usePreviousProps(props);
 
-  useLayoutEffect(
-    () => {
-      if (!app || !app.stage) return;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // This is first render, no need to do anything
+    if (!appRef.current) return;
 
-      rerenderStage(app, prevProps, props);
-    },
-    // Only act if new app was created or props have changed
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [app, props]
-  );
-}
+    const {
+      options,
+      options: { height, width, ...otherOptions },
+    } = props;
+    const {
+      options: { height: prevHeight, width: prevWidth, ...prevOtherOptions },
+    } = prevProps;
+    const view = canvasRef.current;
 
-// Root container might have been resized - resize renderer
-export function useRendererResizer(app, props) {
-  const prevProps = usePreviousProps(props);
+    // We need to create new PIXI.Application when options other than dimensions
+    // are changed because some of the renderer settings are immutable.
+    if (!shallowEqual(otherOptions, prevOtherOptions)) {
+      // Destroy PIXI.Application
+      cleanupStage(appRef.current, STAGE_OPTIONS_RECREATE);
 
-  useLayoutEffect(
-    () => {
-      if (!app || !app.renderer) return;
+      // Create new PIXI.Application
+      // Canvas passed in options as `view` will be used if provided
+      appRef.current = createPixiApplication({ view, ...options });
 
-      resizeRenderer(app, props, prevProps);
-    },
-    // Only act if new app was created or props have changed
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [app, props]
-  );
+      // Set initial properties
+      renderStage(appRef.current, props);
+    } else {
+      // Update stage tree
+      rerenderStage(appRef.current, prevProps, props);
+      // Update canvas and renderer dimestions
+      resizeRenderer(appRef.current, prevProps, props);
+    }
+  });
 }
 
 export default function createStageFunction() {
   function Stage(props) {
-    const { app, canvas } = usePixiAppCreator(props);
+    const { options } = props;
 
-    useStageRenderer(app, props);
-    useStageRerenderer(app, props);
-    useRendererResizer(app, props);
+    // Store PIXI.Application instance
+    const appRef = useRef();
+    // Store canvas if it was rendered
+    const canvasRef = useRef();
 
-    return canvas;
+    // The order is important here to avoid unnecessary renders or extra state:
+    // - useStageRerenderer:
+    //   - is no-op first time it is called, because PIXI.Application is not created yet
+    //   - is responsible
+    // - useStageRenderer:
+    //   - is only called once
+    //   - is responsible for creating first PIXI.Application and destroying it when Stage is finally unmounted
+    useStageRerenderer(props, appRef, canvasRef);
+    useStageRenderer(props, appRef, canvasRef);
+
+    // Do not render anything if canvas is passed in options as `view`
+    if (typeof options !== "undefined" && options.view) {
+      return null;
+    }
+
+    const canvasProps = getCanvasProps(props);
+
+    return <canvas ref={canvasRef} {...canvasProps} />;
   }
 
   Stage.propTypes = propTypes;

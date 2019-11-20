@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { areReactHooksAvailable } from "../compat";
 import createStageFunction from "./hooks";
 import createStageClass from "./legacy";
 
-const Stage = typeof useState === "function" ? createStageFunction() : createStageClass();
-
-export default Stage;
+export default (areReactHooksAvailable() ? createStageFunction() : createStageClass());
 
 export { createStageFunction, createStageClass };

@@ -2,8 +2,8 @@ import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Text } from "../../src";
-import { createStageClass } from "../../src/Stage";
 import { AppProvider } from "../../src/AppProvider";
+import { createStageClass } from "../../src/Stage";
 import { __RewireAPI__ as StageRewireAPI } from "../../src/Stage/legacy";
 
 jest.mock("../../src/ReactPixiFiber", () => {
@@ -94,11 +94,11 @@ describe("Stage (class)", () => {
     let stage;
     const element = renderer.create(<Stage options={options} ref={c => (stage = c)} />);
     const instance = element.getInstance();
-    const app = instance._app;
+    const app = instance._app.current;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
     expect(app.renderer.options).toMatchObject(options);
-    expect(createPixiApplication).toHaveBeenCalledWith({ view: stage._canvas, ...options });
+    expect(createPixiApplication).toHaveBeenCalledWith({ view: stage._canvas.current, ...options });
   });
 
   it("creates PIXI.Application instance with 'view' in options", () => {
@@ -114,7 +114,7 @@ describe("Stage (class)", () => {
     let stage;
     const element = renderer.create(<Stage options={options} ref={c => (stage = c)} />);
     const instance = element.getInstance();
-    const app = instance._app;
+    const app = instance._app.current;
 
     expect(app instanceof PIXI.Application).toBeTruthy();
     expect(app.renderer.options).toMatchObject(options);
@@ -125,7 +125,7 @@ describe("Stage (class)", () => {
     let stage;
     renderer.create(<Stage height={300} width={400} scale={2} position="40,20" ref={c => (stage = c)} />);
 
-    expect(stage._app.stage instanceof PIXI.Container).toBeTruthy();
+    expect(stage._app.current.stage instanceof PIXI.Container).toBeTruthy();
   });
 
   it("applies DisplayObject props to root Container", () => {
@@ -136,7 +136,7 @@ describe("Stage (class)", () => {
       <Stage options={{ width: 400, height: 300 }} position={`${x},${y}`} scale={scale} />
     );
     const instance = element.getInstance();
-    const app = instance._app;
+    const app = instance._app.current;
     const stage = app.stage;
 
     expect(stage.position.x).toEqual(x);
@@ -149,7 +149,7 @@ describe("Stage (class)", () => {
     const scale = 2;
     const element = renderer.create(<Stage options={{ width: 400, height: 300 }} scale={scale} />);
     const instance = element.getInstance();
-    const app = instance._app;
+    const app = instance._app.current;
     const stage = app.stage;
 
     expect(stage.scale.x).toEqual(scale);
@@ -167,7 +167,7 @@ describe("Stage (class)", () => {
     const width = 400;
     const element = renderer.create(<Stage options={{ width, height }} />);
     const instance = element.getInstance();
-    const app = instance._app;
+    const app = instance._app.current;
 
     expect(app.renderer.height).toEqual(height);
     expect(app.renderer.width).toEqual(width);
@@ -186,26 +186,26 @@ describe("Stage (class)", () => {
     expect(() => element.unmount()).not.toThrow();
   });
 
-  it("calls render on componentDidMount", () => {
+  it("calls render on first render", () => {
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children}</Stage>);
     const instance = element.getInstance();
-    const stage = instance._app.stage;
+    const stage = instance._app.current.stage;
 
     expect(__renderMock).toHaveBeenCalledTimes(1);
     expect(__renderMock).toHaveBeenCalledWith(
-      <AppProvider app={instance._app}>{children}</AppProvider>,
+      <AppProvider app={instance._app.current}>{children}</AppProvider>,
       stage,
       undefined,
       instance
     );
   });
 
-  it("calls render on componentDidUpdate", () => {
+  it("calls render on update when props changed", () => {
     const children1 = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children1}</Stage>);
     const instance = element.getInstance();
-    const stage = instance._app.stage;
+    const stage = instance._app.current.stage;
 
     __renderMock.mockClear();
     const children2 = <Text text="World Hello!" />;
@@ -213,17 +213,32 @@ describe("Stage (class)", () => {
 
     expect(__renderMock).toHaveBeenCalledTimes(1);
     expect(__renderMock).toHaveBeenCalledWith(
-      <AppProvider app={instance._app}>{children2}</AppProvider>,
+      <AppProvider app={instance._app.current}>{children2}</AppProvider>,
       stage,
       undefined,
       instance
     );
   });
 
-  it("calls unmount on componentWillUnmount", () => {
+  it("calls unmount when non-dimensional options changed", () => {
+    const height = 300;
+    const width = 400;
+    const backgroundColor = 0x000000;
+    const element = renderer.create(<Stage options={{ width, height, backgroundColor }} />);
+    const instance = element.getInstance();
+    const stage = instance._app.current.stage;
+
+    const newBackgroundColor = 0xffffff;
+    element.update(<Stage options={{ width, height, backgroundColor: newBackgroundColor }} />);
+
+    expect(__unmounMock).toHaveBeenCalledTimes(1);
+    expect(__unmounMock).toHaveBeenCalledWith(stage);
+  });
+
+  it("calls unmount when unmounting", () => {
     const element = renderer.create(<Stage />);
     const instance = element.getInstance();
-    const stage = instance._app.stage;
+    const stage = instance._app.current.stage;
     element.unmount();
 
     expect(__unmounMock).toHaveBeenCalledTimes(1);
