@@ -5,6 +5,7 @@ import "./App.css";
 import ExampleList from "../ExampleList";
 import AnimatedExample from "../AnimatedExample";
 import ApplicationOptionsExample from "../ApplicationOptionsExample";
+import BatchedUpdatesExample from "../BatchedUpdatesExample";
 import BunnyExample from "../BunnyExample";
 import BunnymarkExample from "../BunnymarkExample";
 import CanvasPropsExample from "../CanvasPropsExample";
@@ -15,7 +16,7 @@ import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import HooksExample from "../HooksExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
-import BatchedUpdatesExample from "../BatchedUpdatesExample";
+import SmokeTest from "../SmokeTest";
 import Stats from "../Stats";
 
 const examples = [
@@ -83,7 +84,12 @@ const examples = [
     name: "unstable_batchedUpdates",
     slug: "unstable_batchedUpdates",
     component: BatchedUpdatesExample,
-  }
+  },
+  {
+    name: "Smoke Test",
+    slug: "smoketest",
+    component: SmokeTest,
+  },
 ];
 
 class App extends Component {

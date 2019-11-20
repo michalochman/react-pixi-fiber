@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { isNewContextAvailable } from "./compat";
 
 const propTypes = {
   app: PropTypes.object.isRequired,
@@ -12,7 +13,7 @@ const childContextTypes = {
 let AppContext = null;
 
 function createAppProvider() {
-  if (typeof React.createContext === "function") {
+  if (isNewContextAvailable()) {
     // New Context API
     if (AppContext === null) {
       AppContext = React.createContext(null);

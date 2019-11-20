@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, withApp } from "../src";
+import { isNewContextAvailable } from "../src/compat";
 import { createStageClass, createStageFunction } from "../src/Stage";
 import { createRender } from "../src/render";
 import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
@@ -11,7 +12,7 @@ import * as PIXI from "pixi.js";
 
 const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 
-if (typeof React.createContext === "function") {
+if (isNewContextAvailable()) {
   // New Context API
   describe("AppProvider using New Context API (React >=16.3.0)", () => {
     it("exports AppContext with Provider and Consumer", () => {
@@ -19,7 +20,7 @@ if (typeof React.createContext === "function") {
       expect(AppContext.Consumer).not.toEqual(null);
     });
 
-    it("passess app prop to wrapped component", () => {
+    it("passes app prop to wrapped component", () => {
       const app = new PIXI.Application();
       const TestComponent = jest.fn(() => null);
 
@@ -57,7 +58,7 @@ if (typeof React.createContext === "function") {
       expect(AppContext).toEqual(null);
     });
 
-    it("passess app context to component rendered inside AppProvider", () => {
+    it("passes app context to component rendered inside AppProvider", () => {
       const app = new PIXI.Application();
       const TestComponent = jest.fn(() => null);
       TestComponent.contextTypes = {
@@ -76,37 +77,37 @@ if (typeof React.createContext === "function") {
       expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app });
     });
 
-    it("passess app context to component rendered inside Stage (class)", () => {
-      const StageClass = createStageClass();
+    it("passes app context to component rendered inside Stage (class)", () => {
+      const Stage = createStageClass();
       const TestComponent = jest.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
       };
 
       renderer.create(
-        <StageClass>
+        <Stage>
           <Container>
             <TestComponent foo="bar" />
           </Container>
-        </StageClass>
+        </Stage>
       );
 
       expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app });
     });
 
-    it("passess app context to component rendered inside Stage (function)", () => {
-      const StageFunction = createStageFunction();
+    it("passes app context to component rendered inside Stage (function)", () => {
+      const Stage = createStageFunction();
       const TestComponent = jest.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
       };
 
       renderer.create(
-        <StageFunction>
+        <Stage>
           <Container>
             <TestComponent foo="bar" />
           </Container>
-        </StageFunction>
+        </Stage>
       );
 
       expect(TestComponent).toHaveBeenCalledWith({ foo: "bar" }, { app });
@@ -132,7 +133,7 @@ describe("withApp", () => {
     StageRewireAPI.__ResetDependency__("createPixiApplication");
   });
 
-  it("passess app prop to component rendered inside AppProvider", () => {
+  it("passes app prop to component rendered inside AppProvider", () => {
     const app = new PIXI.Application();
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
@@ -149,30 +150,32 @@ describe("withApp", () => {
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
 
-  it("passess app prop to component rendered inside Stage (class)", () => {
-    const StageClass = createStageClass();
+  it("passes app prop to component rendered inside Stage (class)", () => {
+    const Stage = createStageClass();
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
     renderer.create(
-      <StageClass>
+      <Stage>
         <TestComponentWithApp foo="bar" />
-      </StageClass>
+      </Stage>
     );
 
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
 
-  it("passess app prop to component rendered inside Stage (function)", () => {
-    const StageFunction = createStageFunction();
+  it("passes app prop to component rendered inside Stage (function)", () => {
+    const Stage = createStageFunction();
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
-    renderer.create(
-      <StageFunction>
-        <TestComponentWithApp foo="bar" />
-      </StageFunction>
-    );
+    renderer.act(() => {
+      renderer.create(
+        <Stage>
+          <TestComponentWithApp foo="bar" />
+        </Stage>
+      );
+    })
 
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
