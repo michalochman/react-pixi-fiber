@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import warning from "fbjs/lib/warning";
 import { filterByKey, including } from "./utils";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
 
@@ -16,6 +17,22 @@ export function validateCanvas(props, propName, componentName) {
       `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`
     );
   }
+}
+
+// Copied from https://reactjs.org/warnings/dont-call-proptypes.html#fixing-the-false-positive-in-third-party-proptypes
+const warned = {};
+export function deprecated(propType, explanation) {
+  return function validate(props, propName, componentName, ...rest) {
+    if (props[propName] != null) {
+      const message = `"${propName}" property of "${componentName}" has been deprecated.\n${explanation}`;
+      if (!warned[message]) {
+        warning(false, message);
+        warned[message] = true;
+      }
+    }
+
+    return propType(props, propName, componentName, ...rest);
+  };
 }
 
 export const propTypes = {
@@ -39,8 +56,8 @@ export const propTypes = {
     width: PropTypes.number,
   }),
   children: PropTypes.node,
-  height: PropTypes.number,
-  width: PropTypes.number,
+  height: deprecated(PropTypes.number, "Pass `height` in `options` prop instead."),
+  width: deprecated(PropTypes.number, "Pass `height` in `options` prop instead."),
 };
 
 export const includingDisplayObjectProps = including(Object.keys(DEFAULT_PROPS).concat(EVENT_PROPS));
