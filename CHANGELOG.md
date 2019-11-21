@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Deprecated
+- Deprecated `width` and `height` props of `Stage`
+
 
 ## [0.11.1] - 2019-10-25
 
@@ -23,7 +26,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.10.0] - 2019-10-18
 
 - Improved hooks support ([#127])
-- Added `usePixiAppCreator`, `usePixiApp` and `usePixiTicker` hooks ([#127])
 
 
 ## [0.9.3] - 2019-08-29
