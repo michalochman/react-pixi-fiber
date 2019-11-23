@@ -121,6 +121,26 @@ describe("Stage (class)", () => {
     expect(createPixiApplication).toHaveBeenCalledWith(options);
   });
 
+  it("does not create PIXI.Application if provided", () => {
+    const canvas = document.createElement("canvas");
+    const options = {
+      backgroundColor: 0xff00ff,
+      height: 300,
+      sharedTicker: true,
+      view: canvas,
+      width: 400,
+    };
+    const app = new PIXI.Application(options);
+
+    let stage;
+    const element = renderer.create(<Stage app={app} ref={c => (stage = c)} />);
+    const instance = element.getInstance();
+
+    expect(instance._app.current).toEqual(app);
+    expect(createPixiApplication).toHaveBeenCalledTimes(0);
+    app.destroy(true, true);
+  });
+
   it("creates root Container", () => {
     let stage;
     renderer.create(<Stage options={{ height: 300, width: 400 }} position="40,20" ref={c => (stage = c)} scale={2} />);

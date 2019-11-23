@@ -77,7 +77,7 @@ describe("useStageRenderer", () => {
     HooksRewireAPI.__ResetDependency__("createPixiApplication");
   });
 
-  it("creates PIXI.Application with default canvas", () => {
+  it("creates PIXI.Application with default canvas if app not provided", () => {
     const options = { width: 400, height: 400 };
 
     const appRef = createRef();
@@ -100,9 +100,10 @@ describe("useStageRenderer", () => {
     expect(createPixiApplication).toHaveBeenCalledTimes(1);
     expect(createPixiApplication).toHaveBeenCalledWith({ ...options, view: canvasRef.current });
     expect(renderStage).toHaveBeenCalledTimes(1);
+    expect(renderStage).toHaveBeenCalledWith(appRef.current, { options });
   });
 
-  it("creates PIXI.Application with canvas provided in options", () => {
+  it("creates PIXI.Application with canvas provided in options if app not provided", () => {
     const options = { width: 400, height: 400, view };
 
     const appRef = createRef();
@@ -124,9 +125,36 @@ describe("useStageRenderer", () => {
     expect(createPixiApplication).toHaveBeenCalledTimes(1);
     expect(createPixiApplication).toHaveBeenCalledWith({ ...options, view });
     expect(renderStage).toHaveBeenCalledTimes(1);
+    expect(renderStage).toHaveBeenCalledWith(appRef.current, { options });
   });
 
-  it("cleans up after itself", () => {
+  it("does not create PIXI.Application if app is provided", () => {
+    const options = { width: 400, height: 400, view };
+    const app = new PIXI.Application(options);
+
+    const appRef = createRef();
+    const canvasRef = createRef();
+
+    const TestContainer = props => {
+      useStageRenderer(props, appRef, canvasRef);
+
+      return null;
+    };
+
+    expect(appRef.current).toEqual(null);
+
+    renderer.act(() => {
+      renderer.create(<TestContainer app={app} />);
+    });
+    app.destroy(true, true);
+
+    expect(appRef.current).toBeInstanceOf(PIXI.Application);
+    expect(createPixiApplication).toHaveBeenCalledTimes(0);
+    expect(renderStage).toHaveBeenCalledTimes(1);
+    expect(renderStage).toHaveBeenCalledWith(app, { app });
+  });
+
+  it("cleans up after itself if app not provided", () => {
     const options = { width: 400, height: 400 };
 
     const appRef = createRef();
@@ -146,6 +174,29 @@ describe("useStageRenderer", () => {
 
     expect(cleanupStage).toHaveBeenCalledTimes(1);
     expect(cleanupStage).toHaveBeenCalledWith(app, STAGE_OPTIONS_UNMOUNT);
+  });
+
+  it("does not clean up after itself if app provided", () => {
+    const options = { width: 400, height: 400 };
+    const app = new PIXI.Application(options);
+
+    const appRef = createRef();
+    const canvasRef = createRef();
+    canvasRef.current = view;
+
+    const TestContainer = props => {
+      useStageRenderer(props, appRef, canvasRef);
+
+      return null;
+    };
+
+    const instance = renderer.create(<TestContainer app={app} />);
+
+    // trigger useEffect cleanup
+    instance.unmount();
+    app.destroy(true, true);
+
+    expect(cleanupStage).toHaveBeenCalledTimes(0);
   });
 });
 
@@ -319,6 +370,36 @@ describe("useStageRerenderer", () => {
     expect(resizeRenderer).toHaveBeenCalledTimes(1);
     expect(resizeRenderer).toHaveBeenCalledWith(app, { options: options }, { options: newOptions });
   });
+
+  it("rerenders stage if app provided", () => {
+    const options = { width: 400, height: 400 };
+    const newOptions = { width: 400, height: 400 };
+
+    const appRef = createRef();
+    const canvasRef = createRef();
+
+    const TestContainer = props => {
+      useStageRerenderer(props, appRef, canvasRef);
+
+      return null;
+    };
+
+    let instance;
+    renderer.act(() => {
+      instance = renderer.create(<TestContainer app={app} />);
+    });
+    renderer.act(() => {
+      appRef.current = app;
+      instance.update(<TestContainer app={app} />);
+    });
+
+    expect(createPixiApplication).toHaveBeenCalledTimes(0);
+    expect(renderStage).toHaveBeenCalledTimes(0);
+    expect(rerenderStage).toHaveBeenCalledTimes(1);
+    expect(rerenderStage).toHaveBeenCalledWith(app, { app }, { app });
+    expect(resizeRenderer).toHaveBeenCalledTimes(1);
+    expect(resizeRenderer).toHaveBeenCalledWith(app, { app }, { app });
+  });
 });
 
 describe("Stage (function)", () => {
@@ -345,6 +426,14 @@ describe("Stage (function)", () => {
     const instance = renderer.create(<Stage />).toJSON();
 
     expect(instance).toHaveProperty("type", "canvas");
+  });
+
+  it("renders null if app is passed in options", () => {
+    const app = new PIXI.Application();
+    const instance = renderer.create(<Stage app={app} />).toJSON();
+    app.destroy(true, true);
+
+    expect(instance).toBeNull();
   });
 
   it("renders null if canvas is already passed in options", () => {
