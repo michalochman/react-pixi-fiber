@@ -8,18 +8,11 @@ import {
   includingStageProps,
 } from "../../src/Stage/propTypes";
 import possibleStandardNames from "../../src/possibleStandardNames";
-import { EVENT_PROPS } from "../../src/props";
 import { TYPES } from "../../src/types";
 
 describe("includingContainerProps", () => {
   it("returns true if prop is one of Container members", () => {
     Object.keys(possibleStandardNames[TYPES.CONTAINER]).forEach(propName => {
-      expect(includingContainerProps(propName)).toBeTruthy();
-    });
-  });
-
-  it("returns true if prop is one of Container events", () => {
-    EVENT_PROPS.forEach(propName => {
       expect(includingContainerProps(propName)).toBeTruthy();
     });
   });

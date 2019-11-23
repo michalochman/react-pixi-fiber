@@ -1,31 +1,45 @@
 import * as ReactPixiFiber from "../src/index";
+import CustomPIXIComponent from "../src/CustomPIXIComponent";
+import { AppContext, AppProvider, withApp } from "../src/AppProvider";
+import Stage, { createStageClass } from "../src/Stage";
+import { TYPES } from "../src/types";
+import { usePixiApp, usePixiTicker } from "../src/hooks";
+import { unstable_batchedUpdates } from "../src/ReactPixiFiber";
+import { applyDisplayObjectProps } from "../src/ReactPixiFiberComponent";
 
 describe("ReactPixiFiber public API", () => {
+  it("should match snapshot", () => {
+    expect(ReactPixiFiber).toMatchSnapshot();
+  });
+
   it("provides expected utils", () => {
-    expect(ReactPixiFiber.AppContext).toBeDefined();
-    expect(ReactPixiFiber.AppProvider).toBeDefined();
-    expect(ReactPixiFiber.CustomPIXIComponent).toBeDefined();
-    expect(ReactPixiFiber.applyDisplayObjectProps).toBeDefined();
-    expect(ReactPixiFiber.createStageClass).toBeDefined();
-    expect(ReactPixiFiber.render).toBeDefined();
-    expect(ReactPixiFiber.unmount).toBeDefined();
-    expect(ReactPixiFiber.unstable_batchedUpdates).toBeDefined();
-    expect(ReactPixiFiber.withApp).toBeDefined();
+    expect(ReactPixiFiber.CustomPIXIComponent).toEqual(CustomPIXIComponent);
+    expect(ReactPixiFiber.applyDisplayObjectProps).toEqual(applyDisplayObjectProps);
+    expect(ReactPixiFiber.createStageClass).toEqual(createStageClass);
+    expect(typeof ReactPixiFiber.render).toEqual("function");
+    expect(typeof ReactPixiFiber.unmount).toEqual("function");
+    expect(ReactPixiFiber.unstable_batchedUpdates).toEqual(unstable_batchedUpdates);
+  });
+
+  it("provides expected context utils", () => {
+    expect(ReactPixiFiber.AppContext).toEqual(AppContext);
+    expect(ReactPixiFiber.AppProvider).toEqual(AppProvider);
+    expect(ReactPixiFiber.withApp).toEqual(withApp);
   });
 
   it("provides expected hooks", () => {
-    expect(ReactPixiFiber.usePixiApp).toBeDefined();
-    expect(ReactPixiFiber.usePixiTicker).toBeDefined();
+    expect(ReactPixiFiber.usePixiApp).toEqual(usePixiApp);
+    expect(ReactPixiFiber.usePixiTicker).toEqual(usePixiTicker);
   });
 
   it("provides expected components", () => {
-    expect(ReactPixiFiber.BitmapText).toBeDefined();
-    expect(ReactPixiFiber.Container).toBeDefined();
-    expect(ReactPixiFiber.Graphics).toBeDefined();
-    expect(ReactPixiFiber.ParticleContainer).toBeDefined();
-    expect(ReactPixiFiber.Sprite).toBeDefined();
-    expect(ReactPixiFiber.Stage).toBeDefined();
-    expect(ReactPixiFiber.Text).toBeDefined();
-    expect(ReactPixiFiber.TilingSprite).toBeDefined();
+    expect(ReactPixiFiber.BitmapText).toEqual(TYPES.BITMAP_TEXT);
+    expect(ReactPixiFiber.Container).toEqual(TYPES.CONTAINER);
+    expect(ReactPixiFiber.Graphics).toEqual(TYPES.GRAPHICS);
+    expect(ReactPixiFiber.ParticleContainer).toEqual(TYPES.PARTICLE_CONTAINER);
+    expect(ReactPixiFiber.Sprite).toEqual(TYPES.SPRITE);
+    expect(ReactPixiFiber.Stage).toEqual(Stage);
+    expect(ReactPixiFiber.Text).toEqual(TYPES.TEXT);
+    expect(ReactPixiFiber.TilingSprite).toEqual(TYPES.TILING_SPRITE);
   });
 });

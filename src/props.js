@@ -1,63 +1,95 @@
+import { TYPES } from "./types";
+import * as PIXI from "pixi.js";
+
 export const CHILDREN = "children";
 
-// List of default values for DisplayObject members
-// TODO set different default props for different types
-export const DEFAULT_PROPS = {
+// http://pixijs.download/release/docs/PIXI.DisplayObject.html
+const displayObjectDefaultProps = {
   alpha: 1,
-  anchor: 0,
+  angle: 0,
   buttonMode: false,
   cacheAsBitmap: false,
   cursor: "auto",
-  filterArea: null,
-  filters: null,
-  hitArea: null,
   interactive: false,
-  // localTransform  // readonly
-  mask: null,
-  // parent  // readonly
   pivot: 0,
   position: 0,
   renderable: true,
   rotation: 0,
   scale: 1,
   skew: 0,
-  tint: 0xffffff,
-  transform: null,
   visible: true,
-  // worldAlpha  // readonly
-  // worldTransform  // readonly
-  // worldVisible  // readonly
   x: 0,
   y: 0,
 };
 
-// List of all Pixi events
-export const EVENT_PROPS = [
-  "added",
-  "click",
-  "mousedown",
-  "mousemove",
-  "mouseout",
-  "mouseover",
-  "mouseup",
-  "mouseupoutside",
-  "pointercancel",
-  "pointerdown",
-  "pointermove",
-  "pointerout",
-  "pointerover",
-  "pointertap",
-  "pointerup",
-  "pointerupoutside",
-  "removed",
-  "rightclick",
-  "rightdown",
-  "rightup",
-  "rightupoutside",
-  "tap",
-  "touchcancel",
-  "touchend",
-  "touchendoutside",
-  "touchmove",
-  "touchstart",
-];
+// http://pixijs.download/release/docs/PIXI.Container.html
+const containerDefaultProps = {
+  ...displayObjectDefaultProps,
+  interactiveChildren: true,
+};
+
+// http://pixijs.download/release/docs/PIXI.Sprite.html
+const spriteDefaultProps = {
+  ...containerDefaultProps,
+  anchor: 0,
+  blendMode: PIXI.BLEND_MODES.NORMAL,
+  pluginName: "batch",
+  roundPixels: false,
+  tint: 0xffffff,
+};
+
+// http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
+const bitmapTextDefaultProps = {
+  ...containerDefaultProps,
+  align: "left",
+  anchor: 0,
+  letterSpacing: 0,
+  maxWidth: 0,
+  roundPixels: false,
+  text: "",
+  tint: 0xffffff,
+};
+
+// http://pixijs.download/release/docs/PIXI.Graphics.html
+const graphicsDefaultProps = {
+  ...containerDefaultProps,
+  blendMode: PIXI.BLEND_MODES.NORMAL,
+  pluginName: "batch",
+  tint: 0xffffff,
+};
+
+// http://pixijs.download/release/docs/PIXI.particles.ParticleContainer.html
+const particleContainerDefaultProps = {
+  ...containerDefaultProps,
+  autoResize: false,
+  batchSize: 16384,
+  blendMode: PIXI.BLEND_MODES.NORMAL,
+  interactiveChildren: true,
+  maxSize: 1500,
+  roundPixels: true,
+  tint: 0xffffff,
+};
+
+// http://pixijs.download/release/docs/PIXI.Text.html
+const textDefaultProps = {
+  ...spriteDefaultProps,
+  resolution: 1,
+  text: "",
+};
+
+// http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
+const tilingSpriteDefaultProps = {
+  ...spriteDefaultProps,
+  clampMargin: 0.5,
+  uvRespectAnchor: false,
+};
+
+export const defaultProps = {
+  [TYPES.BITMAP_TEXT]: bitmapTextDefaultProps,
+  [TYPES.CONTAINER]: containerDefaultProps,
+  [TYPES.GRAPHICS]: graphicsDefaultProps,
+  [TYPES.PARTICLE_CONTAINER]: particleContainerDefaultProps,
+  [TYPES.SPRITE]: spriteDefaultProps,
+  [TYPES.TEXT]: textDefaultProps,
+  [TYPES.TILING_SPRITE]: tilingSpriteDefaultProps,
+};
