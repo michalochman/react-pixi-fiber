@@ -5,6 +5,8 @@ import * as PIXI from "pixi.js";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 const asyncFunc = cb => {
   setTimeout(cb, 100);
@@ -20,7 +22,7 @@ class Canvas extends Component {
   };
 
   render() {
-    return <canvas ref={this.mountStage} width="600" height="800" />;
+    return <canvas ref={this.mountStage} />;
   }
 }
 

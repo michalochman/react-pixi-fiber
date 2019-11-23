@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import { Stage } from "react-pixi-fiber";
-import RotatingBunny from "./RotatingBunny";
+import RotatingBunny from "../RotatingBunny";
 
 const COLORS = [0x1099bb, 0x10bb99];
 const SIZES = [{ width: 400, height: 300 }, { width: 300, height: 400 }];
@@ -34,20 +34,44 @@ class BunnyExample extends Component {
   };
 
   renderControls() {
-    const { count } = this.state;
+    const { color, count, mount, size } = this.state;
 
     return (
-      <div>
-        <button onClick={this.toggleStage}>toggle Stage</button>
-        <button onClick={this.toggleSize}>toggle size</button>
-        <button onClick={this.toggleBackground}>toggle background</button>
-        <button disabled={count === 5} onClick={this.addBunny}>
-          add bunny
-        </button>
-        <button disabled={count === 0} onClick={this.removeBunny}>
-          remove bunny
-        </button>
-      </div>
+      <table style={{ margin: "0 auto 1.5em", textAlign: "left" }}>
+        <tbody>
+          <tr>
+            <td>Stage mounted: {mount ? "yes" : "no"}</td>
+            <td>
+              <button onClick={this.toggleStage}>toggle Stage</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Size: {SIZES[size].width}x{SIZES[size].height}
+            </td>
+            <td>
+              <button onClick={this.toggleSize}>toggle size</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Background: #{COLORS[color].toString(16)}</td>
+            <td>
+              <button onClick={this.toggleBackground}>toggle background</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Bunnies: {count}</td>
+            <td>
+              <button disabled={count === 5} onClick={this.addBunny}>
+                add bunny
+              </button>
+              <button disabled={count === 0} onClick={this.removeBunny}>
+                remove bunny
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     );
   }
 

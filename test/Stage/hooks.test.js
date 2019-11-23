@@ -371,7 +371,7 @@ describe("Stage (function)", () => {
 
   it("does not pass stage props to rendered canvas element", () => {
     const style = { height: "100%", width: "100%" };
-    const instance = renderer.create(<Stage height={600} style={style} width={800} />).toJSON();
+    const instance = renderer.create(<Stage options={{ height: 600, width: 800 }} style={style} />).toJSON();
 
     expect(instance).toHaveProperty("type", "canvas");
     expect(instance.props).not.toHaveProperty("height");
@@ -380,7 +380,7 @@ describe("Stage (function)", () => {
 
   it("creates root container", () => {
     const app = new PIXI.Application({});
-    renderer.create(<Stage height={300} width={400} scale={2} position="40,20" />);
+    renderer.create(<Stage options={{ height: 300, width: 400 }} position="40,20" scale={2} />);
     const { stage } = app;
 
     expect(stage instanceof PIXI.Container).toBeTruthy();
@@ -416,7 +416,7 @@ describe("Stage (function)", () => {
 
     const newScale = 1;
     renderer.act(() => {
-      instance.update(<Stage height={300} scale={newScale} width={400} />);
+      instance.update(<Stage options={{ height: 300, width: 400 }} scale={newScale} />);
     });
 
     expect(stage.scale.x).toEqual(newScale);

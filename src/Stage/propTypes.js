@@ -1,42 +1,11 @@
 import PropTypes from "prop-types";
-import warning from "fbjs/lib/warning";
 import possibleStandardNames from "../possibleStandardNames";
+import { deprecated, validateApp, validateCanvas } from "../propTypes";
 import { TYPES } from "../types";
 import { filterByKey, including } from "../utils";
 
-export function validateCanvas(props, propName, componentName) {
-  // Let's assume that element is canvas if the element is Element and implements getContext
-  const element = props[propName];
-  if (typeof element === "undefined") {
-    return;
-  }
-
-  const isCanvas = element instanceof Element && typeof element.getContext === "function";
-  if (!isCanvas) {
-    const propType = typeof element;
-    return new Error(
-      `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`
-    );
-  }
-}
-
-// Copied from https://reactjs.org/warnings/dont-call-proptypes.html#fixing-the-false-positive-in-third-party-proptypes
-const warned = {};
-export function deprecated(propType, explanation) {
-  return function validate(props, propName, componentName, ...rest) {
-    if (props[propName] != null) {
-      const message = `"${propName}" property of "${componentName}" has been deprecated.\n${explanation}`;
-      if (!warned[message]) {
-        warning(false, message);
-        warned[message] = true;
-      }
-    }
-
-    return propType(props, propName, componentName, ...rest);
-  };
-}
-
 export const propTypes = {
+  app: validateApp,
   options: PropTypes.shape({
     antialias: PropTypes.bool,
     autoStart: PropTypes.bool,

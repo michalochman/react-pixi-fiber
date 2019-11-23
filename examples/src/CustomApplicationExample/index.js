@@ -1,21 +1,36 @@
 import React, { Component } from "react";
 import { Stage } from "react-pixi-fiber";
-import Bunny from "./../Bunny";
+import RotatingBunny from "../RotatingBunny";
 import * as PIXI from "pixi.js";
 
-const app = new PIXI.Application({
-  backgroundColor: 0xbb9910,
-  height: 600,
-  view: document.querySelector("#id_preexisting_canvas"),
-  width: 800,
-});
-
 class CustomApplicationExample extends Component {
+  componentDidMount() {
+    const canvas = document.createElement("canvas");
+    this.div.appendChild(canvas);
+
+    this.app = new PIXI.Application({
+      backgroundColor: 0xbb9910,
+      height: 600,
+      view: canvas,
+      width: 800,
+    });
+
+    this.forceUpdate();
+  }
+
+  componentWillUnmount() {
+    this.app.destroy(true, true);
+  }
+
   render() {
     return (
-      <Stage app={app}>
-        <Bunny x={400} y={300} />
-      </Stage>
+      <div ref={div => (this.div = div)}>
+        {this.app && (
+          <Stage app={this.app}>
+            <RotatingBunny x={400} y={300} scale={4} />
+          </Stage>
+        )}
+      </div>
     );
   }
 }
