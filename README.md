@@ -25,13 +25,11 @@ import { Sprite, Stage } from "react-pixi-fiber";
 import bunny from "./bunny.png";
 
 function Bunny(props) {
-  return (
-    <Sprite texture={PIXI.Texture.from(bunny)} {...props} />
-  );
+  return <Sprite texture={PIXI.Texture.from(bunny)} {...props} />;
 }
 
 render(
-  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+  <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
     <Bunny x={200} y={200} />
   </Stage>,
   document.getElementById("container")
@@ -92,32 +90,35 @@ This package works flawlessly with [Create React App](https://github.com/faceboo
 
 It is possible to use React Pixi Fiber as a drop-in replacement for `react-pixi`. 
 
-> Please note that it has only been tested with basic scenarios – it is not guaranteed to work flawlessly. 
-
 There are two options:
 
 ### Changing `import` / `require` statements
 
 Change:
-    
-    import ReactPIXI from "react-pixi";
-    // or
-    const ReactPIXI = require("react-pixi");
+
+```js
+import ReactPIXI from "react-pixi";
+// or
+const ReactPIXI = require("react-pixi");
+```
 
 to:
  
-    import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
-    // or
-    const ReactPIXI = require("react-pixi-fiber/react-pixi-alias");
+ ```js
+import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
+// or
+const ReactPIXI = require("react-pixi-fiber/react-pixi-alias");
+```
 
 ### Using `webpack` resolve `alias`
 
-    resolve: {
-      alias: {
-        'react-pixi$': 'react-pixi-fiber/react-pixi-alias'
-      }
-    }
-
+```js
+resolve: {
+  alias: {
+    'react-pixi$': 'react-pixi-fiber/react-pixi-alias'
+  }
+}
+```
 
 ## API
 
@@ -129,10 +130,9 @@ React Pixi Fiber currently supports following components:
 
 Renders [Root Container] of any [`PIXI.Application`].
 
-Expects the following props:
-* `width` (can be also passed in `options`),
-* `height` (can be also passed in `options`),
-* `options` - see [`PIXI.Application`] options.
+Expects **one** the following props:
+* `app` - pass your own [`PIXI.Application`] instance,
+* `options` - pass only the [`PIXI.Application`] options.
 
 #### `<Container />`
 
@@ -189,7 +189,10 @@ These won't actually replace the property but they will be applied using the ori
   * `ticker` – Ticker for doing render updates,
   * `view` – reference to the renderer's canvas element. 
 
-#### Using `withApp` Higher-Order Component (with React <16.3.0 and React >=16.3.0)
+<details>
+  <summary>
+    <strong>Using <code>withApp</code> Higher-Order Component (with all React versions)</strong>
+  </summary>
 
 To get `app` prop in your component you may wrap it with `withApp` higher-order component:
 
@@ -235,14 +238,19 @@ RotatingBunny.propTypes = {
 const RotatingBunnyWithApp = withApp(RotatingBunny);
 
 render(
-  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+  <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
     <RotatingBunnyWithApp x={200} y={200} />
   </Stage>,
   document.getElementById("container")
 );
 ```
 
-#### Using New Context API directly (React >=16.3.0)
+</details>
+
+<details>
+  <summary>
+    <strong>Using New Context API directly (with React 16.3.0 and newer)</strong>
+  </summary>
 
 ```jsx harmony
 import { render } from "react-dom";
@@ -284,7 +292,7 @@ RotatingBunny.propTypes = {
 };
 
 render(
-  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+  <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
     <AppContext.Consumer>
       {app => (
         <RotatingBunny app={app} x={200} y={200} />
@@ -295,7 +303,12 @@ render(
 );
 ```
 
-#### Using Legacy Context API directly (React <16.3.0)
+</details>
+
+<details>
+  <summary>
+    <strong>Using Legacy Context API directly (with React older than 16.3.0)</strong>
+  </summary>
 
 This approach is not recommended as it is easier to just use `withApp` HoC mentioned above.
 
@@ -340,12 +353,14 @@ RotatingBunny.childContextTypes = {
 };
 
 render(
-  <Stage width={800} height={600} options={{ backgroundColor: 0x10bb99 }}>
+  <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
     <RotatingBunny x={200} y={200} />
   </Stage>,
   document.getElementById("container")
 );
 ```
+
+</details>
 
 ### Custom Components
 
@@ -427,10 +442,25 @@ render(
 
 ## FAQ
 
+### Is it production ready?
+
+Yes! Awesome!
+
+### What version of PixiJS I can use?
+
+Both PixiJS v4 and v5 are supported.
+
+### Can I use already existing [`PIXI.Application`]?
+
+Yes, you can pass `app` property to `Stage` component, e.g. `<Stage app={app} />`.
+
 ### Can I migrate from `react-pixi`?
 
 Yes, it is easy, read [migration guide](#migrating-from-react-pixi).
 
+### Is server-side rendering supported?
+
+No, unfortunately it is not supported right now.
 
 ## Contributing
 
