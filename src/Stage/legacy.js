@@ -1,6 +1,7 @@
 import React from "react";
 import invariant from "fbjs/lib/invariant";
 import shallowEqual from "fbjs/lib/shallowEqual";
+import { createRef } from "../compat";
 import { createPixiApplication } from "../utils";
 import {
   cleanupStage,
@@ -19,9 +20,9 @@ export default function createStageClass() {
       super(props);
 
       // Store PIXI.Application instance
-      this._app = React.createRef();
+      this._app = createRef();
       // Store canvas if it was rendered
-      this._canvas = React.createRef();
+      this._canvas = createRef();
     }
 
     componentDidMount() {
