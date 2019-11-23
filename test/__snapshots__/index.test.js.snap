@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReactPixiFiber public API should match snapshot 1`] = `
+Object {
+  "AppContext": Object {
+    "$$typeof": Symbol(react.context),
+    "Consumer": Object {
+      "$$typeof": Symbol(react.context),
+      "_calculateChangedBits": null,
+      "_context": [Circular],
+    },
+    "Provider": Object {
+      "$$typeof": Symbol(react.provider),
+      "_context": [Circular],
+    },
+    "_calculateChangedBits": null,
+    "_currentRenderer": null,
+    "_currentRenderer2": null,
+    "_currentValue": null,
+    "_currentValue2": null,
+    "_threadCount": 0,
+  },
+  "AppProvider": [Function],
+  "BitmapText": "BitmapText",
+  "Container": "Container",
+  "CustomPIXIComponent": [Function],
+  "Graphics": "Graphics",
+  "ParticleContainer": "ParticleContainer",
+  "Sprite": "Sprite",
+  "Stage": [Function],
+  "Text": "Text",
+  "TilingSprite": "TilingSprite",
+  "applyDisplayObjectProps": [Function],
+  "createStageClass": [Function],
+  "default": Object {},
+  "render": [Function],
+  "unmount": [Function],
+  "unstable_batchedUpdates": [Function],
+  "usePixiApp": [Function],
+  "usePixiTicker": [Function],
+  "withApp": [Function],
+}
+`;
