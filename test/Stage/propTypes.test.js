@@ -6,38 +6,10 @@ import {
   includingCanvasProps,
   includingContainerProps,
   includingStageProps,
-  validateCanvas,
 } from "../../src/Stage/propTypes";
 import possibleStandardNames from "../../src/possibleStandardNames";
 import { EVENT_PROPS } from "../../src/props";
 import { TYPES } from "../../src/types";
-
-describe("validateCanvas", () => {
-  it("passes validation if prop is not defined", () => {
-    const props = {};
-    const propName = "view";
-    const componentName = "Component";
-    expect(validateCanvas(props, propName, componentName)).toBeUndefined();
-  });
-
-  it("passes validation if propName is <canvas /> element", () => {
-    const props = { view: document.createElement("canvas") };
-    const propName = "view";
-    const componentName = "Component";
-    expect(validateCanvas(props, propName, componentName)).toBeUndefined();
-  });
-
-  it("does not pass validation if propName is defined and is not <canvas /> element", () => {
-    const props = { view: document.createElement("p") };
-    const propName = "view";
-    const propType = typeof props.view;
-    const componentName = "Component";
-    const error = `Invalid prop '${propName}' of type '${propType}' supplied to '${componentName}', expected '<canvas> Element'.`;
-    expect(() => {
-      throw validateCanvas(props, propName, componentName);
-    }).toThrow(error);
-  });
-});
 
 describe("includingContainerProps", () => {
   it("returns true if prop is one of Container members", () => {

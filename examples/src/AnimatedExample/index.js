@@ -6,6 +6,8 @@ import Bunny from "../Bunny";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 
 const centerAnchor = new PIXI.Point(0.5, 0.5);
@@ -25,7 +27,7 @@ class BunnyExample extends Component {
 
   render() {
     return (
-      <Stage width={800} height={600} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         <Bunny
           anchor={centerAnchor}
           as={Animated.Sprite}

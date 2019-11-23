@@ -14,6 +14,8 @@ require("pixi-layers/dist/pixi-layers.js");
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 
 //META STUFF, groups exist without stage just fine
@@ -78,7 +80,7 @@ stage.group.enableSort = true;
 class CustomComponentExample extends Component {
   render() {
     return (
-      <Stage width={800} height={600} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         {/* specify display list component */}
         <LayeredStage enableSort>
           {/* sorry, group cant exist without layer yet :( */}

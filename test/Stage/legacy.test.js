@@ -76,7 +76,7 @@ describe("Stage (class)", () => {
 
   it("does not pass stage props to rendered canvas element", () => {
     const style = { height: "100%", width: "100%" };
-    const tree = renderer.create(<Stage height={600} style={style} width={800} />).toJSON();
+    const tree = renderer.create(<Stage options={{ height: 600, width: 800 }} style={style} />).toJSON();
 
     expect(tree).toHaveProperty("type", "canvas");
     expect(tree.props).not.toHaveProperty("height");
@@ -123,7 +123,7 @@ describe("Stage (class)", () => {
 
   it("creates root Container", () => {
     let stage;
-    renderer.create(<Stage height={300} width={400} scale={2} position="40,20" ref={c => (stage = c)} />);
+    renderer.create(<Stage options={{ height: 300, width: 400 }} position="40,20" ref={c => (stage = c)} scale={2} />);
 
     expect(stage._app.current.stage instanceof PIXI.Container).toBeTruthy();
   });

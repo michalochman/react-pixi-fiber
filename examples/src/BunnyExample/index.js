@@ -1,15 +1,17 @@
 import React, { Component } from "react";
 import { Container, Stage } from "react-pixi-fiber";
-import RotatingBunny from "./RotatingBunny";
+import RotatingBunny from "../RotatingBunny";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 
 class BunnyExample extends Component {
   render() {
     return (
-      <Stage width={800} height={600} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         <Container>
           <RotatingBunny x={400} y={300} texture={0} name="regular" step={0.1} />
           <RotatingBunny x={200} y={200} texture={1} name="cool" step={0.2} />

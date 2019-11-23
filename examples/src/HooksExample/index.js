@@ -85,7 +85,7 @@ const Animation = () => {
 const HooksExample = () => {
   if (typeof useState === "function") {
     return (
-      <Stage width={800} height={600} options={{ backgroundColor: 0xff0000 }}>
+      <Stage options={{ backgroundColor: 0xff0000, height: 600, width: 800 }}>
         <AnimationContext.Provider value={{ title: "animation" }}>
           <Animation />
         </AnimationContext.Provider>
@@ -93,7 +93,7 @@ const HooksExample = () => {
     );
   } else {
     return (
-      <Stage width={800} height={600} options={{ backgroundColor: 0xff0000 }}>
+      <Stage options={{ backgroundColor: 0xff0000, height: 600, width: 800 }}>
         <Text text={`Sorry, your version of React (${React.version}) doesn't support hooks.`} x={0} y={500} />
       </Stage>
     );

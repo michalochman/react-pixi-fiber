@@ -1,5 +1,7 @@
 import React from "react";
+import invariant from "fbjs/lib/invariant";
 import shallowEqual from "fbjs/lib/shallowEqual";
+import { createPixiApplication } from "../utils";
 import {
   cleanupStage,
   renderStage,
@@ -9,7 +11,7 @@ import {
   STAGE_OPTIONS_UNMOUNT,
 } from "./common";
 import { defaultProps, getCanvasProps, propTypes } from "./propTypes";
-import { createPixiApplication } from "../utils";
+import * as PIXI from "pixi.js";
 
 export default function createStageClass() {
   class Stage extends React.Component {
@@ -27,7 +29,7 @@ export default function createStageClass() {
 
       this.renderStage(app, this.props);
 
-      // store app instance
+      // Store app instance
       this._app.current = app;
     }
 
@@ -38,17 +40,26 @@ export default function createStageClass() {
       this.renderStage(app, this.props);
       this.rerenderStage(app, this.props, prevProps);
 
-      // update stored app instance
+      // Update stored app instance
       this._app.current = app;
     }
 
     componentWillUnmount() {
-      // Destroy PIXI.Application
-      cleanupStage(this._app.current, STAGE_OPTIONS_UNMOUNT);
+      const { app } = this.props;
+
+      // Destroy PIXI.Application if it was not provided in props
+      if (!(app instanceof PIXI.Application)) {
+        cleanupStage(this._app.current, STAGE_OPTIONS_UNMOUNT);
+      }
     }
 
     render() {
-      const { options } = this.props;
+      const { app, options } = this.props;
+
+      // Do not render anything if PIXI.Application was provided in props
+      if (app instanceof PIXI.Application) {
+        return null;
+      }
 
       // Do not render anything if canvas is passed in options as `view`
       if (typeof options !== "undefined" && options.view) {
@@ -61,7 +72,14 @@ export default function createStageClass() {
     }
 
     getPixiApplication(props, prevProps) {
-      const { options } = props;
+      const { app, options } = props;
+
+      // Return PIXI.Application if it was provided in props
+      if (app != null) {
+        invariant(app instanceof PIXI.Application, "Provided `app` has to be an instance of PIXI.Application");
+        return app;
+      }
+
       const view = this._canvas.current;
 
       // Render stage for the first time
@@ -97,6 +115,7 @@ export default function createStageClass() {
       // Only act if the app was created
       if (app === this._app.current) return;
 
+      // Set initial properties
       renderStage(app, props, this);
     }
 

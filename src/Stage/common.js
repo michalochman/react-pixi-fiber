@@ -1,9 +1,9 @@
 import React from "react";
-import { getContainerProps } from "./propTypes";
 import { AppProvider } from "../AppProvider";
 import { ReactPixiFiberAsSecondaryRenderer } from "../ReactPixiFiber";
 import { diffProperties, setInitialProperties, updateProperties } from "../ReactPixiFiberComponent";
 import { createRender, createUnmount } from "../render";
+import { getContainerProps } from "./propTypes";
 import { TYPES } from "../types";
 
 export const render = createRender(ReactPixiFiberAsSecondaryRenderer);

@@ -8,6 +8,8 @@ PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 
 // http://pixijs.io/examples/#/basics/click.js
@@ -22,7 +24,7 @@ class ClickExample extends Component {
 
   render() {
     return (
-      <Stage width={800} height={600} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         <Bunny
           // Shows hand cursor
           buttonMode

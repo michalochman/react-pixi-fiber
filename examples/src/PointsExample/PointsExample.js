@@ -10,6 +10,8 @@ const WIDTH = 800;
 const HEIGHT = 600;
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: HEIGHT,
+  width: WIDTH,
 };
 
 class PointsExample extends Component {
@@ -36,7 +38,7 @@ class PointsExample extends Component {
 
   render() {
     return (
-      <Stage width={WIDTH} height={HEIGHT} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         {/* Position via single value of X as string */}
         <Bunny position="75" />
         {/* Position via single value of X as number */}

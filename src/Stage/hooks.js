@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import emptyObject from "fbjs/lib/emptyObject";
+import invariant from "fbjs/lib/invariant";
 import shallowEqual from "fbjs/lib/shallowEqual";
+import { createPixiApplication } from "../utils";
 import {
   cleanupStage,
   renderStage,
@@ -10,7 +12,7 @@ import {
   STAGE_OPTIONS_UNMOUNT,
 } from "./common";
 import { defaultProps, getCanvasProps, propTypes } from "./propTypes";
-import { createPixiApplication } from "../utils";
+import * as PIXI from "pixi.js";
 
 export function usePreviousProps(value) {
   const props = useRef(emptyObject);
@@ -25,7 +27,19 @@ export function usePreviousProps(value) {
 export function useStageRenderer(props, appRef, canvasRef) {
   // create app on mount
   useEffect(() => {
-    const { options } = props;
+    const { app, options } = props;
+
+    // Return PIXI.Application if it was provided in props
+    if (app != null) {
+      invariant(app instanceof PIXI.Application, "Provided `app` has to be an instance of PIXI.Application");
+      appRef.current = app;
+
+      renderStage(appRef.current, props);
+
+      // Not destroying provided PIXI.Application when unmounting
+      return;
+    }
+
     const view = canvasRef.current;
 
     // Create new PIXI.Application
@@ -34,7 +48,7 @@ export function useStageRenderer(props, appRef, canvasRef) {
 
     renderStage(appRef.current, props);
 
-    // cleanup current app on unmount
+    // Cleanup current PIXI.Application when unmounting
     return function cleanup() {
       cleanupStage(appRef.current, STAGE_OPTIONS_UNMOUNT);
     };
@@ -49,6 +63,17 @@ export function useStageRerenderer(props, appRef, canvasRef) {
   useEffect(() => {
     // This is first render, no need to do anything
     if (!appRef.current) return;
+
+    const { app } = props;
+
+    if (app instanceof PIXI.Application) {
+      // Update stage tree
+      rerenderStage(appRef.current, prevProps, props);
+      // Update canvas and renderer dimestions
+      resizeRenderer(appRef.current, prevProps, props);
+
+      return;
+    }
 
     const {
       options,
@@ -82,7 +107,7 @@ export function useStageRerenderer(props, appRef, canvasRef) {
 
 export default function createStageFunction() {
   function Stage(props) {
-    const { options } = props;
+    const { app, options } = props;
 
     // Store PIXI.Application instance
     const appRef = useRef();
@@ -98,6 +123,11 @@ export default function createStageFunction() {
     //   - is responsible for creating first PIXI.Application and destroying it when Stage is finally unmounted
     useStageRerenderer(props, appRef, canvasRef);
     useStageRenderer(props, appRef, canvasRef);
+
+    // Do not render anything if PIXI.Application was provided in props
+    if (app instanceof PIXI.Application) {
+      return null;
+    }
 
     // Do not render anything if canvas is passed in options as `view`
     if (typeof options !== "undefined" && options.view) {

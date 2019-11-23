@@ -8,6 +8,8 @@ const COLORS = [0xff00ff, 0x00ffff];
 const POSITIONS = [{ x: 300, y: 200 }, { x: 400, y: 200 }, { x: 400, y: 300 }, { x: 300, y: 300 }];
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 
 class CustomComponentExample extends Component {
@@ -32,7 +34,7 @@ class CustomComponentExample extends Component {
 
   render() {
     return (
-      <Stage width={800} height={600} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         <DraggableContainer>
           <Circle x={50} y={50} radius={50} fill={0xffff00} />
           <Text anchor="0.5,0.5" text={"drag\nme\nnow"} style={{ align: "center", fontSize: 20 }} x={50} y={50} />
