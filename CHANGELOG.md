@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added `app` prop to `Stage`
+
 ### Deprecated
 - Deprecated `width` and `height` props of `Stage`
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import PropTypes from "prop-types";
+import invariant from "fbjs/lib/invariant";
 import { AppProvider } from "./AppProvider";
 import { getCanvasProps, getDisplayObjectProps, propTypes } from "./stageProps";
 import { DEFAULT_PROPS, EVENT_PROPS } from "./props";
@@ -7,6 +8,7 @@ import { usePreviousProps, usePixiAppCreator } from "./hooks";
 import { ReactPixiFiberAsSecondaryRenderer, applyProps } from "./ReactPixiFiber";
 import { createRender, createUnmount } from "./render";
 import { createPixiApplication, including } from "./utils";
+import * as PIXI from "pixi.js";
 
 const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
@@ -70,10 +72,15 @@ export function createStageFunction() {
 export function createStageClass() {
   class Stage extends React.Component {
     componentDidMount() {
-      const { height, options, width } = this.props;
+      const { app, height, options, width } = this.props;
       const view = this._canvas;
 
-      this._app = createPixiApplication({ height, width, view, ...options });
+      invariant(
+        app == null || app instanceof PIXI.Application,
+        "Provided `app` has to be an instance of PIXI.Application"
+      );
+
+      this._app = app || createPixiApplication({ height, width, view, ...options });
 
       // Apply root Container props
       applyUpdate(this._app, this.props, this);
@@ -85,20 +92,31 @@ export function createStageClass() {
     }
 
     componentWillUnmount() {
+      const { app } = this.props;
+
       unmount(this._app.stage);
-      this._app.destroy();
+
+      if (!(app instanceof PIXI.Application)) {
+        this._app.destroy();
+      }
     }
 
     render() {
-      const { options } = this.props;
-      const canvasProps = getCanvasProps(this.props);
+      const { app, options } = this.props;
 
       // Do not render anything if view is passed to options
       if (typeof options !== "undefined" && options.view) {
         return null;
-      } else {
-        return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
       }
+
+      // Do not render anything if app provided
+      if (app instanceof PIXI.Application) {
+        return null;
+      }
+
+      const canvasProps = getCanvasProps(this.props);
+
+      return <canvas ref={ref => (this._canvas = ref)} {...canvasProps} />;
     }
   }
 

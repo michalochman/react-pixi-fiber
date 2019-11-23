@@ -9,6 +9,7 @@ import BunnyExample from "../BunnyExample";
 import BunnymarkExample from "../BunnymarkExample";
 import CanvasPropsExample from "../CanvasPropsExample";
 import ClickExample from "../ClickExample";
+import CustomApplicationExample from "../CustomApplicationExample";
 import CustomBunnymarkExample from "../CustomBunnymarkExample";
 import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import HooksExample from "../HooksExample";
@@ -52,6 +53,11 @@ const examples = [
     name: "Click",
     slug: "click",
     component: ClickExample,
+  },
+  {
+    name: "CustomApplication",
+    slug: "customapplication",
+    component: CustomApplicationExample,
   },
   {
     name: "CustomPIXIComponent",

@@ -1,10 +1,12 @@
 import React from "react";
+import invariant from "fbjs/lib/invariant";
 import { useContext, useEffect, useRef, useState, useLayoutEffect } from "react";
 import { AppContext } from "./AppProvider";
 import { getCanvasProps } from "./stageProps";
 import { createUnmount } from "./render";
 import { createPixiApplication } from "./utils";
 import { ReactPixiFiberAsSecondaryRenderer } from "./ReactPixiFiber";
+import * as PIXI from "pixi.js";
 
 export function usePixiApp() {
   return useContext(AppContext);
@@ -32,28 +34,51 @@ export function usePreviousProps(value) {
   return ref.current;
 }
 
-export function usePixiAppCreator(props) {
-  const { options, width, height } = props;
-  const canvasRef = useRef();
-  const [app, setApp] = useState(null);
-  const canvasProps = getCanvasProps(props);
+export function getCanvas(props, canvasRef) {
+  const { app, options } = props;
+
   // Do not render anything if view is passed to options
-  const canvas = options && options.view ? null : <canvas ref={canvasRef} {...canvasProps} />;
+  if (typeof options !== "undefined" && options.view) {
+    return null;
+  }
+
+  // Do not render anything if app provided
+  if (app instanceof PIXI.Application) {
+    return null;
+  }
+
+  const canvasProps = getCanvasProps(props);
+
+  return <canvas ref={canvasRef} {...canvasProps} />;
+}
+
+export function usePixiAppCreator(props) {
+  const { app } = props;
+
+  invariant(app == null || app instanceof PIXI.Application, "Provided `app` has to be an instance of PIXI.Application");
+
+  const { options, width, height } = props;
+  const [appInstance, setAppInstance] = useState(null);
+  const canvasRef = useRef();
+  const canvas = getCanvas(props, canvasRef);
 
   // Initialize pixi application on mount
   useLayoutEffect(() => {
     const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
     const view = canvasRef.current;
-    const appInstance = createPixiApplication({ height, width, view, ...options });
+    const appInstance = app || createPixiApplication({ height, width, view, ...options });
 
-    setApp(appInstance);
+    setAppInstance(appInstance);
 
     // Destroy pixi application on unmount
     return () => {
       unmount(appInstance.stage);
-      appInstance.destroy();
-    };
-  }, [options, width, height]);
 
-  return { app, canvas };
+      if (!(app instanceof PIXI.Application)) {
+        appInstance.destroy();
+      }
+    };
+  }, [app, options, width, height]);
+
+  return { app: appInstance, canvas };
 }
