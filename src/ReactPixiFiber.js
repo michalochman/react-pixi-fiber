@@ -105,7 +105,7 @@ export function removeChild(parentInstance, child) {
 
   parentInstance.removeChild(child);
 
-  child.destroy();
+  child.destroy({ children: true });
 }
 
 export function insertBefore(parentInstance, child, beforeChild) {
