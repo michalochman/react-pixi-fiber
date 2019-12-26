@@ -248,7 +248,7 @@ describe("ReactPixiFiber", () => {
       ReactPixiFiber.removeChild(parent, child);
 
       expect(child.destroy).toHaveBeenCalledTimes(1);
-      expect(child.destroy).toHaveBeenCalledWith();
+      expect(child.destroy).toHaveBeenCalledWith({ children: true });
     });
 
     it("delegates custom detach to child if _customWillDetach is defined", () => {
