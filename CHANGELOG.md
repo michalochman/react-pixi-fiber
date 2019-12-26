@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.12.1] - 2019-12-26
+
+### Fixed
+- Fixed `ReactPixiFiber` to destroy child components when parent is removed from tree ([#157])
+
 
 ## [0.12.0] - 2019-11-23
 
@@ -304,7 +309,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.10.0...v0.11.0
@@ -342,6 +348,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#157]: https://github.com/michalochman/react-pixi-fiber/pull/157
 [#154]: https://github.com/michalochman/react-pixi-fiber/pull/154
 [#153]: https://github.com/michalochman/react-pixi-fiber/pull/153
 [#149]: https://github.com/michalochman/react-pixi-fiber/issues/149
