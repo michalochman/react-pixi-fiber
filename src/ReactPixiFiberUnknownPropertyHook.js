@@ -65,7 +65,7 @@ if (__DEV__) {
         warnedProperties[name] = true;
         return true;
       }
-    } else if (!isReserved) {
+    } else if (!isReserved && typeof value !== "undefined") {
       warning(
         false,
         "React does not recognize prop `%s` on `<%s />`. If you accidentally passed it from a parent component, remove it from `<%s />`.%s",
