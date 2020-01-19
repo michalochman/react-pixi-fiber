@@ -31,7 +31,7 @@ export function createPixiApplication(options) {
 // Converts value to an array of coordinates
 export function parsePoint(value) {
   let arr = [];
-  if (typeof value === "undefined") {
+  if (value == null) {
     return arr;
   } else if (typeof value === "string") {
     arr = value.split(",");
