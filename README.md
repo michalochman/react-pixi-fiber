@@ -166,8 +166,7 @@ Renders [`PIXI.extras.BitmapText`].
 
 [Similarly](https://reactjs.org/blog/2017/09/08/dom-attributes-in-react-16.html) to ReactDOM in React 16, 
 ReactPixiFiber is not ignoring unknown [`PIXI.DisplayObject`] members – they are all passed through. You can read 
-more about [Unknown Prop Warning](https://reactjs.org/warnings/unknown-prop.html)  in ReactDOM, however 
-ReactPixiFiber will not warn you about unknown members. 
+more about [Unknown Prop Warning](https://reactjs.org/warnings/unknown-prop.html) in ReactDOM.
 
 #### Setting values for Point and ObservablePoint types
 
