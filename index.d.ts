@@ -1,24 +1,13 @@
-import * as React from 'react';
-import * as PIXI from 'pixi.js';
-import {InteractiveComponent} from "react-pixi-fiber";
+import * as React from "react";
+import * as PIXI from "pixi.js";
+import { InteractiveComponent } from "react-pixi-fiber";
 
-declare module 'react-pixi-fiber' {
-
-  /**
-   * An object with keys in T not in U.
-   *
-   * Attribution: https://github.com/Microsoft/TypeScript/issues/12215#issuecomment-377567046
-   */
-  export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
-  /** The shape of an object that has an optional `children` property of any type. */
-  interface ObjectWithChildren { children?: any; }
-
+declare module "react-pixi-fiber" {
   /** The shape of `T` without it's `children` property. */
-  export type Childless<T extends ObjectWithChildren> = Omit<T, 'children'>;
+  export type Childless<T> = Partial<Omit<T, "children">>;
 
   /** The shape of a component that has an optional `children` property. */
-  export interface ChildrenProperties {
+  export interface ReactChildrenProperties {
     children?: React.ReactNode;
   }
 
@@ -27,61 +16,72 @@ declare module 'react-pixi-fiber' {
     app: PIXI.Application;
   }
 
+  /** Point like object with x,y */
+  interface PointLikeObject {
+    x: number;
+    y: number;
+  }
+
+  /** Point like type */
+  type PointLike = PIXI.Point | PIXI.ObservablePoint | PointLikeObject | string | [number, number];
+
+  /** Create new type based on O with replaced T properties by K */
+  type WithElements<O, T extends keyof any, K> = Omit<O, T> & { [P in T]?: K };
+
+  /** Replace P properties to point like */
+  type WithPointLike<T, P extends keyof any> = WithElements<Childless<T>, P, PointLike>;
+
   /**
    * Extra properties to add to allow us to set event handlers using props
    */
-  export interface InteractiveComponent {
-    pointerdown?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointercancel?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointerup?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointertap?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointerupoutside?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointermove?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointerover?: (event: PIXI.interaction.InteractionEvent) => void;
-    pointerout?: (event: PIXI.interaction.InteractionEvent) => void;
-    touchstart?: (event: PIXI.interaction.InteractionEvent) => void;
-    touchcancel?: (event: PIXI.interaction.InteractionEvent) => void;
-    touchend?: (event: PIXI.interaction.InteractionEvent) => void;
-    touchendoutside?: (event: PIXI.interaction.InteractionEvent) => void;
-    touchmove?: (event: PIXI.interaction.InteractionEvent) => void;
-    tap?: (event: PIXI.interaction.InteractionEvent) => void;
-    rightdown?: (event: PIXI.interaction.InteractionEvent) => void;
-    mousedown?: (event: PIXI.interaction.InteractionEvent) => void;
-    rightup?: (event: PIXI.interaction.InteractionEvent) => void;
-    mouseup?: (event: PIXI.interaction.InteractionEvent) => void;
-    rightclick?: (event: PIXI.interaction.InteractionEvent) => void;
-    click?: (event: PIXI.interaction.InteractionEvent) => void;
-    rightupoutside?: (event: PIXI.interaction.InteractionEvent) => void;
-    mouseupoutside?: (event: PIXI.interaction.InteractionEvent) => void;
-    mousemove?: (event: PIXI.interaction.InteractionEvent) => void;
-    mouseover?: (event: PIXI.interaction.InteractionEvent) => void;
-    mouseout?: (event: PIXI.interaction.InteractionEvent) => void;
-  }
+  export type InteractiveComponent = {
+    [P in PIXI.interaction.InteractionEventTypes]?: (event: PIXI.interaction.InteractionEvent) => void
+  };
 
-  /**
-   * A PIXI Component with no children.
-   */
-  export type ChildlessComponent<T extends ObjectWithChildren> = Partial<Childless<T>>;
+  export type WithInteractive<T> = T & InteractiveComponent;
 
   /**
    * A PIXI Component with children.
    */
-  export type Component<T extends ObjectWithChildren> = ChildlessComponent<T> & ChildrenProperties;
+  export type Component<T> = Childless<T> & ReactChildrenProperties;
+
+  type ContainerPointProperties = "position" | "scale" | "pivot";
+  type SpritePointProperties = ContainerPointProperties | "anchor";
+  type BitmapTextPointProperties = ContainerPointProperties | "anchor";
+  type TextPointProperties = ContainerPointProperties | "anchor";
 
   /** `BitmapText` component properties. */
-  export interface BitmapTextProperties extends ChildlessComponent<PIXI.extras.BitmapText & InteractiveComponent> {
-    text: string;
+  export type BitmapTextProperties = WithInteractive<WithPointLike<PIXI.BitmapText, BitmapTextPointProperties>>;
+
+  /** `Container` component properties. */
+  export type ContainerProperties = WithInteractive<WithPointLike<PIXI.Container, ContainerPointProperties>>;
+
+  /** `ParticleContainer` component properties. */
+  export type ParticleContainerProperties = WithInteractive<WithPointLike<PIXI.ParticleContainer, ContainerPointProperties>>;
+
+  /** `Graphics` component properties. */
+  export type GraphicsProperties = WithInteractive<WithPointLike<PIXI.Graphics, ContainerPointProperties>>;
+
+  /** `Sprite` component properties. */
+  export type SpriteProperties = WithInteractive<WithPointLike<PIXI.Sprite, SpritePointProperties>>;
+
+  /** `TilingSprite` component properties. */
+  export type TilingSpriteProperties = WithInteractive<WithPointLike<PIXI.TilingSprite, SpritePointProperties>>;
+
+  /** `Text` component properties */
+  export type TextProperties = WithInteractive<WithPointLike<PIXI.Text, TextPointProperties>>;
+
+  /** `Stage` component properties." */
+  export interface StageProperties extends WithInteractive<WithPointLike<PIXI.Container, ContainerPointProperties>> {
+    options?: {};
   }
 
   /**
-   * A component wrapper for `PIXI.extras.BitmapText`.
+   * A component wrapper for `PIXI.BitmapText`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.extras.BitmapText.html
    */
   export class BitmapText extends React.Component<BitmapTextProperties> {}
-
-  /** `Container` component properties. */
-  export interface ContainerProperties extends ChildlessComponent<PIXI.Container & InteractiveComponent> {}
 
   /**
    * A component wrapper for `PIXI.Container`.
@@ -90,9 +90,6 @@ declare module 'react-pixi-fiber' {
    */
   export class Container extends React.Component<ContainerProperties> {}
 
-  /** `Graphics` component properties. */
-  export interface GraphicsProperties extends Component<PIXI.Graphics & InteractiveComponent> {}
-
   /**
    * A component wrapper for `PIXI.Graphics`.
    *
@@ -100,18 +97,12 @@ declare module 'react-pixi-fiber' {
    */
   export class Graphics extends React.Component<GraphicsProperties> {}
 
-  /** `ParticleContainer` component properties. */
-  export interface ParticleContainerProperties extends ChildlessComponent<PIXI.particles.ParticleContainer & InteractiveComponent> {}
-
   /**
-   * A component wrapper for `PIXI.particles.ParticleContainer`.
+   * A component wrapper for `PIXI.ParticleContainer`.
    *
-   * see: http://pixijs.download/dev/docs/PIXI.particles.ParticleContainer.html
+   * see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
    */
   export class ParticleContainer extends React.Component<TilingSpriteProperties> {}
-
-  /** `Sprite` component properties. */
-  export interface SpriteProperties extends ChildlessComponent<PIXI.Sprite & InteractiveComponent> {}
 
   /**
    * A component wrapper for `PIXI.Sprite`.
@@ -120,11 +111,6 @@ declare module 'react-pixi-fiber' {
    */
   export class Sprite extends React.Component<SpriteProperties> {}
 
-  /** `Text` component properties */
-  export interface TextProperties extends ChildlessComponent<Omit<PIXI.Text, 'anchor'> & InteractiveComponent> {
-    anchor?: string | number[] | PIXI.ObservablePoint;
-  }
-
   /**
    * A component wrapper for `PIXI.Text`.
    *
@@ -132,32 +118,26 @@ declare module 'react-pixi-fiber' {
    */
   export class Text extends React.Component<TextProperties> {}
 
-  /** `TilingSprite` component properties. */
-  export interface TilingSpriteProperties extends ChildlessComponent<PIXI.extras.TilingSprite & InteractiveComponent> {
-    texture: PIXI.Texture;
-  }
-
   /**
-   * A component wrapper for `PIXI.extras.TilingSprite`.
+   * A component wrapper for `PIXI.TilingSprite`.
    *
-   * see: http://pixijs.download/dev/docs/PIXI.extras.TilingSprite.html
+   * see: http://pixijs.download/dev/docs/PIXI.TilingSprite.html
    */
   export class TilingSprite extends React.Component<TilingSpriteProperties> {}
 
-  /** `Stage` component properties." */
-  export interface StageProperties extends Component<PIXI.Container & InteractiveComponent> {
-    options?: {}
-  }
-
   /**
-   * A component wrapper for `PIXI.Application`.
+   * A component wrapper for PIXI `Stage`.
    *
    * see: http://pixijs.download/dev/docs/PIXI.Application.html
    */
   export class Stage extends React.Component<StageProperties> {}
 
   /** Custom React Reconciler render method. */
-  export function render(pixiElement: React.ReactElement<any> | React.ReactElement<any>[] | PIXI.DisplayObject | PIXI.DisplayObject[], stage: PIXI.Container, callback?: Function): void;
+  export function render(
+    pixiElement: React.ReactElement<any> | React.ReactElement<any>[] | PIXI.DisplayObject | PIXI.DisplayObject[],
+    stage: PIXI.Container,
+    callback?: Function
+  ): void;
 
   /**
    * Custom component properties.
@@ -170,20 +150,20 @@ declare module 'react-pixi-fiber' {
     /**
      * Use this to apply newProps to your Component in a custom way.
      */
-    customApplyProps?: (displayObject: U, oldProps: T, newProps: T) => any;
+    customApplyProps?: (displayObject: U, oldProps: T, newProps: T) => void;
     /**
      * Use this to do something after displayObject is attached, which happens after componentDidMount lifecycle method.
      */
-    customDidAttach?: (displayObject: U) => any;
+    customDidAttach?: (displayObject: U) => void;
     /**
      * Use this to do something (usually cleanup) before detaching, which happens before componentWillUnmount lifecycle method.
      */
-    customWillDetach?: (displayObject: U) => any;
+    customWillDetach?: (displayObject: U) => void;
   }
   /**
    * Create a custom component.
    */
-  export function CustomPIXIComponent<T, U extends PIXI.DisplayObject & InteractiveComponent>(
+  export function CustomPIXIComponent<T, U extends WithInteractive<PIXI.DisplayObject>> (
     behavior: Behavior<T, U>,
     /**
      * The name of this custom component.
@@ -205,4 +185,3 @@ declare module 'react-pixi-fiber' {
   export function unstable_batchedUpdates<A>(callback: (a: A) => any, a: A): void;
   export function unstable_batchedUpdates(callback: () => any): void;
 }
-
