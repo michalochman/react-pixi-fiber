@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.12.2] - 2020-01-20
+
+### Added
+- Added support for point like props ([#162])
+
+### Changed
+- Rewrote types definition
+
+
 ## [0.12.1] - 2019-12-26
 
 ### Fixed
@@ -309,7 +319,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.2...HEAD
+[0.12.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.11.0...v0.11.1
@@ -348,6 +359,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#162]: https://github.com/michalochman/react-pixi-fiber/pull/162
 [#157]: https://github.com/michalochman/react-pixi-fiber/pull/157
 [#154]: https://github.com/michalochman/react-pixi-fiber/pull/154
 [#153]: https://github.com/michalochman/react-pixi-fiber/pull/153
