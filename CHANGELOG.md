@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added missing type definitions
+
+### Fixed
+- Fixed type definitions for `CustomPIXIComponents`
+
 
 ## [0.12.2] - 2020-01-20
 
