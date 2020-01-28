@@ -8,12 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.12.3] - 2020-01-28
+
 ### Added
-- Added missing type definitions
+- Added missing type definitions ([#163])
 
 ### Fixed
-- Fixed type definitions for `CustomPIXIComponents`
-- Fixed type definitions for `Stage` to be able to use `ref`s
+- Fixed type definitions for `CustomPIXIComponents` ([#163])
+- Fixed type definitions for `Stage` to be able to use `ref`s ([#165])
 
 
 ## [0.12.2] - 2020-01-20
@@ -326,7 +329,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.3...HEAD
+[0.12.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.11.1...v0.12.0
@@ -366,6 +370,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#165]: https://github.com/michalochman/react-pixi-fiber/pull/165
+[#163]: https://github.com/michalochman/react-pixi-fiber/pull/163
 [#162]: https://github.com/michalochman/react-pixi-fiber/pull/162
 [#157]: https://github.com/michalochman/react-pixi-fiber/pull/157
 [#154]: https://github.com/michalochman/react-pixi-fiber/pull/154
