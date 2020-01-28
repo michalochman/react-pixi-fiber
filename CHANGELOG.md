@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed type definitions for `CustomPIXIComponents`
+- Fixed type definitions for `Stage` to be able to use `ref`s
 
 
 ## [0.12.2] - 2020-01-20

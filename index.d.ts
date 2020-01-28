@@ -72,6 +72,11 @@ declare module "react-pixi-fiber" {
    * Base components
    */
 
+  // Allow components to have refs
+  interface ComponentWithRef {
+    ref?: React.Ref<React.ReactNode>;
+  }
+
   // Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
   export type DisplayObjectProperties<T> = WithPointLike<Childless<T>> & InteractiveComponent;
 
@@ -118,7 +123,8 @@ declare module "react-pixi-fiber" {
 
   // Allow either `app` or `options` passed to `Stage`.
   export type StageProperties = (StagePropertiesWithApp | StagePropertiesWithOptions) &
-    React.CanvasHTMLAttributes<HTMLCanvasElement>;
+    React.CanvasHTMLAttributes<HTMLCanvasElement> &
+    ComponentWithRef;
 
   // A component wrapper for PIXI `Stage`.
   // see: http://pixijs.download/dev/docs/PIXI.Application.html
