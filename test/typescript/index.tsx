@@ -16,7 +16,7 @@ const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
 
 const texture = PIXI.Texture.from("https://i.imgur.com/IaUrttj.png");
 
-const CompositionExample: React.SFC = () => (
+const CompositionExample: React.FC = () => (
   <Container>
     <BitmapText text="" />
   </Container>
@@ -31,21 +31,26 @@ const AnimatedSprite: React.ReactType = CustomPIXIComponent(
   },
   "AnimatedSprite"
 );
-const CustomPIXIComponentExample: React.SFC = () => <AnimatedSprite />;
+const CustomPIXIComponentExample: React.FC = () => <AnimatedSprite />;
 
-const StageExample: React.SFC = () => (
-  <Stage options={{ backgroundColor: 0xffffff }}>
-    <BitmapText text="" />
-    <Container>
+const StageExample: React.FC = () => {
+  const stageRef = React.useRef(null);
+  const spriteRef = React.useRef(null);
+
+  return (
+    <Stage options={{ backgroundColor: 0xffffff }} ref={stageRef}>
       <BitmapText text="" />
-    </Container>
-    <Graphics />
-    <ParticleContainer autoResize={false}>
-      <Sprite texture={PIXI.Texture.WHITE} />
-    </ParticleContainer>
-    <Sprite anchor={anchor} texture={texture} />
-    <Text />
-    <TilingSprite texture={texture} />
-    <CompositionExample />
-  </Stage>
-);
+      <Container>
+        <BitmapText text="" />
+      </Container>
+      <Graphics />
+      <ParticleContainer autoResize={false}>
+        <Sprite texture={PIXI.Texture.WHITE} />
+      </ParticleContainer>
+      <Sprite anchor={anchor} texture={texture} ref={spriteRef} />
+      <Text />
+      <TilingSprite texture={texture} />
+      <CompositionExample />
+    </Stage>
+  );
+};
