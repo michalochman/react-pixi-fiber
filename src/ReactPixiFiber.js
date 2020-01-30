@@ -142,10 +142,18 @@ export function createInstance(type, props, internalInstanceHandle) {
 
   switch (type) {
     case TYPES.BITMAP_TEXT:
+      const style =
+        typeof props.style !== "undefined"
+          ? props.style
+          : {
+              align: props.align,
+              font: props.font,
+              tint: props.tint,
+            };
       try {
-        instance = new PIXI.extras.BitmapText(props.text, props.style);
+        instance = new PIXI.extras.BitmapText(props.text, style);
       } catch (e) {
-        instance = new PIXI.BitmapText(props.text, props.style);
+        instance = new PIXI.BitmapText(props.text, style);
       }
       break;
     case TYPES.CONTAINER:

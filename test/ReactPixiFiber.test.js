@@ -360,10 +360,24 @@ describe("ReactPixiFiber", () => {
       jest.resetAllMocks();
     });
 
-    it("returns PIXI.BitmapText if type is BITMAP_TEXT", () => {
+    it("returns PIXI.BitmapText if type is BITMAP_TEXT with style prop", () => {
       const text = "Hello World";
-      const style = { font: "16 Arial" };
+      const style = { font: "16 Arial", align: "left", tint: 0x421337 };
       ReactPixiFiber.createInstance(TYPES.BITMAP_TEXT, { text, style });
+
+      expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
+      expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);
+    });
+
+    it("returns PIXI.BitmapText if type is BITMAP_TEXT with font prop", () => {
+      const text = "Hello World";
+      const style = { font: "16 Arial", align: "left", tint: 0x421337 };
+      ReactPixiFiber.createInstance(TYPES.BITMAP_TEXT, {
+        text,
+        font: style.font,
+        align: style.align,
+        tint: style.tint,
+      });
 
       expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
       expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);

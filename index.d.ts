@@ -6,24 +6,27 @@ declare module "react-pixi-fiber" {
    * Helpers
    */
 
-  // The shape of `T` without it's `children` property.
-  type Childless<T> = Partial<Omit<T, "children">>;
+  // Returns keys `K` of `T` where type of `T[K]` partially matches `U`.
+  // e.g. KeysThatMayHaveType<{ foo: string, bar: string | null }, string> -> "foo" | "bar"
+  // e.g. KeysThatMayHaveType<{ foo: number, bar: string | null }, string> -> "bar"
+  type KeysThatMayHaveType<T, U> = { [K in keyof T]: U extends T[K] ? K : never }[keyof T];
 
-  // Returns optional keys of `T`
-  type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T];
-  // Returns required keys of `T`
-  type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
-  // Returns keys `K` of `T` where `T[K]` is of type `U`
-  type KeysOfType<T, U> = { [K in keyof T]: T[K] extends U ? K : never }[keyof T];
+  // Returns keys `K` of `T` where type of `T[K]` is not specifically `any`.
+  type KeysThatAreNotAny<T> = { [K in keyof T]: any extends T[K] ? never : K }[keyof T];
 
-  // Constructs a type by picking the set of optional properties `T`.
-  type OptionalProperties<T> = Pick<T, OptionalKeys<T>>;
-  // Constructs a type by picking the set of required properties `T`.
-  type RequiredProperties<T> = Pick<T, RequiredKeys<T>>;
+  // The shape of `T` with `children` property that React understands.
+  type PropsWithReactChildren<T> = Omit<T, "children"> & { children?: React.ReactNode };
+
+  // Returns `T` when it extends `PIXI.DisplayObject`, otherwise returns `U`.
+  // This is a hack which we use to be able to use these types with types from PixiJS v4 and v5
+  type PixiTypeFallback<T, U> = T extends PIXI.DisplayObject ? T : U;
 
   /**
    * Points
    */
+
+  // Point types used by PixiJS. PIXI.IPoint exists in PIXIJS v5 only.
+  type PixiPoint = PIXI.Point | PIXI.ObservablePoint | PIXI.IPoint;
 
   // Point-like object with `x`, `y` keys.
   // e.g. `position={{ x: 13, y: 37 }}`
@@ -36,28 +39,26 @@ declare module "react-pixi-fiber" {
   // e.g. `pivot={[13, 37]}`
   export type PointLikeTuple = [number, number];
 
-  // Point-like number with `x` and `y` encoded  as a single value
+  // Point-like number with `x` and `y` encoded  as a single value.
   // e.g. `scale={2}`
   export type PointLikeNumber = number;
 
-  // Point-like string with `x` and `y` separated by a comma
+  // Point-like string with `x` and `y` separated by a comma.
   // e.g. `anchor="1,0.5"`
   export type PointLikeString = string;
 
-  // Point-like type
-  export type PointLike = PIXI.IPoint | PointLikeObject | PointLikeTuple | PointLikeNumber | PointLikeString;
+  // Point-like type.
+  export type PointLike = PixiPoint | PointLikeObject | PointLikeTuple | PointLikeNumber | PointLikeString;
 
-  // Properties of `T` that extend `PIXI.IPoint` interface
-  export type PointProperties<T> = Extract<keyof T, KeysOfType<Required<T>, PIXI.IPoint>>;
+  // Properties of `T` that extend `PixiPoint`.
+  export type PointProperties<T> = Extract<keyof T, Extract<KeysThatMayHaveType<T, PixiPoint>, KeysThatAreNotAny<T>>>;
 
   // Replace type of properties declared in `T` as `PIXI.IPoint` to `PointLike`.
   export type WithPointLike<T> =
     // Omit all properties declared it `T` as `PIXI.IPoint`.
     Omit<T, PointProperties<T>> &
-      // Pick all required point properties from `T` with type changed to `PointLike` and make sure they are still required.
-      Pick<{ [U in PointProperties<RequiredProperties<T>>]: PointLike }, PointProperties<RequiredProperties<T>>> &
-      // Pick all optional point properties from `T` with type changed to `PointLike` and make sure they are still optional.
-      Pick<{ [U in PointProperties<OptionalProperties<T>>]?: PointLike }, PointProperties<OptionalProperties<T>>>;
+      // Pick all point properties from `T` with type changed to `PointLike`.
+      Pick<{ [U in PointProperties<T>]: PointLike }, PointProperties<T>>;
 
   /**
    * Interactivity
@@ -72,64 +73,85 @@ declare module "react-pixi-fiber" {
    * Base components
    */
 
-  // Allow components to have refs
-  interface ComponentWithRef {
-    ref?: React.Ref<React.ReactNode>;
+  type PixiElement<Props> = PropsWithReactChildren<Props> & React.ClassAttributes<Props> & InteractiveComponent;
+
+  // This is similar to React.FunctionComponent<P>
+  export interface PixiComponent<P = {}> {
+    (props: PixiElement<P>): React.ReactElement<P>;
   }
 
   // Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
-  export type DisplayObjectProperties<T> = WithPointLike<Childless<T>> & InteractiveComponent;
+  export type DisplayObjectProps<T> = Partial<WithPointLike<T>>;
 
-  // A component wrapper for `PIXI.BitmapText`.
+  // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.BitmapText.html
-  export class BitmapText extends React.Component<DisplayObjectProperties<PIXI.BitmapText>> {}
+  export const BitmapText: PixiComponent<
+    DisplayObjectProps<PixiTypeFallback<PIXI.extras.BitmapText, PIXI.BitmapText>> & {
+      // `style` is not a property on `PIXI.BitmapText`, but is used in constructor
+      style?: ConstructorParameters<PixiTypeFallback<typeof PIXI.extras.BitmapText, typeof PIXI.BitmapText>>[1];
+    }
+  >;
 
   // A component wrapper for `PIXI.Container`.
   // see: http://pixijs.download/dev/docs/PIXI.Container.html
-  export class Container extends React.Component<DisplayObjectProperties<PIXI.Container>> {}
+  export const Container: PixiComponent<DisplayObjectProps<PIXI.Container>>;
 
   // A component wrapper for `PIXI.Graphics`.
   // see: http://pixijs.download/dev/docs/PIXI.Graphics.html
-  export class Graphics extends React.Component<DisplayObjectProperties<PIXI.Graphics>> {}
+  export const Graphics: PixiComponent<DisplayObjectProps<PIXI.Graphics>>;
 
-  // A component wrapper for `PIXI.ParticleContainer`.
+  // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
-  export class ParticleContainer extends React.Component<DisplayObjectProperties<PIXI.ParticleContainer>> {}
+  export const ParticleContainer: PixiComponent<
+    DisplayObjectProps<PixiTypeFallback<PIXI.particles.ParticleContainer, PIXI.ParticleContainer>>
+  >;
 
   // A component wrapper for `PIXI.Sprite`.
   // see: http://pixijs.download/dev/docs/PIXI.Sprite.html
-  export class Sprite extends React.Component<DisplayObjectProperties<PIXI.Sprite>> {}
+  export const Sprite: PixiComponent<DisplayObjectProps<PIXI.Sprite>>;
 
   // A component wrapper for `PIXI.Text`.
   // see: http://pixijs.download/dev/docs/PIXI.Text.html
-  export class Text extends React.Component<DisplayObjectProperties<PIXI.Text>> {}
+  export const Text: PixiComponent<DisplayObjectProps<PIXI.Text>>;
 
-  // A component wrapper for `PIXI.TilingSprite`.
+  // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.TilingSprite.html
-  export class TilingSprite extends React.Component<DisplayObjectProperties<PIXI.TilingSprite>> {}
+  export const TilingSprite: PixiComponent<
+    DisplayObjectProps<PixiTypeFallback<PIXI.extras.TilingSprite, PIXI.TilingSprite>>
+  >;
 
   /**
    * Rendering: using Stage component or using render and unmount
    */
 
-  interface StagePropertiesWithApp {
+  interface StagePropsWithApp {
     app: PIXI.Application;
     options?: never;
   }
-  interface StagePropertiesWithOptions {
+  interface StagePropsWithOptions {
     app?: never;
     options: ConstructorParameters<typeof PIXI.Application>[0];
   }
 
-  // Allow either `app` or `options` passed to `Stage`.
-  export type StageProperties = (StagePropertiesWithApp | StagePropertiesWithOptions) &
-    React.CanvasHTMLAttributes<HTMLCanvasElement> &
-    ComponentWithRef;
+  // Allow either `app` or `options` passed to `Stage` but not both.
+  export type StageProps = (StagePropsWithApp | StagePropsWithOptions) & React.CanvasHTMLAttributes<HTMLCanvasElement>;
 
-  // A component wrapper for PIXI `Stage`.
-  // see: http://pixijs.download/dev/docs/PIXI.Application.html
-  export class Stage extends React.Component<StageProperties> {}
-  export function createStageClass(): React.ComponentType<StageProperties>;
+  // Type of Stage as class component.
+  export type StageClass = React.ComponentType<StageProps & { ref?: React.Ref<React.ReactNode> }> & {
+    _app: PIXI.Application;
+    props: StageProps;
+  };
+
+  // Type of Stage as function component.
+  // TODO allow passing ref that would receive object of { _app: PIXI.Application } shape
+  export type StageFunction = React.FunctionComponent<StageProps>;
+
+  // A component wrapper for PIXI `Stage` as function component.
+  // see: http://pixijs.download/dev/docs/PIXI.Application.html#stage
+  export const Stage: StageFunction;
+
+  // Factory returning Stage as class component.
+  export function createStageClass(): StageClass;
 
   // Standalone ReactPixiFiber render method.
   export function render(
@@ -137,6 +159,7 @@ declare module "react-pixi-fiber" {
     stage: PIXI.Container,
     callback?: Function
   ): void;
+
   // Standalone ReactPixiFiber unmount method.
   export function unmount(stage: PIXI.Container): void;
 
@@ -146,65 +169,56 @@ declare module "react-pixi-fiber" {
 
   // Used create an instance of `PIXI.DisplayObject`.
   // Also used as a `CustomPIXIComponent` `behavior` factory function.
-  export type CustomDisplayObjectCreator<DisplayObject extends PIXI.DisplayObject, Props> = (
-    props: Props
-  ) => CustomDisplayObject<DisplayObject, Props>;
+  export type CustomDisplayObjectCreator<T extends PIXI.DisplayObject, P> = (props: P) => CustomDisplayObject<T, P>;
 
   // Used to apply `newProps` to your `CustomPIXIComponent` in a custom way.
-  export type CustomDisplayObjectPropSetter<DisplayObject extends PIXI.DisplayObject, Props> = (
-    displayObject: DisplayObject,
-    oldProps: Props,
-    newProps: Props
+  export type CustomDisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
+    displayObject: T,
+    oldProps: P,
+    newProps: P
   ) => void;
 
   // Used to do something after `displayObject` is attached, which happens after `componentDidMount` lifecycle method.
-  export type CustomDisplayObjectAttachHandler<DisplayObject extends PIXI.DisplayObject> = (
-    displayObject: DisplayObject
-  ) => void;
+  export type CustomDisplayObjectAttachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
 
   // Used to do something (usually cleanup) before detaching `displayObject`, which happens before `componentWillUnmount` lifecycle method.
-  export type CustomDisplayObjectDetachHandler<DisplayObject extends PIXI.DisplayObject> = (
-    displayObject: DisplayObject
-  ) => void;
+  export type CustomDisplayObjectDetachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
 
   // Inject API adds `_customApplyProps`, `_customDidAttach`, `_customWillDetach` methods.
-  export interface CustomDisplayObject<DisplayObject extends PIXI.DisplayObject, Props> extends PIXI.DisplayObject {
-    _customApplyProps?: CustomDisplayObjectPropSetter<DisplayObject, Props>;
-    _customDidAttach?: CustomDisplayObjectAttachHandler<DisplayObject>;
-    _customWillDetach?: CustomDisplayObjectDetachHandler<DisplayObject>;
+  export interface CustomDisplayObject<T extends PIXI.DisplayObject, P> extends PIXI.DisplayObject {
+    _customApplyProps?: CustomDisplayObjectPropSetter<T, P>;
+    _customDidAttach?: CustomDisplayObjectAttachHandler<T>;
+    _customWillDetach?: CustomDisplayObjectDetachHandler<T>;
   }
 
   // `CustomPIXIComponent` `behavior` object.
-  export interface CustomPIXIComponentBehaviorDefinition<DisplayObject extends PIXI.DisplayObject, Props> {
-    customDisplayObject: CustomDisplayObjectCreator<DisplayObject, Props>;
-    customApplyProps?: CustomDisplayObjectPropSetter<DisplayObject, Props>;
-    customDidAttach?: CustomDisplayObjectAttachHandler<DisplayObject>;
-    customWillDetach?: CustomDisplayObjectDetachHandler<DisplayObject>;
+  export interface CustomPIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P> {
+    customDisplayObject: CustomDisplayObjectCreator<T, P>;
+    customApplyProps?: CustomDisplayObjectPropSetter<T, P>;
+    customDidAttach?: CustomDisplayObjectAttachHandler<T>;
+    customWillDetach?: CustomDisplayObjectDetachHandler<T>;
   }
 
   // `CustomPIXIComponent` has `behavior` defined either as an object or factory function.
-  export type CustomPIXIComponentBehavior<DisplayObject extends PIXI.DisplayObject, Props> =
-    | CustomPIXIComponentBehaviorDefinition<DisplayObject, Props>
-    | CustomDisplayObjectCreator<DisplayObject, Props>;
+  export type CustomPIXIComponentBehavior<T extends PIXI.DisplayObject, P> =
+    | CustomPIXIComponentBehaviorDefinition<T, P>
+    | CustomDisplayObjectCreator<T, P>;
 
   // Create a custom component.
-  export function CustomPIXIComponent<DisplayObject extends PIXI.DisplayObject, Props>(
-    behavior: CustomPIXIComponentBehavior<DisplayObject, Props>,
+  export function CustomPIXIComponent<T extends PIXI.DisplayObject, P>(
+    behavior: CustomPIXIComponentBehavior<T, P>,
     type: string
-  ): React.ComponentType<Props & Omit<DisplayObjectProperties<DisplayObject>, keyof Props>>;
+  ): // Props defined on custom component overwrite props of underlying DisplayObject
+  PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>>;
 
   // Used to apply `newProps` to your `DisplayObject`.
-  export type applyProps<DisplayObject extends PIXI.DisplayObject, Props> = (
-    displayObject: DisplayObject,
-    oldProps: Props,
-    newProps: Props
-  ) => void;
+  export type applyProps<T extends PIXI.DisplayObject, P> = (displayObject: T, oldProps: P, newProps: P) => void;
 
   /**
    * `PIXI.Application` context.
    */
 
-  export type AppContext = React.Context<PIXI.Application>;
+  export const AppContext: React.Context<PIXI.Application>;
 
   // `withApp` higher-order component that injects `app` property of `PIXI.Application` type to your component.
   // You can use `interface ComponentProps extends PixiAppProperties {}` with component wrapped by `withApp`.
