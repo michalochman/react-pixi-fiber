@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added `style` prop to `BitmapText` type
+
+### Fixed
+- Fixed type definitions to work with both PixiJS v4 and v5
+- Fixed type definitions for properties of type `any` being replaced with `PointLike`
+- Fixed type definitions for built-in components to be able to use `ref`s
+
 
 ## [0.12.3] - 2020-01-28
 
