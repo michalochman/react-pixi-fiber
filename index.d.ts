@@ -212,19 +212,26 @@ declare module "react-pixi-fiber" {
   PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>>;
 
   // Used to apply `newProps` to your `DisplayObject`.
-  export type applyProps<T extends PIXI.DisplayObject, P> = (displayObject: T, oldProps: P, newProps: P) => void;
+  export type applyDisplayObjectProps<T extends PIXI.DisplayObject, P> = (
+    type: string,
+    displayObject: T,
+    oldProps: P,
+    newProps: P
+  ) => void;
 
   /**
    * `PIXI.Application` context.
    */
 
-  export const AppContext: React.Context<PIXI.Application>;
-
-  // `withApp` higher-order component that injects `app` property of `PIXI.Application` type to your component.
   // You can use `interface ComponentProps extends PixiAppProperties {}` with component wrapped by `withApp`.
   export interface PixiAppProperties {
     app: PIXI.Application;
   }
+
+  export const AppContext: React.Context<PIXI.Application>;
+  export const AppProvider: React.FunctionComponent<PixiAppProperties>;
+
+  // `withApp` higher-order component that injects `app` property of `PIXI.Application` type to your component.
   export function withApp<P extends PixiAppProperties>(
     Component: React.ComponentType<P>
   ): React.ComponentType<Omit<P, keyof PixiAppProperties>>;
