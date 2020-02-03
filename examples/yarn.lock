@@ -8409,10 +8409,10 @@ react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.3.tgz#4ad8b029c2a718fc0cfc746c8d4e1b7221e5387d"
   integrity sha512-Y4rC1ZJmsxxkkPuMLwvKvlL1Zfpbcu+Bf4ZigkHup3v9EfdYhAlWAaVyA19olXq2o2mGn0w+dFKvk3pVVlYcIA==
 
-react-pixi-fiber@0.12.3:
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.12.3.tgz#a7599f43882cca467a47a70eab7cad5f515fa0f5"
-  integrity sha512-O6OKQgjRHyapx7LiSKhCtf0C2kzcStEaTb6CMA7wNs4D+dopiLR6RHWJ7VmKo4oISx92YZKN/m8XP8rp3+1IKA==
+react-pixi-fiber@0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-0.13.0.tgz#c9f5fdae5ed51196c38042fceb476981a3f4ebe1"
+  integrity sha512-XzSIRWXstDJmUDPdmCLMuOYrjgBEYpYULSyMN7IQxJYs3PvncQMCcni/QbfeRkycz3TfXAG03cnA/QGJ0iMuIA==
   dependencies:
     fbjs "^0.8.0"
     performance-now "^2.1.0"

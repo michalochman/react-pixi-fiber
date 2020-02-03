@@ -8,13 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.13.0] - 2020-02-03
+
 ### Added
-- Added `style` prop to `BitmapText` type
+- Added `style` prop to `BitmapText` type ([#166])
 
 ### Fixed
-- Fixed type definitions to work with both PixiJS v4 and v5
-- Fixed type definitions for properties of type `any` being replaced with `PointLike`
-- Fixed type definitions for built-in components to be able to use `ref`s
+- Fixed type definitions to work with both PixiJS v4 and v5 ([#166])
+- Fixed type definitions for properties of type `any` being replaced with `PointLike` ([#166])
+- Fixed type definitions for built-in components to be able to use `ref`s ([#166])
+- Fixed type definitions for `AppContext` which was exported as type, not as value ([#166])
 
 
 ## [0.12.3] - 2020-01-28
@@ -337,7 +341,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.3...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.3...v0.13.0
 [0.12.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.0...v0.12.1
@@ -378,6 +383,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#166]: https://github.com/michalochman/react-pixi-fiber/pull/166
 [#165]: https://github.com/michalochman/react-pixi-fiber/pull/165
 [#163]: https://github.com/michalochman/react-pixi-fiber/pull/163
 [#162]: https://github.com/michalochman/react-pixi-fiber/pull/162
