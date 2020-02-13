@@ -73,7 +73,7 @@ declare module "react-pixi-fiber" {
    * Base components
    */
 
-  type PixiElement<Props> = PropsWithReactChildren<Props> & React.ClassAttributes<Props> & InteractiveComponent;
+  type PixiElement<Props> = Props & React.ClassAttributes<Props> & InteractiveComponent;
 
   // This is similar to React.FunctionComponent<P>
   export interface PixiComponent<P = {}> {
@@ -81,44 +81,47 @@ declare module "react-pixi-fiber" {
   }
 
   // Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
-  export type DisplayObjectProps<T> = Partial<WithPointLike<T>>;
+  export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>>;
 
   // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.BitmapText.html
-  export const BitmapText: PixiComponent<
-    DisplayObjectProps<PixiTypeFallback<PIXI.extras.BitmapText, PIXI.BitmapText>> & {
-      // `style` is not a property on `PIXI.BitmapText`, but is used in constructor
-      style?: ConstructorParameters<PixiTypeFallback<typeof PIXI.extras.BitmapText, typeof PIXI.BitmapText>>[1];
-    }
-  >;
+  export type BitmapText = DisplayObjectProps<PixiTypeFallback<PIXI.extras.BitmapText, PIXI.BitmapText>> & {
+    // `style` is not a property on `PIXI.BitmapText`, but is used in constructor
+    style?: ConstructorParameters<PixiTypeFallback<typeof PIXI.extras.BitmapText, typeof PIXI.BitmapText>>[1];
+  };
+  export const BitmapText: PixiComponent<BitmapText>;
 
   // A component wrapper for `PIXI.Container`.
   // see: http://pixijs.download/dev/docs/PIXI.Container.html
-  export const Container: PixiComponent<DisplayObjectProps<PIXI.Container>>;
+  export type Container = DisplayObjectProps<PIXI.Container>;
+  export const Container: PixiComponent<Container>;
 
   // A component wrapper for `PIXI.Graphics`.
   // see: http://pixijs.download/dev/docs/PIXI.Graphics.html
-  export const Graphics: PixiComponent<DisplayObjectProps<PIXI.Graphics>>;
+  export type Graphics = DisplayObjectProps<PIXI.Graphics>;
+  export const Graphics: PixiComponent<Graphics>;
 
   // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
-  export const ParticleContainer: PixiComponent<
-    DisplayObjectProps<PixiTypeFallback<PIXI.particles.ParticleContainer, PIXI.ParticleContainer>>
+  export type ParticleContainer = DisplayObjectProps<
+    PixiTypeFallback<PIXI.particles.ParticleContainer, PIXI.ParticleContainer>
   >;
+  export const ParticleContainer: PixiComponent<ParticleContainer>;
 
   // A component wrapper for `PIXI.Sprite`.
   // see: http://pixijs.download/dev/docs/PIXI.Sprite.html
-  export const Sprite: PixiComponent<DisplayObjectProps<PIXI.Sprite>>;
+  export type Sprite = DisplayObjectProps<PIXI.Sprite>;
+  export const Sprite: PixiComponent<Sprite>;
 
   // A component wrapper for `PIXI.Text`.
   // see: http://pixijs.download/dev/docs/PIXI.Text.html
-  export const Text: PixiComponent<DisplayObjectProps<PIXI.Text>>;
+  export type Text = DisplayObjectProps<PIXI.Text>;
+  export const Text: PixiComponent<Text>;
 
   // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.TilingSprite.html
-  export const TilingSprite: PixiComponent<
-    DisplayObjectProps<PixiTypeFallback<PIXI.extras.TilingSprite, PIXI.TilingSprite>>
-  >;
+  export type TilingSprite = DisplayObjectProps<PixiTypeFallback<PIXI.extras.TilingSprite, PIXI.TilingSprite>>;
+  export const TilingSprite: PixiComponent<TilingSprite>;
 
   /**
    * Rendering: using Stage component or using render and unmount

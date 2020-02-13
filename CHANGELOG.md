@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added exports for type of props for built-in components 
 
 ## [0.13.0] - 2020-02-03
 
