@@ -90,6 +90,23 @@ const WickedContainer = CustomPIXIComponent<WickedContainerClass, WickedContaine
 
 const CustomPIXIComponentExample: React.FC = () => <AnimatedSprite textures={[]} />;
 
+type WithRestProps<P, T> = P & Omit<T, keyof P>;
+type RestPropsExampleProps = WithRestProps<
+  {
+    propertyNotInSpriteAlready: string;
+    render: boolean;
+  },
+  Sprite
+>;
+const RestPropsExample: React.FC<RestPropsExampleProps> = ({
+  render,
+  propertyNotInSpriteAlready,
+  ...rest
+}: RestPropsExampleProps) => {
+  console.log("propertyNotInSpriteAlready: ", propertyNotInSpriteAlready);
+  return render ? <Sprite {...rest} /> : null;
+};
+
 const StageClassExample: React.FC = () => {
   const Stage = createStageClass();
 
@@ -122,7 +139,13 @@ const StageClassExample: React.FC = () => {
         text="Bitmap text 1"
         style={{ font: { name: "Font", size: 42 }, align: "left", tint: 0xffffff }}
       />
-      <BitmapText key="bitmapText2" text="Bitmap text 2" font={{ name: "Font", size: 42 }} align="left" tint={0xffffff} />
+      <BitmapText
+        key="bitmapText2"
+        text="Bitmap text 2"
+        font={{ name: "Font", size: 42 }}
+        align="left"
+        tint={0xffffff}
+      />
       <Container position="10,10">
         <BitmapText text="" />
       </Container>
@@ -137,6 +160,7 @@ const StageClassExample: React.FC = () => {
       <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
       <WickedContainer isWicked={false} />
       <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
+      <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
     </Stage>
   );
 };
@@ -181,6 +205,7 @@ const StageFunctionExample: React.FC = () => {
       <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
       <WickedContainer isWicked={false} />
       <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
+      <RestPropsExample propertyNotInSpriteAlready="3" render anchor="0.5,0.5" />
     </Stage>
   );
 };
