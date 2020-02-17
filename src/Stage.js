@@ -50,6 +50,7 @@ const resizeRenderer = (app, prevProps, props) => {
 
 export function createStageFunction() {
   function Stage(props) {
+    const { app: externalApp } = props;
     const { app, canvas } = usePixiAppCreator(props);
     const prevProps = usePreviousProps(props);
 
@@ -58,7 +59,10 @@ export function createStageFunction() {
       if (!app || !app.stage) return;
 
       applyUpdate(app, props);
-      resizeRenderer(app, prevProps, props);
+
+      if (!(externalApp instanceof PIXI.Application)) {
+        resizeRenderer(app, prevProps, props);
+      }
     });
 
     return canvas;
@@ -87,8 +91,13 @@ export function createStageClass() {
     }
 
     componentDidUpdate(prevProps) {
+      const { app } = this.props;
+
       applyUpdate(this._app, this.props, this);
-      resizeRenderer(this._app, prevProps, this.props);
+
+      if (!(app instanceof PIXI.Application)) {
+        resizeRenderer(this._app, prevProps, this.props);
+      }
     }
 
     componentWillUnmount() {
