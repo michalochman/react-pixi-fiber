@@ -5,6 +5,7 @@ import * as PIXI from "pixi.js";
 import bunnys from "./bunnys.png";
 
 const maxSize = 200000;
+const initialBunnies = 100;
 const bunniesAddedPerFrame = 100;
 const gravity = 0.5;
 const maxX = 800;
@@ -74,10 +75,10 @@ class Bunnymark extends Component {
     const bunny5 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 2, 26, 37));
 
     this.bunnyTextures = [bunny1, bunny2, bunny3, bunny4, bunny5];
-    const currentTexture = 2;
     this.setState({
-      bunnys: [generateBunny(currentTexture), generateBunny(currentTexture)],
-      currentTexture: currentTexture,
+      bunnys: Array(initialBunnies)
+        .fill(0)
+        .map(() => generateBunny(Math.floor(Math.random() * this.bunnyTextures.length))),
     });
 
     this.props.app.ticker.add(this.animate);

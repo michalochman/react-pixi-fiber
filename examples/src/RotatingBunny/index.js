@@ -1,45 +1,37 @@
-import React, { Component } from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
-import { withApp } from "react-pixi-fiber";
+import { usePixiTicker } from "react-pixi-fiber";
 import Bunny from "../Bunny";
 
 // http://pixijs.io/examples/#/basics/basic.js
-class RotatingBunny extends Component {
-  state = {
-    rotation: 0,
-  };
+function RotatingBunny({ step = 0.1, ...passedProps }) {
+  const [rotation, setRotation] = useState(0);
+  const animate = useCallback(
+    delta => {
+      // just for fun, let's rotate mr rabbit a little
+      // delta is 1 if running at 100% performance
+      // creates frame-independent tranformation
+      setRotation(rotation => {
+        // uncomment this to see concurrent mode and dev build bug, observe timestamps and value of rotation
+        // console.log("setRotation", rotation + step * delta);
+        return rotation + step * delta;
+      });
+    },
+    [step]
+  );
 
-  componentDidMount() {
-    this.props.app.ticker.add(this.animate);
-  }
+  // TODO:
+  // When using concurrent mode and dev build results in double render by React (to better surface bugs),
+  // but for some reason it doesn't play well with PIXI.Ticker.
+  // Investigate why setRotation is called 4 times instead of 2.
+  // The issue exists for both Class and Function Components.
+  // This is not an issue when production build is used.
+  usePixiTicker(animate);
 
-  componentWillUnmount() {
-    this.props.app.ticker.remove(this.animate);
-  }
-
-  animate = delta => {
-    // just for fun, let's rotate mr rabbit a little
-    // delta is 1 if running at 100% performance
-    // creates frame-independent tranformation
-    this.setState(state => ({
-      ...state,
-      rotation: state.rotation + this.props.step * delta,
-    }));
-  };
-
-  render() {
-    // we don't want to pass app prop further down, it will trigger dev warning
-    const { app, step, ...passedProps } = this.props;
-
-    return <Bunny {...passedProps} rotation={this.state.rotation} />;
-  }
+  return <Bunny {...passedProps} rotation={rotation} />;
 }
 RotatingBunny.propTypes = {
-  app: PropTypes.object.isRequired,
   step: PropTypes.number,
 };
-RotatingBunny.defaultProps = {
-  step: 0.1,
-};
 
-export default withApp(RotatingBunny);
+export default RotatingBunny;

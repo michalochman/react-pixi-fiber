@@ -3,12 +3,17 @@ import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage, { createStageClass } from "./Stage";
 import { TYPES } from "./types";
 import { usePixiApp, usePixiTicker } from "./hooks";
-import { createRender, createUnmount } from "./render";
+import ReactPixiFiberLegacyFactory from "./ReactPixiFiberLegacyFactory";
+import ReactPixiFiberRootFactory from "./ReactPixiFiberRootFactory";
 import { ReactPixiFiberAsPrimaryRenderer, unstable_batchedUpdates } from "./ReactPixiFiber";
 import { applyDisplayObjectProps } from "./ReactPixiFiberComponent";
 
-const render = createRender(ReactPixiFiberAsPrimaryRenderer);
-const unmount = createUnmount(ReactPixiFiberAsPrimaryRenderer);
+const ReactPixiFiberRoot = ReactPixiFiberRootFactory(ReactPixiFiberAsPrimaryRenderer);
+const createBlockingRoot = ReactPixiFiberRoot.createBlockingRoot;
+const createRoot = ReactPixiFiberRoot.createRoot;
+const ReactPixiFiberLegacy = ReactPixiFiberLegacyFactory(ReactPixiFiberAsPrimaryRenderer);
+const render = ReactPixiFiberLegacy.render;
+const unmount = ReactPixiFiberLegacy.unmount;
 
 /* Public API */
 
@@ -18,6 +23,8 @@ export {
   CustomPIXIComponent,
   Stage,
   applyDisplayObjectProps,
+  createBlockingRoot,
+  createRoot,
   createStageClass,
   render,
   unmount,

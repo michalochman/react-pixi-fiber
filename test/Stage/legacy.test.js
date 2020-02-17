@@ -5,6 +5,7 @@ import { Text } from "../../src";
 import { AppProvider } from "../../src/AppProvider";
 import { createStageClass } from "../../src/Stage";
 import { __RewireAPI__ as StageRewireAPI } from "../../src/Stage/legacy";
+import { __RewireAPI__ as CommonRewireAPI } from "../../src/Stage/common";
 
 jest.mock("../../src/ReactPixiFiber", () => {
   return Object.assign({}, require.requireActual("../../src/ReactPixiFiber"), {
@@ -14,36 +15,29 @@ jest.mock("../../src/ReactPixiFiber", () => {
   });
 });
 
-jest.mock("../../src/render", () => {
-  const render = jest.fn();
-  const unmount = jest.fn();
-
-  return {
-    createRender: jest.fn().mockReturnValue(render),
-    createUnmount: jest.fn().mockReturnValue(unmount),
-    __renderMock: render,
-    __unmounMock: unmount,
-  };
-});
-
 describe("Stage (class)", () => {
-  const { __renderMock, __unmounMock } = require("../../src/render");
   const Stage = createStageClass();
   let app;
   const createPixiApplication = jest.fn(options => {
     app = new PIXI.Application(options);
     return app;
   });
+  const render = jest.fn();
+  const unmount = jest.fn();
+  const createReactRoot = jest.fn().mockReturnValue({ render, unmount });
 
   beforeEach(() => {
     StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
+    CommonRewireAPI.__Rewire__("createReactRoot", createReactRoot);
     createPixiApplication.mockClear();
-    __renderMock.mockClear();
-    __unmounMock.mockClear();
+    createReactRoot.mockClear();
+    render.mockClear();
+    unmount.mockClear();
   });
 
   afterEach(() => {
     StageRewireAPI.__ResetDependency__("createPixiApplication");
+    CommonRewireAPI.__ResetDependency__("createReactRoot");
   });
 
   it("renders canvas element", () => {
@@ -210,34 +204,22 @@ describe("Stage (class)", () => {
     const children = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children}</Stage>);
     const instance = element.getInstance();
-    const stage = instance._app.current.stage;
 
-    expect(__renderMock).toHaveBeenCalledTimes(1);
-    expect(__renderMock).toHaveBeenCalledWith(
-      <AppProvider app={instance._app.current}>{children}</AppProvider>,
-      stage,
-      undefined,
-      instance
-    );
+    expect(render).toHaveBeenCalledTimes(1);
+    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app.current}>{children}</AppProvider>);
   });
 
   it("calls render on update when props changed", () => {
     const children1 = <Text text="Hello World!" />;
     const element = renderer.create(<Stage>{children1}</Stage>);
     const instance = element.getInstance();
-    const stage = instance._app.current.stage;
 
-    __renderMock.mockClear();
+    render.mockClear();
     const children2 = <Text text="World Hello!" />;
     element.update(<Stage>{children2}</Stage>);
 
-    expect(__renderMock).toHaveBeenCalledTimes(1);
-    expect(__renderMock).toHaveBeenCalledWith(
-      <AppProvider app={instance._app.current}>{children2}</AppProvider>,
-      stage,
-      undefined,
-      instance
-    );
+    expect(render).toHaveBeenCalledTimes(1);
+    expect(render).toHaveBeenCalledWith(<AppProvider app={instance._app.current}>{children2}</AppProvider>);
   });
 
   it("calls unmount when non-dimensional options changed", () => {
@@ -245,23 +227,20 @@ describe("Stage (class)", () => {
     const width = 400;
     const backgroundColor = 0x000000;
     const element = renderer.create(<Stage options={{ width, height, backgroundColor }} />);
-    const instance = element.getInstance();
-    const stage = instance._app.current.stage;
 
     const newBackgroundColor = 0xffffff;
     element.update(<Stage options={{ width, height, backgroundColor: newBackgroundColor }} />);
 
-    expect(__unmounMock).toHaveBeenCalledTimes(1);
-    expect(__unmounMock).toHaveBeenCalledWith(stage);
+    expect(unmount).toHaveBeenCalledTimes(1);
+    expect(typeof unmount.mock.calls[0][0]).toEqual("function");
   });
 
   it("calls unmount when unmounting", () => {
     const element = renderer.create(<Stage />);
     const instance = element.getInstance();
-    const stage = instance._app.current.stage;
     element.unmount();
 
-    expect(__unmounMock).toHaveBeenCalledTimes(1);
-    expect(__unmounMock).toHaveBeenCalledWith(stage);
+    expect(unmount).toHaveBeenCalledTimes(1);
+    expect(typeof unmount.mock.calls[0][0]).toEqual("function");
   });
 });

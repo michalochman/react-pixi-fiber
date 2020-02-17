@@ -26,11 +26,13 @@ export const propTypes = {
     width: PropTypes.number,
   }),
   children: PropTypes.node,
+  mode: PropTypes.oneOf(["blocking", "concurrent", "inherit", "legacy"]),
   height: deprecated(PropTypes.number, "Pass `height` in `options` prop instead."),
   width: deprecated(PropTypes.number, "Pass `height` in `options` prop instead."),
 };
 
 export const defaultProps = {
+  mode: "legacy",
   options: {},
 };
 

@@ -1,13 +1,14 @@
-import React, { useLayoutEffect } from "react";
+import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Container } from "../src/index";
 import { usePixiApp, usePixiTicker } from "../src/hooks";
 import { AppContext } from "../src/AppProvider";
-import { createRender } from "../src/render";
 import { ReactPixiFiberAsSecondaryRenderer } from "../src/ReactPixiFiber";
+import ReactPixiFiberLegacyFactory from "../src/ReactPixiFiberLegacyFactory";
 
-const render = createRender(ReactPixiFiberAsSecondaryRenderer);
+const ReactPixiFiberLegacy = ReactPixiFiberLegacyFactory(ReactPixiFiberAsSecondaryRenderer);
+const render = ReactPixiFiberLegacy.render;
 
 describe("usePixiApp", () => {
   it("will provide app from the context above", () => {

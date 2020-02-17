@@ -4,17 +4,27 @@ import RotatingBunny from "../RotatingBunny";
 
 const COLORS = [0x1099bb, 0x10bb99];
 const SIZES = [{ width: 400, height: 300 }, { width: 300, height: 400 }];
+const MODES = [
+  ["legacy", "Legacy Mode (sync)"],
+  ["blocking", "Blocking Mode (async)"],
+  ["concurrent", "Concurrent Mode (async)"],
+];
 
 class BunnyExample extends Component {
   state = {
     color: 0,
     count: 0,
+    mode: MODES[0][0],
     mount: false,
     size: 0,
   };
 
   addBunny = () => {
     this.setState(state => ({ ...state, count: Math.min(5, state.count + 1) }));
+  };
+
+  changeMode = e => {
+    this.setState({ mode: e.target.value });
   };
 
   removeBunny = () => {
@@ -34,7 +44,7 @@ class BunnyExample extends Component {
   };
 
   renderControls() {
-    const { color, count, mount, size } = this.state;
+    const { color, count, mode, mount, size } = this.state;
 
     return (
       <table style={{ margin: "0 auto 1.5em", textAlign: "left" }}>
@@ -70,20 +80,32 @@ class BunnyExample extends Component {
               </button>
             </td>
           </tr>
+          <tr>
+            <td>React Mode:</td>
+            <td>
+              <select value={mode} onChange={this.changeMode}>
+                {MODES.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </td>
+          </tr>
         </tbody>
       </table>
     );
   }
 
   renderStage() {
-    const { color, count, mount, size } = this.state;
+    const { color, count, mode, mount, size } = this.state;
     const backgroundColor = COLORS[color];
     const { width, height } = SIZES[size];
 
     if (!mount) return null;
 
     return (
-      <Stage options={{ backgroundColor, height, width }}>
+      <Stage key={mode} options={{ backgroundColor, height, width }} mode={mode}>
         {count > 0 && <RotatingBunny x={width / 2} y={height / 2} texture={0} step={0.1} />}
         {count > 1 && <RotatingBunny x={width / 4} y={height / 4} texture={1} step={0.2} />}
         {count > 2 && <RotatingBunny x={width / 4} y={(3 * height) / 4} texture={2} step={-0.25} />}

@@ -3,10 +3,14 @@ import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
+import ReactPixiFiberLegacyFactory from "../src/ReactPixiFiberLegacyFactory";
+import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
 import { __RewireAPI__ as ReactPixiFiberRewireAPI } from "../src/ReactPixiFiber";
 import { __RewireAPI__ as ReactPixiFiberUnknownPropertyHookRewireAPI } from "../src/ReactPixiFiberUnknownPropertyHook";
-import { createRender } from "../src/render";
 import { TYPES } from "../src/types";
+
+const ReactPixiFiberLegacy = ReactPixiFiberLegacyFactory(ReactPixiFiberAsPrimaryRenderer);
+const render = ReactPixiFiberLegacy.render;
 
 jest.mock("pixi.js", () => {
   return Object.assign({}, require.requireActual("pixi.js"), {
@@ -347,7 +351,6 @@ describe("ReactPixiFiber", () => {
 
   describe("unstable_batchedUpdates", () => {
     it("should render one time when call setState many times", () => {
-      const render = createRender(ReactPixiFiber.ReactPixiFiberAsPrimaryRenderer);
       const app = new PIXI.Application();
       const root = app.stage;
       const nextState = {};

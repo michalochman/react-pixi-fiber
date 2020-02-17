@@ -4,13 +4,14 @@ import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, withApp } from "../src";
 import { isNewContextAvailable } from "../src/compat";
 import { createStageClass, createStageFunction } from "../src/Stage";
-import { createRender } from "../src/render";
+import ReactPixiFiberLegacyFactory from "../src/ReactPixiFiberLegacyFactory";
 import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
 import { __RewireAPI__ as HooksRewireAPI } from "../src/Stage/hooks";
 import { __RewireAPI__ as StageRewireAPI } from "../src/Stage/legacy";
 import * as PIXI from "pixi.js";
 
-const render = createRender(ReactPixiFiberAsPrimaryRenderer);
+const ReactPixiFiberLegacy = ReactPixiFiberLegacyFactory(ReactPixiFiberAsPrimaryRenderer);
+const render = ReactPixiFiberLegacy.render;
 
 if (isNewContextAvailable()) {
   // New Context API

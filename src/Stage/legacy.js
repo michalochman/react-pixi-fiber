@@ -117,7 +117,7 @@ export default function createStageClass() {
       if (app === this._app.current) return;
 
       // Set initial properties
-      renderStage(app, props, this);
+      renderStage(app, props);
     }
 
     rerenderStage(app, props, prevProps) {
@@ -125,7 +125,7 @@ export default function createStageClass() {
       if (app !== this._app.current) return;
 
       // Update stage tree
-      rerenderStage(app, prevProps, props, this);
+      rerenderStage(app, prevProps, props);
       // Update canvas and renderer dimestions
       resizeRenderer(app, prevProps, props);
     }

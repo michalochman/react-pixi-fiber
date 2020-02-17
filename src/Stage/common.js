@@ -1,13 +1,13 @@
 import React from "react";
 import { AppProvider } from "../AppProvider";
+import ReactPixiFiberRootFactory from "../ReactPixiFiberRootFactory";
 import { ReactPixiFiberAsSecondaryRenderer } from "../ReactPixiFiber";
 import { diffProperties, setInitialProperties, updateProperties } from "../ReactPixiFiberComponent";
-import { createRender, createUnmount } from "../render";
+import { internalReactPixiFiberRootInstanceKey } from "../ReactPixiFiberComponentTree";
 import { getContainerProps } from "./propTypes";
 import { TYPES } from "../types";
 
-export const render = createRender(ReactPixiFiberAsSecondaryRenderer);
-export const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
+const ReactPixiFiberRoot = ReactPixiFiberRootFactory(ReactPixiFiberAsSecondaryRenderer);
 
 export const STAGE_OPTIONS_RECREATE = false;
 export const STAGE_OPTIONS_UNMOUNT = true;
@@ -19,10 +19,22 @@ export function cleanupStage(app, stageOptions = STAGE_OPTIONS_RECREATE) {
   const removeView = false;
 
   // Unmount stage tree
-  unmount(app.stage);
+  app[internalReactPixiFiberRootInstanceKey].unmount(() => {
+    // Destroy PIXI.Application and what it rendered if necessary
+    app.destroy(removeView, stageOptions);
+  });
+}
 
-  // Destroy PIXI.Application and what it rendered if necessary
-  app.destroy(removeView, stageOptions);
+export function createReactRoot(container, mode) {
+  if (mode === "blocking") {
+    return ReactPixiFiberRoot.createBlockingRoot(container);
+  }
+  if (mode === "concurrent") {
+    return ReactPixiFiberRoot.createRoot(container);
+  }
+  if (mode === "legacy") {
+    return ReactPixiFiberRoot.createLegacyRoot(container);
+  }
 }
 
 export function getDimensions(props) {
@@ -33,25 +45,25 @@ export function getDimensions(props) {
   return [width, height];
 }
 
-export function renderApp(app, props, instance) {
+export function renderApp(app, props) {
   const provider = <AppProvider app={app}>{props.children}</AppProvider>;
 
-  if (typeof instance === "object") {
-    render(provider, app.stage, undefined, instance);
-  } else {
-    render(provider, app.stage);
+  let root = app[internalReactPixiFiberRootInstanceKey];
+  if (!root) {
+    root = app[internalReactPixiFiberRootInstanceKey] = createReactRoot(app.stage, props.mode);
   }
+  root.render(provider);
 }
 
-export function renderStage(app, props, instance) {
+export function renderStage(app, props) {
   // Determine what props to apply
   const stageProps = getContainerProps(props);
 
   setInitialProperties(TYPES.CONTAINER, app.stage, stageProps);
-  renderApp(app, props, instance);
+  renderApp(app, props);
 }
 
-export function rerenderStage(app, oldProps, newProps, instance) {
+export function rerenderStage(app, oldProps, newProps) {
   // Determine what has changed
   const oldStageProps = getContainerProps(oldProps);
   const newStageProps = getContainerProps(newProps);
@@ -61,7 +73,7 @@ export function rerenderStage(app, oldProps, newProps, instance) {
     updateProperties(TYPES.CONTAINER, app.stage, updatePayload);
   }
 
-  renderApp(app, newProps, instance);
+  renderApp(app, newProps);
 }
 
 export function resizeRenderer(app, oldProps, newProps) {

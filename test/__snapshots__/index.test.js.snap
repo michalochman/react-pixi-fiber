@@ -31,6 +31,8 @@ Object {
   "Text": "Text",
   "TilingSprite": "TilingSprite",
   "applyDisplayObjectProps": [Function],
+  "createBlockingRoot": [Function],
+  "createRoot": [Function],
   "createStageClass": [Function],
   "default": Object {},
   "render": [Function],
