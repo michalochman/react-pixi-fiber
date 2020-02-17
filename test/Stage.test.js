@@ -48,6 +48,7 @@ describe("Stage (function)", () => {
     app = new PIXI.Application(options);
     return app;
   });
+  const resizeRenderer = jest.fn();
 
   beforeEach(() => {
     HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
@@ -173,9 +174,17 @@ describe("Stage (function)", () => {
     const newHeight = 600;
     const newWidth = 800;
     element.update(<StageFunction height={newHeight} width={newWidth} />);
+  });
 
-    expect(app.renderer.height).toEqual(newHeight);
-    expect(app.renderer.width).toEqual(newWidth);
+  it("does not call resize renderer if app is provided", () => {
+    StageRewireAPI.__Rewire__("resizeRenderer", resizeRenderer);
+    const app = new PIXI.Application({});
+    const element = renderer.create(<StageFunction app={app} height={300} width={300} />);
+
+    element.update(<StageFunction app={app} height={300} width={300} />);
+    StageRewireAPI.__ResetDependency__("resizeRenderer");
+
+    expect(resizeRenderer).toHaveBeenCalledTimes(0);
   });
 
   it("can be unmounted", () => {
@@ -222,6 +231,7 @@ describe("Stage (class)", () => {
     app = new PIXI.Application(options);
     return app;
   });
+  const resizeRenderer = jest.fn();
 
   beforeEach(() => {
     StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
@@ -371,6 +381,17 @@ describe("Stage (class)", () => {
 
     expect(app.renderer.height).toEqual(newHeight);
     expect(app.renderer.width).toEqual(newWidth);
+  });
+
+  it("does not call resize renderer if app is provided", () => {
+    StageRewireAPI.__Rewire__("resizeRenderer", resizeRenderer);
+    const app = new PIXI.Application({});
+    const element = renderer.create(<StageClass app={app} height={300} width={300} />);
+
+    element.update(<StageClass app={app} height={300} width={300} />);
+    StageRewireAPI.__ResetDependency__("resizeRenderer");
+
+    expect(resizeRenderer).toHaveBeenCalledTimes(0);
   });
 
   it("can be umounted", () => {
