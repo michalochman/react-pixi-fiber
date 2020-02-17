@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.13.2] - 2020-02-17
+
+### Fixed
+- Fixed `Stage` not to resize renderer if app is provided in props ([#174])
+
 
 ## [0.13.1] - 2020-02-13
 
@@ -347,7 +352,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...HEAD
+[0.13.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.3...v0.13.0
 [0.12.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.2...v0.12.3
@@ -390,6 +396,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#174]: https://github.com/michalochman/react-pixi-fiber/pull/174
 [#170]: https://github.com/michalochman/react-pixi-fiber/pull/170
 [#166]: https://github.com/michalochman/react-pixi-fiber/pull/166
 [#165]: https://github.com/michalochman/react-pixi-fiber/pull/165
