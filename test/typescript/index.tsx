@@ -4,6 +4,7 @@ import {
   BitmapText,
   Container,
   Graphics,
+  NineSlicePlane,
   ParticleContainer,
   Sprite,
   Stage,
@@ -150,6 +151,7 @@ const StageClassExample: React.FC = () => {
         <BitmapText text="" />
       </Container>
       <Graphics />
+      <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
       <ParticleContainer autoResize={false}>
         <Sprite texture={PIXI.Texture.WHITE} />
       </ParticleContainer>

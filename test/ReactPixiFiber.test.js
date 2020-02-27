@@ -18,6 +18,9 @@ jest.mock("pixi.js", () => {
       BitmapText: jest.fn(),
       TilingSprite: jest.fn(),
     },
+    mesh: {
+      NineSlicePlane: jest.fn(),
+    },
     particles: {
       ParticleContainer: jest.fn(),
     },
@@ -395,6 +398,24 @@ describe("ReactPixiFiber", () => {
 
       expect(PIXI.Graphics).toHaveBeenCalledTimes(1);
       expect(PIXI.Graphics).toHaveBeenCalledWith();
+    });
+
+    it("returns PIXI.NineSlicePlane if type is NINE_SLICE_PLANE", () => {
+      const texture = "TEXTURE";
+      const leftWidth = 15;
+      const topHeight = 20;
+      const rightWidth = 25;
+      const bottomHeight = 30;
+      ReactPixiFiber.createInstance(TYPES.NINE_SLICE_PLANE, {
+        texture,
+        leftWidth,
+        topHeight,
+        rightWidth,
+        bottomHeight,
+      });
+
+      expect(PIXI.mesh.NineSlicePlane).toHaveBeenCalledTimes(1);
+      expect(PIXI.mesh.NineSlicePlane).toHaveBeenCalledWith(texture, leftWidth, topHeight, rightWidth, bottomHeight);
     });
 
     it("returns PIXI.ParticleContainer if type is PARTICLE_CONTAINER", () => {
