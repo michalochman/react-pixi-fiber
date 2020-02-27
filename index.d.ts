@@ -222,7 +222,7 @@ declare module "react-pixi-fiber" {
   PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>>;
 
   // Used to apply `newProps` to your `DisplayObject`.
-  export type applyProps<T extends PIXI.DisplayObject, P> = (displayObject: T, oldProps: P, newProps: P) => void;
+  export function applyProps<T extends PIXI.DisplayObject, P>(displayObject: T, oldProps: P, newProps: P): void;
 
   /**
    * `PIXI.Application` context.
