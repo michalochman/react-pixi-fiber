@@ -101,6 +101,13 @@ declare module "react-pixi-fiber" {
   export type Graphics = DisplayObjectProps<PIXI.Graphics>;
   export const Graphics: PixiComponent<Graphics>;
 
+  // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
+  // see: http://pixijs.download/dev/docs/PIXI.NineSlicePlane.html
+  export type NineSlicePlane = DisplayObjectProps<
+    PixiTypeFallback<PIXI.mesh.NineSlicePlane, PIXI.NineSlicePlane>
+  >;
+  export const NineSlicePlane: PixiComponent<NineSlicePlane>;
+
   // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
   export type ParticleContainer = DisplayObjectProps<
@@ -215,7 +222,7 @@ declare module "react-pixi-fiber" {
   PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>>;
 
   // Used to apply `newProps` to your `DisplayObject`.
-  export type applyProps<T extends PIXI.DisplayObject, P> = (displayObject: T, oldProps: P, newProps: P) => void;
+  export function applyProps<T extends PIXI.DisplayObject, P>(displayObject: T, oldProps: P, newProps: P): void;
 
   /**
    * `PIXI.Application` context.
