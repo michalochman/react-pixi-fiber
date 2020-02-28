@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added <NineSlicePlane /> component ([#176])
+
+### Fixed
+- Fixed applyProps type definition ([#176])
+
+
 ## [0.13.2] - 2020-02-17
 
 ### Fixed
