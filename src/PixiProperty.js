@@ -3,7 +3,7 @@ import { isInjectedType } from "./inject";
 import { parsePoint } from "./utils";
 
 // A reserved attribute.
-// It is handled by React separately and shouldn't be written to the DOM.
+// It is handled by React separately and shouldn't be written to PIXI tree.
 export const RESERVED = 0;
 
 // A simple string attribute.
@@ -89,7 +89,13 @@ export function getPropertyInfo(name) {
   return properties.hasOwnProperty(name) ? properties[name] : null;
 }
 
-function PropertyInfoRecord(name, type) {
+export function getCustomPropertyInfo(name, type) {
+  return customProperties.hasOwnProperty(type) && customProperties[type].hasOwnProperty(name)
+    ? customProperties[type][name]
+    : null;
+}
+
+export function PropertyInfoRecord(name, type) {
   this.acceptsBooleans = type === BOOLEAN;
   this.propertyName = name;
   this.type = type;
@@ -99,17 +105,12 @@ function PropertyInfoRecord(name, type) {
 // the `possibleStandardNames` module to ensure casing and incorrect
 // name warnings.
 const properties = {};
+export const customProperties = {};
 
 // These props are reserved by React. They shouldn't be written to the DOM.
 ["children", "parent"].forEach(name => {
   properties[name] = new PropertyInfoRecord(name, RESERVED);
 });
-
-// A few React string attributes have a different name.
-// This is a mapping from React prop names to the attribute names.
-// [["className", "class"]].forEach(([name, attributeName]) => {
-//   properties[name] = new PropertyInfoRecord(name, STRING);
-// });
 
 // let otherProps = [
 //   "align",
@@ -134,7 +135,7 @@ const properties = {};
 //   "uvTransform",
 // ];
 
-// These are HTML boolean attributes.
+// These are PIXI boolean attributes.
 [
   "autoResize",
   "buttonMode",
@@ -151,12 +152,12 @@ const properties = {};
   properties[name] = new PropertyInfoRecord(name, BOOLEAN);
 });
 
-// These are HTML attributes that must be positive numbers.
+// These are PIXI attributes that must be positive numbers.
 ["alpha", "fillAlpha", "height", "lineColor", "maxWidth", "resolution", "tint", "width"].forEach(name => {
   properties[name] = new PropertyInfoRecord(name, POSITIVE_NUMERIC);
 });
 
-// These are HTML attributes that must be numbers.
+// These are PIXI attributes that must be numbers.
 ["boundsPadding", "clampMargin", "rotation", "x", "y"].forEach(name => {
   properties[name] = new PropertyInfoRecord(name, NUMERIC);
 });

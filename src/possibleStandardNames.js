@@ -73,13 +73,11 @@ const spriteStandardNames = {
   ...containerStandardNames,
   anchor: "anchor",
   blendmode: "blendMode",
-  height: "height",
   pluginname: "pluginName",
   roundpixels: "roundPixels",
   shader: "shader",
   texture: "texture",
   tint: "tint",
-  width: "width",
 };
 
 // http://pixijs.download/release/docs/PIXI.extras.BitmapText.html

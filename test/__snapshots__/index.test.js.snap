@@ -24,6 +24,7 @@ Object {
   "BitmapText": "BitmapText",
   "Container": "Container",
   "CustomPIXIComponent": [Function],
+  "CustomPIXIProperty": [Function],
   "Graphics": "Graphics",
   "ParticleContainer": "ParticleContainer",
   "Sprite": "Sprite",

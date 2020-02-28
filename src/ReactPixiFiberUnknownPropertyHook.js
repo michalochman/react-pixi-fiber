@@ -1,7 +1,7 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/ReactDOMUnknownPropertyHook.js
 import emptyFunction from "fbjs/lib/emptyFunction";
 import warning from "fbjs/lib/warning";
-import { RESERVED, shouldRemoveAttributeWithWarning, getPropertyInfo } from "./PixiProperty";
+import { RESERVED, getPropertyInfo, getCustomPropertyInfo, shouldRemoveAttributeWithWarning } from "./PixiProperty";
 import { getStackAddendum } from "./ReactGlobalSharedState";
 import { isInjectedType } from "./inject";
 import possibleStandardNames from "./possibleStandardNames";
@@ -45,6 +45,7 @@ if (__DEV__) {
     }
 
     const propertyInfo = getPropertyInfo(name);
+    const customPropertyInfo = getCustomPropertyInfo(name, type);
     const isReserved = propertyInfo !== null && propertyInfo.type === RESERVED;
 
     // Known attributes should match the casing specified in the property config.
@@ -86,6 +87,12 @@ if (__DEV__) {
 
     // Warn when a known attribute is a bad type
     if (shouldRemoveAttributeWithWarning(type, name, value, propertyInfo)) {
+      warnedProperties[name] = true;
+      return false;
+    }
+
+    // Warn when custom property does not pass custom validation
+    if (customPropertyInfo != null && !customPropertyInfo.type(value)) {
       warnedProperties[name] = true;
       return false;
     }

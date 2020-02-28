@@ -2,14 +2,14 @@
 // Drag the rabbits to understand what's going on
 // https://pixijs.io/examples/#/layers/zorder.js
 import React, { Component } from "react";
-import { Container, Stage } from "react-pixi-fiber";
+import { CustomPIXIProperty, Container, Stage } from "react-pixi-fiber";
 import ColoredBunny from "./ColoredBunny";
 import DraggableContainer from "../CustomPIXIComponentExample/DraggableContainer";
 import Layer from "./Layer";
 import LayeredStage from "./LayeredStage";
 import Rect from "../CustomPIXIComponentExample/Rect";
 const PIXI = require("pixi.js");
-window.PIXI = PIXI
+window.PIXI = PIXI;
 require("pixi-layers/dist/pixi-layers.js");
 
 const OPTIONS = {
@@ -17,6 +17,9 @@ const OPTIONS = {
   height: 600,
   width: 800,
 };
+
+// Mark parentGroup prop as legal on Container as long as it's a valid display group
+CustomPIXIProperty(Container, "parentGroup", value => value instanceof PIXI.display.Group);
 
 //META STUFF, groups exist without stage just fine
 
@@ -89,8 +92,8 @@ class CustomComponentExample extends Component {
           <Layer group={dragGroup} />
           <Layer group={shadowGroup} />
           {/* make obsolete containers. Why do we need them?
-            * Just to show that we can do everything without
-            * caring of actual parent container */}
+           * Just to show that we can do everything without
+           * caring of actual parent container */}
           <Container>
             {evenBunnies.map(index => (
               <DraggableContainer

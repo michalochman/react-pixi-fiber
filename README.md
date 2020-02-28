@@ -164,9 +164,54 @@ Renders [`PIXI.extras.BitmapText`].
 
 ### Props
 
-[Similarly](https://reactjs.org/blog/2017/09/08/dom-attributes-in-react-16.html) to ReactDOM in React 16, 
-ReactPixiFiber is not ignoring unknown [`PIXI.DisplayObject`] members – they are all passed through. You can read 
+[Similarly](https://reactjs.org/blog/2017/09/08/dom-attributes-in-react-16.html) to ReactDOM in React 16,
+ReactPixiFiber is not ignoring unknown [`PIXI.DisplayObject`] members – they are all passed through. You can read
 more about [Unknown Prop Warning](https://reactjs.org/warnings/unknown-prop.html) in ReactDOM.
+
+
+#### Custom Props / Plugins
+
+In case you are using PixiJS plugins, such as [`pixi-layers`](https://github.com/pixijs/pixi-layers), ReactPixiFiber can
+recognize these custom props by using the following `CustomPIXIProperty` API:
+
+`CustomPIXIProperty(maybeComponentType, propertyName, validator)` accepts:
+* `maybeComponentType` – a ReactPixiFiber component, an array of ReactPixiFiber components or `undefined`/`null`. Passing `undefined` or `null` will apply custom property to all ReactPixiFiber components.
+* `propertyName` – a name of the custom property as string. ReactPixiFiber will also check that the casing is correct.
+* `validator` – optional function that will be called with value provided and should return `true` if the value is valid, `false` otherwise.
+
+For example:
+
+```js
+import { Container, Sprite } from "react-pixi-fiber";
+
+const group = new PIXI.display.Group(0, true);
+
+// if you just want to get rid of Unknown Prop Warning:
+CustomPIXIProperty(Container, "parentGroup");
+CustomPIXIProperty(undefined, "zIndex");
+
+// if you want to be strict in the values that are provided
+CustomPIXIProperty(Container, "parentGroup", value => value instanceof PIXI.display.Group);
+CustomPIXIProperty([Container, Sprite], "zIndex", value => Number.isFinite(value));
+
+function App() {
+  return (
+    <Container>
+      <Container parentGroup={group}>
+        <Sprite texture={PIXI.Texture.WHITE} x={10} y={10} zIndex={1} />
+        <Sprite texture={PIXI.Texture.WHITE} x={15} y={15} zIndex={2} />
+      </Container>
+      {/* `parentgroup` below will trigger prop warning, as the letter casing is incorrect */}
+      <Container parentgroup={group}>
+        <Sprite texture={PIXI.Texture.WHITE} x={100} y={100} zIndex={1} />
+        {/* `zindex` below will trigger prop warning, as the letter casing is incorrect */}
+        <Sprite texture={PIXI.Texture.WHITE} x={105} y={105} zindex={2} />
+      </Container>
+    </Container>
+  )
+}
+```
+
 
 #### Setting values for Point and ObservablePoint types
 

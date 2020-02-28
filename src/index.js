@@ -1,4 +1,4 @@
-import CustomPIXIComponent from "./CustomPIXIComponent";
+import CustomPIXIComponent, { CustomPIXIProperty } from "./CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage, { createStageClass } from "./Stage";
 import { TYPES } from "./types";
@@ -16,6 +16,7 @@ export {
   AppContext,
   AppProvider,
   CustomPIXIComponent,
+  CustomPIXIProperty,
   Stage,
   applyDisplayObjectProps,
   createStageClass,
