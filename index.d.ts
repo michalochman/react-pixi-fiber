@@ -21,6 +21,18 @@ declare module "react-pixi-fiber" {
   // This is a hack which we use to be able to use these types with types from PixiJS v4 and v5
   type PixiTypeFallback<T, U> = T extends PIXI.DisplayObject ? T : U;
 
+  // Gets the length of an array/tuple type.
+  // see: https://dev.to/kjleitz/comment/gb5d
+  type LengthOfTuple<T extends any[]> = T extends { length: infer L } ? L : never;
+
+  // Drops the first element of a tuple.
+  // see: https://dev.to/kjleitz/comment/gb5d
+  type DropFirstInTuple<T extends any[]> = ((...args: T) => any) extends (arg: any, ...rest: infer U) => any ? U : T;
+
+  // Gets the type of the last element of a tuple.
+  // see: https://dev.to/kjleitz/comment/gb5d
+  type LastInTuple<T extends any[]> = T[LengthOfTuple<DropFirstInTuple<T>>];
+
   /**
    * Points
    */
@@ -103,9 +115,7 @@ declare module "react-pixi-fiber" {
 
   // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.NineSlicePlane.html
-  export type NineSlicePlane = DisplayObjectProps<
-    PixiTypeFallback<PIXI.mesh.NineSlicePlane, PIXI.NineSlicePlane>
-  >;
+  export type NineSlicePlane = DisplayObjectProps<PixiTypeFallback<PIXI.mesh.NineSlicePlane, PIXI.NineSlicePlane>>;
   export const NineSlicePlane: PixiComponent<NineSlicePlane>;
 
   // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
@@ -140,7 +150,8 @@ declare module "react-pixi-fiber" {
   }
   interface StagePropsWithOptions {
     app?: never;
-    options: ConstructorParameters<typeof PIXI.Application>[0];
+    // Take last element of constructor parameters which returns ApplicationOptions for both PixiJS v4 and v5
+    options: LastInTuple<ConstructorParameters<typeof PIXI.Application>>;
   }
 
   // Allow either `app` or `options` passed to `Stage` but not both.
