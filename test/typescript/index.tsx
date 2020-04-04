@@ -8,7 +8,6 @@ import {
   ParticleContainer,
   Sprite,
   Stage,
-  StageClass,
   Text,
   TilingSprite,
   CustomPIXIComponent,
@@ -111,7 +110,7 @@ const RestPropsExample: React.FC<RestPropsExampleProps> = ({
 const StageClassExample: React.FC = () => {
   const Stage = createStageClass();
 
-  const stageRef = React.useRef<StageClass>(null);
+  const stageRef = React.useRef<typeof Stage>(null);
   const spriteRef = React.useRef<PIXI.Sprite>(null);
   const wickedContainerRef = React.useRef<WickedContainerClass>(null);
 
@@ -134,7 +133,7 @@ const StageClassExample: React.FC = () => {
   }, []);
 
   return (
-    <Stage key="stage" options={{ backgroundColor: 0xffffff }} ref={stageRef}>
+    <Stage key="stage" options={{ backgroundColor: 0xffffff }} ref={stageRef} position="0,0" scale={1}>
       <BitmapText
         key="bitmapText1"
         text="Bitmap text 1"
@@ -191,7 +190,7 @@ const StageFunctionExample: React.FC = () => {
   }, []);
 
   return (
-    <Stage key="stage" options={{ backgroundColor: 0xffffff }}>
+    <Stage key="stage" options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
       <BitmapText key="bitmapText" text="" />
       <Container position="10,10">
         <BitmapText text="" />
