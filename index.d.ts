@@ -154,8 +154,13 @@ declare module "react-pixi-fiber" {
     options: LastInTuple<ConstructorParameters<typeof PIXI.Application>>;
   }
 
+  export type StageAsCanvasProps = React.CanvasHTMLAttributes<HTMLCanvasElement>;
+  export type StageAsContainerProps = DisplayObjectProps<PIXI.Container>;
   // Allow either `app` or `options` passed to `Stage` but not both.
-  export type StageProps = (StagePropsWithApp | StagePropsWithOptions) & React.CanvasHTMLAttributes<HTMLCanvasElement>;
+  export type StageProps = Omit<
+    (StagePropsWithApp | StagePropsWithOptions) & StageAsCanvasProps & StageAsContainerProps,
+    "height" | "width"
+  >;
 
   // Type of Stage as class component.
   export type StageClass = React.ComponentType<StageProps & { ref?: React.Ref<React.ReactNode> }> & {
