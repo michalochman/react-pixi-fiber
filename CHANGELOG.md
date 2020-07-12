@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed type compatibility with PixiJS v5.3.0 ([#185])
+
 
 ## [0.14.0] - 2020-04-04
 
@@ -409,6 +412,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#185]: https://github.com/michalochman/react-pixi-fiber/issues/185
 [#182]: https://github.com/michalochman/react-pixi-fiber/pull/182
 [#180]: https://github.com/michalochman/react-pixi-fiber/pull/180
 [#174]: https://github.com/michalochman/react-pixi-fiber/pull/174
