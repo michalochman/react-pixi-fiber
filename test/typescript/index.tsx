@@ -199,7 +199,16 @@ const StageFunctionExample: React.FC = () => {
       <ParticleContainer autoResize={false}>
         <Sprite texture={PIXI.Texture.WHITE} />
       </ParticleContainer>
-      <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
+      <Sprite
+        anchor={anchor}
+        texture={texture}
+        ref={spriteRef}
+        interactive
+        pointerup={(e): void => {
+          console.log(e.type);
+          console.log(e.data);
+        }}
+      />
       <Text />
       <TilingSprite texture={texture} />
       <CompositionExample />
