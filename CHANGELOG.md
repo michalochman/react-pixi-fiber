@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.14.1] - 2020-07-13
+
 ### Fixed
 - Fixed type compatibility with PixiJS v5.3.0 ([#185])
 
@@ -367,7 +370,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.0...v0.13.1
