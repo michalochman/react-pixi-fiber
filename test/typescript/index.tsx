@@ -4,10 +4,10 @@ import {
   BitmapText,
   Container,
   Graphics,
+  NineSlicePlane,
   ParticleContainer,
   Sprite,
   Stage,
-  StageClass,
   Text,
   TilingSprite,
   CustomPIXIComponent,
@@ -110,7 +110,7 @@ const RestPropsExample: React.FC<RestPropsExampleProps> = ({
 const StageClassExample: React.FC = () => {
   const Stage = createStageClass();
 
-  const stageRef = React.useRef<StageClass>(null);
+  const stageRef = React.useRef<typeof Stage>(null);
   const spriteRef = React.useRef<PIXI.Sprite>(null);
   const wickedContainerRef = React.useRef<WickedContainerClass>(null);
 
@@ -133,7 +133,7 @@ const StageClassExample: React.FC = () => {
   }, []);
 
   return (
-    <Stage key="stage" options={{ backgroundColor: 0xffffff }} ref={stageRef}>
+    <Stage key="stage" options={{ backgroundColor: 0xffffff }} ref={stageRef} position="0,0" scale={1}>
       <BitmapText
         key="bitmapText1"
         text="Bitmap text 1"
@@ -150,6 +150,7 @@ const StageClassExample: React.FC = () => {
         <BitmapText text="" />
       </Container>
       <Graphics />
+      <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
       <ParticleContainer autoResize={false}>
         <Sprite texture={PIXI.Texture.WHITE} />
       </ParticleContainer>
@@ -189,7 +190,7 @@ const StageFunctionExample: React.FC = () => {
   }, []);
 
   return (
-    <Stage key="stage" options={{ backgroundColor: 0xffffff }}>
+    <Stage key="stage" options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
       <BitmapText key="bitmapText" text="" />
       <Container position="10,10">
         <BitmapText text="" />
@@ -198,7 +199,16 @@ const StageFunctionExample: React.FC = () => {
       <ParticleContainer autoResize={false}>
         <Sprite texture={PIXI.Texture.WHITE} />
       </ParticleContainer>
-      <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
+      <Sprite
+        anchor={anchor}
+        texture={texture}
+        ref={spriteRef}
+        interactive
+        pointerup={(e): void => {
+          console.log(e.type);
+          console.log(e.data);
+        }}
+      />
       <Text />
       <TilingSprite texture={texture} />
       <CompositionExample />

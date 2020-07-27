@@ -1,7 +1,28 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
 
+
 declare module "react-pixi-fiber" {
+  /**
+   * Compatibility
+   */
+
+  // Returns either real keys of `PIXI.interaction` (if it exists) or generic `string` (if it doesn't exist).
+  // `PIXI.interaction` was removed without deprecation notice in https://github.com/pixijs/pixi.js/pull/6681
+  // shipped in pixi.js@5.3.0. We want to support earlier versions of PixiJS as well so we need this hack for now.
+  // @ts-ignore TS2694
+  type InteractionCompatibility = Exclude<keyof typeof PIXI.interaction, number | symbol>;
+  type InteractionEvent = string extends InteractionCompatibility
+    // @ts-ignore TS2694
+    ? PIXI.InteractionEvent
+    // @ts-ignore TS2694
+    : PIXI.interaction.InteractionEvent;
+  type InteractionEventTypes = string extends InteractionCompatibility
+    // @ts-ignore TS2694
+    ? PIXI.InteractionEventTypes
+    // @ts-ignore TS2694
+    : PIXI.interaction.InteractionEventTypes;
+
   /**
    * Helpers
    */
@@ -20,6 +41,18 @@ declare module "react-pixi-fiber" {
   // Returns `T` when it extends `PIXI.DisplayObject`, otherwise returns `U`.
   // This is a hack which we use to be able to use these types with types from PixiJS v4 and v5
   type PixiTypeFallback<T, U> = T extends PIXI.DisplayObject ? T : U;
+
+  // Gets the length of an array/tuple type.
+  // see: https://dev.to/kjleitz/comment/gb5d
+  type LengthOfTuple<T extends any[]> = T extends { length: infer L } ? L : never;
+
+  // Drops the first element of a tuple.
+  // see: https://dev.to/kjleitz/comment/gb5d
+  type DropFirstInTuple<T extends any[]> = ((...args: T) => any) extends (arg: any, ...rest: infer U) => any ? U : T;
+
+  // Gets the type of the last element of a tuple.
+  // see: https://dev.to/kjleitz/comment/gb5d
+  type LastInTuple<T extends any[]> = T[LengthOfTuple<DropFirstInTuple<T>>];
 
   /**
    * Points
@@ -65,9 +98,7 @@ declare module "react-pixi-fiber" {
    */
 
   // Extra properties to add to allow us to set event handlers using props.
-  export type InteractiveComponent = {
-    [P in PIXI.interaction.InteractionEventTypes]?: (event: PIXI.interaction.InteractionEvent) => void
-  };
+  export type InteractiveComponent = { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
 
   /**
    * Base components
@@ -85,9 +116,21 @@ declare module "react-pixi-fiber" {
 
   // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.BitmapText.html
-  export type BitmapText = DisplayObjectProps<PixiTypeFallback<PIXI.extras.BitmapText, PIXI.BitmapText>> & {
+  export type BitmapText = DisplayObjectProps<
+    PixiTypeFallback<
+      // @ts-ignore TS2694
+      PIXI.extras.BitmapText,
+      PIXI.BitmapText
+    >
+  > & {
     // `style` is not a property on `PIXI.BitmapText`, but is used in constructor
-    style?: ConstructorParameters<PixiTypeFallback<typeof PIXI.extras.BitmapText, typeof PIXI.BitmapText>>[1];
+    style?: ConstructorParameters<
+      PixiTypeFallback<
+        // @ts-ignore TS2694
+        typeof PIXI.extras.BitmapText,
+        typeof PIXI.BitmapText
+      >
+    >[1];
   };
   export const BitmapText: PixiComponent<BitmapText>;
 
@@ -101,10 +144,25 @@ declare module "react-pixi-fiber" {
   export type Graphics = DisplayObjectProps<PIXI.Graphics>;
   export const Graphics: PixiComponent<Graphics>;
 
+  // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
+  // see: http://pixijs.download/dev/docs/PIXI.NineSlicePlane.html
+  export type NineSlicePlane = DisplayObjectProps<
+    PixiTypeFallback<
+      // @ts-ignore TS2694
+      PIXI.mesh.NineSlicePlane,
+      PIXI.NineSlicePlane
+    >
+  >;
+  export const NineSlicePlane: PixiComponent<NineSlicePlane>;
+
   // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
   export type ParticleContainer = DisplayObjectProps<
-    PixiTypeFallback<PIXI.particles.ParticleContainer, PIXI.ParticleContainer>
+    PixiTypeFallback<
+      // @ts-ignore TS2694
+      PIXI.particles.ParticleContainer,
+      PIXI.ParticleContainer
+    >
   >;
   export const ParticleContainer: PixiComponent<ParticleContainer>;
 
@@ -120,7 +178,13 @@ declare module "react-pixi-fiber" {
 
   // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.TilingSprite.html
-  export type TilingSprite = DisplayObjectProps<PixiTypeFallback<PIXI.extras.TilingSprite, PIXI.TilingSprite>>;
+  export type TilingSprite = DisplayObjectProps<
+    PixiTypeFallback<
+      // @ts-ignore TS2694
+      PIXI.extras.TilingSprite,
+      PIXI.TilingSprite
+    >
+  >;
   export const TilingSprite: PixiComponent<TilingSprite>;
 
   /**
@@ -133,11 +197,17 @@ declare module "react-pixi-fiber" {
   }
   interface StagePropsWithOptions {
     app?: never;
-    options: ConstructorParameters<typeof PIXI.Application>[0];
+    // Take last element of constructor parameters which returns ApplicationOptions for both PixiJS v4 and v5
+    options: LastInTuple<ConstructorParameters<typeof PIXI.Application>>;
   }
 
+  export type StageAsCanvasProps = React.CanvasHTMLAttributes<HTMLCanvasElement>;
+  export type StageAsContainerProps = DisplayObjectProps<PIXI.Container>;
   // Allow either `app` or `options` passed to `Stage` but not both.
-  export type StageProps = (StagePropsWithApp | StagePropsWithOptions) & React.CanvasHTMLAttributes<HTMLCanvasElement>;
+  export type StageProps = Omit<
+    (StagePropsWithApp | StagePropsWithOptions) & StageAsCanvasProps & StageAsContainerProps,
+    "height" | "width"
+  >;
 
   // Type of Stage as class component.
   export type StageClass = React.ComponentType<StageProps & { ref?: React.Ref<React.ReactNode> }> & {
@@ -215,12 +285,12 @@ declare module "react-pixi-fiber" {
   PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>>;
 
   // Used to apply `newProps` to your `DisplayObject`.
-  export type applyDisplayObjectProps<T extends PIXI.DisplayObject, P> = (
+  export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(
     type: string,
     displayObject: T,
     oldProps: P,
     newProps: P
-  ) => void;
+  ): void;
 
   /**
    * `PIXI.Application` context.

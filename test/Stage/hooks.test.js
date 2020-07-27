@@ -397,8 +397,7 @@ describe("useStageRerenderer", () => {
     expect(renderStage).toHaveBeenCalledTimes(0);
     expect(rerenderStage).toHaveBeenCalledTimes(1);
     expect(rerenderStage).toHaveBeenCalledWith(app, { app }, { app });
-    expect(resizeRenderer).toHaveBeenCalledTimes(1);
-    expect(resizeRenderer).toHaveBeenCalledWith(app, { app }, { app });
+    expect(resizeRenderer).toHaveBeenCalledTimes(0);
   });
 });
 

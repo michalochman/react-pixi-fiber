@@ -31,6 +31,7 @@ export {
 export const BitmapText = TYPES.BITMAP_TEXT;
 export const Container = TYPES.CONTAINER;
 export const Graphics = TYPES.GRAPHICS;
+export const NineSlicePlane = TYPES.NINE_SLICE_PLANE;
 export const ParticleContainer = TYPES.PARTICLE_CONTAINER;
 export const Sprite = TYPES.SPRITE;
 export const Text = TYPES.TEXT;

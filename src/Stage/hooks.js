@@ -69,8 +69,6 @@ export function useStageRerenderer(props, appRef, canvasRef) {
     if (app instanceof PIXI.Application) {
       // Update stage tree
       rerenderStage(appRef.current, prevProps, props);
-      // Update canvas and renderer dimestions
-      resizeRenderer(appRef.current, prevProps, props);
 
       return;
     }

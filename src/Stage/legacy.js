@@ -126,8 +126,11 @@ export default function createStageClass() {
 
       // Update stage tree
       rerenderStage(app, prevProps, props, this);
+
       // Update canvas and renderer dimestions
-      resizeRenderer(app, prevProps, props);
+      if (!(props.app instanceof PIXI.Application)) {
+        resizeRenderer(app, prevProps, props);
+      }
     }
   }
 

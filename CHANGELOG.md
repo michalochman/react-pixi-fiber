@@ -15,6 +15,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added ReactDOM-like prop validation in development ([#47])
 
 
+## [0.14.1] - 2020-07-13
+
+### Fixed
+- Fixed type compatibility with PixiJS v5.3.0 ([#185])
+
+
+## [0.14.0] - 2020-04-04
+
+### Added
+- Added <NineSlicePlane /> component ([#176])
+
+### Fixed
+- Fixed applyProps type definition ([#176])
+- Fixed `StagePropsWithOptions` type definition to work with both PixiJS v4 and v5 ([#180])
+- Fixed `StageProps` type definition to include `Container` props and exclude width and height ([#182])
+
+
+## [0.13.2] - 2020-02-17
+
+### Fixed
+- Fixed `Stage` not to resize renderer if app is provided in props ([#174])
+
+
 ## [0.13.1] - 2020-02-13
 
 ### Added
@@ -360,7 +383,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 [Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.1...HEAD
-[1.0.0-beta.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...v1.0.0-beta.1
+[1.0.0-beta.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v1.0.0-beta.1
+[0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
+[0.14.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...v0.14.0
+[0.13.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.3...v0.13.0
 [0.12.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.12.2...v0.12.3
@@ -403,6 +429,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#185]: https://github.com/michalochman/react-pixi-fiber/issues/185
+[#182]: https://github.com/michalochman/react-pixi-fiber/pull/182
+[#180]: https://github.com/michalochman/react-pixi-fiber/pull/180
+[#174]: https://github.com/michalochman/react-pixi-fiber/pull/174
 [#170]: https://github.com/michalochman/react-pixi-fiber/pull/170
 [#166]: https://github.com/michalochman/react-pixi-fiber/pull/166
 [#165]: https://github.com/michalochman/react-pixi-fiber/pull/165

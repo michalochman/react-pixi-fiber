@@ -40,6 +40,25 @@ export function createInstance(type, props, internalInstanceHandle) {
     case TYPES.GRAPHICS:
       instance = new PIXI.Graphics();
       break;
+    case TYPES.NINE_SLICE_PLANE:
+      try {
+        instance = new PIXI.mesh.NineSlicePlane(
+          props.texture,
+          props.leftWidth,
+          props.topHeight,
+          props.rightWidth,
+          props.bottomHeight
+        );
+      } catch (e) {
+        instance = new PIXI.NineSlicePlane(
+          props.texture,
+          props.leftWidth,
+          props.topHeight,
+          props.rightWidth,
+          props.bottomHeight
+        );
+      }
+      break;
     case TYPES.PARTICLE_CONTAINER:
       try {
         instance = new PIXI.particles.ParticleContainer(

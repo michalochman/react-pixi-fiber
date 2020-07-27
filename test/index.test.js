@@ -36,6 +36,7 @@ describe("ReactPixiFiber public API", () => {
     expect(ReactPixiFiber.BitmapText).toEqual(TYPES.BITMAP_TEXT);
     expect(ReactPixiFiber.Container).toEqual(TYPES.CONTAINER);
     expect(ReactPixiFiber.Graphics).toEqual(TYPES.GRAPHICS);
+    expect(ReactPixiFiber.NineSlicePlane).toEqual(TYPES.NINE_SLICE_PLANE);
     expect(ReactPixiFiber.ParticleContainer).toEqual(TYPES.PARTICLE_CONTAINER);
     expect(ReactPixiFiber.Sprite).toEqual(TYPES.SPRITE);
     expect(ReactPixiFiber.Stage).toEqual(Stage);

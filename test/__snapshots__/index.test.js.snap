@@ -26,6 +26,7 @@ Object {
   "CustomPIXIComponent": [Function],
   "CustomPIXIProperty": [Function],
   "Graphics": "Graphics",
+  "NineSlicePlane": "NineSlicePlane",
   "ParticleContainer": "ParticleContainer",
   "Sprite": "Sprite",
   "Stage": [Function],

@@ -162,6 +162,10 @@ Renders [`PIXI.Text`].
 
 Renders [`PIXI.extras.BitmapText`].
 
+#### `<NineSlicePlane />`
+
+Renders [`PIXI.NineSlicePlane`].
+
 ### Props
 
 [Similarly](https://reactjs.org/blog/2017/09/08/dom-attributes-in-react-16.html) to ReactDOM in React 16,
@@ -563,6 +567,7 @@ For making an awesome project structure and documentation that is used in simila
 [`PIXI.extras.BitmapText`]: http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
 [`PIXI.extras.TilingSprite`]: http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
 [`PIXI.Graphics`]: http://pixijs.download/release/docs/PIXI.Graphics.html
+[`PIXI.NineSlicePlane`]: http://pixijs.download/release/docs/PIXI.NineSlicePlane.html
 [`PIXI.ObservablePoint`]: http://pixijs.download/release/docs/PIXI.ObservablePoint.html
 [`PIXI.particles.ParticleContainer`]: http://pixijs.download/release/docs/PIXI.particles.ParticleContainer.html
 [`PIXI.Point`]: http://pixijs.download/release/docs/PIXI.Point.html

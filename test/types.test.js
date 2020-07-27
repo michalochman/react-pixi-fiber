@@ -6,6 +6,7 @@ describe("TYPES", () => {
       BITMAP_TEXT: "BitmapText",
       CONTAINER: "Container",
       GRAPHICS: "Graphics",
+      NINE_SLICE_PLANE: "NineSlicePlane",
       PARTICLE_CONTAINER: "ParticleContainer",
       SPRITE: "Sprite",
       TEXT: "Text",
