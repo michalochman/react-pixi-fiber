@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Updated build dependencies
+- Updated dev dependencies
 
 ### Removed
 - Removed `performance-now` dependency

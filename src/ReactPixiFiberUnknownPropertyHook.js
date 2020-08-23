@@ -13,7 +13,7 @@ if (__DEV__) {
   const hasOwnProperty = Object.prototype.hasOwnProperty;
   const EVENT_NAME_REGEX = /^on./;
 
-  validateProperty = function(type, name, value) {
+  validateProperty = function (type, name, value) {
     if (hasOwnProperty.call(warnedProperties, name) && warnedProperties[name]) {
       return true;
     }
@@ -103,7 +103,7 @@ if (__DEV__) {
 
 export { validateProperty };
 
-export const warnUnknownProperties = function(type, props) {
+export const warnUnknownProperties = function (type, props) {
   const unknownProps = [];
   for (const key in props) {
     const isValid = validateProperty(type, key, props[key]);

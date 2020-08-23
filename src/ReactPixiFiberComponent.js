@@ -10,7 +10,7 @@ import { validateProperties as validateUnknownProperties } from "./ReactPixiFibe
 let validatePropertiesInDevelopment;
 
 if (__DEV__) {
-  validatePropertiesInDevelopment = function(type, props) {
+  validatePropertiesInDevelopment = function (type, props) {
     validateUnknownProperties(type, props);
   };
 }
