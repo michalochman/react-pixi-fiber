@@ -1,5 +1,4 @@
 import React from "react";
-import pkg from "../package.json";
 import { Container, Text } from "../src/index";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 import { createRender, createUnmount, getDevToolsVersion, roots } from "../src/render";

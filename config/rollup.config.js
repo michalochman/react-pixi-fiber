@@ -1,10 +1,8 @@
 const pkg = require("../package.json");
-const json = require("rollup-plugin-json");
-const babel = require("rollup-plugin-babel");
-const commonjs = require("rollup-plugin-commonjs");
-const globals = require("rollup-plugin-node-globals");
-const replace = require("rollup-plugin-replace");
-const resolve = require("rollup-plugin-node-resolve");
+const { babel } = require("@rollup/plugin-babel");
+const commonjs = require("@rollup/plugin-commonjs");
+const replace = require("@rollup/plugin-replace");
+const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
 const visualizer = require("rollup-plugin-visualizer");
 
@@ -17,14 +15,8 @@ const getOutputFile = (name, format = "cjs") => {
 };
 
 const getPlugins = entry => [
-  json({
-    preferConst: true,
-    indent: "  ",
-  }),
-  resolve({
-    browser: true,
-    jsnext: true,
-    main: true,
+  nodeResolve({
+    mainFields: ["module", "jsnext:main", "main"],
   }),
   babel({
     exclude: "node_modules/**",
@@ -34,19 +26,7 @@ const getPlugins = entry => [
     __PACKAGE_NAME__: JSON.stringify(pkg.name),
     "process.env.NODE_ENV": isProduction ? JSON.stringify("production") : JSON.stringify("development"),
   }),
-  commonjs({
-    ignoreGlobal: false,
-    include: [
-      "node_modules/fbjs/**",
-      "node_modules/object-assign/**",
-      "node_modules/prop-types/**",
-      "node_modules/react/**",
-      "node_modules/react-dom/**",
-      "node_modules/react-reconciler/**",
-      "node_modules/scheduler/**",
-    ],
-  }),
-  globals(),
+  commonjs(),
   isProduction && terser(),
   visualizer({
     filename: `./stats.${entry}.${isProduction ? "production" : "development"}.html`,
@@ -88,7 +68,7 @@ export default [
         "react-dom": "ReactDOM",
         "prop-types": "PropTypes",
         "pixi.js": "PIXI",
-        "scheduler": "Scheduler",
+        scheduler: "Scheduler",
       },
     },
     plugins: getPlugins("index"),
@@ -107,7 +87,7 @@ export default [
         "prop-types": "PropTypes",
         "pixi.js": "PIXI",
         "react-pixi-fiber": "ReactPixiFiber",
-        "scheduler": "Scheduler",
+        scheduler: "Scheduler",
       },
     },
     plugins: getPlugins("alias"),

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Updated build dependencies
+
 ### Removed
 - Removed `performance-now` dependency
 
