@@ -2,6 +2,7 @@
 node_modules
 *~
 cjs/
+es/
 umd/
 coverage/
 .module-cache

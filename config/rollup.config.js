@@ -9,9 +9,9 @@ const visualizer = require("rollup-plugin-visualizer");
 const NODE_ENV = process.env.NODE_ENV || "production";
 const isProduction = NODE_ENV === "production";
 
-const getOutputFile = (name, format = "cjs") => {
+const getOutputFile = (entry, format) => {
   const suffix = isProduction ? "production.min" : "development";
-  return `${format}/${name}.${suffix}.js`;
+  return `${format}/${entry}.${suffix}.js`;
 };
 
 const getPlugins = entry => [
@@ -33,64 +33,46 @@ const getPlugins = entry => [
   }),
 ];
 
+const getExternal = entry => {
+  return {
+    "react-pixi-alias": ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber", "scheduler"],
+    "react-pixi-fiber": ["pixi.js", "prop-types", "react", "react-dom", "scheduler"],
+  }[entry];
+};
+
+const getInput = entry => {
+  return {
+    "react-pixi-alias": "src/react-pixi-alias/index.js",
+    "react-pixi-fiber": "src/index.js",
+  }[entry];
+};
+
+const getConfig = (entry, format) => ({
+  input: getInput(entry),
+  output: {
+    file: getOutputFile(entry, format),
+    name: "ReactPixiFiber",
+    exports: "named",
+    format: format,
+    globals: {
+      react: "React",
+      "react-dom": "ReactDOM",
+      "prop-types": "PropTypes",
+      "pixi.js": "PIXI",
+      "react-pixi-fiber": "ReactPixiFiber",
+      scheduler: "Scheduler",
+    },
+    sourcemap: isProduction,
+  },
+  plugins: getPlugins(entry),
+  external: getExternal(entry),
+});
+
 export default [
-  {
-    input: "src/index.js",
-    output: {
-      file: getOutputFile("react-pixi-fiber"),
-      name: "ReactPixiFiber",
-      exports: "named",
-      format: "cjs",
-    },
-    plugins: getPlugins("index"),
-    external: ["pixi.js", "prop-types", "react", "react-dom", "scheduler"],
-  },
-  {
-    input: "src/react-pixi-alias/index.js",
-    output: {
-      file: getOutputFile("react-pixi-alias"),
-      name: "ReactPixiFiber",
-      exports: "named",
-      format: "cjs",
-    },
-    plugins: getPlugins("alias"),
-    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber", "scheduler"],
-  },
-  {
-    input: "src/index.js",
-    output: {
-      file: getOutputFile("react-pixi-fiber", "umd"),
-      name: "ReactPixiFiber",
-      exports: "named",
-      format: "umd",
-      globals: {
-        react: "React",
-        "react-dom": "ReactDOM",
-        "prop-types": "PropTypes",
-        "pixi.js": "PIXI",
-        scheduler: "Scheduler",
-      },
-    },
-    plugins: getPlugins("index"),
-    external: ["pixi.js", "prop-types", "react", "react-dom", "scheduler"],
-  },
-  {
-    input: "src/react-pixi-alias/index.js",
-    output: {
-      file: getOutputFile("react-pixi-alias", "umd"),
-      name: "ReactPixiFiber",
-      exports: "named",
-      format: "umd",
-      globals: {
-        react: "React",
-        "react-dom": "ReactDOM",
-        "prop-types": "PropTypes",
-        "pixi.js": "PIXI",
-        "react-pixi-fiber": "ReactPixiFiber",
-        scheduler: "Scheduler",
-      },
-    },
-    plugins: getPlugins("alias"),
-    external: ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber", "scheduler"],
-  },
+  getConfig("react-pixi-fiber", "cjs"),
+  getConfig("react-pixi-alias", "cjs"),
+  getConfig("react-pixi-fiber", "es"),
+  getConfig("react-pixi-alias", "es"),
+  getConfig("react-pixi-fiber", "umd"),
+  getConfig("react-pixi-alias", "umd"),
 ];

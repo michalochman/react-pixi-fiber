@@ -3,6 +3,9 @@
   "version": "1.0.0-beta.2",
   "description": "React Fiber renderer for PixiJS",
   "main": "index.js",
+  "umd:main": "index.umd.js",
+  "module": "index.es.js",
+  "jsnext:main": "index.es.js",
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": "github:michalochman/react-pixi-fiber",
@@ -17,6 +20,7 @@
     "umd/",
     "src/"
   ],
+  "sideEffects": false,
   "dependencies": {
     "fbjs": "^2.0.0",
     "react-reconciler": "^0.21.0",

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Add ES format output
+
 ### Changed
 - Updated build dependencies
 - Updated dev dependencies
