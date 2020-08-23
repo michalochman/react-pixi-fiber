@@ -39,7 +39,6 @@ const getPlugins = entry => [
     include: [
       "node_modules/fbjs/**",
       "node_modules/object-assign/**",
-      "node_modules/performance-now/**",
       "node_modules/prop-types/**",
       "node_modules/react/**",
       "node_modules/react-dom/**",
