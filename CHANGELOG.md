@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated build dependencies
 - Updated dev dependencies
 
+### Fixed
+- Fixed type of `oldProps` sent to `customApplyProps` of `CustomPIXIComponent`
+
 ### Removed
 - Removed `performance-now` dependency
 

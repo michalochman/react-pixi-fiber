@@ -247,7 +247,7 @@ declare module "react-pixi-fiber" {
   // Used to apply `newProps` to your `CustomPIXIComponent` in a custom way.
   export type CustomDisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
     displayObject: T,
-    oldProps: P,
+    oldProps: P | undefined,
     newProps: P
   ) => void;
 
