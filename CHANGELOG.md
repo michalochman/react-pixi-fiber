@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.0.0-beta.3] - 2020-08-23
+## [1.0.0-beta.4] - 2020-08-27
 
 ### Added
 - Added ReactDOM-like prop validation in development ([#47])
@@ -393,8 +393,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.3...HEAD
-[1.0.0-beta.3]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v1.0.0-beta.3
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.4...HEAD
+[1.0.0-beta.4]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v1.0.0-beta.4
 [0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...v0.13.2
