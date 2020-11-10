@@ -443,6 +443,82 @@ render(
 
 ## Caveats
 
+### React Context API limitations
+
+Because of a [React limitation preventing context to pass through renderers](https://github.com/facebook/react/issues/13336), new React Context API (react >= 16.3.0) cannot be used inside Stage inner components. Even if you're not using this feature directly, some of your dependencies may use it (react-redux, material-ui, ...).
+
+A workaround would be to "make a bridge" between default renderer and react-pixi-fiber one. For example:
+```jsx harmony
+// use example
+export const App = () => {
+
+  return (
+    <GameTitleContext.Provider value={'game title'}>
+      <GameTitleContext.Consumer>
+        {title => <h1>{title}</h1>}
+      <GameTitleContext.Consumer>
+      
+      <ContextBridge
+        contexts={[
+          GameTitleContext,
+          ReactReduxContext,
+          OtherContext,
+        ]}
+        barrierRender={children => (
+          <Stage options={{ height: 600, width: 800 }}>
+            {children}
+          </Stage>
+        )}
+      >
+        <Container>
+          <GameTitleContext.Consumer>
+            {title => <Text text={title} />}
+          </GameTitleContext.Consumer>
+        </Container>
+      </ContextBridge>
+    </GameTitleContext.Provider>
+  );
+};
+```
+
+```jsx harmony
+// context-bridge component
+
+/*
+ * type ContextBridgeProps = {
+ *    contexts: React.Context<any>[];
+ *    barrierRender: (children: React.ReactElement | null) => React.ReactElement | null;
+ *    children: React.ReactNode;
+ * };
+ */
+
+export const ContextBridge = ({ barrierRender, contexts, children }) => {
+
+    const providers = values => {
+
+        const getValue = i => values[ values.length - 1 - i ];
+
+        return <>
+          {contexts.reduce((innerProviders, Context, i) => (
+            <Context.Provider value={getValue(i)}>
+                {innerProviders}
+            </Context.Provider>
+          ), children)}
+        </>;
+    };
+
+    const consumers = contexts.reduce((getChildren, Context) => (
+        values => <Context.Consumer>
+            {value => getChildren([ ...values, value ])}
+        </Context.Consumer>
+    ), values => barrierRender(providers(values)));
+
+    return consumers([]);
+};
+```
+
+More infos & workarounds: [#93](https://github.com/michalochman/react-pixi-fiber/issues/93) [#84 (comment)](https://github.com/michalochman/react-pixi-fiber/pull/84#issuecomment-437581875)
+
 
 ## FAQ
 
