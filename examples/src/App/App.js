@@ -16,6 +16,7 @@ import HooksExample from "../HooksExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
 import SmokeTest from "../SmokeTest";
+import SuspenseExample from "../SuspenseExample";
 import Stats from "../Stats";
 
 const examples = [
@@ -73,6 +74,11 @@ const examples = [
     name: "Point-like props",
     slug: "points",
     component: PointsExample,
+  },
+  {
+    name: "Suspense",
+    slug: "suspense",
+    component: SuspenseExample,
   },
   {
     name: "unstable_batchedUpdates",
