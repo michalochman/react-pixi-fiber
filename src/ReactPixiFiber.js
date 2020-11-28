@@ -104,6 +104,22 @@ export function commitMount(instance, type, newProps) {
   // Noop
 }
 
+export function hideInstance(instance) {
+  instance.visible = false;
+}
+
+export function unhideInstance(instance, props) {
+  instance.visible = typeof props.visible !== "undefined" ? props.visible : true;
+}
+
+export function hideTextInstance(instance) {
+  // Noop
+}
+
+export function unhideTextInstance(instance, props) {
+  // Noop
+}
+
 export const supportsMutation = true;
 
 const hostConfig = {
@@ -120,6 +136,8 @@ const hostConfig = {
   getChildHostContext: getChildHostContext,
   getRootHostContext: getRootHostContext,
   getPublicInstance: getPublicInstance,
+  hideInstance: hideInstance,
+  hideTextInstance: hideTextInstance,
   insertBefore: insertBefore,
   insertInContainerBefore: insertBefore,
   now: now,
@@ -134,6 +152,8 @@ const hostConfig = {
   shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
   shouldSetTextContent: shouldSetTextContent,
   supportsMutation: supportsMutation,
+  unhideInstance: unhideInstance,
+  unhideTextInstance: unhideTextInstance,
 };
 
 // React Pixi Fiber renderer is primary if used without React DOM
