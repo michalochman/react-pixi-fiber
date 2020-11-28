@@ -16,6 +16,7 @@ import HooksExample from "../HooksExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
 import BatchedUpdatesExample from "../BatchedUpdatesExample";
+import SuspenseExample from "../SuspenseExample";
 import Stats from "../Stats";
 
 const examples = [
@@ -80,10 +81,15 @@ const examples = [
     component: PointsExample,
   },
   {
+    name: "Suspense",
+    slug: "suspense",
+    component: SuspenseExample,
+  },
+  {
     name: "unstable_batchedUpdates",
     slug: "unstable_batchedUpdates",
     component: BatchedUpdatesExample,
-  }
+  },
 ];
 
 class App extends Component {
