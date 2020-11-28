@@ -33,7 +33,7 @@ const AnimatedSprite = CustomPIXIComponent<PIXI.AnimatedSprite, AnimatedSpritePr
     customApplyProps: (instance, oldProps, newProps) => {
       console.log(instance.animationSpeed);
       console.log(instance.textures);
-      console.log(oldProps.textures);
+      console.log(oldProps?.textures);
       console.log(newProps.textures);
     },
     customDidAttach: instance => {
@@ -76,7 +76,7 @@ const WickedContainer = CustomPIXIComponent<WickedContainerClass, WickedContaine
     customApplyProps: (instance, oldProps, newProps) => {
       console.log(instance.children);
       console.log(instance.isWicked);
-      console.log(oldProps.isJungleMassive);
+      console.log(oldProps?.isJungleMassive);
     },
     customDidAttach: instance => {
       console.log(instance.isWicked);
