@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.14.2] - 2020-11-28
+
 ### Fixed
 - Fixed compatibility with React 17 and React.Suspense ([#196])
 
@@ -373,7 +376,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.2...HEAD
+[0.14.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.1...v0.13.2
@@ -419,6 +423,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#196]: https://github.com/michalochman/react-pixi-fiber/issues/196
 [#185]: https://github.com/michalochman/react-pixi-fiber/issues/185
 [#182]: https://github.com/michalochman/react-pixi-fiber/pull/182
 [#180]: https://github.com/michalochman/react-pixi-fiber/pull/180
