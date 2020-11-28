@@ -6,7 +6,7 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![gitter](https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg)](https://gitter.im/react-pixi-fiber/Lobby)
 
-ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16.
+ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16 and React 17.
 
 For React <16.0.0 see [`react-pixi`].
 
