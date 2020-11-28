@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed compatibility with React 17 and React.Suspense ([#196])
+
 
 ## [0.14.1] - 2020-07-13
 
