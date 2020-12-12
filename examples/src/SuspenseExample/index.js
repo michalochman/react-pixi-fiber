@@ -5,6 +5,8 @@ import * as PIXI from "pixi.js";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
+  height: 600,
+  width: 800,
 };
 
 const spriteSheet = createAsset(() => import("./bunnys.png"), Infinity);
@@ -18,7 +20,7 @@ function SpriteRenderer() {
 class SuspenseExample extends Component {
   render() {
     return (
-      <Stage width={800} height={600} options={OPTIONS}>
+      <Stage options={OPTIONS}>
         <Container>
           <React.Suspense fallback={null}>
             <SpriteRenderer />
