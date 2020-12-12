@@ -7,7 +7,14 @@ export function injectType(type, behavior) {
   return type;
 }
 
-export function createInjectedTypeInstance(type, props, internalInstanceHandle, applyDisplayObjectProps) {
+export function createInjectedTypeInstance(
+  type,
+  props,
+  rootContainer,
+  hostContext,
+  internalHandle,
+  applyDisplayObjectProps
+) {
   let instance;
 
   if (type in INJECTED_TYPES) {

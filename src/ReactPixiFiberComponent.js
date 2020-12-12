@@ -15,7 +15,7 @@ if (__DEV__) {
   };
 }
 
-export function createInstance(type, props, internalInstanceHandle) {
+export function createInstance(type, props, rootContainer, hostContext, internalHandle) {
   let instance;
 
   switch (type) {
@@ -85,7 +85,14 @@ export function createInstance(type, props, internalInstanceHandle) {
       }
       break;
     default:
-      instance = createInjectedTypeInstance(type, props, internalInstanceHandle, applyDisplayObjectProps);
+      instance = createInjectedTypeInstance(
+        type,
+        props,
+        rootContainer,
+        hostContext,
+        internalHandle,
+        applyDisplayObjectProps
+      );
       break;
   }
 
@@ -94,11 +101,11 @@ export function createInstance(type, props, internalInstanceHandle) {
   return instance;
 }
 
-export function setInitialCustomComponentProperties(type, instance, rawProps, rootContainerElement) {
+export function setInitialCustomComponentProperties(type, instance, rawProps, rootContainer, hostContext) {
   instance._customApplyProps(instance, undefined, rawProps);
 }
 
-export function setInitialPixiProperties(type, instance, rawProps, rootContainerElement) {
+export function setInitialPixiProperties(type, instance, rawProps, rootContainer, hostContext) {
   for (const propKey in rawProps) {
     if (!rawProps.hasOwnProperty(propKey)) {
       continue;
@@ -112,10 +119,10 @@ export function setInitialPixiProperties(type, instance, rawProps, rootContainer
   }
 }
 
-export function setInitialProperties(type, instance, rawProps, rootContainerElement) {
+export function setInitialProperties(type, instance, rawProps, rootContainer, hostContext) {
   // injected types with customApplyProps need to have full control over passed props
   if (isInjectedType(type) && typeof instance._customApplyProps === "function") {
-    setInitialCustomComponentProperties(type, instance, rawProps, rootContainerElement);
+    setInitialCustomComponentProperties(type, instance, rawProps, rootContainer, hostContext);
     return;
   }
 
@@ -123,12 +130,12 @@ export function setInitialProperties(type, instance, rawProps, rootContainerElem
     validatePropertiesInDevelopment(type, rawProps);
   }
 
-  setInitialPixiProperties(type, instance, rawProps, rootContainerElement);
+  setInitialPixiProperties(type, instance, rawProps, rootContainer, hostContext);
 }
 
 // Calculate the diff between the two objects.
 // See: https://github.com/facebook/react/blob/97e2911/packages/react-dom/src/client/ReactDOMFiberComponent.js#L546
-export function diffProperties(type, instance, lastRawProps, nextRawProps, rootContainerElement) {
+export function diffProperties(type, instance, lastRawProps, nextRawProps) {
   if (__DEV__) {
     validatePropertiesInDevelopment(type, nextRawProps);
   }
@@ -175,25 +182,11 @@ export function applyDisplayObjectProps(type, instance, oldProps, newProps) {
   }
 }
 
-export function updateCustomComponentProperties(
-  type,
-  instance,
-  updatePayload,
-  lastRawProps,
-  nextRawProps,
-  internalInstanceHandle
-) {
-  instance._customApplyProps(instance, lastRawProps, nextRawProps);
+export function updateCustomComponentProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle) {
+  instance._customApplyProps(instance, prevProps, nextProps);
 }
 
-export function updatePixiProperties(
-  type,
-  instance,
-  updatePayload,
-  lastRawProps,
-  nextRawProps,
-  internalInstanceHandle
-) {
+export function updatePixiProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle) {
   for (let i = 0; i < updatePayload.length; i += 2) {
     const propKey = updatePayload[i];
     const propValue = updatePayload[i + 1];
@@ -206,12 +199,12 @@ export function updatePixiProperties(
 }
 
 // Apply the diff.
-export function updateProperties(type, instance, updatePayload, lastRawProps, nextRawProps, internalInstanceHandle) {
+export function updateProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle) {
   // injected types with customApplyProps need to have full control over passed props
   if (isInjectedType(type) && typeof instance._customApplyProps === "function") {
-    updateCustomComponentProperties(type, instance, updatePayload, lastRawProps, nextRawProps, internalInstanceHandle);
+    updateCustomComponentProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
     return;
   }
 
-  updatePixiProperties(type, instance, updatePayload, lastRawProps, nextRawProps, internalInstanceHandle);
+  updatePixiProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
 }

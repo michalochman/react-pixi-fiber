@@ -170,7 +170,9 @@ describe("useStageRenderer", () => {
     const instance = renderer.create(<TestContainer options={options} />);
 
     // trigger useEffect cleanup
-    instance.unmount();
+    renderer.act(() => {
+      instance.unmount();
+    });
 
     expect(cleanupStage).toHaveBeenCalledTimes(1);
     expect(cleanupStage).toHaveBeenCalledWith(app, STAGE_OPTIONS_UNMOUNT);
@@ -193,7 +195,9 @@ describe("useStageRenderer", () => {
     const instance = renderer.create(<TestContainer app={app} />);
 
     // trigger useEffect cleanup
-    instance.unmount();
+    renderer.act(() => {
+      instance.unmount();
+    });
     app.destroy(true, true);
 
     expect(cleanupStage).toHaveBeenCalledTimes(0);

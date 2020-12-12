@@ -10,6 +10,8 @@ import { createInstance, setInitialProperties, diffProperties, updateProperties 
 
 /* PixiJS Renderer */
 
+const noTimeout = -1;
+
 export function appendChild(parentInstance, child) {
   // TODO do we need to remove the child first if it's already added?
   parentInstance.removeChild(child);
@@ -43,45 +45,53 @@ export function insertBefore(parentInstance, child, beforeChild) {
   parentInstance.addChildAt(child, index);
 }
 
-export function commitUpdate(instance, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
-  updateProperties(type, instance, updatePayload, oldProps, newProps, internalInstanceHandle);
+export function commitUpdate(instance, updatePayload, type, prevProps, nextProps, internalHandle) {
+  updateProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
 }
 
-export function createTextInstance(text, rootContainerInstance, internalInstanceHandle) {
+export function createTextInstance(text, rootContainer, hostContext, internalHandle) {
   invariant(false, "ReactPixiFiber does not support text instances. Use `Text` component instead.");
 }
 
-export function finalizeInitialChildren(instance, type, props, rootContainerInstance) {
-  setInitialProperties(type, instance, props, rootContainerInstance);
+export function finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
+  setInitialProperties(type, instance, props, rootContainer, hostContext);
   return false;
 }
 
-export function getChildHostContext(parentHostContext, type) {
+export function getChildHostContext(parentHostContext, type, rootContainer) {
+  return parentHostContext;
+}
+
+export function getRootHostContext(rootContainer) {
   return emptyObject;
 }
 
-export function getRootHostContext(rootContainerInstance) {
-  return emptyObject;
+export function getPublicInstance(instance) {
+  return instance;
 }
 
-export function getPublicInstance(inst) {
-  return inst;
+export function prepareForCommit(containerInfo) {
+  return null;
 }
 
-export function prepareForCommit() {
+export function preparePortalMount(containerInfo) {
   // Noop
 }
 
-export function prepareUpdate(instance, type, oldProps, newProps, rootContainerInstance, hostContext) {
-  return diffProperties(type, instance, oldProps, newProps, rootContainerInstance);
+export function prepareUpdate(instance, type, oldProps, newProps, rootContainer, hostContext) {
+  return diffProperties(type, instance, oldProps, newProps);
 }
 
-export function resetAfterCommit() {
+export function resetAfterCommit(containerInfo) {
   // Noop
 }
 
 export function resetTextContent(instance) {
   // Noop
+}
+
+export function scheduleTimeout(fn, delay) {
+  setTimeout(fn, delay);
 }
 
 export function shouldDeprioritizeSubtree(type, props) {
@@ -96,11 +106,19 @@ export function shouldSetTextContent(type, props) {
   return false;
 }
 
-export function commitTextUpdate(textInstance, oldText, newText) {
+export function commitTextUpdate(textInstance, prevText, nextText) {
   // Noop
 }
 
-export function commitMount(instance, type, newProps) {
+export function cancelTimeout(id) {
+  clearTimeout(id);
+}
+
+export function clearContainer(container) {
+  container.removeChildren();
+}
+
+export function commitMount(instance, type, props, internalHandle) {
   // Noop
 }
 
@@ -126,7 +144,8 @@ const hostConfig = {
   appendChild: appendChild,
   appendChildToContainer: appendChild,
   appendInitialChild: appendChild,
-  cancelPassiveEffects: cancelDeferredCallback,
+  cancelTimeout: cancelTimeout,
+  clearContainer: clearContainer,
   commitMount: commitMount,
   commitTextUpdate: commitTextUpdate,
   commitUpdate: commitUpdate,
@@ -140,20 +159,26 @@ const hostConfig = {
   hideTextInstance: hideTextInstance,
   insertBefore: insertBefore,
   insertInContainerBefore: insertBefore,
+  noTimeout: noTimeout,
   now: now,
   prepareForCommit: prepareForCommit,
+  preparePortalMount: preparePortalMount,
   prepareUpdate: prepareUpdate,
   removeChild: removeChild,
   removeChildFromContainer: removeChild,
   resetAfterCommit: resetAfterCommit,
   resetTextContent: resetTextContent,
-  scheduleDeferredCallback: scheduleDeferredCallback,
-  schedulePassiveEffects: scheduleDeferredCallback,
-  shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
+  scheduleTimeout: scheduleTimeout,
   shouldSetTextContent: shouldSetTextContent,
   supportsMutation: supportsMutation,
   unhideInstance: unhideInstance,
   unhideTextInstance: unhideTextInstance,
+  // needed before https://github.com/facebook/react/pull/14984
+  cancelPassiveEffects: cancelDeferredCallback,
+  scheduleDeferredCallback: scheduleDeferredCallback,
+  schedulePassiveEffects: scheduleDeferredCallback,
+  // needed before https://github.com/facebook/react/pull/19124
+  shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
 };
 
 // React Pixi Fiber renderer is primary if used without React DOM

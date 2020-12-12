@@ -81,7 +81,9 @@ describe("usePixiTicker", () => {
 
     // trigger useEffect cleanup because that's when usePixiTicker
     // calls `app.ticker.remove`
-    tree.unmount();
+    renderer.act(() => {
+      tree.unmount();
+    });
 
     expect(remove).toHaveBeenCalledWith(fn);
   });

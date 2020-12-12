@@ -149,7 +149,8 @@ describe("ReactPixiFiber", () => {
     const instance = {};
     const type = "type";
     const rawProps = { position: "0,0" };
-    const rootContainerElement = {};
+    const rootContainer = {};
+    const hostContext = {};
     const isInjectedType = jest.fn();
     const setInitialCustomComponentProperties = jest.fn();
     const setInitialPixiProperties = jest.fn();
@@ -183,34 +184,40 @@ describe("ReactPixiFiber", () => {
         _customApplyProps: jest.fn(),
       };
       isInjectedType.mockImplementation(() => true);
-      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainerElement);
+      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setInitialPixiProperties).toHaveBeenCalledTimes(0);
       expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialCustomComponentProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainerElement);
+      expect(setInitialCustomComponentProperties).toHaveBeenCalledWith(
+        type,
+        instance,
+        rawProps,
+        rootContainer,
+        hostContext
+      );
     });
 
     it("calls setInitialPixiProperties for injected types without _customApplyProps defined", () => {
       isInjectedType.mockImplementation(() => true);
-      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainerElement);
+      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(0);
       expect(setInitialPixiProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainerElement);
+      expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainer, hostContext);
     });
 
     it("calls setInitialPixiProperties for regular types", () => {
       isInjectedType.mockImplementation(() => false);
-      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainerElement);
+      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(0);
       expect(setInitialPixiProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainerElement);
+      expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainer, hostContext);
     });
 
     it("validates properties for regular types in development", () => {
       isInjectedType.mockImplementation(() => false);
-      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainerElement);
+      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       if (__DEV__) {
         expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);

@@ -1,4 +1,3 @@
-import { injectType } from "../src/ReactPixiFiber";
 import { INJECTED_TYPES, createInjectedTypeInstance, isInjectedType } from "../src/inject";
 
 jest.mock("../src/ReactPixiFiber");
@@ -85,7 +84,7 @@ describe("inject", () => {
       const applyDisplayObjectProps = jest.fn();
       const oldProps = { value: 1 };
       const newProps = { value: 2 };
-      const instance = inject.createInjectedTypeInstance(type, {}, null, applyDisplayObjectProps);
+      const instance = inject.createInjectedTypeInstance(type, {}, null, {}, {}, applyDisplayObjectProps);
 
       const context = instance._customApplyProps(instance, oldProps, newProps);
       expect(context).toHaveProperty("applyDisplayObjectProps");

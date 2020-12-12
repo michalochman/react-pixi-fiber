@@ -188,7 +188,10 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls updateProperties with only changed props for regular types", () => {
-      ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      ReactPixiFiberRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
 
       const type = TYPES.TEXT;
       const oldProps = { text: "42" };
@@ -213,7 +216,8 @@ describe("ReactPixiFiber", () => {
     const instance = {};
     const type = "type";
     const props = {};
-    const rootContainerInstance = {};
+    const rootContainer = {};
+    const hostContext = {};
     const setInitialProperties = jest.fn();
 
     afterEach(() => {
@@ -221,21 +225,22 @@ describe("ReactPixiFiber", () => {
     });
 
     it("returns false", () => {
-      expect(ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainerInstance)).toBeFalsy();
+      expect(ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainer)).toBeFalsy();
     });
 
     it("calls setInitialProperties", () => {
       ReactPixiFiberRewireAPI.__Rewire__("setInitialProperties", setInitialProperties);
-      ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainerInstance);
+      ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainer, hostContext);
       expect(setInitialProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialProperties).toHaveBeenCalledWith(type, instance, props, rootContainerInstance);
+      expect(setInitialProperties).toHaveBeenCalledWith(type, instance, props, rootContainer, hostContext);
       ReactPixiFiberRewireAPI.__ResetDependency__("setInitialProperties");
     });
   });
 
   describe("getChildHostContext", () => {
-    it("returns empty object", () => {
-      expect(ReactPixiFiber.getChildHostContext()).toEqual(emptyObject);
+    it("returns parent hostContext", () => {
+      const parentHostContext = { foo: "bar" };
+      expect(ReactPixiFiber.getChildHostContext(parentHostContext)).toEqual(parentHostContext);
     });
   });
 
@@ -260,7 +265,7 @@ describe("ReactPixiFiber", () => {
   describe("prepareForCommit", () => {
     it("does nothing", () => {
       expect(() => ReactPixiFiber.prepareForCommit()).not.toThrow();
-      expect(ReactPixiFiber.prepareForCommit()).toBeUndefined();
+      expect(ReactPixiFiber.prepareForCommit()).toBeNull();
     });
   });
 
@@ -285,11 +290,12 @@ describe("ReactPixiFiber", () => {
     it("calls diffProperties", () => {
       const oldProps = { answer: 42 };
       const newProps = { answer: 1337, scale: 2 };
-      const rootContainerInstance = null;
-      const result = ReactPixiFiber.prepareUpdate(instance, type, oldProps, newProps, rootContainerInstance);
+      const rootContainer = null;
+      const hostContext = {};
+      const result = ReactPixiFiber.prepareUpdate(instance, type, oldProps, newProps, rootContainer, hostContext);
 
       expect(diffProperties).toHaveBeenCalledTimes(1);
-      expect(diffProperties).toHaveBeenCalledWith(type, instance, oldProps, newProps, rootContainerInstance);
+      expect(diffProperties).toHaveBeenCalledWith(type, instance, oldProps, newProps);
     });
   });
 
