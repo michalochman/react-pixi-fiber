@@ -110,18 +110,20 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
     });
 
     it("should not call warnUnknownProperties for injected types", () => {
+      const strictRoot = null;
       isInjectedType.mockImplementation(() => true);
-      ReactPixiFiberUnknownPropertyHook.validateProperties(type, props);
+      ReactPixiFiberUnknownPropertyHook.validateProperties(type, props, strictRoot);
 
       expect(warnUnknownProperties).toHaveBeenCalledTimes(0);
     });
 
-    it("should not call warnUnknownProperties for regular types", () => {
+    it("should call warnUnknownProperties for regular types", () => {
+      const strictRoot = null;
       isInjectedType.mockImplementation(() => false);
-      ReactPixiFiberUnknownPropertyHook.validateProperties(type, props);
+      ReactPixiFiberUnknownPropertyHook.validateProperties(type, props, strictRoot);
 
       expect(warnUnknownProperties).toHaveBeenCalledTimes(1);
-      expect(warnUnknownProperties).toHaveBeenCalledWith(type, props);
+      expect(warnUnknownProperties).toHaveBeenCalledWith(type, props, strictRoot);
     });
   });
 

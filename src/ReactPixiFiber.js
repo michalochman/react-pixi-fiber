@@ -7,6 +7,41 @@ import {
   unstable_cancelCallback as cancelDeferredCallback,
 } from "scheduler";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
+import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
+
+let findStrictRoot;
+let validatePropertiesInDevelopment;
+
+if (__DEV__) {
+  // See https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactTypeOfMode.js#L13
+  const StrictMode = 1;
+
+  // Would be better if this was just exported from react-reconciler
+  // Additional try/catch added in case the internal API changes
+  // See: https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactStrictModeWarnings.new.js#L31
+  findStrictRoot = fiber => {
+    try {
+      let maybeStrictRoot = null;
+
+      let node = fiber;
+      while (node !== null) {
+        if (node.mode & StrictMode) {
+          maybeStrictRoot = node;
+        }
+        node = node.return;
+      }
+
+      return maybeStrictRoot;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  validatePropertiesInDevelopment = function (type, props, internalHandle) {
+    const strictRoot = findStrictRoot(internalHandle);
+    validateUnknownProperties(type, props, strictRoot);
+  };
+}
 
 /* PixiJS Renderer */
 
@@ -47,6 +82,10 @@ export function insertBefore(parentInstance, child, beforeChild) {
 
 export function commitUpdate(instance, updatePayload, type, prevProps, nextProps, internalHandle) {
   updateProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
+
+  if (__DEV__) {
+    validatePropertiesInDevelopment(type, nextProps, internalHandle);
+  }
 }
 
 export function createTextInstance(text, rootContainer, hostContext, internalHandle) {
@@ -55,7 +94,7 @@ export function createTextInstance(text, rootContainer, hostContext, internalHan
 
 export function finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
   setInitialProperties(type, instance, props, rootContainer, hostContext);
-  return false;
+  return true;
 }
 
 export function getChildHostContext(parentHostContext, type, rootContainer) {
@@ -119,7 +158,9 @@ export function clearContainer(container) {
 }
 
 export function commitMount(instance, type, props, internalHandle) {
-  // Noop
+  if (__DEV__) {
+    validatePropertiesInDevelopment(type, props, internalHandle);
+  }
 }
 
 export function hideInstance(instance) {

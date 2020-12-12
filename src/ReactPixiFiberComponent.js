@@ -5,15 +5,6 @@ import { CHILDREN } from "./props";
 import { TYPES } from "./types";
 import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { setValueForProperty } from "./PixiPropertyOperations";
-import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
-
-let validatePropertiesInDevelopment;
-
-if (__DEV__) {
-  validatePropertiesInDevelopment = function (type, props) {
-    validateUnknownProperties(type, props);
-  };
-}
 
 export function createInstance(type, props, rootContainer, hostContext, internalHandle) {
   let instance;
@@ -126,20 +117,12 @@ export function setInitialProperties(type, instance, rawProps, rootContainer, ho
     return;
   }
 
-  if (__DEV__) {
-    validatePropertiesInDevelopment(type, rawProps);
-  }
-
   setInitialPixiProperties(type, instance, rawProps, rootContainer, hostContext);
 }
 
 // Calculate the diff between the two objects.
 // See: https://github.com/facebook/react/blob/97e2911/packages/react-dom/src/client/ReactDOMFiberComponent.js#L546
 export function diffProperties(type, instance, lastRawProps, nextRawProps) {
-  if (__DEV__) {
-    validatePropertiesInDevelopment(type, nextRawProps);
-  }
-
   let updatePayload = null;
 
   let lastProps = lastRawProps;

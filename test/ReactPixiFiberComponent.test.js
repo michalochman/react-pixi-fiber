@@ -154,7 +154,6 @@ describe("ReactPixiFiber", () => {
     const isInjectedType = jest.fn();
     const setInitialCustomComponentProperties = jest.fn();
     const setInitialPixiProperties = jest.fn();
-    const validatePropertiesInDevelopment = jest.fn();
 
     beforeAll(() => {
       ReactPixiFiberComponentRewireAPI.__Rewire__("isInjectedType", isInjectedType);
@@ -163,20 +162,17 @@ describe("ReactPixiFiber", () => {
         setInitialCustomComponentProperties
       );
       ReactPixiFiberComponentRewireAPI.__Rewire__("setInitialPixiProperties", setInitialPixiProperties);
-      ReactPixiFiberComponentRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
     });
 
     afterAll(() => {
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("isInjectedType");
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("setInitialCustomComponentProperties");
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("setInitialPixiProperties");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
     });
 
     afterEach(() => {
       setInitialCustomComponentProperties.mockReset();
       setInitialPixiProperties.mockReset();
-      validatePropertiesInDevelopment.mockReset();
     });
 
     it("calls setInitialCustomComponentProperties for injected types with _customApplyProps defined", () => {
@@ -213,18 +209,6 @@ describe("ReactPixiFiber", () => {
       expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(0);
       expect(setInitialPixiProperties).toHaveBeenCalledTimes(1);
       expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainer, hostContext);
-    });
-
-    it("validates properties for regular types in development", () => {
-      isInjectedType.mockImplementation(() => false);
-      ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
-
-      if (__DEV__) {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledWith(type, rawProps);
-      } else {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(0);
-      }
     });
   });
 
@@ -267,19 +251,6 @@ describe("ReactPixiFiber", () => {
   describe("diffProperties", () => {
     const oldProps = { children: [1, 2], position: "0,0", scale: 2, text: "Hello World!" };
     const newProps = { children: [2], pivot: "0,0", scale: 2, text: "Goodbye World!" };
-    const validatePropertiesInDevelopment = jest.fn();
-
-    beforeAll(() => {
-      ReactPixiFiberComponentRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
-    });
-
-    afterAll(() => {
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
-    });
-
-    afterEach(() => {
-      validatePropertiesInDevelopment.mockReset();
-    });
 
     it("returns null if props did not change", () => {
       expect(ReactPixiFiberComponent.diffProperties("Text", {}, {}, {})).toBeNull();
@@ -294,17 +265,6 @@ describe("ReactPixiFiber", () => {
         "text",
         "Goodbye World!",
       ]);
-    });
-
-    it("validates properties in development", () => {
-      ReactPixiFiberComponent.diffProperties("Text", {}, oldProps, newProps);
-
-      if (__DEV__) {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledWith("Text", newProps);
-      } else {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(0);
-      }
     });
   });
 
@@ -340,26 +300,22 @@ describe("ReactPixiFiber", () => {
     const isInjectedType = jest.fn();
     const updateCustomComponentProperties = jest.fn();
     const updatePixiProperties = jest.fn();
-    const validatePropertiesInDevelopment = jest.fn();
 
     beforeAll(() => {
       ReactPixiFiberComponentRewireAPI.__Rewire__("isInjectedType", isInjectedType);
       ReactPixiFiberComponentRewireAPI.__Rewire__("updateCustomComponentProperties", updateCustomComponentProperties);
       ReactPixiFiberComponentRewireAPI.__Rewire__("updatePixiProperties", updatePixiProperties);
-      ReactPixiFiberComponentRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
     });
 
     afterAll(() => {
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("isInjectedType");
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("updateCustomComponentProperties");
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("updatePixiProperties");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
     });
 
     afterEach(() => {
       updateCustomComponentProperties.mockReset();
       updatePixiProperties.mockReset();
-      validatePropertiesInDevelopment.mockReset();
     });
 
     it("calls updateCustomComponentProperties for injected types with _customApplyProps defined", () => {

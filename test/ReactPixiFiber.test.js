@@ -158,18 +158,22 @@ describe("ReactPixiFiber", () => {
     const type = "type";
     const instance = {};
     const updateProperties = jest.fn();
+    const validatePropertiesInDevelopment = jest.fn();
 
     afterEach(() => {
       updateProperties.mockReset();
+      validatePropertiesInDevelopment.mockReset();
     });
 
     beforeAll(() => {
       ReactPixiFiberRewireAPI.__Rewire__("updateProperties", updateProperties);
+      ReactPixiFiberRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
     });
 
     afterAll(() => {
       ReactPixiFiberRewireAPI.__ResetDependency__("isInjectedType");
       ReactPixiFiberRewireAPI.__ResetDependency__("updateProperties");
+      ReactPixiFiberRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
       ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("isInjectedType");
     });
 
@@ -202,6 +206,22 @@ describe("ReactPixiFiber", () => {
       expect(updateProperties).toHaveBeenCalledTimes(1);
       expect(updateProperties).toHaveBeenCalledWith(type, instance, updatePayload, oldProps, newProps, undefined);
     });
+
+    it("validates properties in development", () => {
+      const internalHandle = {};
+      const type = TYPES.TEXT;
+      const oldProps = { text: "42" };
+      const newProps = { text: "42", scale: 2 };
+      const updatePayload = ReactPixiFiberComponent.diffProperties(type, instance, oldProps, newProps);
+      ReactPixiFiber.commitUpdate(instance, updatePayload, type, oldProps, newProps, internalHandle);
+
+      if (__DEV__) {
+        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);
+        expect(validatePropertiesInDevelopment).toHaveBeenCalledWith("Text", newProps, internalHandle);
+      } else {
+        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(0);
+      }
+    });
   });
 
   describe("createTextInstance", () => {
@@ -224,8 +244,8 @@ describe("ReactPixiFiber", () => {
       setInitialProperties.mockReset();
     });
 
-    it("returns false", () => {
-      expect(ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainer)).toBeFalsy();
+    it("returns true", () => {
+      expect(ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainer)).toBeTruthy();
     });
 
     it("calls setInitialProperties", () => {
@@ -345,9 +365,38 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("commitMount", () => {
+    const validatePropertiesInDevelopment = jest.fn();
+
+    afterEach(() => {
+      validatePropertiesInDevelopment.mockReset();
+    });
+
+    beforeAll(() => {
+      ReactPixiFiberRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
+    });
+
+    afterAll(() => {
+      ReactPixiFiberRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
+    });
+
     it("does nothing", () => {
       expect(() => ReactPixiFiber.commitMount()).not.toThrow();
       expect(ReactPixiFiber.commitMount()).toBeUndefined();
+    });
+
+    it("validates properties in development", () => {
+      const internalHandle = {};
+      const instance = new PIXI.Text();
+      const type = TYPES.TEXT;
+      const props = { text: "42" };
+      ReactPixiFiber.commitMount(instance, type, props, internalHandle);
+
+      if (__DEV__) {
+        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);
+        expect(validatePropertiesInDevelopment).toHaveBeenCalledWith("Text", props, internalHandle);
+      } else {
+        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(0);
+      }
     });
   });
 
