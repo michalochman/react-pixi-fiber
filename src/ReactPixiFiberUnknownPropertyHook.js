@@ -13,7 +13,7 @@ if (__DEV__) {
   const hasOwnProperty = Object.prototype.hasOwnProperty;
   const EVENT_NAME_REGEX = /^on./;
 
-  validateProperty = function (type, name, value, strictRoot) {
+  validateProperty = function (type, name, value) {
     if (hasOwnProperty.call(warnedProperties, name) && warnedProperties[name]) {
       return true;
     }
@@ -66,7 +66,7 @@ if (__DEV__) {
         warnedProperties[name] = true;
         return true;
       }
-    } else if (!isReserved && typeof value !== "undefined" && strictRoot != null) {
+    } else if (!isReserved && typeof value !== "undefined") {
       warning(
         false,
         "React does not recognize prop `%s` on `<%s />`. If you accidentally passed it from a parent component, remove it from `<%s />`.%s",
@@ -103,10 +103,10 @@ if (__DEV__) {
 
 export { validateProperty };
 
-export const warnUnknownProperties = function (type, props, strictRoot) {
+export const warnUnknownProperties = function (type, props) {
   const unknownProps = [];
   for (const key in props) {
-    const isValid = validateProperty(type, key, props[key], strictRoot);
+    const isValid = validateProperty(type, key, props[key]);
     if (!isValid) {
       unknownProps.push(key);
     }
@@ -121,8 +121,8 @@ export const warnUnknownProperties = function (type, props, strictRoot) {
 };
 
 export function validateProperties(type, props, strictRoot) {
-  if (isInjectedType(type)) {
+  if (isInjectedType(type) || strictRoot == null) {
     return;
   }
-  warnUnknownProperties(type, props, strictRoot);
+  warnUnknownProperties(type, props);
 }
