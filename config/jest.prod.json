@@ -5,11 +5,9 @@
   "globals": {
     "__DEV__": false
   },
-  "moduleNameMapper": {
-    "pixi.js$": "pixi.js-legacy"
-  },
   "rootDir": "..",
   "setupFiles": [
+    "jest-webgl-canvas-mock",
     "./config/jest/setupGlobals.js",
     "./config/jest/setupPixi.js"
   ],

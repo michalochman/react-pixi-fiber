@@ -8,11 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Fixed
-- Fixed hook-based `Stage` to render and rerender synchronously ([#204])
-
-
-## [1.0.0-beta.7] - 2020-12-12
+## [1.0.0-beta.8] - 2021-03-21
 
 ### Added
 - Added ReactDOM-like prop validation in development ([#47])
@@ -24,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed type of `oldProps` sent to `customApplyProps` of `CustomPIXIComponent`
+- Fixed hook-based `Stage` to render and rerender synchronously ([#204])
 
 ### Removed
 - Removed `performance-now` dependency
@@ -402,8 +399,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.7...HEAD
-[1.0.0-beta.7]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.2...v1.0.0-beta.7
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.8...HEAD
+[1.0.0-beta.8]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.2...v1.0.0-beta.8
 [0.14.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...v0.14.0
