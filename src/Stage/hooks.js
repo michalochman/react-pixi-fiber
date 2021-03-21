@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useEffect, useRef } from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import shallowEqual from "fbjs/lib/shallowEqual";
@@ -26,7 +26,7 @@ export function usePreviousProps(value) {
 
 export function useStageRenderer(props, appRef, canvasRef) {
   // create app on mount
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { app, options } = props;
 
     // Return PIXI.Application if it was provided in props
@@ -60,7 +60,7 @@ export function useStageRerenderer(props, appRef, canvasRef) {
   const prevProps = usePreviousProps(props);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
+  useLayoutEffect(() => {
     // This is first render, no need to do anything
     if (!appRef.current) return;
 

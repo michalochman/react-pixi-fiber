@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed hook-based `Stage` to render and rerender synchronously ([#204])
+
 
 ## [1.0.0-beta.7] - 2020-12-12
 
@@ -447,6 +450,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#204]: https://github.com/michalochman/react-pixi-fiber/issues/204
 [#196]: https://github.com/michalochman/react-pixi-fiber/issues/196
 [#185]: https://github.com/michalochman/react-pixi-fiber/issues/185
 [#182]: https://github.com/michalochman/react-pixi-fiber/pull/182
