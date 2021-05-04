@@ -17,11 +17,12 @@ declare module "react-pixi-fiber" {
     ? PIXI.InteractionEvent
     // @ts-ignore TS2694
     : PIXI.interaction.InteractionEvent;
-  type InteractionEventTypes = string extends InteractionCompatibility
-    // @ts-ignore TS2694
-    ? PIXI.InteractionEventTypes
-    // @ts-ignore TS2694
-    : PIXI.interaction.InteractionEventTypes;
+  // Hardcoded due to the InteractionEventTypes being removed since pixi.js@6.0.0
+  type InteractionPointerEvents = "pointerdown" | "pointercancel" | "pointerup" | "pointertap" | "pointerupoutside" | "pointermove" | "pointerover" | "pointerout";
+  type InteractionTouchEvents = "touchstart" | "touchcancel" | "touchend" | "touchendoutside" | "touchmove" | "tap";
+  type InteractionMouseEvents = "rightdown" | "mousedown" | "rightup" | "mouseup" | "rightclick" | "click" | "rightupoutside" | "mouseupoutside" | "mousemove" | "mouseover" | "mouseout";
+  type InteractionPixiEvents = "added" | "removed";
+  type InteractionEventTypes = InteractionPointerEvents | InteractionTouchEvents | InteractionMouseEvents | InteractionPixiEvents;
 
   /**
    * Helpers
