@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Added missing `prop-types` dependency ([#221])
+
 
 ## [1.0.0-beta.9] - 2021-05-04
 
@@ -449,6 +452,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#221]: https://github.com/michalochman/react-pixi-fiber/issues/221
 [#210]: https://github.com/michalochman/react-pixi-fiber/issues/210
 [#204]: https://github.com/michalochman/react-pixi-fiber/issues/204
 [#196]: https://github.com/michalochman/react-pixi-fiber/issues/196
