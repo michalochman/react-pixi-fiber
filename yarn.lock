@@ -3540,6 +3540,7 @@
     "pretty-format" "^24.9.0"
 
 "jest-environment-jsdom-with-canvas@https://github.com/arcatdmz/jest-environment-jsdom-with-canvas.git":
+  "integrity" "sha512-GTwPzsvlDkYKDVyvEi0tGCT1KTq2vV7SaoW2dNmtt9QEw8vk05180PqyvRC9oATnxsQuIm1VvajJuHwREey+Dw=="
   "resolved" "git+ssh://git@github.com/arcatdmz/jest-environment-jsdom-with-canvas.git#e31408458aad78ec1e532cdcba64e39838c86807"
   "version" "0.1.0"
   dependencies:
