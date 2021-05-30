@@ -8534,7 +8534,7 @@
     "kleur" "^2.0.1"
     "sisteransi" "^0.1.1"
 
-"prop-types@^15.6.1", "prop-types@^15.6.2":
+"prop-types@^15.6.1", "prop-types@^15.6.2", "prop-types@^15.7.2":
   "integrity" "sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ=="
   "resolved" "https://registry.npmjs.org/prop-types/-/prop-types-15.7.2.tgz"
   "version" "15.7.2"
@@ -8783,10 +8783,10 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-16.9.0.tgz"
   "version" "16.9.0"
 
-"react-pixi-fiber@1.0.0-beta.9":
-  "integrity" "sha512-wIxhuAlW3jwF3zUo/Cr6vOuYJrw61RTAp9IIq/9W8yuj6v4fTKiNJkvAkZnNGyoxoWSArJjfi8uccPjz2aMCJA=="
-  "resolved" "https://registry.npmjs.org/react-pixi-fiber/-/react-pixi-fiber-1.0.0-beta.9.tgz"
-  "version" "1.0.0-beta.9"
+"react-pixi-fiber@1.0.0-beta.10":
+  "integrity" "sha512-MIaGxuN5qZ1eWfXpGx37jr9bp2mkRAphzGiNgKCB5UFzgE8XZQGAQKFYee1gTkNjkoeFAc1bY6PnEsfajbZuqw=="
+  "resolved" "https://registry.npmjs.org/react-pixi-fiber/-/react-pixi-fiber-1.0.0-beta.10.tgz"
+  "version" "1.0.0-beta.10"
   dependencies:
     "fbjs" "^3.0.0"
     "react-reconciler" "^0.26.1"

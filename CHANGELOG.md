@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.0.0-beta.10] - 2021-05-30
+
 ### Fixed
 - Added missing `prop-types` dependency ([#221])
 
@@ -404,8 +407,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.9...HEAD
-[1.0.0-beta.9]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.2...v1.0.0-beta.9
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0-beta.10...HEAD
+[1.0.0-beta.10]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.2...v1.0.0-beta.10
 [0.14.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.13.2...v0.14.0
