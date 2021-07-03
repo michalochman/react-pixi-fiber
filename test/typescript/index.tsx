@@ -116,7 +116,8 @@ const StageClassExample: React.FC = () => {
 
   React.useEffect(() => {
     if (stageRef.current) {
-      console.log("stageRef", stageRef.current._app);
+      console.log("stageRef", stageRef.current._app.current?.renderer);
+      console.log("stageRef", stageRef.current._canvas.current?.width);
       console.log("stageRef", stageRef.current.props);
     }
 
@@ -133,48 +134,59 @@ const StageClassExample: React.FC = () => {
   }, []);
 
   return (
-    <Stage key="stage" options={{ backgroundColor: 0xffffff }} ref={stageRef} position="0,0" scale={1}>
-      <BitmapText
-        key="bitmapText1"
-        text="Bitmap text 1"
-        style={{ font: { name: "Font", size: 42 }, align: "left", tint: 0xffffff }}
-      />
-      <BitmapText
-        key="bitmapText2"
-        text="Bitmap text 2"
-        font={{ name: "Font", size: 42 }}
-        align="left"
-        tint={0xffffff}
-      />
-      <Container position="10,10">
-        <BitmapText text="" />
-      </Container>
-      <Graphics />
-      <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
-      <ParticleContainer autoResize={false}>
-        <Sprite texture={PIXI.Texture.WHITE} />
-      </ParticleContainer>
-      <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
-      <Text text="Regular text" />
-      <TilingSprite texture={texture} />
-      <CompositionExample />
-      <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
-      <WickedContainer isWicked={false} />
-      <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
-      <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
-    </Stage>
+    <>
+      <Stage key="stage1" ref={stageRef} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
+        <BitmapText
+          key="bitmapText1"
+          text="Bitmap text 1"
+          style={{ font: { name: "Font", size: 42 }, align: "left", tint: 0xffffff }}
+        />
+        <BitmapText
+          key="bitmapText2"
+          text="Bitmap text 2"
+          font={{ name: "Font", size: 42 }}
+          align="left"
+          tint={0xffffff}
+        />
+        <Container position="10,10">
+          <BitmapText text="" />
+        </Container>
+        <Graphics />
+        <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
+        <ParticleContainer autoResize={false}>
+          <Sprite texture={PIXI.Texture.WHITE} />
+        </ParticleContainer>
+      </Stage>
+      <Stage key="stage2" ref={(stage) => {
+        if (stage) {
+          console.log("stage", stage._app);
+          console.log("stage", stage._canvas);
+          console.log("stage", stage.props);
+        }
+      }} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
+        <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
+        <Text text="Regular text" />
+        <TilingSprite texture={texture} />
+        <CompositionExample />
+        <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+        <WickedContainer isWicked={false} />
+        <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
+        <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
+      </Stage>
+    </>
   );
 };
 
 const StageFunctionExample: React.FC = () => {
-  const stageRef = React.useRef<PIXI.Container>(null);
+  const stageRef = React.useRef<typeof Stage>(null);
   const spriteRef = React.useRef<PIXI.Sprite>(null);
   const wickedContainerRef = React.useRef<WickedContainerClass>(null);
 
   React.useEffect(() => {
     if (stageRef.current) {
-      console.log("stageRef", stageRef.current.children);
-      console.log("stageRef", stageRef.current.position);
+      console.log("stageRef", stageRef.current._app.current?.renderer);
+      console.log("stageRef", stageRef.current._canvas.current?.width);
+      console.log("stageRef", stageRef.current.props);
     }
 
     if (spriteRef.current) {
@@ -190,32 +202,45 @@ const StageFunctionExample: React.FC = () => {
   }, []);
 
   return (
-    <Stage key="stage" options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
-      <BitmapText key="bitmapText" text="" />
-      <Container position="10,10">
-        <BitmapText text="" />
-      </Container>
-      <Graphics />
-      <ParticleContainer autoResize={false}>
-        <Sprite texture={PIXI.Texture.WHITE} />
-      </ParticleContainer>
-      <Sprite
-        anchor={anchor}
-        texture={texture}
-        ref={spriteRef}
-        interactive
-        pointerup={(e): void => {
-          console.log(e.type);
-          console.log(e.data);
-        }}
-      />
-      <Text />
-      <TilingSprite texture={texture} />
-      <CompositionExample />
-      <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
-      <WickedContainer isWicked={false} />
-      <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
-      <RestPropsExample propertyNotInSpriteAlready="3" render anchor="0.5,0.5" />
-    </Stage>
+    <>
+      <Stage key="stage1" ref={stageRef} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
+        <BitmapText
+          key="bitmapText1"
+          text="Bitmap text 1"
+          style={{ font: { name: "Font", size: 42 }, align: "left", tint: 0xffffff }}
+        />
+        <BitmapText
+          key="bitmapText2"
+          text="Bitmap text 2"
+          font={{ name: "Font", size: 42 }}
+          align="left"
+          tint={0xffffff}
+        />
+        <Container position="10,10">
+          <BitmapText text="" />
+        </Container>
+        <Graphics />
+        <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
+        <ParticleContainer autoResize={false}>
+          <Sprite texture={PIXI.Texture.WHITE} />
+        </ParticleContainer>
+      </Stage>
+      <Stage key="stage2" ref={(stage) => {
+          if (stage) {
+            console.log("stage", stage._app);
+            console.log("stage", stage._canvas);
+            console.log("stage", stage.props);
+          }
+        }} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
+          <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
+          <Text text="Regular text" />
+          <TilingSprite texture={texture} />
+          <CompositionExample />
+          <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+          <WickedContainer isWicked={false} />
+          <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
+          <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
+      </Stage>
+    </>
   );
 };
