@@ -13,7 +13,8 @@
         "node_modules/resource-loader/typings/mini-signals.d.ts"
       ],
       "react-pixi-fiber": ["index.d.ts"]
-    }
+    },
+    "types": []
   },
   "files": [
     "test/typescript/index.tsx"

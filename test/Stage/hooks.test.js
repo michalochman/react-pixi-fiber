@@ -9,7 +9,7 @@ import { usePreviousProps, useStageRenderer, useStageRerenderer } from "../../sr
 import { __RewireAPI__ as HooksRewireAPI } from "../../src/Stage/hooks";
 
 jest.mock("../../src/ReactPixiFiber", () => {
-  return Object.assign({}, require.requireActual("../../src/ReactPixiFiber"), {
+  return Object.assign({}, jest.requireActual("../../src/ReactPixiFiber"), {
     createContainer: jest.fn(),
     injectIntoDevTools: jest.fn(),
     updateContainer: jest.fn(),

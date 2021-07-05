@@ -9,7 +9,7 @@ import { createRender } from "../src/render";
 import { TYPES } from "../src/types";
 
 jest.mock("pixi.js", () => {
-  return Object.assign({}, require.requireActual("pixi.js"), {
+  return Object.assign({}, jest.requireActual("pixi.js"), {
     Container: jest.fn(),
     Graphics: jest.fn(),
     Sprite: jest.fn(),
@@ -24,7 +24,7 @@ jest.mock("pixi.js", () => {
   });
 });
 jest.mock("../src/utils", () => {
-  return Object.assign({}, require.requireActual("../src/utils.js"), {
+  return Object.assign({}, jest.requireActual("../src/utils.js"), {
     setPixiValue: jest.fn(),
   });
 });

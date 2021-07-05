@@ -5,7 +5,7 @@ import { createRender, createUnmount, getDevToolsVersion, roots } from "../src/r
 import * as PIXI from "pixi.js";
 
 jest.mock("../src/ReactPixiFiber", () => {
-  const actual = require.requireActual("../src/ReactPixiFiber");
+  const actual = jest.requireActual("../src/ReactPixiFiber");
   return Object.assign({}, actual, {
     ReactPixiFiberAsPrimaryRenderer: Object.assign({}, actual.ReactPixiFiberAsPrimaryRenderer, {
       createContainer: jest.fn(),
