@@ -30,7 +30,7 @@ const behavior = {
     instance.on("mouseup", this.dragEnd);
     instance.on("mousemove", this.dragMove);
   },
-  customWillDetach: instance => {
+  customWillDetach: function (instance) {
     instance.off("mousedown", this.dragStart);
     instance.off("mouseup", this.dragEnd);
     instance.off("mousemove", this.dragMove);
