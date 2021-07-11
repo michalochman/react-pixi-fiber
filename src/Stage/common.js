@@ -21,8 +21,11 @@ export function cleanupStage(app, stageOptions = STAGE_OPTIONS_RECREATE) {
   // Unmount stage tree
   unmount(app.stage);
 
-  // Destroy PIXI.Application and what it rendered if necessary
-  app.destroy(removeView, stageOptions);
+  // Give components a chance to finish unmounting before destroying PIXI.Application
+  setTimeout(() => {
+    // Destroy PIXI.Application and what it rendered if necessary
+    app.destroy(removeView, stageOptions);
+  }, 0);
 }
 
 export function getDimensions(props) {
