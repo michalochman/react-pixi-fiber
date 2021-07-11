@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React from "react";
 import { Stage } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 import Bunny from "../Bunny";
@@ -15,16 +15,6 @@ const OPTIONS = {
 };
 
 function PointsExample() {
-  const bunnyHasMoved = useCallback(() => {
-    console.log(`Bunny has moved to ${randomPosition.current.x},${randomPosition.current.y}`);
-  }, []);
-  const randomPosition = useRef(
-    new PIXI.ObservablePoint(bunnyHasMoved, undefined, Math.random() * WIDTH, Math.random() * HEIGHT)
-  );
-  const escape = useCallback(() => {
-    randomPosition.current.set(Math.random() * WIDTH, Math.random() * HEIGHT);
-  }, []);
-
   return (
     <Stage options={OPTIONS}>
       {/* Position via single value of X as string */}
@@ -41,14 +31,6 @@ function PointsExample() {
       <Bunny position={{ x: 450, y: 450 }} />
       {/* Position via explicit PIXI.Point */}
       <Bunny position={new PIXI.Point(525, 525)} />
-      {/* Position via explicit PIXI.ObservablePoint */}
-      <Bunny
-        // Opt-in to interactivity
-        interactive
-        // Pointers normalize touch and mouse
-        pointerover={escape}
-        position={randomPosition.current}
-      />
     </Stage>
   );
 }
