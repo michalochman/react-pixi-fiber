@@ -210,22 +210,21 @@ declare module "react-pixi-fiber" {
     "height" | "width"
   >;
 
-  // Type of Stage as class component.
-  export type StageClass = React.ComponentType<StageProps & { ref?: React.Ref<React.ReactNode> }> & {
-    _app: PIXI.Application;
-    props: StageProps;
+  export type StageRef = {
+    _app: React.RefObject<PIXI.Application>
+    _canvas: React.RefObject<HTMLCanvasElement>
+    props: StageProps,
   };
 
-  // Type of Stage as function component.
-  // TODO allow passing ref that would receive object of { _app: PIXI.Application } shape
-  export type StageFunction = React.FunctionComponent<StageProps>;
+  // Type of Stage component.
+  export type Stage = React.ForwardRefExoticComponent<StageProps & { ref?: React.Ref<StageRef> }> & StageRef;
 
   // A component wrapper for PIXI `Stage` as function component.
   // see: http://pixijs.download/dev/docs/PIXI.Application.html#stage
-  export const Stage: StageFunction;
+  export const Stage: Stage;
 
   // Factory returning Stage as class component.
-  export function createStageClass(): StageClass;
+  export function createStageClass(): Stage;
 
   // Standalone ReactPixiFiber render method.
   export function render(

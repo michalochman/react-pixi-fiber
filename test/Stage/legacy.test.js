@@ -7,7 +7,7 @@ import { createStageClass } from "../../src/Stage";
 import { __RewireAPI__ as StageRewireAPI } from "../../src/Stage/legacy";
 
 jest.mock("../../src/ReactPixiFiber", () => {
-  return Object.assign({}, require.requireActual("../../src/ReactPixiFiber"), {
+  return Object.assign({}, jest.requireActual("../../src/ReactPixiFiber"), {
     createContainer: jest.fn(),
     injectIntoDevTools: jest.fn(),
     updateContainer: jest.fn(),

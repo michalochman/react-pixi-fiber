@@ -29,7 +29,20 @@ Object {
   "NineSlicePlane": "NineSlicePlane",
   "ParticleContainer": "ParticleContainer",
   "Sprite": "Sprite",
-  "Stage": [Function],
+  "Stage": Object {
+    "$$typeof": Symbol(react.forward_ref),
+    "defaultProps": Object {
+      "options": Object {},
+    },
+    "propTypes": Object {
+      "app": [Function],
+      "children": [Function],
+      "height": [Function],
+      "options": [Function],
+      "width": [Function],
+    },
+    "render": [Function],
+  },
   "Text": "Text",
   "TilingSprite": "TilingSprite",
   "applyDisplayObjectProps": [Function],

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import shallowEqual from "fbjs/lib/shallowEqual";
@@ -104,13 +104,19 @@ export function useStageRerenderer(props, appRef, canvasRef) {
 }
 
 export default function createStageFunction() {
-  function Stage(props) {
+  const Stage = forwardRef(function Stage(props, ref) {
     const { app, options } = props;
 
     // Store PIXI.Application instance
     const appRef = useRef();
     // Store canvas if it was rendered
     const canvasRef = useRef();
+
+    useImperativeHandle(ref, () => ({
+      _app: appRef,
+      _canvas: appRef,
+      props: props,
+    }));
 
     // The order is important here to avoid unnecessary renders or extra state:
     // - useStageRerenderer:
@@ -135,7 +141,7 @@ export default function createStageFunction() {
     const canvasProps = getCanvasProps(props);
 
     return <canvas ref={canvasRef} {...canvasProps} />;
-  }
+  });
 
   Stage.propTypes = propTypes;
   Stage.defaultProps = defaultProps;

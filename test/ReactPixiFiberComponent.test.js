@@ -6,7 +6,7 @@ import { __RewireAPI__ as ReactPixiFiberUnknownPropertyHookRewireAPI } from "../
 import { TYPES } from "../src/types";
 
 jest.mock("pixi.js", () => {
-  return Object.assign({}, require.requireActual("pixi.js"), {
+  return Object.assign({}, jest.requireActual("pixi.js"), {
     Container: jest.fn(),
     Graphics: jest.fn(),
     Sprite: jest.fn(),
