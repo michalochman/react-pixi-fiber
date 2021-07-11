@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from "react";
+import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Stage, Text, usePixiTicker } from "react-pixi-fiber";
 import Circle from "../CustomPIXIComponentExample/Circle";
 import Rect from "../CustomPIXIComponentExample/Rect";
@@ -20,7 +20,7 @@ function useAnimatedValue({ direction, max, min, value }) {
     value,
   });
 
-  usePixiTicker(() => {
+  const animate = useCallback(() => {
     // perform all the logic inside setData so useEffect's dependency array
     // can be empty so it will only trigger one on initial render and not
     // add and remove from ticker constantly.
@@ -28,7 +28,10 @@ function useAnimatedValue({ direction, max, min, value }) {
       const data = { ...current };
 
       // flip direction once min or max has been reached.
-      if ((current.value >= max && current.direction === 1) || (current.value <= min && current.direction === -1)) {
+      if (
+        (current.value >= current.max && current.direction === 1) ||
+        (current.value <= current.min && current.direction === -1)
+      ) {
         data.direction *= -1;
       }
 
@@ -37,7 +40,9 @@ function useAnimatedValue({ direction, max, min, value }) {
 
       return data;
     });
-  }, [direction, max, min, value, setData]);
+  }, []);
+
+  usePixiTicker(animate);
 
   return data.value;
 }
@@ -83,21 +88,13 @@ const Animation = () => {
 };
 
 const HooksExample = () => {
-  if (typeof useState === "function") {
-    return (
-      <Stage options={{ backgroundColor: 0xff0000, height: 600, width: 800 }}>
-        <AnimationContext.Provider value={{ title: "animation" }}>
-          <Animation />
-        </AnimationContext.Provider>
-      </Stage>
-    );
-  } else {
-    return (
-      <Stage options={{ backgroundColor: 0xff0000, height: 600, width: 800 }}>
-        <Text text={`Sorry, your version of React (${React.version}) doesn't support hooks.`} x={0} y={500} />
-      </Stage>
-    );
-  }
+  return (
+    <Stage options={{ backgroundColor: 0xff0000, height: 600, width: 800 }}>
+      <AnimationContext.Provider value={{ title: "animation" }}>
+        <Animation />
+      </AnimationContext.Provider>
+    </Stage>
+  );
 };
 
 export default HooksExample;
