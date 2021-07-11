@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Container, Sprite, Stage } from "react-pixi-fiber";
 import { createAsset } from "use-asset";
 import * as PIXI from "pixi.js";
@@ -17,18 +17,16 @@ function SpriteRenderer() {
   return <Sprite texture={PIXI.Texture.from(sheet)} />;
 }
 
-class SuspenseExample extends Component {
-  render() {
-    return (
-      <Stage options={OPTIONS}>
-        <Container>
-          <React.Suspense fallback={null}>
-            <SpriteRenderer />
-          </React.Suspense>
-        </Container>
-      </Stage>
-    );
-  }
+function SuspenseExample() {
+  return (
+    <Stage options={OPTIONS}>
+      <Container>
+        <React.Suspense fallback={null}>
+          <SpriteRenderer />
+        </React.Suspense>
+      </Container>
+    </Stage>
+  );
 }
 
 export default SuspenseExample;

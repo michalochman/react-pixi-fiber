@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment, useCallback, useLayoutEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { withApp, ParticleContainer, Sprite, Text } from "react-pixi-fiber";
+import { usePixiTicker, withApp, ParticleContainer, Sprite, Text } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
-import bunnys from "./bunnys.png";
+import bunnysImage from "./bunnys.png";
 
 const maxSize = 200000;
 const bunniesAddedPerFrame = 100;
@@ -58,37 +58,27 @@ const moveBunny = bunny => {
   return movedBunny;
 };
 
-class Bunnymark extends Component {
-  state = {
-    bunnys: [],
-    currentTexture: 0,
-    isAdding: false,
-  };
+function Bunnymark() {
+  const [bunnys, setBunnys] = useState([]);
+  const [bunnyTextures, setBunnyTextures] = useState([]);
+  const [currentTexture, setCurrentTexture] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
 
-  componentDidMount() {
-    const bunnyTextures = new PIXI.Texture.from(bunnys);
+  useLayoutEffect(() => {
+    const bunnyTextures = new PIXI.Texture.from(bunnysImage);
     const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
     const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
     const bunny3 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37));
     const bunny4 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 164, 26, 37));
     const bunny5 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 2, 26, 37));
 
-    this.bunnyTextures = [bunny1, bunny2, bunny3, bunny4, bunny5];
+    setBunnyTextures([bunny1, bunny2, bunny3, bunny4, bunny5]);
     const currentTexture = 2;
-    this.setState({
-      bunnys: [generateBunny(currentTexture), generateBunny(currentTexture)],
-      currentTexture: currentTexture,
-    });
+    setBunnys([generateBunny(currentTexture), generateBunny(currentTexture)]);
+    setCurrentTexture(currentTexture);
+  }, []);
 
-    this.props.app.ticker.add(this.animate);
-  }
-
-  componentWillUnmount() {
-    this.props.app.ticker.remove(this.animate);
-  }
-
-  animate = () => {
-    const { bunnys, currentTexture, isAdding } = this.state;
+  const animate = useCallback(() => {
     const addedBunnys = [];
 
     if (isAdding) {
@@ -101,45 +91,40 @@ class Bunnymark extends Component {
 
     const newBunnys = bunnys.concat(addedBunnys).map(moveBunny);
 
-    this.setState({ bunnys: newBunnys });
-  };
+    setBunnys(newBunnys);
+  }, [bunnys, currentTexture, isAdding]);
 
-  handlePointerDown = () => {
-    this.setState({ isAdding: true });
-  };
+  usePixiTicker(animate);
 
-  handlePointerUp = () => {
-    this.setState(state => ({
-      currentTexture: (state.currentTexture + 1) % 5,
-    }));
+  const handlePointerDown = useCallback(() => {
+    setIsAdding(true);
+  }, []);
 
-    this.setState({ isAdding: false });
-  };
+  const handlePointerUp = useCallback(() => {
+    setCurrentTexture(currentTexture => (currentTexture + 1) % 5);
+    setIsAdding(false);
+  }, []);
 
-  render() {
-    const { bunnys } = this.state;
-
-    return (
-      <Fragment>
-        <ParticleContainer maxSize={maxSize} properties={particleContainerProperties}>
-          {bunnys.map((bunny, i) => (
-            <Sprite key={i} anchor={bunnyAnchor} texture={this.bunnyTextures[bunny.texture]} x={bunny.x} y={bunny.y} />
-          ))}
-        </ParticleContainer>
-        <Text text={`${bunnys.length} BUNNIES`} style={{ fill: 0xffff00, fontSize: 14 }} x={5} y={5} />
-        {/* ParticleContainer and its children cannot be interactive
+  return (
+    <Fragment>
+      <ParticleContainer maxSize={maxSize} properties={particleContainerProperties}>
+        {bunnys.map((bunny, i) => (
+          <Sprite key={i} anchor={bunnyAnchor} texture={bunnyTextures[bunny.texture]} x={bunny.x} y={bunny.y} />
+        ))}
+      </ParticleContainer>
+      <Text text={`${bunnys.length} BUNNIES`} style={{ fill: 0xffff00, fontSize: 14 }} x={5} y={5} />
+      {/* ParticleContainer and its children cannot be interactive
             so here's a clickable hit area */}
-        <Sprite
-          height={600}
-          interactive
-          pointerdown={this.handlePointerDown}
-          pointerup={this.handlePointerUp}
-          texture={PIXI.Texture.EMPTY}
-          width={800}
-        />
-      </Fragment>
-    );
-  }
+      <Sprite
+        height={600}
+        interactive
+        pointerdown={handlePointerDown}
+        pointerup={handlePointerUp}
+        texture={PIXI.Texture.EMPTY}
+        width={800}
+      />
+    </Fragment>
+  );
 }
 Bunnymark.propTypes = {
   app: PropTypes.object,

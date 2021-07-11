@@ -1,38 +1,26 @@
-import React, { Component } from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
-import { withApp } from "react-pixi-fiber";
+import { usePixiTicker, withApp } from "react-pixi-fiber";
 import Bunny from "../Bunny";
 
 // http://pixijs.io/examples/#/basics/basic.js
-class RotatingBunny extends Component {
-  state = {
-    rotation: 0,
-  };
+// we don't want to pass app prop further down, it will trigger dev warning
+function RotatingBunny({ app, step, ...passedProps }) {
+  const [rotation, setRotation] = useState(0);
 
-  componentDidMount() {
-    this.props.app.ticker.add(this.animate);
-  }
+  const animate = useCallback(
+    delta => {
+      // just for fun, let's rotate mr rabbit a little
+      // delta is 1 if running at 100% performance
+      // creates frame-independent tranformation
+      setRotation(rotation => rotation + step * delta);
+    },
+    [step]
+  );
 
-  componentWillUnmount() {
-    this.props.app.ticker.remove(this.animate);
-  }
+  usePixiTicker(animate);
 
-  animate = delta => {
-    // just for fun, let's rotate mr rabbit a little
-    // delta is 1 if running at 100% performance
-    // creates frame-independent tranformation
-    this.setState(state => ({
-      ...state,
-      rotation: state.rotation + this.props.step * delta,
-    }));
-  };
-
-  render() {
-    // we don't want to pass app prop further down, it will trigger dev warning
-    const { app, step, ...passedProps } = this.props;
-
-    return <Bunny {...passedProps} rotation={this.state.rotation} />;
-  }
+  return <Bunny {...passedProps} rotation={rotation} />;
 }
 RotatingBunny.propTypes = {
   app: PropTypes.object.isRequired,

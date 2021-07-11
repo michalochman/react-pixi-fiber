@@ -1,7 +1,7 @@
 // This is demo of pixi-display.js, https://github.com/gameofbombs/pixi-display
 // Drag the rabbits to understand what's going on
 // https://pixijs.io/examples/#/layers/zorder.js
-import React, { Component } from "react";
+import React from "react";
 import { CustomPIXIProperty, Container, Stage } from "react-pixi-fiber";
 import ColoredBunny from "./ColoredBunny";
 import DraggableContainer from "../CustomPIXIComponentExample/DraggableContainer";
@@ -80,66 +80,64 @@ const shadowProps = {
 const stage = new PIXI.display.Stage();
 stage.group.enableSort = true;
 
-class CustomComponentExample extends Component {
-  render() {
-    return (
-      <Stage options={OPTIONS}>
-        {/* specify display list component */}
-        <LayeredStage enableSort>
-          {/* sorry, group cant exist without layer yet :( */}
-          <Layer group={blueGroup} />
-          <Layer group={greenGroup} />
-          <Layer group={dragGroup} />
-          <Layer group={shadowGroup} />
-          {/* make obsolete containers. Why do we need them?
-           * Just to show that we can do everything without
-           * caring of actual parent container */}
-          <Container>
-            {evenBunnies.map(index => (
-              <DraggableContainer
-                key={index}
-                x={100 + 20 * index}
-                y={100 + 20 * index}
-                onDragEnd={onBunnyDragEnd}
-                onDragStart={onBunnyDragStart}
-              >
-                <Rect {...shadowProps} parentGroup={shadowGroup} />
-                <ColoredBunny fill={0x74fa9a} parentGroup={greenGroup} />
-              </DraggableContainer>
-            ))}
-          </Container>
-          <Container>
-            {oddBunnies.map(index => (
-              <DraggableContainer
-                key={index}
-                x={100 + 20 * index}
-                y={100 + 20 * index}
-                onDragEnd={onBunnyDragEnd}
-                onDragStart={onBunnyDragStart}
-              >
-                <Rect {...shadowProps} parentGroup={shadowGroup} />
-                <ColoredBunny fill={0x74fa9a} parentGroup={greenGroup} />
-              </DraggableContainer>
-            ))}
-          </Container>
-          <Container>
-            {blueBunnies.map(index => (
-              <DraggableContainer
-                key={index}
-                x={400 + 20 * index}
-                y={400 - 20 * index}
-                onDragEnd={onBunnyDragEnd}
-                onDragStart={onBunnyDragStart}
-              >
-                <Rect {...shadowProps} parentGroup={shadowGroup} />
-                <ColoredBunny fill={0xbcfdfe} parentGroup={blueGroup} />
-              </DraggableContainer>
-            ))}
-          </Container>
-        </LayeredStage>
-      </Stage>
-    );
-  }
+function LayersExample() {
+  return (
+    <Stage options={OPTIONS}>
+      {/* specify display list component */}
+      <LayeredStage enableSort>
+        {/* sorry, group cant exist without layer yet :( */}
+        <Layer group={blueGroup} />
+        <Layer group={greenGroup} />
+        <Layer group={dragGroup} />
+        <Layer group={shadowGroup} />
+        {/* make obsolete containers. Why do we need them?
+         * Just to show that we can do everything without
+         * caring of actual parent container */}
+        <Container>
+          {evenBunnies.map(index => (
+            <DraggableContainer
+              key={index}
+              x={100 + 20 * index}
+              y={100 + 20 * index}
+              onDragEnd={onBunnyDragEnd}
+              onDragStart={onBunnyDragStart}
+            >
+              <Rect {...shadowProps} parentGroup={shadowGroup} />
+              <ColoredBunny fill={0x74fa9a} parentGroup={greenGroup} />
+            </DraggableContainer>
+          ))}
+        </Container>
+        <Container>
+          {oddBunnies.map(index => (
+            <DraggableContainer
+              key={index}
+              x={100 + 20 * index}
+              y={100 + 20 * index}
+              onDragEnd={onBunnyDragEnd}
+              onDragStart={onBunnyDragStart}
+            >
+              <Rect {...shadowProps} parentGroup={shadowGroup} />
+              <ColoredBunny fill={0x74fa9a} parentGroup={greenGroup} />
+            </DraggableContainer>
+          ))}
+        </Container>
+        <Container>
+          {blueBunnies.map(index => (
+            <DraggableContainer
+              key={index}
+              x={400 + 20 * index}
+              y={400 - 20 * index}
+              onDragEnd={onBunnyDragEnd}
+              onDragStart={onBunnyDragStart}
+            >
+              <Rect {...shadowProps} parentGroup={shadowGroup} />
+              <ColoredBunny fill={0xbcfdfe} parentGroup={blueGroup} />
+            </DraggableContainer>
+          ))}
+        </Container>
+      </LayeredStage>
+    </Stage>
+  );
 }
 
-export default CustomComponentExample;
+export default LayersExample;

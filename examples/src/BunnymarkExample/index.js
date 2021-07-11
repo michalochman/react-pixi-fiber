@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Stage } from "react-pixi-fiber";
 import Bunnymark from "./Bunnymark";
 
@@ -8,14 +8,12 @@ const OPTIONS = {
   width: 800,
 };
 
-class BunnymarkExample extends Component {
-  render() {
-    return (
-      <Stage options={OPTIONS}>
-        <Bunnymark />
-      </Stage>
-    );
-  }
+function BunnymarkExample() {
+  return (
+    <Stage options={OPTIONS}>
+      <Bunnymark />
+    </Stage>
+  );
 }
 
 export default BunnymarkExample;

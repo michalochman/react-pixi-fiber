@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { render, unstable_batchedUpdates } from "react-pixi-fiber";
 import Bunny from "../Bunny";
 import * as PIXI from "pixi.js";
@@ -12,64 +12,55 @@ const asyncFunc = cb => {
   setTimeout(cb, 100);
 };
 
-class Canvas extends Component {
-  mountStage = canvasEl => {
-    this.app = new PIXI.Application({
+function Canvas() {
+  const mountStage = useCallback(canvasEl => {
+    const app = new PIXI.Application({
       ...OPTIONS,
       view: canvasEl,
     });
-    render(<BatchedUpdatesExample />, this.app.stage);
-  };
+    render(<BatchedUpdatesExample />, app.stage);
+  }, []);
 
-  render() {
-    return <canvas ref={this.mountStage} />;
-  }
+  return <canvas ref={mountStage} />;
 }
 
-class BatchedUpdatesExample extends Component {
-  state = {
-    x: 0,
-    y: 0,
-  };
+function BatchedUpdatesExample() {
+  console.log("`render` called");
 
-  componentDidMount() {
-    // auto batched in life cycle
-    // render once
-    this.setStateTwice();
-  }
-
-  setStateTwice = () => {
-    this.setState({
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const setStateTwice = useCallback(() => {
+    setPosition({
       x: 100,
       y: 200,
     });
-    this.setState({
+    setPosition({
       x: 300,
       y: 400,
     });
-  };
+  }, []);
 
-  batched = () => {
+  // auto batched in life cycle
+  // render once
+  useEffect(setStateTwice, [setStateTwice]);
+
+  const batchedUpdate = useCallback(() => {
     // render once
-    asyncFunc(unstable_batchedUpdates(this.setStateTwice));
-  };
+    asyncFunc(unstable_batchedUpdates(setStateTwice));
+  }, [setStateTwice]);
 
-  normal = () => {
+  const normalUpdate = useCallback(() => {
     // render twice
-    asyncFunc(this.setStateTwice);
-  };
+    asyncFunc(setStateTwice);
+  }, [setStateTwice]);
 
-  render() {
-    console.log("`render` called");
-    const width = 800;
-    const height = 600;
-    return (
-      <Fragment>
-        <Bunny x={this.state.x} y={this.state.y} interactive pointerdown={this.normal} />
-        <Bunny x={width - this.state.x} y={height - this.state.y} interactive pointerdown={this.batched} />
-      </Fragment>
-    );
-  }
+  const width = 800;
+  const height = 600;
+  return (
+    <Fragment>
+      <Bunny x={position.x} y={position.y} interactive pointerdown={normalUpdate} />
+      <Bunny x={width - position.x} y={height - position.y} interactive pointerdown={batchedUpdate} />
+    </Fragment>
+  );
 }
 
 export default Canvas;
