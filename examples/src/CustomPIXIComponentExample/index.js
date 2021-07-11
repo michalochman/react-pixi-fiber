@@ -5,7 +5,12 @@ import DraggableContainer from "./DraggableContainer";
 import Rect from "./Rect";
 
 const COLORS = [0xff00ff, 0x00ffff];
-const POSITIONS = [{ x: 300, y: 200 }, { x: 400, y: 200 }, { x: 400, y: 300 }, { x: 300, y: 300 }];
+const POSITIONS = [
+  { x: 300, y: 200 },
+  { x: 400, y: 200 },
+  { x: 400, y: 300 },
+  { x: 300, y: 300 },
+];
 const OPTIONS = {
   backgroundColor: 0x1099bb,
   height: 600,

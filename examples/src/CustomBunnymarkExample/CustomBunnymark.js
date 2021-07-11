@@ -28,7 +28,7 @@ const generateBunny = texture => ({
   texture: texture,
 });
 
-const moveBunny = function() {
+const moveBunny = function () {
   this.x += this.speedX;
   this.y += this.speedY;
   this.speedY += gravity;

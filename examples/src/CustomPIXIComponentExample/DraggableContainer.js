@@ -4,7 +4,7 @@ import * as PIXI from "pixi.js";
 const TYPE = "DraggableContainer";
 const behavior = {
   customDisplayObject: () => new PIXI.Container(),
-  customDidAttach: function(instance) {
+  customDidAttach: function (instance) {
     instance.interactive = true;
     instance.cursor = "pointer";
 
