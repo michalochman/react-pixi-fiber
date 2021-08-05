@@ -8,38 +8,16 @@ import {
 } from "scheduler";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
+import { findStrictRoot } from "./utils";
 
-let findStrictRoot;
 let validatePropertiesInDevelopment;
 
 if (__DEV__) {
-  // See https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactTypeOfMode.js#L13
-  const StrictMode = 1;
-
-  // Would be better if this was just exported from react-reconciler
-  // Additional try/catch added in case the internal API changes
-  // See: https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactStrictModeWarnings.new.js#L31
-  findStrictRoot = fiber => {
-    try {
-      let maybeStrictRoot = null;
-
-      let node = fiber;
-      while (node !== null) {
-        if (node.mode & StrictMode) {
-          maybeStrictRoot = node;
-        }
-        node = node.return;
-      }
-
-      return maybeStrictRoot;
-    } catch (e) {
-      return null;
-    }
-  };
-
   validatePropertiesInDevelopment = function (type, props, internalHandle) {
     const strictRoot = findStrictRoot(internalHandle);
-    validateUnknownProperties(type, props, strictRoot);
+    if (strictRoot != null) {
+      validateUnknownProperties(type, props);
+    }
   };
 }
 

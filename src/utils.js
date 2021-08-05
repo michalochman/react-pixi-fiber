@@ -22,6 +22,32 @@ export function filterByKey(inputObject, filter) {
   return exportObject;
 }
 
+/* react-reconciler related Methods */
+
+// See https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactTypeOfMode.js#L13
+const StrictMode = 1;
+
+// Would be better if this was just exported from react-reconciler
+// Additional try/catch added in case the internal API changes
+// See: https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactStrictModeWarnings.new.js#L31
+export function findStrictRoot(fiber) {
+  try {
+    let maybeStrictRoot = null;
+
+    let node = fiber;
+    while (node !== null) {
+      if (node.mode & StrictMode) {
+        maybeStrictRoot = node;
+      }
+      node = node.return;
+    }
+
+    return maybeStrictRoot;
+  } catch (e) {
+    return null;
+  }
+}
+
 /* PIXI related Methods */
 
 export function createPixiApplication(options) {

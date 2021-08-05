@@ -120,8 +120,8 @@ export const warnUnknownProperties = function (type, props) {
   }
 };
 
-export function validateProperties(type, props, strictRoot) {
-  if (isInjectedType(type) || strictRoot == null) {
+export function validateProperties(type, props) {
+  if (isInjectedType(type)) {
     return;
   }
   warnUnknownProperties(type, props);

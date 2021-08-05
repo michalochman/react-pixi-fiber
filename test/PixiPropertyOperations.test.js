@@ -41,22 +41,20 @@ describe("PixiPropertyOperations", () => {
       expect(setPixiValue).toHaveBeenCalledWith(instance, propName, false);
     });
 
-    it("should call setPixiValue with null value if property should be removed and default is not available", () => {
+    it("should not call setPixiValue if property should be removed and default is not available", () => {
       const type = "Sprite";
       const propName = "unknownProp";
       shouldRemoveAttribute.mockImplementation(() => true);
       PixiPropertyOperations.setValueForProperty(type, instance, propName, undefined);
-      expect(setPixiValue).toHaveBeenCalledTimes(1);
-      expect(setPixiValue).toHaveBeenCalledWith(instance, propName, null);
+      expect(setPixiValue).toHaveBeenCalledTimes(0);
     });
 
-    it("should call setPixiValue with null value if property should be removed and defaults are not available", () => {
+    it("should not call setPixiValue if property should be removed and defaults are not available", () => {
       const type = "UnknownType";
       const propName = "unknownProp";
       shouldRemoveAttribute.mockImplementation(() => true);
       PixiPropertyOperations.setValueForProperty(type, instance, propName, undefined);
-      expect(setPixiValue).toHaveBeenCalledTimes(1);
-      expect(setPixiValue).toHaveBeenCalledWith(instance, propName, null);
+      expect(setPixiValue).toHaveBeenCalledTimes(0);
     });
 
     it("should call setPixiValue with provided value if property should not be removed", () => {

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added ReactDOM-like prop validation in development ([#47])
 - Add ES format output
+- Added missing `prop-types` dependency ([#221])
 
 ### Changed
 - Updated build dependencies
@@ -25,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed type of `oldProps` sent to `customApplyProps` of `CustomPIXIComponent`
 - Fixed hook-based `Stage` to render and rerender synchronously ([#204])
 - Fixed type compatibility with PixiJS v6.0.0 ([#210])
-- Added missing `prop-types` dependency ([#221])
+- Fixed breaking change when undefined values were assigned to props with previously defined values
 
 ### Removed
 - Removed `performance-now` dependency

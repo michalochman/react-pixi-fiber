@@ -437,9 +437,27 @@ describe("ReactPixiFiber", () => {
         internalInstanceHandle
       );
       expect(setValueForProperty).toHaveBeenCalledTimes(2);
-      expect(setValueForProperty).not.toHaveBeenCalledWith(type, instance, "children", nextRawProps["children"]);
-      expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", nextRawProps["position"]);
-      expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "scale", nextRawProps["scale"]);
+      expect(setValueForProperty).not.toHaveBeenCalledWith(
+        type,
+        instance,
+        "children",
+        nextRawProps["children"],
+        internalInstanceHandle
+      );
+      expect(setValueForProperty).toHaveBeenCalledWith(
+        type,
+        instance,
+        "position",
+        nextRawProps["position"],
+        internalInstanceHandle
+      );
+      expect(setValueForProperty).toHaveBeenCalledWith(
+        type,
+        instance,
+        "scale",
+        nextRawProps["scale"],
+        internalInstanceHandle
+      );
 
       ReactPixiFiberComponentRewireAPI.__ResetDependency__("setValueForProperty");
     });
