@@ -3,7 +3,13 @@ import { useContext, useEffect } from "react";
 import { AppContext } from "./AppProvider";
 
 export function usePixiApp() {
-  return useContext(AppContext);
+  const app = useContext(AppContext);
+
+  if (app === null) {
+    throw new Error("No PIXI.Application is available here. You can only access it in children of <Stage />");
+  }
+
+  return app;
 }
 
 export function usePixiTicker(fn) {

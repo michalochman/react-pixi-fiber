@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated dev dependencies
 - Changed `Stage` class and function component types to be the same ([#225])
 - Changed Stage to delay destroying PIXI.Application when unmounting
+- Changed usePixiApp to throw an error when used outside of <Stage /> ([#227])
 
 ### Fixed
 - Fixed type of `oldProps` sent to `customApplyProps` of `CustomPIXIComponent`
@@ -453,6 +454,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#227]: https://github.com/michalochman/react-pixi-fiber/issues/227
 [#225]: https://github.com/michalochman/react-pixi-fiber/issues/225
 [#221]: https://github.com/michalochman/react-pixi-fiber/issues/221
 [#210]: https://github.com/michalochman/react-pixi-fiber/issues/210
