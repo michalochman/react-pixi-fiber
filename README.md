@@ -15,6 +15,22 @@ For React <16.0.0 see [`react-pixi`].
 See [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6) demo.
 
 
+
+
+## Installing
+
+The current version assumes [React] >16.0.0 and [PixiJS] >4.4.0
+
+    yarn add react-pixi-fiber prop-types pixi.js
+
+or
+
+    npm install react-pixi-fiber prop-types pixi.js --save
+
+Refer to next sections to see usage examples.
+
+This package works flawlessly with [Create React App](https://github.com/facebookincubator/create-react-app) – see examples below, they already use it.
+
 ## Usage
 
 ### With ReactDOM
@@ -71,19 +87,6 @@ This example will render [`PIXI.Text`] object into a [Root Container] of PIXI Ap
 2. Run `yarn install` (or `npm install`) in the `examples` directory.
 3. Run `yarn start` (or `npm run start`) in the `examples` directory.
 4. Wait few seconds and browse examples that will open in new browser window.
-
-
-## Installing
-
-The current version assumes [React] >16.0.0 and [PixiJS] >4.4.0
-
-    yarn add react-pixi-fiber
-
-or
-
-    npm install react-pixi-fiber --save
-
-This package works flawlessly with [Create React App](https://github.com/facebookincubator/create-react-app) – see examples above, they already use it.
 
 
 ## Migrating from [`react-pixi`]
@@ -496,7 +499,7 @@ Yes! Awesome!
 
 ### What version of PixiJS I can use?
 
-Both PixiJS v4 and v5 are supported.
+PixiJS v4, v5 and v6 are supported.
 
 ### Can I use already existing [`PIXI.Application`]?
 
