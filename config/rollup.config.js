@@ -35,8 +35,8 @@ const getPlugins = entry => [
 
 const getExternal = entry => {
   return {
-    "react-pixi-alias": ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber", "scheduler"],
-    "react-pixi-fiber": ["pixi.js", "prop-types", "react", "react-dom", "scheduler"],
+    "react-pixi-alias": ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
+    "react-pixi-fiber": ["pixi.js", "prop-types", "react", "react-dom"],
   }[entry];
 };
 
@@ -60,7 +60,6 @@ const getConfig = (entry, format) => ({
       "prop-types": "PropTypes",
       "pixi.js": "PIXI",
       "react-pixi-fiber": "ReactPixiFiber",
-      scheduler: "Scheduler",
     },
     sourcemap: isProduction,
   },

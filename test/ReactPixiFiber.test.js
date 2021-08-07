@@ -333,24 +333,6 @@ describe("ReactPixiFiber", () => {
     });
   });
 
-  describe("shouldDeprioritizeSubtree", () => {
-    it("returns true when alpha is 0", () => {
-      expect(ReactPixiFiber.shouldDeprioritizeSubtree(null, { alpha: 0 })).toBeTruthy();
-    });
-
-    it("returns true when renderable is false", () => {
-      expect(ReactPixiFiber.shouldDeprioritizeSubtree(null, { renderable: false })).toBeTruthy();
-    });
-
-    it("returns true when visible is false", () => {
-      expect(ReactPixiFiber.shouldDeprioritizeSubtree(null, { visible: false })).toBeTruthy();
-    });
-
-    it("returns false when alpha is not 0, renderable is true and visible is true", () => {
-      expect(ReactPixiFiber.shouldDeprioritizeSubtree(null, { alpha: 1, renderable: true, visible: true })).toBeFalsy();
-    });
-  });
-
   describe("shouldSetTextContent", () => {
     it("returns false", () => {
       expect(ReactPixiFiber.shouldSetTextContent()).toBeFalsy();

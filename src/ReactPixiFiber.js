@@ -1,11 +1,6 @@
 import ReactFiberReconciler from "react-reconciler";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
-import {
-  unstable_now as now,
-  unstable_scheduleCallback as scheduleDeferredCallback,
-  unstable_cancelCallback as cancelDeferredCallback,
-} from "scheduler";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
 import { findStrictRoot } from "./utils";
@@ -111,14 +106,6 @@ export function scheduleTimeout(fn, delay) {
   setTimeout(fn, delay);
 }
 
-export function shouldDeprioritizeSubtree(type, props) {
-  const isAlphaVisible = typeof props.alpha === "undefined" || props.alpha > 0;
-  const isRenderable = typeof props.renderable === "undefined" || props.renderable === true;
-  const isVisible = typeof props.visible === "undefined" || props.visible === true;
-
-  return !(isAlphaVisible && isRenderable && isVisible);
-}
-
 export function shouldSetTextContent(type, props) {
   return false;
 }
@@ -157,6 +144,12 @@ export function unhideTextInstance(instance, props) {
   // Noop
 }
 
+export function now() {
+  return typeof performance === "object" && typeof performance.now === "function"
+    ? () => performance.now()
+    : () => Date.now();
+}
+
 export const supportsMutation = true;
 
 const hostConfig = {
@@ -192,12 +185,6 @@ const hostConfig = {
   supportsMutation: supportsMutation,
   unhideInstance: unhideInstance,
   unhideTextInstance: unhideTextInstance,
-  // needed before https://github.com/facebook/react/pull/14984
-  cancelPassiveEffects: cancelDeferredCallback,
-  scheduleDeferredCallback: scheduleDeferredCallback,
-  schedulePassiveEffects: scheduleDeferredCallback,
-  // needed before https://github.com/facebook/react/pull/19124
-  shouldDeprioritizeSubtree: shouldDeprioritizeSubtree,
 };
 
 // React Pixi Fiber renderer is primary if used without React DOM
