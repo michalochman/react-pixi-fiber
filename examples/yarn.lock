@@ -9574,10 +9574,10 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   "version" "17.0.2"
 
-"react-pixi-fiber@1.0.0-beta.13":
-  "integrity" "sha512-32+1nDxY2ycLjytmsfqGKtS2njcvntSSgCcbp+bGvBscTyMYghnUxWfvnsSYOONkIWRT7bOaOQ/YlLPGk96E6g=="
-  "resolved" "https://registry.npmjs.org/react-pixi-fiber/-/react-pixi-fiber-1.0.0-beta.13.tgz"
-  "version" "1.0.0-beta.13"
+"react-pixi-fiber@1.0.0-beta.14":
+  "integrity" "sha512-2VdPZ6touFldFLOELM2ikqYHxKOdzRy8sfay6ZX1EZ3jF10ak/mgZkbrNjD6DkEt13nXUrj9dCmpuS7f2oUHOg=="
+  "resolved" "https://registry.npmjs.org/react-pixi-fiber/-/react-pixi-fiber-1.0.0-beta.14.tgz"
+  "version" "1.0.0-beta.14"
   dependencies:
     "fbjs" "^3.0.0"
     "react-reconciler" "^0.26.2"
