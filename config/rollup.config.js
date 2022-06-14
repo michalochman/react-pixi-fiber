@@ -2,9 +2,10 @@ const pkg = require("../package.json");
 const { babel } = require("@rollup/plugin-babel");
 const commonjs = require("@rollup/plugin-commonjs");
 const replace = require("@rollup/plugin-replace");
+const peerDepsExternal = require("rollup-plugin-peer-deps-external");
 const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
-const visualizer = require("rollup-plugin-visualizer");
+const { visualizer } = require("rollup-plugin-visualizer");
 
 const NODE_ENV = process.env.NODE_ENV || "production";
 const isProduction = NODE_ENV === "production";
@@ -15,16 +16,21 @@ const getOutputFile = (entry, format) => {
 };
 
 const getPlugins = entry => [
+  peerDepsExternal(),
   nodeResolve({
     mainFields: ["module", "jsnext:main", "main"],
   }),
   babel({
+    babelHelpers: "bundled",
     exclude: "node_modules/**",
   }),
   replace({
-    __DEV__: isProduction ? JSON.stringify(false) : JSON.stringify(true),
-    __PACKAGE_NAME__: JSON.stringify(pkg.name),
-    "process.env.NODE_ENV": isProduction ? JSON.stringify("production") : JSON.stringify("development"),
+    preventAssignment: true,
+    values: {
+      __DEV__: isProduction ? JSON.stringify(false) : JSON.stringify(true),
+      __PACKAGE_NAME__: JSON.stringify(pkg.name),
+      "process.env.NODE_ENV": isProduction ? JSON.stringify("production") : JSON.stringify("development"),
+    },
   }),
   commonjs(),
   isProduction && terser(),
@@ -35,8 +41,7 @@ const getPlugins = entry => [
 
 const getExternal = entry => {
   return {
-    "react-pixi-alias": ["pixi.js", "prop-types", "react", "react-dom", "react-pixi-fiber"],
-    "react-pixi-fiber": ["pixi.js", "prop-types", "react", "react-dom"],
+    "react-pixi-alias": ["react-pixi-fiber"],
   }[entry];
 };
 
