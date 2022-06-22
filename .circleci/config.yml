@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.24.1
+      - image: cimg/node:16.15.1
 
     working_directory: ~/react-pixi-fiber
 
