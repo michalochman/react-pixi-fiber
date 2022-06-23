@@ -51,7 +51,7 @@
     "eslint-plugin-react-hooks": "^2.0.1",
     "jest": "^24.1.0",
     "jest-environment-jsdom-with-canvas": "https://github.com/arcatdmz/jest-environment-jsdom-with-canvas.git",
-    "jsdom": "^13.2.0",
+    "jsdom": "^16.5.0",
     "pixi.js": "^5.0.4",
     "pixi.js-legacy": "^5.0.4",
     "prettier": "^1.12.1",
