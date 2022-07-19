@@ -114,7 +114,7 @@ export default function createStageFunction() {
 
     useImperativeHandle(ref, () => ({
       _app: appRef,
-      _canvas: appRef,
+      _canvas: canvasRef,
       props: props,
     }));
 
