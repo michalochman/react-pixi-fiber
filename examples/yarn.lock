@@ -9353,10 +9353,10 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-pixi-fiber@1.0.0-beta.16:
-  version "1.0.0-beta.16"
-  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-1.0.0-beta.16.tgz#8801c4d54f29882af16ab4fb839c4a89042dd78e"
-  integrity sha512-blZCo0WjdEpc2pGHkTs5GErJeNe368IRiXCqhNwKNT5QCOJGVyoWfzRoJ8MZ/3sTEqf4JkH4TlG9kJ2I413SOg==
+react-pixi-fiber@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-pixi-fiber/-/react-pixi-fiber-1.0.0.tgz#9f00c39dd7b883cb2516405fc488c38582b011a7"
+  integrity sha512-b9QmgS04t2u/s/Y79aJYAEGVJ/00YGGNBbmscO2CVDuRSfJsKkl8gIEi5j44gjTjmnBZAj7hFTc+Zb/pwtl1Dw==
   dependencies:
     fbjs "^3.0.0"
     react-reconciler "^0.26.2"
