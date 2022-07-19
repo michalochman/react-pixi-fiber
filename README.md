@@ -1,14 +1,36 @@
-# ReactPixiFiber – React Fiber renderer for PixiJS 
-[![npm](https://img.shields.io/npm/v/react-pixi-fiber.svg)](https://npmjs.com/package/react-pixi-fiber)
-[![License](https://img.shields.io/github/license/michalochman/react-pixi-fiber.svg)](https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE)
-[![CircleCI](https://img.shields.io/circleci/project/github/michalochman/react-pixi-fiber/master.svg)](https://circleci.com/gh/michalochman/react-pixi-fiber/tree/master)
-[![codecov](https://img.shields.io/codecov/c/github/michalochman/react-pixi-fiber/master.svg)](https://codecov.io/gh/michalochman/react-pixi-fiber/branch/master)
-[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![gitter](https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg)](https://gitter.im/react-pixi-fiber/Lobby)
+<div align="center">
+  <img alt="ReactPixiFiber" src="./react-pixi.svg" width="500" />
+</div>
 
-ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16 and above.
+<div align="center">
+  <h1>ReactPixiFiber – React Fiber renderer for PixiJS</h1>
 
-For React <16.0.0 see [`react-pixi`].
+  <p>
+    ReactPixiFiber is a JavaScript library for writing <a href="https://pixijs.com/">PixiJS</a> applications using <a href="https://reactjs.org/">React</a> declarative style in React 16 and above.
+    <br />
+    For React <16.0.0 see <a href="https://github.com/Izzimach/react-pixi">react-pixi</a>.
+  </p>
+
+  <a href="https://npmjs.com/package/react-pixi-fiber">
+    <img alt="npm" src="https://img.shields.io/npm/v/react-pixi-fiber.svg" />
+  </a>
+  <a href="https://github.com/michalochman/react-pixi-fiber/blob/master/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/michalochman/react-pixi-fiber.svg" />
+  </a>
+  <a href="https://circleci.com/gh/michalochman/react-pixi-fiber/tree/master">
+    <img alt="CircleCI" src="https://img.shields.io/circleci/project/github/michalochman/react-pixi-fiber/master.svg" />
+  </a>
+  <a href="https://codecov.io/gh/michalochman/react-pixi-fiber/branch/master">
+    <img alt="codecov" src="https://img.shields.io/codecov/c/github/michalochman/react-pixi-fiber/master.svg" />
+  </a>
+  <a href="
+  [![styled with prettier]()](">
+    <img alt="styled with prettier" src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" />
+  </a>
+  <a href="https://gitter.im/react-pixi-fiber/Lobby">
+    <img alt="gitter" src="https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg" />
+  </a>
+</div>
 
 ## Demo
 
