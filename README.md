@@ -6,7 +6,7 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![gitter](https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg)](https://gitter.im/react-pixi-fiber/Lobby)
 
-ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16 and React 17.
+ReactPixiFiber is a JavaScript library for writing PixiJS applications using React declarative style in React 16 and above.
 
 For React <16.0.0 see [`react-pixi`].
 
@@ -15,7 +15,9 @@ For React <16.0.0 see [`react-pixi`].
 See [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6) demo.
 
 
+## 🚀 Migrating from version `0.x.y`? 🚀
 
+Read [migration guide](#migrating-from-react-pixi-fiber0xy-before-version-100). 
 
 ## Installing
 
@@ -89,7 +91,173 @@ This example will render [`PIXI.Text`] object into a [Root Container] of PIXI Ap
 4. Wait few seconds and browse examples that will open in new browser window.
 
 
-## Migrating from [`react-pixi`]
+## Migrating from `react-pixi-fiber@0.x.y` (before version `1.0.0`)
+
+<details>
+  <summary>
+    <strong>Changed built-in <code>Stage</code> and the one returned by <code>createStageClass()</code> to have the same API</strong>
+  </summary>
+
+It is now possible to get `ref` to built-in `Stage`.
+
+Unless you are using class-based `Stage` component explicitly in your application, for example you are extending it, you should prefer to use built-in `Stage` instead of creating it with `createStageClass()`.
+
+Data available on the `Stage` "instance":
+* `_app` - PIXI.Application instance
+* `_canvas` - HTMLCanvasElement instance
+* `props` - props passed to Stage component
+
+For example:
+```js
+import * as React from "react";
+import { Stage, Text } from "react-pixi-fiber";
+
+const width = 600;
+const height = 400;
+const options = {
+  backgroundColor: 0x56789a,
+  width: width,
+  height: height
+};
+const style = {
+  width: width,
+  height: height
+};
+
+function App() {
+  const stageRef = React.useRef()
+  React.useEffect(() => {
+    // Access PIXI.Application instance
+    console.log(stageRef.current?._app.current)
+    // Access HTMLCanvasElement instance
+    console.log(stageRef.current?._canvas.current)
+    // Access props passed to Stage component
+    console.log(stageRef.current?.props)
+  }, [])
+
+  return (
+    <Stage options={options} style={style} ref={stageRef}>
+      <Text x={100} y={100} text="Hello world!" />
+    </Stage>
+  );
+}
+```
+</details>
+
+<details>
+  <summary>
+    <strong>Changed <code>PIXI.Application</code> exposed by <code>Stage</code> to be React <code>ref</code></strong>
+  </summary>
+
+This is only relevant if you were using `createStageClass()` to create `Stage` component, as it was impossible to get `ref` when using built-in `Stage` as if was a function component, which triggered `Warning: Function components cannot be given refs` error.
+
+For example:
+```diff
+import * as React from "react";
+import { createStageClass, Text } from "react-pixi-fiber";
+
+const Stage = createStageClass()
+
+const width = 600;
+const height = 400;
+const options = {
+  backgroundColor: 0x56789a,
+  width: width,
+  height: height
+};
+const style = {
+  width: width,
+  height: height
+};
+
+function App() {
+  const stageRef = React.useRef()
+  React.useEffect(() => {
+-    console.log(stageRef.current?._app.renderer)
++    console.log(stageRef.current?._app.current.renderer)
+  }, [])
+
+  return (
+    <Stage options={options} style={style} ref={stageRef}>
+      <Text x={100} y={100} text="Hello world!" />
+    </Stage>
+  );
+}
+```
+</details>
+
+<details>
+  <summary>
+    <strong>Changed <code>oldProps</code> in <code>customApplyProps</code> to not be initialised when the component is first rendered</strong>
+  </summary>
+
+Make sure to check if `oldProps` is initialised before trying to read properties from it.
+
+For example:
+```diff
+import { Container, CustomPIXIComponent } from "react-pixi-fiber"
+
+const TYPE = "CustomContainer"
+const behavior = {
+  customApplyProps: function (instance, oldProps, newProps) {
+-    const { customProp: oldCustomProp, ...otherOldProps } = oldProps
++    const { customProp: oldCustomProp, ...otherOldProps } = oldProps ?? {}
+    const { customProp, ...otherNewProps } = newProps
+    if (customProp !== oldCustomProp) {
+      // Do something when customProp value have changed
+    }
+    this.applyDisplayObjectProps(otherOldProps, otherNewProps)
+  },
+  customDisplayObject: function ({ customProp, ...props }) {
+    const container = new PIXI.Container(props)
+    if (customProp === "foo") {
+      // Do something when customProp is equal to "foo"
+    }
+    return container
+  },
+}
+
+export default CustomPIXIComponent(behavior, TYPE)
+```
+</details>
+
+<details>
+  <summary>
+    <strong>Changed <code>applyProps</code> to <code>applyDisplayObjectProps</code></strong>
+  </summary>
+
+
+`react-pixi-fiber` now needs to know the type of component (e.g. `"Sprite"`) to properly apply the props.
+
+For example:
+```diff
+-import { applyProps } from "react-pixi-fiber"
++import { applyDisplayObjectProps } from "react-pixi-fiber"
+
+function ApplyAnimatedValues(instance, props) {
+  if (instance instanceof PIXI.DisplayObject) {
+-    applyProps(instance, {}, props)
++    // Component has custom way of applying props - use that
++    if (typeof instance._customApplyProps === "function") {
++      instance._customApplyProps(instance, {}, props)
++    }
++    // Component doesn't have custom way of applying props - use default way
++    else {
++      const type = instance.constructor.name
++      applyDisplayObjectProps(type, instance, {}, props)
+    }
+  } else {
+    return false
+  }
+}
+```
+
+Refer to the implementation, when in doubt:
+* old `applyProps` -> https://github.com/michalochman/react-pixi-fiber/blob/64e8e9f991f51b407f3af108da732e186429454a/src/ReactPixiFiber.js#L43
+* new `applyDisplayObjectProps` -> https://github.com/michalochman/react-pixi-fiber/blob/3a9b71b8d18180117bf70459dd6b4419c5ef1c21/src/ReactPixiFiberComponent.js#L161
+</details>
+
+## Migrating from `react-pixi`
 
 It is possible to use React Pixi Fiber as a drop-in replacement for `react-pixi`. 
 
