@@ -36,6 +36,17 @@
 
 See [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6) demo.
 
+Also, please explore our [CodeSandbox](https://codesandbox.io/) templates:
+* [Hello world using JavaScript](https://codesandbox.io/s/react-pixi-fiber-template-ohk6z)
+* [Hello world using TypeScript](https://codesandbox.io/s/react-pixi-fiber-typescript-template-613ly)
+
+and examples:
+* [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6)
+* [AnimatedSprite using CustomComponent](https://codesandbox.io/s/react-pixi-fiber-demo-animatedsprite-d6udu)
+* [Aligning texts](https://codesandbox.io/s/react-pixi-fiber-text-alignment-th5eg)
+* [Sharing Redux state](https://codesandbox.io/s/react-pixi-fiber-with-redux-g4k7n)
+* [Using animated](https://codesandbox.io/s/9qyxrljyo)
+
 
 ## 🚀 Migrating from version `0.x.y`? 🚀
 
@@ -57,7 +68,41 @@ This package works flawlessly with [Create React App](https://github.com/faceboo
 
 ## Usage
 
-### With ReactDOM
+<details open>
+  <summary>
+    <strong>With ReactDOM (React 18 and above)</strong>
+  </summary>
+
+```jsx harmony
+import { createRoot } from "react-dom/client";
+import { Sprite, Stage } from "react-pixi-fiber";
+import bunny from "./bunny.png";
+
+function Bunny (props) {
+  return <Sprite texture={PIXI.Texture.from(bunny)} {...props} />;
+}
+
+const container = document.getElementById("container");
+const root = createRoot(container);
+
+root.render(
+  <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
+    <Bunny x={200} y={200} />
+  </Stage>,
+);
+```
+
+This example will render [`PIXI.Sprite`] object into a [Root Container] of [`PIXI.Application`] on the page.
+
+The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html) is not required to use with this renderer, but it makes code more readable. You can use [Babel](https://babeljs.io/) with a [React preset](https://babeljs.io/docs/plugins/preset-react/) to convert JSX into native JavaScript.
+</details>
+
+---
+
+<details>
+  <summary>
+    <strong>With ReactDOM (React 16 and 17)</strong>
+  </summary>
 
 ```jsx harmony
 import { render } from "react-dom";
@@ -68,20 +113,26 @@ function Bunny(props) {
   return <Sprite texture={PIXI.Texture.from(bunny)} {...props} />;
 }
 
+const container = document.getElementById("container");
 render(
   <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
     <Bunny x={200} y={200} />
   </Stage>,
-  document.getElementById("container")
+  container
 );
 ```
 
 This example will render [`PIXI.Sprite`] object into a [Root Container] of [`PIXI.Application`] on the page.
 
 The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html) is not required to use with this renderer, but it makes code more readable. You can use [Babel](https://babeljs.io/) with a [React preset](https://babeljs.io/docs/plugins/preset-react/) to convert JSX into native JavaScript.
+</details>
 
+---
 
-### Without ReactDOM
+<details>
+  <summary>
+    <strong>Without ReactDOM</strong>
+  </summary>
 
 ```jsx harmony
 import { render, Text } from "react-pixi-fiber";
@@ -103,6 +154,7 @@ render(
 ```
 
 This example will render [`PIXI.Text`] object into a [Root Container] of PIXI Application (created as `app`) inside the `<canvas id="container"></canvas>` element on the page.
+</details>
 
 
 ## Running Examples
@@ -166,6 +218,8 @@ function App() {
 ```
 </details>
 
+---
+
 <details>
   <summary>
     <strong>Changed <code>PIXI.Application</code> exposed by <code>Stage</code> to be React <code>ref</code></strong>
@@ -208,6 +262,8 @@ function App() {
 ```
 </details>
 
+---
+
 <details>
   <summary>
     <strong>Changed <code>oldProps</code> in <code>customApplyProps</code> to not be initialised when the component is first rendered</strong>
@@ -242,6 +298,8 @@ const behavior = {
 export default CustomPIXIComponent(behavior, TYPE)
 ```
 </details>
+
+---
 
 <details>
   <summary>
@@ -279,13 +337,16 @@ Refer to the implementation, when in doubt:
 * new `applyDisplayObjectProps` -> https://github.com/michalochman/react-pixi-fiber/blob/3a9b71b8d18180117bf70459dd6b4419c5ef1c21/src/ReactPixiFiberComponent.js#L161
 </details>
 
+---
+
 ## Migrating from `react-pixi`
 
 It is possible to use React Pixi Fiber as a drop-in replacement for `react-pixi`. 
 
 There are two options:
 
-### Changing `import` / `require` statements
+<details>
+  <summary>Changing <code>import</code> or <code>require</code> statements</summary>
 
 Change:
 
@@ -296,28 +357,35 @@ const ReactPIXI = require("react-pixi");
 ```
 
 to:
- 
+
  ```js
 import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
 // or
 const ReactPIXI = require("react-pixi-fiber/react-pixi-alias");
 ```
+</details>
 
-### Using `webpack` resolve `alias`
+---
+
+<details>
+  <summary>Using <code>webpack</code> resolve <code>alias</code></summary>
 
 ```js
 resolve: {
   alias: {
-    'react-pixi$': 'react-pixi-fiber/react-pixi-alias'
+    "react-pixi$": "react-pixi-fiber/react-pixi-alias"
   }
 }
 ```
+</details>
+
+---
 
 ## API
 
 ### Components
 
-React Pixi Fiber currently supports following components:
+React Pixi Fiber currently supports following components out of the box (but read [Custom Components](#custom-components) section if you need more):
 
 #### `<Stage />`
 
@@ -337,7 +405,7 @@ Renders [`PIXI.Graphics`].
 
 #### `<ParticleContainer />`
 
-Renders [`PIXI.particles.ParticleContainer`].
+Renders [`PIXI.ParticleContainer`] (or [`PIXI.particles.ParticleContainer`] if you're using PixiJS 4).
 
 #### `<Sprite />`
 
@@ -345,7 +413,7 @@ Renders [`PIXI.Sprite`].
 
 #### `<TilingSprite />`
 
-Renders [`PIXI.extras.TilingSprite`].
+Renders [`PIXI.TilingSprite`] (or [`PIXI.extras.TilingSprite`] if you're using PixiJS 4).
 
 #### `<Text />`
 
@@ -353,7 +421,7 @@ Renders [`PIXI.Text`].
 
 #### `<BitmapText />`
 
-Renders [`PIXI.extras.BitmapText`].
+Renders [`PIXI.BitmapText`] (or [`PIXI.extras.BitmapText`] if you're using PixiJS 4).
 
 #### `<NineSlicePlane />`
 
@@ -488,6 +556,8 @@ render(
 
 </details>
 
+---
+
 <details>
   <summary>
     <strong>Using New Context API directly (with React 16.3.0 and newer)</strong>
@@ -546,6 +616,8 @@ render(
 
 </details>
 
+---
+
 <details>
   <summary>
     <strong>Using Legacy Context API directly (with React older than 16.3.0)</strong>
@@ -602,6 +674,8 @@ render(
 ```
 
 </details>
+
+---
 
 ### Custom Components
 
@@ -685,11 +759,15 @@ render(
 
 ### Is it production ready?
 
-Yes! Awesome!
+Yes and it's awesome! It is battle tested and backed up by [Kalamba Games](https://kalambagames.com/games/) since the conception in the beginning of 2018 (after [migrating from `react-pixi`](#migrating-from-react-pixi)) and now also used by other game studios.
 
 ### What version of PixiJS I can use?
 
 PixiJS v4, v5 and v6 are supported.
+
+### Can I use it in my TypeScript project?
+
+Sure thing! We've got you covered.
 
 ### Can I use already existing [`PIXI.Application`]?
 
@@ -755,15 +833,18 @@ For making an awesome project structure and documentation that is used in simila
 [React]: https://github.com/facebook/react
 [Root Container]: http://pixijs.download/release/docs/PIXI.Application.html#stage
 [`PIXI.Application`]: http://pixijs.download/release/docs/PIXI.Application.html
+[`PIXI.BitmapText`]: http://pixijs.download/release/docs/PIXI.BitmapText.html
 [`PIXI.Container`]: http://pixijs.download/release/docs/PIXI.Container.html
 [`PIXI.DisplayObject`]: http://pixijs.download/release/docs/PIXI.DisplayObject.html 
-[`PIXI.extras.BitmapText`]: http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
-[`PIXI.extras.TilingSprite`]: http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
+[`PIXI.extras.BitmapText`]: https://pixijs.download/v4.8.8/docs/PIXI.extras.BitmapText.html
+[`PIXI.extras.TilingSprite`]: https://pixijs.download/v4.8.8/docs/PIXI.extras.TilingSprite.html
 [`PIXI.Graphics`]: http://pixijs.download/release/docs/PIXI.Graphics.html
 [`PIXI.NineSlicePlane`]: http://pixijs.download/release/docs/PIXI.NineSlicePlane.html
 [`PIXI.ObservablePoint`]: http://pixijs.download/release/docs/PIXI.ObservablePoint.html
-[`PIXI.particles.ParticleContainer`]: http://pixijs.download/release/docs/PIXI.particles.ParticleContainer.html
+[`PIXI.ParticleContainer`]: http://pixijs.download/release/docs/PIXI.ParticleContainer.html
+[`PIXI.particles.ParticleContainer`]: https://pixijs.download/v4.8.8/docs/PIXI.particles.ParticleContainer.html
 [`PIXI.Point`]: http://pixijs.download/release/docs/PIXI.Point.html
 [`PIXI.Sprite`]: http://pixijs.download/release/docs/PIXI.Sprite.html
 [`PIXI.Text`]: http://pixijs.download/release/docs/PIXI.Text.html
+[`PIXI.TilingSprite`]: http://pixijs.download/release/docs/PIXI.TilingSprite.html
 [`react-pixi`]: https://github.com/Izzimach/react-pixi
