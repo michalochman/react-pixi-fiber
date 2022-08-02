@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.0.1] - 2022-08-02
+
+### Fixed
+- Fixed peer dependencies ([#277])
+
+
 ## [1.0.0] - 2022-07-19
 
 ### Added
@@ -406,7 +412,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.3...v1.0.0
 [0.14.2]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.0...v0.14.1
@@ -454,6 +461,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#277]: https://github.com/michalochman/react-pixi-fiber/pull/277
 [#227]: https://github.com/michalochman/react-pixi-fiber/issues/227
 [#225]: https://github.com/michalochman/react-pixi-fiber/issues/225
 [#221]: https://github.com/michalochman/react-pixi-fiber/issues/221
