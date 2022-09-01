@@ -1,7 +1,8 @@
 import invariant from "fbjs/lib/invariant";
+import { version } from "react";
 
 export function getDevToolsVersion() {
-  return require("react").version;
+  return version;
 }
 
 export const roots = new Map();
