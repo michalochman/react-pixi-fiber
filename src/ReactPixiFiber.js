@@ -119,7 +119,9 @@ export function cancelTimeout(id) {
 }
 
 export function clearContainer(container) {
-  container && container.removeChildren();
+  if (container) {
+    container.removeChildren();
+  }
 }
 
 export function commitMount(instance, type, props, internalHandle) {
