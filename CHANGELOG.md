@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fix `useStageRerenderer` hook in `React.StrictMode` ([#285])
+
 
 ## [1.0.3] - 2022-10-11
 
@@ -476,6 +479,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
 [#286]: https://github.com/michalochman/react-pixi-fiber/pull/286
+[#285]: https://github.com/michalochman/react-pixi-fiber/issues/285
 [#283]: https://github.com/michalochman/react-pixi-fiber/pull/283
 [#277]: https://github.com/michalochman/react-pixi-fiber/pull/277
 [#227]: https://github.com/michalochman/react-pixi-fiber/issues/227
