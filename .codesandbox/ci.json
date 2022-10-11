@@ -1,3 +1,14 @@
 {
-  "sandboxes": ["new", "react-ts", "/examples"]
+  "sandboxes": [
+    "new",
+    "react-ts",
+    "/examples",
+    "react-pixi-fiber-template-ohk6z",
+    "react-pixi-fiber-typescript-template-613ly",
+    "q7oj1p0jo6",
+    "react-pixi-fiber-demo-animatedsprite-d6udu",
+    "react-pixi-fiber-text-alignment-th5eg",
+    "react-pixi-fiber-with-redux-g4k7n",
+    "9qyxrljyo"
+  ]
 }
