@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.0.3] - 2022-10-11
+
+### Fixed
+- Fixed reconciler to check that container exists before calling `removeChildren` ([#286])
+
+
 ## [1.0.2] - 2022-09-01
 
 ### Fixed
@@ -418,7 +424,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...v1.0.3
 [1.0.2]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.3...v1.0.0
@@ -468,6 +475,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#286]: https://github.com/michalochman/react-pixi-fiber/pull/286
 [#283]: https://github.com/michalochman/react-pixi-fiber/pull/283
 [#277]: https://github.com/michalochman/react-pixi-fiber/pull/277
 [#227]: https://github.com/michalochman/react-pixi-fiber/issues/227
