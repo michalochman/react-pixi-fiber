@@ -62,7 +62,7 @@ export function useStageRerenderer(props, appRef, canvasRef) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     // This is first render, no need to do anything
-    if (!appRef.current) return;
+    if (!appRef.current || prevProps === emptyObject) return;
 
     const { app } = props;
 
@@ -83,7 +83,7 @@ export function useStageRerenderer(props, appRef, canvasRef) {
     const view = canvasRef.current;
 
     // We need to create new PIXI.Application when options other than dimensions
-    // are changed because some of the renderer settings are immutable.
+    // are changed because some renderer settings are immutable.
     if (!shallowEqual(otherOptions, prevOtherOptions)) {
       // Destroy PIXI.Application
       cleanupStage(appRef.current, STAGE_OPTIONS_RECREATE);
@@ -121,7 +121,7 @@ export default function createStageFunction() {
     // The order is important here to avoid unnecessary renders or extra state:
     // - useStageRerenderer:
     //   - is no-op first time it is called, because PIXI.Application is not created yet
-    //   - is responsible
+    //   - is responsible for applying changes to existing PIXI.Application
     // - useStageRenderer:
     //   - is only called once
     //   - is responsible for creating first PIXI.Application and destroying it when Stage is finally unmounted
