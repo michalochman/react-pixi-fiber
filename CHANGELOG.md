@@ -8,8 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.0.4] - 2022-10-19
+
 ### Fixed
-- Fix `useStageRerenderer` hook in `React.StrictMode` ([#285])
+- Fixed reconciler to check that parent exists before calling `appendChild` ([#291])
+- Fixed `useStageRerenderer` hook in `React.StrictMode` ([#285])
 
 
 ## [1.0.3] - 2022-10-11
@@ -34,7 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added ReactDOM-like prop validation in development ([#47])
-- Add ES format output
+- Added ES format output
 - Added missing `prop-types` dependency ([#221])
 
 ### Changed
@@ -427,8 +431,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...HEAD
-[1.0.3]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...v1.0.3
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.14.3...v1.0.0
@@ -478,6 +483,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#291]: https://github.com/michalochman/react-pixi-fiber/pull/291
 [#286]: https://github.com/michalochman/react-pixi-fiber/pull/286
 [#285]: https://github.com/michalochman/react-pixi-fiber/issues/285
 [#283]: https://github.com/michalochman/react-pixi-fiber/pull/283
