@@ -21,6 +21,8 @@ if (__DEV__) {
 const noTimeout = -1;
 
 export function appendChild(parentInstance, child) {
+  if (parentInstance == null) return;
+
   // TODO do we need to remove the child first if it's already added?
   parentInstance.removeChild(child);
 
