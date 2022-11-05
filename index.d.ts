@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
+import EventEmitter from "eventemitter3";
 
 
 declare module "react-pixi-fiber" {
@@ -12,11 +13,15 @@ declare module "react-pixi-fiber" {
   // shipped in pixi.js@5.3.0. We want to support earlier versions of PixiJS as well so we need this hack for now.
   // @ts-ignore TS2694
   type InteractionCompatibility = Exclude<keyof typeof PIXI.interaction, number | symbol>;
+  // @ts-ignore TS2694
+  type InteractionCompatibility2 = Exclude<keyof typeof PIXI.InteractionEvent, number | symbol>;
   type InteractionEvent = string extends InteractionCompatibility
     // @ts-ignore TS2694
     ? PIXI.InteractionEvent
+    : string extends InteractionCompatibility2
     // @ts-ignore TS2694
-    : PIXI.interaction.InteractionEvent;
+    ? PIXI.interaction.InteractionEvent
+    : never;
   // Hardcoded due to the InteractionEventTypes being removed since pixi.js@6.0.0
   type InteractionPointerEvents = "pointerdown" | "pointercancel" | "pointerup" | "pointertap" | "pointerupoutside" | "pointermove" | "pointerover" | "pointerout";
   type InteractionTouchEvents = "touchstart" | "touchcancel" | "touchend" | "touchendoutside" | "touchmove" | "tap";
@@ -99,7 +104,19 @@ declare module "react-pixi-fiber" {
    */
 
   // Extra properties to add to allow us to set event handlers using props.
-  export type InteractiveComponent = { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
+  export type InteractiveComponent =
+    InteractionEvent extends never
+    // pixi.js >= 7
+    ? {
+      // @ts-ignore TS2694
+      [P in EventEmitter.EventNames<PIXI.DisplayObjectEvents>
+        // this line uses TS 4.1 https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#key-remapping-via-as
+        as P extends string ? `on${P}` : never
+      // @ts-ignore TS2694
+      ]?: EventEmitter.EventListener<PIXI.DisplayObjectEvents, P>
+    }
+    // pixi.js <= 6
+    : { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
 
   /**
    * Base components
