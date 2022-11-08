@@ -86,6 +86,15 @@ export function copyPoint(instance, propName, value) {
   }
 }
 
+export function replacePixiCallback(instance, eventName, listener, prevListener) {
+  if (typeof prevListener === "function") {
+    instance.off(eventName, prevListener);
+  }
+  if (typeof listener === "function") {
+    instance.on(eventName, listener);
+  }
+}
+
 // Set props on a DisplayObject by checking the type. If a PIXI.Point or
 // a PIXI.ObservablePoint is having its value set, then either a comma-separated
 // string with in the form of "x,y" or a size 2 array with index 0 being the x

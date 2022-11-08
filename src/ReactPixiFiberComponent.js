@@ -161,7 +161,7 @@ export function diffProperties(type, instance, lastRawProps, nextRawProps) {
 export function applyDisplayObjectProps(type, instance, oldProps, newProps) {
   const updatePayload = diffProperties(type, instance, oldProps, newProps);
   if (updatePayload !== null) {
-    updatePixiProperties(type, instance, updatePayload);
+    updatePixiProperties(type, instance, updatePayload, oldProps);
   }
 }
 
@@ -176,7 +176,7 @@ export function updatePixiProperties(type, instance, updatePayload, prevProps, n
     if (propKey === CHILDREN) {
       // Noop. Text children not supported
     } else {
-      setValueForProperty(type, instance, propKey, propValue, internalHandle);
+      setValueForProperty(type, instance, propKey, propValue, prevProps[propKey], internalHandle);
     }
   }
 }

@@ -3,7 +3,7 @@ import warning from "fbjs/lib/warning";
 import { getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
 import { defaultProps } from "./props";
 import { getStackAddendum } from "./ReactGlobalSharedState";
-import { findStrictRoot, setPixiValue } from "./utils";
+import { findStrictRoot, replacePixiCallback, setPixiValue } from "./utils";
 
 export function getDefaultValue(type, propName) {
   const defaultValues = defaultProps[type];
@@ -21,7 +21,7 @@ export function getDefaultValue(type, propName) {
  * @param {*} value
  * @param {*} internalHandle
  */
-export function setValueForProperty(type, instance, propName, value, internalHandle) {
+export function setValueForProperty(type, instance, propName, value, prevValue, internalHandle) {
   const propertyInfo = getPropertyInfo(propName);
   let strictRoot = null;
   if (__DEV__) {
@@ -29,6 +29,14 @@ export function setValueForProperty(type, instance, propName, value, internalHan
   }
 
   if (shouldIgnoreAttribute(type, propName, propertyInfo)) {
+    return;
+  }
+  if (propName.startsWith("on")) {
+    // Can't apply the same shouldIgnoreValue logic to event listeners,
+    // otherwise we might loose the reference to prevValue without unsubscribing
+    // it beforehand
+    const eventName = propKey.substring(2);
+    replacePixiCallback(instance, eventName, value, prevValue);
     return;
   }
   let shouldIgnoreValue = false;
