@@ -176,7 +176,7 @@ export function updatePixiProperties(type, instance, updatePayload, prevProps, n
     if (propKey === CHILDREN) {
       // Noop. Text children not supported
     } else {
-      setValueForProperty(type, instance, propKey, propValue, prevProps[propKey], internalHandle);
+      setValueForProperty(type, instance, propKey, propValue, prevProps?.[propKey], internalHandle);
     }
   }
 }

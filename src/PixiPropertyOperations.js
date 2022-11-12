@@ -35,7 +35,7 @@ export function setValueForProperty(type, instance, propName, value, prevValue, 
     // Can't apply the same shouldIgnoreValue logic to event listeners,
     // otherwise we might loose the reference to prevValue without unsubscribing
     // it beforehand
-    const eventName = propKey.substring(2);
+    const eventName = propName.substring(2);
     replacePixiCallback(instance, eventName, value, prevValue);
     return;
   }
