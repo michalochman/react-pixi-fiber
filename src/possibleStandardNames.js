@@ -3,6 +3,7 @@ import { TYPES } from "./types";
 
 // http://pixijs.download/release/docs/PIXI.DisplayObject.html
 const eventsStandardNames = {
+  // pixi.js < 7.0
   added: "added",
   click: "click",
   mousedown: "mousedown",
@@ -30,6 +31,37 @@ const eventsStandardNames = {
   touchendoutside: "touchendoutside",
   touchmove: "touchmove",
   touchstart: "touchstart",
+  // pixi.js >= 7.1
+  onclick: "onclick",
+  onmousedown: "onmousedown",
+  onmouseenter: "onmouseenter",
+  onmouseleave: "onmouseleave",
+  onmousemove: "onmousemove",
+  onmouseout: "onmouseout",
+  onmouseover: "onmouseover",
+  onmouseup: "onmouseup",
+  onmouseupoutside: "onmouseupoutside",
+  onpointercancel: "onpointercancel",
+  onpointerdown: "onpointerdown",
+  onpointerenter: "onpointerenter",
+  onpointerleave: "onpointerleave",
+  onpointermove: "onpointermove",
+  onpointerout: "onpointerout",
+  onpointerover: "onpointerover",
+  onpointertap: "onpointertap",
+  onpointerup: "onpointerup",
+  onpointerupoutside: "onpointerupoutside",
+  onrightclick: "onrightclick",
+  onrightdown: "onrightdown",
+  onrightup: "onrightup",
+  onrightupoutside: "onrightupoutside",
+  ontap: "ontap",
+  ontouchcancel: "ontouchcancel",
+  ontouchend: "ontouchend",
+  ontouchendoutside: "ontouchendoutside",
+  ontouchmove: "ontouchmove",
+  ontouchstart: "ontouchstart",
+  onwheel: "onwheel",
 };
 
 // http://pixijs.download/release/docs/PIXI.DisplayObject.html
