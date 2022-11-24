@@ -12,7 +12,13 @@ declare module "react-pixi-fiber" {
   // shipped in pixi.js@5.3.0. We want to support earlier versions of PixiJS as well so we need this hack for now.
   // @ts-ignore TS2694
   type InteractionCompatibility = Exclude<keyof typeof PIXI.interaction, number | symbol>;
-  type InteractionEvent = string extends InteractionCompatibility
+  // Returns either real keys of `PIXI.InteractionEvent` (if it exists) or generic `string` (if it doesn't exist).
+  // `PIXI.InteractionEvent` was removed in pixi.js@7.0.0.
+  // @ts-ignore TS2694
+  type InteractionEventCompatibility = Exclude<keyof typeof PIXI.InteractionEvent, number | symbol>;
+  type InteractionEvent = string extends InteractionEventCompatibility
+    ? never
+    : string extends InteractionCompatibility
     // @ts-ignore TS2694
     ? PIXI.InteractionEvent
     // @ts-ignore TS2694
@@ -99,7 +105,12 @@ declare module "react-pixi-fiber" {
    */
 
   // Extra properties to add to allow us to set event handlers using props.
-  export type InteractiveComponent = { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
+  export type InteractiveComponent =
+    InteractionEvent extends never
+    // pixi.js >= 7
+    ? { }
+    // pixi.js <= 6
+    : { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
 
   /**
    * Base components
