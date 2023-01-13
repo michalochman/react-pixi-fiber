@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.0.6] - 2023-01-13
+
+### Added
+- Added support for events in PixiJS v7.1 ([#306])
+
+
 ## [1.0.4] - 2022-10-19
 
 ### Fixed
@@ -431,7 +437,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.4...v1.0.6
 [1.0.4]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.1...v1.0.2
@@ -483,6 +490,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/michalochman/react-pixi-fiber/compare/v0.1.0...v0.1.1
 
+[#306]: https://github.com/michalochman/react-pixi-fiber/pull/306
 [#291]: https://github.com/michalochman/react-pixi-fiber/pull/291
 [#286]: https://github.com/michalochman/react-pixi-fiber/pull/286
 [#285]: https://github.com/michalochman/react-pixi-fiber/issues/285
