@@ -167,6 +167,7 @@ export const customProperties = {};
 });
 
 [
+  // pixi.js < 7.0
   "added",
   "click",
   "mousedown",
@@ -194,6 +195,37 @@ export const customProperties = {};
   "touchendoutside",
   "touchmove",
   "touchstart",
+  // pixi.js >= 7.1
+  "onclick",
+  "onmousedown",
+  "onmouseenter",
+  "onmouseleave",
+  "onmousemove",
+  "onmouseout",
+  "onmouseover",
+  "onmouseup",
+  "onmouseupoutside",
+  "onpointercancel",
+  "onpointerdown",
+  "onpointerenter",
+  "onpointerleave",
+  "onpointermove",
+  "onpointerout",
+  "onpointerover",
+  "onpointertap",
+  "onpointerup",
+  "onpointerupoutside",
+  "onrightclick",
+  "onrightdown",
+  "onrightup",
+  "onrightupoutside",
+  "ontap",
+  "ontouchcancel",
+  "ontouchend",
+  "ontouchendoutside",
+  "ontouchmove",
+  "ontouchstart",
+  "onwheel",
 ].forEach(name => {
   properties[name] = new PropertyInfoRecord(name, CALLBACK);
 });
