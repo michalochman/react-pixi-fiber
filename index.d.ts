@@ -326,14 +326,4 @@ declare module "react-pixi-fiber" {
 
   export function usePixiApp(): PIXI.Application;
   export function usePixiTicker(callback: (deltaTime: number) => void): void;
-
-  /**
-   * Batched updates
-   */
-
-  // BatchedUpdates same as ReactDOM.
-  // see: https://github.com/AlexGalays/typescript-example/blob/5de2b59ba1984c41d24f022e1675f07c6015be5a/typings/react/react-dom.d.ts#L30
-  export function unstable_batchedUpdates<A, B>(callback: (a: A, b: B) => any, a: A, b: B): void;
-  export function unstable_batchedUpdates<A>(callback: (a: A) => any, a: A): void;
-  export function unstable_batchedUpdates(callback: () => any): void;
 }
