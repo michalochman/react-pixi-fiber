@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import * as ReactPixiFiber from "react-pixi-fiber";
+import * as ReactPixiFiber from "..";
 
 // react-pixi like API
 // Note: ReactPIXI.factories is not supported

@@ -1,5 +1,5 @@
 import * as ReactPIXI from "../../src/react-pixi-alias/index";
-import * as ReactPixiFiber from "react-pixi-fiber";
+import * as ReactPixiFiber from "../../src";
 import ReactDOM from "react-dom";
 
 describe("react-pixi-alias", () => {
