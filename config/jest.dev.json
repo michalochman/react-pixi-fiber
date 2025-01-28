@@ -11,6 +11,10 @@
     "./config/jest/setupGlobals.js",
     "./config/jest/setupPixi.js"
   ],
+  "moduleNameMapper": {
+    "^react-pixi-fiber$": "src/index.js"
+  },
+  "modulePaths": ["<rootDir>"],
   "transform": {
     "^.+\\.js$": "babel-jest"
   }
