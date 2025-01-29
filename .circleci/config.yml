@@ -16,7 +16,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - npm-dependencies-
 
-      - run: yarn install --frozen-lockfile
+      - run: npm ci
 
       # Cache dependencies
       - save_cache:
