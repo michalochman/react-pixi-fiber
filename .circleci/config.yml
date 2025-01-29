@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:16.15.1
+      - image: cimg/node:18.16.0
 
     working_directory: ~/react-pixi-fiber
 
@@ -12,7 +12,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - npm-dependencies-{{ checksum "package.json" }}
+          - npm-dependencies-{{ checksum ".nvmrc" }}-{{ checksum "package-lock.json" }}
           # fallback to using the latest cache if no exact match is found
           - npm-dependencies-
 
@@ -22,14 +22,14 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: npm-dependencies-{{ checksum "package.json" }}
+          key: npm-dependencies-{{ checksum ".nvmrc" }}-{{ checksum "package-lock.json" }}
 
       # run build
-      - run: yarn build
+      - run: npm run build
 
       # run tests
-      - run: yarn test --coverage --ci --silent
-      - run: yarn test:ts
+      - run: npm run test --coverage --ci --silent
+      - run: npm run test:ts
 
       # upload coverage report
-      - run: yarn codecov
+      - run: npm run codecov
