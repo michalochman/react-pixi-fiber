@@ -32,4 +32,5 @@ jobs:
       - run: npm run test:ts
 
       # upload coverage report
-      - run: npm run codecov
+      # TODO: Migrate to new uploader
+      # - run: npm exec codecov
