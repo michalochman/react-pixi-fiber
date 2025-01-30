@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Container } from "../src/index";
@@ -25,12 +25,14 @@ describe("usePixiApp", () => {
       );
     };
 
-    render(
-      <AppContext.Provider value={app}>
-        <HookContainer />
-      </AppContext.Provider>,
-      app.stage
-    );
+    renderer.act(() => {
+      render(
+        <AppContext.Provider value={app}>
+          <HookContainer />
+        </AppContext.Provider>,
+        app.stage
+      );
+    });
 
     expect(TestComponent).toHaveBeenCalledWith({ app }, {});
   });

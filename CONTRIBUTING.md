@@ -41,17 +41,17 @@ The core team is monitoring for pull requests. We will review your pull request 
 **Before submitting a pull request**, please make sure the following is done:
 
 1. Fork [the repository](https://github.com/michalochman/react-pixi-fiber) and create your branch from `master`.
-2. Run `yarn` in the repository root.
+2. Run `npm install` in the repository root.
 3. If you've fixed a bug or added code that should be tested, add tests!
-4. Ensure the test suite passes (`yarn test`). Tip: `yarn test --watch TestName` is helpful in development.
-5. Format your code with [prettier](https://github.com/prettier/prettier) (`yarn prettier`).
-6. Make sure your code lints (`yarn eslint`).
+4. Ensure the test suite passes (`npm run test`). Tip: `npm run test --watch TestName` is helpful in development.
+5. Format your code with [prettier](https://github.com/prettier/prettier) (`npm run prettier`).
+6. Make sure your code lints (`npm run eslint`).
 
 ## Style Guide
 
-We use an automatic code formatter called [Prettier](https://prettier.io/). Run `yarn prettier` after making any changes to the code.
+We use an automatic code formatter called [Prettier](https://prettier.io/). Run `npm run prettier` after making any changes to the code.
 
-Then, our linter will catch most issues that may exist in your code. You can check the status of your code styling by simply running `yarn eslint`.
+Then, our linter will catch most issues that may exist in your code. You can check the status of your code styling by simply running `npm run eslint`.
 
 However, there are still some styles that the linter cannot pick up. If you are unsure about something, looking at [Airbnb's Style Guide](https://github.com/airbnb/javascript) will guide you in the right direction.
 

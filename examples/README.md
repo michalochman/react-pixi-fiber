@@ -296,12 +296,6 @@ To format our code whenever we make a commit in git, we need to install the foll
 npm install --save husky lint-staged prettier
 ```
 
-Alternatively you may use `yarn`:
-
-```sh
-yarn add husky lint-staged prettier
-```
-
 * `husky` makes it easy to use githooks as if they are npm scripts.
 * `lint-staged` allows us to run scripts on staged files in git. See this [blog post about lint-staged to learn more about it](https://medium.com/@okonetchnikov/make-linting-great-again-f3890e1ad6b8).
 * `prettier` is the JavaScript formatter we will run before commits.
@@ -352,12 +346,6 @@ The generated project includes React and ReactDOM as dependencies. It also inclu
 
 ```sh
 npm install --save react-router
-```
-
-Alternatively you may use `yarn`:
-
-```sh
-yarn add react-router
 ```
 
 This works for any library, not just `react-router`.
@@ -539,12 +527,6 @@ First, let’s install the command-line interface for Sass:
 npm install --save node-sass-chokidar
 ```
 
-Alternatively you may use `yarn`:
-
-```sh
-yarn add node-sass-chokidar
-```
-
 Then in `package.json`, add the following lines to `scripts`:
 
 ```diff
@@ -582,12 +564,6 @@ As a final step, you may find it convenient to run `watch-css` automatically wit
 
 ```sh
 npm install --save npm-run-all
-```
-
-Alternatively you may use `yarn`:
-
-```sh
-yarn add npm-run-all
 ```
 
 Then we can change `start` and `build` scripts to include the CSS preprocessor commands:
@@ -750,12 +726,6 @@ Install React Bootstrap and Bootstrap from npm. React Bootstrap does not include
 npm install --save react-bootstrap bootstrap@3
 ```
 
-Alternatively you may use `yarn`:
-
-```sh
-yarn add react-bootstrap bootstrap@3
-```
-
 Import Bootstrap CSS and optionally Bootstrap theme CSS in the beginning of your ```src/index.js``` file:
 
 ```js
@@ -792,12 +762,12 @@ Recent versions of [Flow](http://flowtype.org/) work with Create React App proje
 
 To add Flow to a Create React App project, follow these steps:
 
-1. Run `npm install --save flow-bin` (or `yarn add flow-bin`).
+1. Run `npm install --save flow-bin`.
 2. Add `"flow": "flow"` to the `scripts` section of your `package.json`.
-3. Run `npm run flow init` (or `yarn flow init`) to create a [`.flowconfig` file](https://flowtype.org/docs/advanced-configuration.html) in the root directory.
+3. Run `npm run flow init` to create a [`.flowconfig` file](https://flowtype.org/docs/advanced-configuration.html) in the root directory.
 4. Add `// @flow` to any files you want to type check (for example, to `src/App.js`).
 
-Now you can run `npm run flow` (or `yarn flow`) to check the files for type errors.
+Now you can run `npm run flow` to check the files for type errors.
 You can optionally use an IDE like [Nuclide](https://nuclide.io/docs/languages/flow/) for a better integrated experience.
 In the future we plan to integrate it into Create React App even more closely.
 
@@ -1267,12 +1237,6 @@ If you’d like to test components in isolation from the child components they r
 npm install --save enzyme enzyme-adapter-react-16 react-test-renderer
 ```
 
-Alternatively you may use `yarn`:
-
-```sh
-yarn add enzyme enzyme-adapter-react-16 react-test-renderer
-```
-
 As of Enzyme 3, you will need to install Enzyme along with an Adapter corresponding to the version of React you are using. (The examples above use the adapter for React 16.)
 
 The adapter will also need to be configured in your [global setup file](#initializing-test-environment):
@@ -1329,12 +1293,6 @@ To enable this, install `jest-enzyme`:
 
 ```sh
 npm install --save jest-enzyme
-```
-
-Alternatively you may use `yarn`:
-
-```sh
-yarn add jest-enzyme
 ```
 
 Import it in [`src/setupTests.js`](#initializing-test-environment) to make its matchers available in every test:
@@ -1580,12 +1538,6 @@ First, install Styleguidist:
 npm install --save react-styleguidist
 ```
 
-Alternatively you may use `yarn`:
-
-```sh
-yarn add react-styleguidist
-```
-
 Then, add these scripts to your `package.json`:
 
 ```diff
@@ -1725,12 +1677,6 @@ To add Source map explorer to a Create React App project, follow these steps:
 
 ```sh
 npm install --save source-map-explorer
-```
-
-Alternatively you may use `yarn`:
-
-```sh
-yarn add source-map-explorer
 ```
 
 Then in `package.json`, add the following line to `scripts`:
@@ -1967,12 +1913,6 @@ To publish it at [https://myusername.github.io/my-app](https://myusername.github
 npm install --save gh-pages
 ```
 
-Alternatively you may use `yarn`:
-
-```sh
-yarn add gh-pages
-```
-
 Add the following scripts in your `package.json`:
 
 ```diff
@@ -2149,7 +2089,7 @@ If none of these solutions help please leave a comment [in this thread](https://
 
 If you run `npm test` and the console gets stuck after printing `react-scripts test --env=jsdom` to the console there might be a problem with your [Watchman](https://facebook.github.io/watchman/) installation as described in [facebookincubator/create-react-app#713](https://github.com/facebookincubator/create-react-app/issues/713).
 
-We recommend deleting `node_modules` in your project and running `npm install` (or `yarn` if you use it) first. If it doesn't help, you can try one of the numerous workarounds mentioned in these issues:
+We recommend deleting `node_modules` in your project and running `npm install` first. If it doesn't help, you can try one of the numerous workarounds mentioned in these issues:
 
 * [facebook/jest#1767](https://github.com/facebook/jest/issues/1767)
 * [facebook/watchman#358](https://github.com/facebook/watchman/issues/358)
