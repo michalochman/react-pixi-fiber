@@ -159,9 +159,9 @@ This example will render [`PIXI.Text`] object into a [Root Container] of PIXI Ap
 
 ## Running Examples
 
-1. Run `yarn install` (or `npm install`) in the repository root.
-2. Run `yarn install` (or `npm install`) in the `examples` directory.
-3. Run `yarn start` (or `npm run start`) in the `examples` directory.
+1. Run `npm install` in the repository root.
+2. Run `npm install` in the `examples` directory.
+3. Run `npm run start` in the `examples` directory.
 4. Wait few seconds and browse examples that will open in new browser window.
 
 

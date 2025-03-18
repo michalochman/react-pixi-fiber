@@ -24,12 +24,14 @@ if (isNewContextAvailable()) {
       const app = new PIXI.Application();
       const TestComponent = jest.fn(() => null);
 
-      render(
-        <AppContext.Provider value={app}>
-          <AppContext.Consumer>{app => <TestComponent app={app} foo="bar" />}</AppContext.Consumer>
-        </AppContext.Provider>,
-        app.stage
-      );
+      renderer.act(() => {
+        render(
+          <AppContext.Provider value={app}>
+            <AppContext.Consumer>{app => <TestComponent app={app} foo="bar" />}</AppContext.Consumer>
+          </AppContext.Provider>,
+          app.stage
+        );
+      });
 
       expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
     });
@@ -138,14 +140,16 @@ describe("withApp", () => {
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
-    render(
-      <AppProvider app={app}>
-        <Container>
-          <TestComponentWithApp foo="bar" />
-        </Container>
-      </AppProvider>,
-      app.stage
-    );
+    renderer.act(() => {
+      render(
+        <AppProvider app={app}>
+          <Container>
+            <TestComponentWithApp foo="bar" />
+          </Container>
+        </AppProvider>,
+        app.stage
+      );
+    });
 
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
@@ -155,11 +159,13 @@ describe("withApp", () => {
     const TestComponent = jest.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
-    renderer.create(
-      <Stage>
-        <TestComponentWithApp foo="bar" />
-      </Stage>
-    );
+    renderer.act(() => {
+      renderer.create(
+        <Stage>
+          <TestComponentWithApp foo="bar" />
+        </Stage>
+      );
+    });
 
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
@@ -175,7 +181,7 @@ describe("withApp", () => {
           <TestComponentWithApp foo="bar" />
         </Stage>
       );
-    })
+    });
 
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });

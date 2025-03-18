@@ -1,4 +1,5 @@
 import ReactFiberReconciler from "react-reconciler";
+import { DefaultEventPriority } from "react-reconciler/constants";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
@@ -19,6 +20,10 @@ if (__DEV__) {
 /* PixiJS Renderer */
 
 const noTimeout = -1;
+
+export function afterActiveInstanceBlur() {
+  // Noop
+}
 
 export function appendChild(parentInstance, child) {
   if (parentInstance == null) return;
@@ -67,6 +72,10 @@ export function createTextInstance(text, rootContainer, hostContext, internalHan
   invariant(false, "ReactPixiFiber does not support text instances. Use `Text` component instead.");
 }
 
+export function detachDeletedInstance(node) {
+  // Noop
+}
+
 export function finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
   setInitialProperties(type, instance, props, rootContainer, hostContext);
   return true;
@@ -74,6 +83,18 @@ export function finalizeInitialChildren(instance, type, props, rootContainer, ho
 
 export function getChildHostContext(parentHostContext, type, rootContainer) {
   return parentHostContext;
+}
+
+export function getCurrentEventPriority() {
+  return DefaultEventPriority;
+}
+
+export function getInstanceFromNode() {
+  invariant(false, "Not yet implemented.");
+}
+
+export function getInstanceFromScope() {
+  invariant(false, "Not yet implemented.");
 }
 
 export function getRootHostContext(rootContainer) {
@@ -96,6 +117,10 @@ export function prepareUpdate(instance, type, oldProps, newProps, rootContainer,
   return diffProperties(type, instance, oldProps, newProps);
 }
 
+export function prepareScopeUpdate() {
+  // Noop
+}
+
 export function resetAfterCommit(containerInfo) {
   // Noop
 }
@@ -110,6 +135,10 @@ export function scheduleTimeout(fn, delay) {
 
 export function shouldSetTextContent(type, props) {
   return false;
+}
+
+export function beforeActiveInstanceBlur() {
+  // Noop
 }
 
 export function commitTextUpdate(textInstance, prevText, nextText) {
@@ -155,11 +184,16 @@ export function now() {
 }
 
 export const supportsMutation = true;
+export const supportsPersistence = false;
+export const supportsHydration = false;
+export const supportsMicrotasks = true;
 
 const hostConfig = {
+  afterActiveInstanceBlur: afterActiveInstanceBlur,
   appendChild: appendChild,
   appendChildToContainer: appendChild,
   appendInitialChild: appendChild,
+  beforeActiveInstanceBlur: beforeActiveInstanceBlur,
   cancelTimeout: cancelTimeout,
   clearContainer: clearContainer,
   commitMount: commitMount,
@@ -167,8 +201,12 @@ const hostConfig = {
   commitUpdate: commitUpdate,
   createInstance: createInstance,
   createTextInstance: createTextInstance,
+  detachDeletedInstance: detachDeletedInstance,
   finalizeInitialChildren: finalizeInitialChildren,
   getChildHostContext: getChildHostContext,
+  getCurrentEventPriority: getCurrentEventPriority,
+  getInstanceFromNode: getInstanceFromNode,
+  getInstanceFromScope: getInstanceFromScope,
   getRootHostContext: getRootHostContext,
   getPublicInstance: getPublicInstance,
   hideInstance: hideInstance,
@@ -180,13 +218,31 @@ const hostConfig = {
   prepareForCommit: prepareForCommit,
   preparePortalMount: preparePortalMount,
   prepareUpdate: prepareUpdate,
+  prepareScopeUpdate: prepareScopeUpdate,
   removeChild: removeChild,
   removeChildFromContainer: removeChild,
   resetAfterCommit: resetAfterCommit,
   resetTextContent: resetTextContent,
   scheduleTimeout: scheduleTimeout,
   shouldSetTextContent: shouldSetTextContent,
+  supportsHydration: supportsHydration,
+  scheduleMicrotask:
+    typeof queueMicrotask === "function"
+      ? queueMicrotask
+      : typeof Promise !== "undefined"
+      ? callback =>
+          Promise.resolve(null)
+            .then(callback)
+            .catch(error => {
+              setTimeout(() => {
+                throw error;
+              });
+            })
+      : setTimeout,
+  supportsMicrotasks: true,
   supportsMutation: supportsMutation,
+  supportsPersistence: supportsPersistence,
+
   unhideInstance: unhideInstance,
   unhideTextInstance: unhideTextInstance,
 };
@@ -196,8 +252,5 @@ export const ReactPixiFiberAsPrimaryRenderer = ReactFiberReconciler({ ...hostCon
 
 // React Pixi Fiber renderer is secondary to React DOM renderer if used together
 export const ReactPixiFiberAsSecondaryRenderer = ReactFiberReconciler({ ...hostConfig, isPrimaryRenderer: false });
-
-// If use ReactDOM to render, try use ReactDOM.unstable_batchedUpdates
-export const unstable_batchedUpdates = ReactPixiFiberAsPrimaryRenderer.batchedUpdates;
 
 export default ReactPixiFiberAsSecondaryRenderer;

@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
 
-
 declare module "react-pixi-fiber" {
   /**
    * Compatibility
@@ -19,16 +18,39 @@ declare module "react-pixi-fiber" {
   type InteractionEvent = string extends InteractionEventCompatibility
     ? never
     : string extends InteractionCompatibility
-    // @ts-ignore TS2694
-    ? PIXI.InteractionEvent
-    // @ts-ignore TS2694
-    : PIXI.interaction.InteractionEvent;
+    ? // @ts-ignore TS2694
+      PIXI.InteractionEvent
+    : // @ts-ignore TS2694
+      PIXI.interaction.InteractionEvent;
   // Hardcoded due to the InteractionEventTypes being removed since pixi.js@6.0.0
-  type InteractionPointerEvents = "pointerdown" | "pointercancel" | "pointerup" | "pointertap" | "pointerupoutside" | "pointermove" | "pointerover" | "pointerout";
+  type InteractionPointerEvents =
+    | "pointerdown"
+    | "pointercancel"
+    | "pointerup"
+    | "pointertap"
+    | "pointerupoutside"
+    | "pointermove"
+    | "pointerover"
+    | "pointerout";
   type InteractionTouchEvents = "touchstart" | "touchcancel" | "touchend" | "touchendoutside" | "touchmove" | "tap";
-  type InteractionMouseEvents = "rightdown" | "mousedown" | "rightup" | "mouseup" | "rightclick" | "click" | "rightupoutside" | "mouseupoutside" | "mousemove" | "mouseover" | "mouseout";
+  type InteractionMouseEvents =
+    | "rightdown"
+    | "mousedown"
+    | "rightup"
+    | "mouseup"
+    | "rightclick"
+    | "click"
+    | "rightupoutside"
+    | "mouseupoutside"
+    | "mousemove"
+    | "mouseover"
+    | "mouseout";
   type InteractionPixiEvents = "added" | "removed";
-  type InteractionEventTypes = InteractionPointerEvents | InteractionTouchEvents | InteractionMouseEvents | InteractionPixiEvents;
+  type InteractionEventTypes =
+    | InteractionPointerEvents
+    | InteractionTouchEvents
+    | InteractionMouseEvents
+    | InteractionPixiEvents;
 
   /**
    * Helpers
@@ -42,8 +64,8 @@ declare module "react-pixi-fiber" {
   // Returns keys `K` of `T` where type of `T[K]` is not specifically `any`.
   type KeysThatAreNotAny<T> = { [K in keyof T]: any extends T[K] ? never : K }[keyof T];
 
-  // The shape of `T` with `children` property that React understands.
-  type PropsWithReactChildren<T> = Omit<T, "children"> & { children?: React.ReactNode };
+  // The shape of `T` with `children` property omitted.
+  type WithoutChildren<T> = Omit<T, "children">;
 
   // Returns `T` when it extends `PIXI.DisplayObject`, otherwise returns `U`.
   // This is a hack which we use to be able to use these types with types from PixiJS v4 and v5
@@ -105,12 +127,11 @@ declare module "react-pixi-fiber" {
    */
 
   // Extra properties to add to allow us to set event handlers using props.
-  export type InteractiveComponent =
-    InteractionEvent extends never
-    // pixi.js >= 7
-    ? { }
-    // pixi.js <= 6
-    : { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
+  export type InteractiveComponent = InteractionEvent extends never
+    ? // pixi.js >= 7
+      {}
+    : // pixi.js <= 6
+      { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
 
   /**
    * Base components
@@ -124,7 +145,7 @@ declare module "react-pixi-fiber" {
   }
 
   // Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
-  export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>>;
+  export type DisplayObjectProps<T> = WithoutChildren<Partial<WithPointLike<T>>>;
 
   // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.BitmapText.html
@@ -148,7 +169,7 @@ declare module "react-pixi-fiber" {
 
   // A component wrapper for `PIXI.Container`.
   // see: http://pixijs.download/dev/docs/PIXI.Container.html
-  export type Container = DisplayObjectProps<PIXI.Container>;
+  export type Container = DisplayObjectProps<PIXI.Container> & { children?: React.ReactNode };
   export const Container: PixiComponent<Container>;
 
   // A component wrapper for `PIXI.Graphics`.
@@ -164,7 +185,7 @@ declare module "react-pixi-fiber" {
       PIXI.mesh.NineSlicePlane,
       PIXI.NineSlicePlane
     >
-  >;
+  > & { children?: React.ReactNode };
   export const NineSlicePlane: PixiComponent<NineSlicePlane>;
 
   // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
@@ -175,7 +196,7 @@ declare module "react-pixi-fiber" {
       PIXI.particles.ParticleContainer,
       PIXI.ParticleContainer
     >
-  >;
+  > & { children?: React.ReactNode };
   export const ParticleContainer: PixiComponent<ParticleContainer>;
 
   // A component wrapper for `PIXI.Sprite`.
@@ -222,9 +243,9 @@ declare module "react-pixi-fiber" {
   >;
 
   export type StageRef = {
-    _app: React.RefObject<PIXI.Application>
-    _canvas: React.RefObject<HTMLCanvasElement>
-    props: StageProps,
+    _app: React.RefObject<PIXI.Application>;
+    _canvas: React.RefObject<HTMLCanvasElement>;
+    props: StageProps;
   };
 
   // Type of Stage component.
@@ -326,14 +347,4 @@ declare module "react-pixi-fiber" {
 
   export function usePixiApp(): PIXI.Application;
   export function usePixiTicker(callback: (deltaTime: number) => void): void;
-
-  /**
-   * Batched updates
-   */
-
-  // BatchedUpdates same as ReactDOM.
-  // see: https://github.com/AlexGalays/typescript-example/blob/5de2b59ba1984c41d24f022e1675f07c6015be5a/typings/react/react-dom.d.ts#L30
-  export function unstable_batchedUpdates<A, B>(callback: (a: A, b: B) => any, a: A, b: B): void;
-  export function unstable_batchedUpdates<A>(callback: (a: A) => any, a: A): void;
-  export function unstable_batchedUpdates(callback: () => any): void;
 }

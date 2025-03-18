@@ -4,7 +4,6 @@ import { AppContext, AppProvider, withApp } from "../src/AppProvider";
 import Stage, { createStageClass } from "../src/Stage";
 import { TYPES } from "../src/types";
 import { usePixiApp, usePixiTicker } from "../src/hooks";
-import { unstable_batchedUpdates } from "../src/ReactPixiFiber";
 import { applyDisplayObjectProps } from "../src/ReactPixiFiberComponent";
 
 describe("ReactPixiFiber public API", () => {
@@ -18,7 +17,6 @@ describe("ReactPixiFiber public API", () => {
     expect(ReactPixiFiber.createStageClass).toEqual(createStageClass);
     expect(typeof ReactPixiFiber.render).toEqual("function");
     expect(typeof ReactPixiFiber.unmount).toEqual("function");
-    expect(ReactPixiFiber.unstable_batchedUpdates).toEqual(unstable_batchedUpdates);
   });
 
   it("provides expected context utils", () => {
