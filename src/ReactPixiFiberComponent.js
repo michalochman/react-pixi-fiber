@@ -6,6 +6,10 @@ import { TYPES } from "./types";
 import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { setValueForProperty } from "./PixiPropertyOperations";
 
+// PixiJS v4 keeps these classes under extras/mesh/particles, which v5+ does not export. Reading them from a
+// plain copy of the namespace stops bundlers from reporting them as missing ES module exports.
+const PIXI_V4 = Object.assign({}, PIXI);
+
 export function createInstance(type, props, rootContainer, hostContext, internalHandle) {
   let instance;
 
@@ -20,7 +24,7 @@ export function createInstance(type, props, rootContainer, hostContext, internal
               tint: props.tint,
             };
       try {
-        instance = new PIXI.extras.BitmapText(props.text, style);
+        instance = new PIXI_V4.extras.BitmapText(props.text, style);
       } catch (e) {
         instance = new PIXI.BitmapText(props.text, style);
       }
@@ -33,7 +37,7 @@ export function createInstance(type, props, rootContainer, hostContext, internal
       break;
     case TYPES.NINE_SLICE_PLANE:
       try {
-        instance = new PIXI.mesh.NineSlicePlane(
+        instance = new PIXI_V4.mesh.NineSlicePlane(
           props.texture,
           props.leftWidth,
           props.topHeight,
@@ -52,7 +56,7 @@ export function createInstance(type, props, rootContainer, hostContext, internal
       break;
     case TYPES.PARTICLE_CONTAINER:
       try {
-        instance = new PIXI.particles.ParticleContainer(
+        instance = new PIXI_V4.particles.ParticleContainer(
           props.maxSize,
           props.properties,
           props.batchSize,
@@ -70,7 +74,7 @@ export function createInstance(type, props, rootContainer, hostContext, internal
       break;
     case TYPES.TILING_SPRITE:
       try {
-        instance = new PIXI.extras.TilingSprite(props.texture, props.width, props.height);
+        instance = new PIXI_V4.extras.TilingSprite(props.texture, props.width, props.height);
       } catch (e) {
         instance = new PIXI.TilingSprite(props.texture, props.width, props.height);
       }
