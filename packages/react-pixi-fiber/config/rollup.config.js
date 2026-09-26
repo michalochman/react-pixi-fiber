@@ -35,7 +35,7 @@ const getPlugins = entry => [
   commonjs(),
   isProduction && terser(),
   visualizer({
-    filename: `./stats.${entry}.${isProduction ? "production" : "development"}.html`,
+    filename: `./stats/${entry}.${isProduction ? "production" : "development"}.html`,
   }),
 ];
 

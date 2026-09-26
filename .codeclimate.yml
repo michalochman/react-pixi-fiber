@@ -31,7 +31,7 @@ plugins:
     enabled: true
     channel: "eslint-5"
     config:
-      config: .eslintrc.json
+      config: packages/react-pixi-fiber/.eslintrc.json
   fixme:
     enabled: true
   git-legal:
@@ -40,6 +40,6 @@ plugins:
     enabled: true
 
 exclude_patterns:
-  - "examples/"
-  - "test/"
+  - "apps/"
+  - "packages/react-pixi-fiber/test/"
   - "**/*.d.ts"

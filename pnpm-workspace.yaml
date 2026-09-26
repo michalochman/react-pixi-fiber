@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+onlyBuiltDependencies:
+  - canvas
+ignoredBuiltDependencies:
+  - core-js
+  - core-js-pure
