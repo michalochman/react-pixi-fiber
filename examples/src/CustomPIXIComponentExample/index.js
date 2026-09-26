@@ -23,8 +23,8 @@ function CustomComponentExample() {
   const [position, setPosition] = useState(0);
 
   useInterval(() => {
-    setColor(color => color + 1) % COLORS.length;
-    setPosition(position => position + 1) % POSITIONS.length;
+    setColor(color => (color + 1) % COLORS.length);
+    setPosition(position => (position + 1) % POSITIONS.length);
   }, 2000);
 
   return (

@@ -25,7 +25,9 @@ function CustomApplicationExample() {
 
     return function cleanup() {
       setApp(null);
-      app.destroy(true, true);
+      // Destroy children but not their textures: Bunny textures are shared module-level objects,
+      // destroying them here would break every Bunny mounted afterwards.
+      app.destroy(true, { children: true });
     };
   }, []);
 
