@@ -9,7 +9,7 @@
     "test": "pnpm --filter react-pixi-fiber test",
     "lint": "biome check",
     "format": "biome check --write",
-    "check-types": "pnpm --filter react-pixi-fiber test:ts && pnpm --filter examples check-types",
+    "check-types": "pnpm -r check-types",
     "start": "pnpm --filter examples start",
     "check-package": "node scripts/check-package.mjs"
   },

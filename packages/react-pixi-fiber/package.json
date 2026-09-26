@@ -77,14 +77,14 @@
     "vitest-webgl-canvas-mock": "1.1.0"
   },
   "scripts": {
-    "build": "rm -rf dist && npm run build:prod && npm run build:dev",
+    "build": "rm -rf dist && pnpm run build:prod && pnpm run build:dev",
     "build:dev": "cross-env NODE_ENV=development tsdown",
     "build:prod": "cross-env NODE_ENV=production tsdown",
-    "prepublishOnly": "npm run test && npm run build && pnpm -w check-package",
-    "test": "npm run test:dev && npm run test:prod",
-    "test:cov": "npm run test:dev -- --coverage --reporter=blob --outputFile=.vitest-reports/blob-dev.json && npm run test:prod -- --coverage --reporter=blob --outputFile=.vitest-reports/blob-prod.json && vitest run --merge-reports=.vitest-reports --coverage --coverage.reportsDirectory=coverage",
+    "check-types": "tsc -p tsconfig.json",
+    "prepublishOnly": "pnpm run test && pnpm run build && pnpm -w check-package",
+    "test": "pnpm run test:dev && pnpm run test:prod",
+    "test:cov": "pnpm run test:dev --coverage --reporter=blob --outputFile=.vitest-reports/blob-dev.json && pnpm run test:prod --coverage --reporter=blob --outputFile=.vitest-reports/blob-prod.json && vitest run --merge-reports=.vitest-reports --coverage --coverage.reportsDirectory=coverage",
     "test:dev": "vitest run --mode development",
-    "test:prod": "vitest run --mode production",
-    "test:ts": "tsc -p tsconfig.json"
+    "test:prod": "vitest run --mode production"
   }
 }

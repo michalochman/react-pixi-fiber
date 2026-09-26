@@ -20,31 +20,14 @@
   <a href="https://circleci.com/gh/michalochman/react-pixi-fiber/tree/master">
     <img alt="CircleCI" src="https://img.shields.io/circleci/project/github/michalochman/react-pixi-fiber/master.svg" />
   </a>
-  <a href="https://codecov.io/gh/michalochman/react-pixi-fiber/branch/master">
-    <img alt="codecov" src="https://img.shields.io/codecov/c/github/michalochman/react-pixi-fiber/master.svg" />
-  </a>
   <a href="https://biomejs.dev">
     <img alt="formatted with Biome" src="https://img.shields.io/badge/formatted_with-Biome-60a5fa.svg" />
-  </a>
-  <a href="https://gitter.im/react-pixi-fiber/Lobby">
-    <img alt="gitter" src="https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg" />
   </a>
 </div>
 
 ## Demo
 
-See [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6) demo.
-
-Also, please explore our [CodeSandbox](https://codesandbox.io/) templates:
-* [Hello world using JavaScript](https://codesandbox.io/s/react-pixi-fiber-template-ohk6z)
-* [Hello world using TypeScript](https://codesandbox.io/s/react-pixi-fiber-typescript-template-613ly)
-
-and examples:
-* [Rotating Bunny](https://codesandbox.io/s/q7oj1p0jo6)
-* [AnimatedSprite using CustomComponent](https://codesandbox.io/s/react-pixi-fiber-demo-animatedsprite-d6udu)
-* [Aligning texts](https://codesandbox.io/s/react-pixi-fiber-text-alignment-th5eg)
-* [Sharing Redux state](https://codesandbox.io/s/react-pixi-fiber-with-redux-g4k7n)
-* [Using animated](https://codesandbox.io/s/9qyxrljyo)
+The [examples](https://github.com/michalochman/react-pixi-fiber/tree/master/apps/examples) cover the API; run them with `pnpm install`, `pnpm build` and `pnpm start` in the repository.
 
 
 ## 🚀 Migrating from version `0.x.y`? 🚀
@@ -798,11 +781,6 @@ React Pixi Fiber has adopted a Contributor Covenant Code of Conduct that we expe
 ### [Contributing Guide](https://github.com/michalochman/react-pixi-fiber/blob/master/CONTRIBUTING.md)
 
 Read the contributing guide to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to React Pixi Fiber.
-
-### Contact
-
-You can help others and discuss in our [gitter channel](https://gitter.im/react-pixi-fiber/Lobby).
-
 
 ## License
 
