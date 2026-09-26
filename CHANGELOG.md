@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [2.0.0-rc.2] - 2026-09-26
+
 ### Added
 - TypeScript: `CustomPIXIProperty` is now declared in `index.d.ts`
 - TypeScript: `PointLikeTuple` accepts a single element tuple (e.g. `scale={[2]}`), matching runtime behavior
@@ -463,7 +466,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.1...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.2...HEAD
+[2.0.0-rc.2]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.1...v2.0.0-rc.2
 [2.0.0-rc.1]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-alpha.1...v2.0.0-rc.1
 [2.0.0-alpha.1]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.6...v2.0.0-alpha.1
 [1.0.6]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.4...v1.0.6
