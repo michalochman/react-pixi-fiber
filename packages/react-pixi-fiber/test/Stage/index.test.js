@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { createStageFunction, createStageClass } from "../../src/Stage";
 
 describe("Stage", () => {

@@ -61,23 +61,20 @@
     "react-dom": ">=18.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.1",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/preset-env": "^7.22.4",
-    "@babel/preset-react": "^7.22.3",
     "@types/react": "^18.2.8",
-    "babel-plugin-rewire": "^1.2.0",
+    "@vitest/coverage-v8": "4.1.10",
     "canvas": "^3.2.3",
     "cross-env": "^7.0.3",
-    "jest": "^26.6.3",
-    "jest-webgl-canvas-mock": "^2.5.0",
+    "jsdom": "28.1.0",
     "pixi.js": "^6.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-test-renderer": "^18.2.0",
     "rolldown": "1.1.5",
     "tsdown": "0.22.8",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "4.1.10",
+    "vitest-webgl-canvas-mock": "1.1.0"
   },
   "scripts": {
     "build": "rm -rf dist && npm run build:prod && npm run build:dev",
@@ -85,9 +82,9 @@
     "build:prod": "cross-env NODE_ENV=production tsdown",
     "prepublishOnly": "npm run test && npm run build && pnpm -w check-package",
     "test": "npm run test:dev && npm run test:prod",
-    "test:cov": "npm run test:dev -- --coverage && npm run test:prod -- --coverage && node mapCoverage.js",
-    "test:dev": "jest -c config/jest.dev.json",
-    "test:prod": "jest -c config/jest.prod.json",
+    "test:cov": "npm run test:dev -- --coverage --reporter=blob --outputFile=.vitest-reports/blob-dev.json && npm run test:prod -- --coverage --reporter=blob --outputFile=.vitest-reports/blob-prod.json && vitest run --merge-reports=.vitest-reports --coverage --coverage.reportsDirectory=coverage",
+    "test:dev": "vitest run --mode development",
+    "test:prod": "vitest run --mode production",
     "test:ts": "tsc -p tsconfig.json"
   }
 }

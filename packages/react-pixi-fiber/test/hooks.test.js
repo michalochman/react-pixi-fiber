@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
@@ -15,7 +16,7 @@ describe("usePixiApp", () => {
   it("will provide app from the context above", () => {
     const app = new PIXI.Application();
 
-    const TestComponent = jest.fn(() => null);
+    const TestComponent = vi.fn(() => null);
 
     const HookContainer = () => {
       const app = usePixiApp();
@@ -43,8 +44,8 @@ describe("usePixiApp", () => {
 describe("usePixiTicker", () => {
   it("will add the callback to the app.ticker", () => {
     const app = new PIXI.Application();
-    const fn = jest.fn();
-    const add = jest.spyOn(app.ticker, "add");
+    const fn = vi.fn();
+    const add = vi.spyOn(app.ticker, "add");
 
     const TestComponent = () => {
       usePixiTicker(fn);
@@ -68,8 +69,8 @@ describe("usePixiTicker", () => {
 
   it("will remove the callback from the app.ticker as a cleanup", () => {
     const app = new PIXI.Application();
-    const fn = jest.fn();
-    const remove = jest.spyOn(app.ticker, "remove");
+    const fn = vi.fn();
+    const remove = vi.spyOn(app.ticker, "remove");
 
     const TestComponent = () => {
       usePixiTicker(fn);

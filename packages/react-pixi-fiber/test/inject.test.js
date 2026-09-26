@@ -1,16 +1,17 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { INJECTED_TYPES, createInjectedTypeInstance, isInjectedType } from "../src/inject";
 
-jest.mock("../src/ReactPixiFiber");
+vi.mock("../src/ReactPixiFiber");
 
 describe("inject", () => {
   beforeEach(() => {
     // injectType is mutating INJECTED_TYPES
-    jest.resetModules();
+    vi.resetModules();
   });
 
   describe("injectType", () => {
-    it("should add type to INJECTED_TYPES", () => {
-      const inject = require("../src/inject");
+    it("should add type to INJECTED_TYPES", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
       const behavior = {};
       expect(inject.INJECTED_TYPES).not.toHaveProperty(type);
@@ -29,16 +30,16 @@ describe("inject", () => {
     it("returns undefined if type is not in INJECTED_TYPES", () => {
       expect(createInjectedTypeInstance("NON_EXISTENT_TYPE", {})).toBeUndefined();
     });
-    it("throws when passed incompatible behavior", () => {
-      const inject = require("../src/inject");
+    it("throws when passed incompatible behavior", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
       // incompatible behavior
       const behavior = {};
       inject.injectType(type, behavior);
       expect(() => inject.createInjectedTypeInstance(type)).toThrow();
     });
-    it("returns an instance of type if type is in INJECTED_TYPES (with simple behavior)", () => {
-      const inject = require("../src/inject");
+    it("returns an instance of type if type is in INJECTED_TYPES (with simple behavior)", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
       // just return the type name
       const customDisplayObject = () => type;
@@ -46,8 +47,8 @@ describe("inject", () => {
       expect(inject.createInjectedTypeInstance(type)).toBeDefined();
       expect(inject.createInjectedTypeInstance(type)).toEqual(customDisplayObject());
     });
-    it("returns an instance of type if type is in INJECTED_TYPES (with full behavior)", () => {
-      const inject = require("../src/inject");
+    it("returns an instance of type if type is in INJECTED_TYPES (with full behavior)", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
       const behavior = {
         // customDisplayObject will just return the type name
@@ -57,18 +58,18 @@ describe("inject", () => {
       expect(inject.createInjectedTypeInstance(type)).toBeDefined();
       expect(inject.createInjectedTypeInstance(type)).toEqual(behavior.customDisplayObject());
     });
-    it("calls type constructor with props", () => {
-      const inject = require("../src/inject");
+    it("calls type constructor with props", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
-      const customDisplayObject = jest.fn();
+      const customDisplayObject = vi.fn();
       inject.injectType(type, customDisplayObject);
       const props = { prop: "value" };
       inject.createInjectedTypeInstance(type, props);
       expect(customDisplayObject).toHaveBeenCalledTimes(1);
       expect(customDisplayObject).toHaveBeenCalledWith(props);
     });
-    it("attaches custom behavior to created instance", () => {
-      const inject = require("../src/inject");
+    it("attaches custom behavior to created instance", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
       const behavior = {
         customDisplayObject: () => ({}),
@@ -76,12 +77,12 @@ describe("inject", () => {
           // returning `this` so we can test bound `this` value
           return this;
         },
-        customDidAttach: jest.fn(),
-        customWillDetach: jest.fn(),
+        customDidAttach: vi.fn(),
+        customWillDetach: vi.fn(),
       };
       inject.injectType(type, behavior);
 
-      const applyDisplayObjectProps = jest.fn();
+      const applyDisplayObjectProps = vi.fn();
       const oldProps = { value: 1 };
       const newProps = { value: 2 };
       const instance = inject.createInjectedTypeInstance(type, {}, null, {}, {}, applyDisplayObjectProps);
@@ -99,8 +100,8 @@ describe("inject", () => {
   });
 
   describe("isInjectedType", () => {
-    it("returns true if type is injected", () => {
-      const inject = require("../src/inject");
+    it("returns true if type is injected", async () => {
+      const inject = await import("../src/inject");
       const type = "INJECTED_TYPE";
       const behavior = () => ({});
       inject.injectType(type, behavior);

@@ -1,49 +1,47 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import renderer from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import { Text } from "../../src";
 import { AppProvider } from "../../src/AppProvider";
+import { __renderMock, __unmounMock } from "../../src/render";
 import { createStageClass } from "../../src/Stage";
-import { __RewireAPI__ as StageRewireAPI } from "../../src/Stage/legacy";
+import { createPixiApplication } from "../../src/utils";
 
-jest.mock("../../src/ReactPixiFiber", () => {
-  return Object.assign({}, jest.requireActual("../../src/ReactPixiFiber"), {
-    createContainer: jest.fn(),
-    injectIntoDevTools: jest.fn(),
-    updateContainer: jest.fn(),
+vi.mock("../../src/ReactPixiFiber", async importOriginal => {
+  return Object.assign({}, await importOriginal(), {
+    createContainer: vi.fn(),
+    injectIntoDevTools: vi.fn(),
+    updateContainer: vi.fn(),
   });
 });
 
-jest.mock("../../src/render", () => {
-  const render = jest.fn();
-  const unmount = jest.fn();
+vi.mock("../../src/utils", async importOriginal => ({ ...(await importOriginal()), createPixiApplication: vi.fn() }));
+
+vi.mock("../../src/render", () => {
+  const render = vi.fn();
+  const unmount = vi.fn();
 
   return {
-    createRender: jest.fn().mockReturnValue(render),
-    createUnmount: jest.fn().mockReturnValue(unmount),
+    createRender: vi.fn().mockReturnValue(render),
+    createUnmount: vi.fn().mockReturnValue(unmount),
     __renderMock: render,
     __unmounMock: unmount,
   };
 });
 
 describe("Stage (class)", () => {
-  const { __renderMock, __unmounMock } = require("../../src/render");
   const Stage = createStageClass();
   let app;
-  const createPixiApplication = jest.fn(options => {
-    app = new PIXI.Application(options);
-    return app;
-  });
 
   beforeEach(() => {
-    StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
-    createPixiApplication.mockClear();
+    createPixiApplication.mockReset();
+    createPixiApplication.mockImplementation(options => {
+      app = new PIXI.Application(options);
+      return app;
+    });
     __renderMock.mockClear();
     __unmounMock.mockClear();
-  });
-
-  afterEach(() => {
-    StageRewireAPI.__ResetDependency__("createPixiApplication");
   });
 
   it("renders canvas element", () => {

@@ -1,38 +1,46 @@
+import { describe, it, expect, vi, afterAll, beforeEach } from "vitest";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
-import { __RewireAPI__ as ReactPixiFiberComponentRewireAPI } from "../src/ReactPixiFiberComponent";
-import { __RewireAPI__ as ReactPixiFiberUnknownPropertyHookRewireAPI } from "../src/ReactPixiFiberUnknownPropertyHook";
+import { createInjectedTypeInstance, isInjectedType } from "../src/inject";
+import { setValueForProperty } from "../src/PixiPropertyOperations";
 import { TYPES } from "../src/types";
 
-jest.mock("pixi.js", () => {
-  return Object.assign({}, jest.requireActual("pixi.js"), {
-    Container: jest.fn(),
-    Graphics: jest.fn(),
-    Sprite: jest.fn(),
-    Text: jest.fn(),
+vi.mock("../src/inject", async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    createInjectedTypeInstance: vi.fn(actual.createInjectedTypeInstance),
+    isInjectedType: vi.fn(actual.isInjectedType),
+  };
+});
+vi.mock("../src/PixiPropertyOperations", async importOriginal => ({
+  ...(await importOriginal()),
+  setValueForProperty: vi.fn(),
+}));
+
+vi.mock("pixi.js", async importOriginal => {
+  return Object.assign({}, await importOriginal(), {
+    Container: vi.fn(),
+    Graphics: vi.fn(),
+    Sprite: vi.fn(),
+    Text: vi.fn(),
     extras: {
-      BitmapText: jest.fn(),
-      TilingSprite: jest.fn(),
+      BitmapText: vi.fn(),
+      TilingSprite: vi.fn(),
     },
     mesh: {
-      NineSlicePlane: jest.fn(),
+      NineSlicePlane: vi.fn(),
     },
     particles: {
-      ParticleContainer: jest.fn(),
+      ParticleContainer: vi.fn(),
     },
   });
 });
 
 describe("ReactPixiFiber", () => {
   beforeEach(() => {
-    PIXI.Container.mockClear();
-    PIXI.Graphics.mockClear();
-    PIXI.Sprite.mockClear();
-    PIXI.Text.mockClear();
-    PIXI.extras.BitmapText.mockClear();
-    PIXI.extras.TilingSprite.mockClear();
-    PIXI.particles.ParticleContainer.mockClear();
+    vi.clearAllMocks();
   });
 
   describe("createInstance", () => {
@@ -132,10 +140,8 @@ describe("ReactPixiFiber", () => {
 
     it("returns injected instance if type was injected", () => {
       const instance = {};
-      const createInjectedTypeInstance = jest.fn(() => instance);
-      ReactPixiFiberComponentRewireAPI.__Rewire__("createInjectedTypeInstance", createInjectedTypeInstance);
+      createInjectedTypeInstance.mockImplementationOnce(() => instance);
       expect(() => ReactPixiFiberComponent.createInstance("INJECTED_TYPE", {})).not.toThrow();
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("createInjectedTypeInstance");
     });
 
     it("throws if type is not supported", () => {
@@ -151,70 +157,45 @@ describe("ReactPixiFiber", () => {
     const rawProps = { position: "0,0" };
     const rootContainer = {};
     const hostContext = {};
-    const isInjectedType = jest.fn();
-    const setInitialCustomComponentProperties = jest.fn();
-    const setInitialPixiProperties = jest.fn();
 
-    beforeAll(() => {
-      ReactPixiFiberComponentRewireAPI.__Rewire__("isInjectedType", isInjectedType);
-      ReactPixiFiberComponentRewireAPI.__Rewire__(
-        "setInitialCustomComponentProperties",
-        setInitialCustomComponentProperties
-      );
-      ReactPixiFiberComponentRewireAPI.__Rewire__("setInitialPixiProperties", setInitialPixiProperties);
-    });
-
+    // setInitialCustomComponentProperties and setInitialPixiProperties are internal to the module, so the tests
+    // observe what they do: call instance._customApplyProps or setValueForProperty for each prop
     afterAll(() => {
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("isInjectedType");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("setInitialCustomComponentProperties");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("setInitialPixiProperties");
-    });
-
-    afterEach(() => {
-      setInitialCustomComponentProperties.mockReset();
-      setInitialPixiProperties.mockReset();
+      isInjectedType.mockReset();
     });
 
     it("calls setInitialCustomComponentProperties for injected types with _customApplyProps defined", () => {
       const instance = {
-        _customApplyProps: jest.fn(),
+        _customApplyProps: vi.fn(),
       };
       isInjectedType.mockImplementation(() => true);
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
-      expect(setInitialPixiProperties).toHaveBeenCalledTimes(0);
-      expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialCustomComponentProperties).toHaveBeenCalledWith(
-        type,
-        instance,
-        rawProps,
-        rootContainer,
-        hostContext
-      );
+      expect(setValueForProperty).toHaveBeenCalledTimes(0);
+      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
+      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
     });
 
     it("calls setInitialPixiProperties for injected types without _customApplyProps defined", () => {
       isInjectedType.mockImplementation(() => true);
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
-      expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(0);
-      expect(setInitialPixiProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainer, hostContext);
+      expect(setValueForProperty).toHaveBeenCalledTimes(1);
+      expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", rawProps.position);
     });
 
     it("calls setInitialPixiProperties for regular types", () => {
       isInjectedType.mockImplementation(() => false);
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
-      expect(setInitialCustomComponentProperties).toHaveBeenCalledTimes(0);
-      expect(setInitialPixiProperties).toHaveBeenCalledTimes(1);
-      expect(setInitialPixiProperties).toHaveBeenCalledWith(type, instance, rawProps, rootContainer, hostContext);
+      expect(setValueForProperty).toHaveBeenCalledTimes(1);
+      expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", rawProps.position);
     });
   });
 
   describe("setInitialCustomComponentProperties", () => {
     const instance = {
-      _customApplyProps: jest.fn(),
+      _customApplyProps: vi.fn(),
     };
     const type = "type";
     const rawProps = { position: "0,0" };
@@ -233,18 +214,13 @@ describe("ReactPixiFiber", () => {
     const type = "type";
     const rawProps = { children: [], position: "0,0", scale: 2 };
     const rootContainerElement = {};
-    const setValueForProperty = jest.fn();
 
     it("calls setValueForProperty for each prop that is not children", () => {
-      ReactPixiFiberComponentRewireAPI.__Rewire__("setValueForProperty", setValueForProperty);
-
       ReactPixiFiberComponent.setInitialPixiProperties(type, instance, rawProps, rootContainerElement);
       expect(setValueForProperty).toHaveBeenCalledTimes(2);
       expect(setValueForProperty).not.toHaveBeenCalledWith(type, instance, "children", rawProps["children"]);
       expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", rawProps["position"]);
       expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "scale", rawProps["scale"]);
-
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("setValueForProperty");
     });
   });
 
@@ -273,20 +249,13 @@ describe("ReactPixiFiber", () => {
     const type = "type";
     const oldProps = { position: "0,0" };
     const newProps = { position: "1,1" };
-    const updatePayload = ["position", "1,1"];
-    const updatePixiProperties = jest.fn();
-    const isInjectedType = jest.fn(() => true);
 
     it("calls updatePixiProperties with update payload", () => {
-      ReactPixiFiberComponentRewireAPI.__Rewire__("updatePixiProperties", updatePixiProperties);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("isInjectedType", isInjectedType);
-
       ReactPixiFiberComponent.applyDisplayObjectProps(type, instance, oldProps, newProps);
-      expect(updatePixiProperties).toHaveBeenCalledTimes(1);
-      expect(updatePixiProperties).toHaveBeenCalledWith(type, instance, updatePayload);
 
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("isInjectedType");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("updatePixiProperties");
+      // updatePixiProperties is internal to the module, it calls setValueForProperty for each changed prop
+      expect(setValueForProperty).toHaveBeenCalledTimes(1);
+      expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", newProps.position, undefined);
     });
   });
 
@@ -297,30 +266,16 @@ describe("ReactPixiFiber", () => {
     const nextRawProps = { position: "1,1" };
     const updatePayload = ["position", "1,1"];
     const internalInstanceHandle = {};
-    const isInjectedType = jest.fn();
-    const updateCustomComponentProperties = jest.fn();
-    const updatePixiProperties = jest.fn();
 
-    beforeAll(() => {
-      ReactPixiFiberComponentRewireAPI.__Rewire__("isInjectedType", isInjectedType);
-      ReactPixiFiberComponentRewireAPI.__Rewire__("updateCustomComponentProperties", updateCustomComponentProperties);
-      ReactPixiFiberComponentRewireAPI.__Rewire__("updatePixiProperties", updatePixiProperties);
-    });
-
+    // updateCustomComponentProperties and updatePixiProperties are internal to the module, so the tests observe
+    // what they do: call instance._customApplyProps or setValueForProperty for each prop
     afterAll(() => {
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("isInjectedType");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("updateCustomComponentProperties");
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("updatePixiProperties");
-    });
-
-    afterEach(() => {
-      updateCustomComponentProperties.mockReset();
-      updatePixiProperties.mockReset();
+      isInjectedType.mockReset();
     });
 
     it("calls updateCustomComponentProperties for injected types with _customApplyProps defined", () => {
       const instance = {
-        _customApplyProps: jest.fn(),
+        _customApplyProps: vi.fn(),
       };
       isInjectedType.mockImplementation(() => true);
       ReactPixiFiberComponent.updateProperties(
@@ -332,16 +287,9 @@ describe("ReactPixiFiber", () => {
         internalInstanceHandle
       );
 
-      expect(updatePixiProperties).toHaveBeenCalledTimes(0);
-      expect(updateCustomComponentProperties).toHaveBeenCalledTimes(1);
-      expect(updateCustomComponentProperties).toHaveBeenCalledWith(
-        type,
-        instance,
-        updatePayload,
-        lastRawProps,
-        nextRawProps,
-        internalInstanceHandle
-      );
+      expect(setValueForProperty).toHaveBeenCalledTimes(0);
+      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
+      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
     });
 
     it("calls updatePixiProperties for injected types without _customApplyProps defined", () => {
@@ -355,14 +303,12 @@ describe("ReactPixiFiber", () => {
         internalInstanceHandle
       );
 
-      expect(updateCustomComponentProperties).toHaveBeenCalledTimes(0);
-      expect(updatePixiProperties).toHaveBeenCalledTimes(1);
-      expect(updatePixiProperties).toHaveBeenCalledWith(
+      expect(setValueForProperty).toHaveBeenCalledTimes(1);
+      expect(setValueForProperty).toHaveBeenCalledWith(
         type,
         instance,
-        updatePayload,
-        lastRawProps,
-        nextRawProps,
+        "position",
+        nextRawProps.position,
         internalInstanceHandle
       );
     });
@@ -378,14 +324,12 @@ describe("ReactPixiFiber", () => {
         internalInstanceHandle
       );
 
-      expect(updateCustomComponentProperties).toHaveBeenCalledTimes(0);
-      expect(updatePixiProperties).toHaveBeenCalledTimes(1);
-      expect(updatePixiProperties).toHaveBeenCalledWith(
+      expect(setValueForProperty).toHaveBeenCalledTimes(1);
+      expect(setValueForProperty).toHaveBeenCalledWith(
         type,
         instance,
-        updatePayload,
-        lastRawProps,
-        nextRawProps,
+        "position",
+        nextRawProps.position,
         internalInstanceHandle
       );
     });
@@ -393,7 +337,7 @@ describe("ReactPixiFiber", () => {
 
   describe("updateCustomComponentProperties", () => {
     const instance = {
-      _customApplyProps: jest.fn(),
+      _customApplyProps: vi.fn(),
     };
     const type = "type";
     const lastRawProps = { position: "0,0" };
@@ -423,11 +367,8 @@ describe("ReactPixiFiber", () => {
     const nextRawProps = { children: [2], position: "1,1", scale: 1 };
     const updatePayload = ["children", [2], "position", "1,1", "scale", 1];
     const internalInstanceHandle = {};
-    const setValueForProperty = jest.fn();
 
     it("calls setValueForProperty for each prop that is not children", () => {
-      ReactPixiFiberComponentRewireAPI.__Rewire__("setValueForProperty", setValueForProperty);
-
       ReactPixiFiberComponent.updatePixiProperties(
         type,
         instance,
@@ -458,8 +399,6 @@ describe("ReactPixiFiber", () => {
         nextRawProps["scale"],
         internalInstanceHandle
       );
-
-      ReactPixiFiberComponentRewireAPI.__ResetDependency__("setValueForProperty");
     });
   });
 });

@@ -1,14 +1,14 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ReactPixiFiber public API should match snapshot 1`] = `
-Object {
-  "AppContext": Object {
+exports[`ReactPixiFiber public API > should match snapshot 1`] = `
+{
+  "AppContext": {
     "$$typeof": Symbol(react.context),
-    "Consumer": Object {
+    "Consumer": {
       "$$typeof": Symbol(react.context),
       "_context": [Circular],
     },
-    "Provider": Object {
+    "Provider": {
       "$$typeof": Symbol(react.provider),
       "_context": [Circular],
     },
@@ -29,12 +29,12 @@ Object {
   "NineSlicePlane": "NineSlicePlane",
   "ParticleContainer": "ParticleContainer",
   "Sprite": "Sprite",
-  "Stage": Object {
+  "Stage": {
     "$$typeof": Symbol(react.forward_ref),
-    "defaultProps": Object {
-      "options": Object {},
+    "defaultProps": {
+      "options": {},
     },
-    "propTypes": Object {
+    "propTypes": {
       "app": [Function],
       "children": [Function],
       "height": [Function],
@@ -47,7 +47,6 @@ Object {
   "TilingSprite": "TilingSprite",
   "applyDisplayObjectProps": [Function],
   "createStageClass": [Function],
-  "default": Object {},
   "render": [Function],
   "unmount": [Function],
   "usePixiApp": [Function],

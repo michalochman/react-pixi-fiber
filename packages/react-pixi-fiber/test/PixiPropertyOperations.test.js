@@ -1,24 +1,18 @@
+import { describe, it, expect, vi, afterEach } from "vitest";
 import * as PixiPropertyOperations from "../src/PixiPropertyOperations";
-import { __RewireAPI__ as PixiPropertyOperationsRewireAPI } from "../src/PixiPropertyOperations";
+import { shouldIgnoreAttribute, shouldRemoveAttribute } from "../src/PixiProperty";
+import { setPixiValue } from "../src/utils";
+
+vi.mock("../src/PixiProperty", async importOriginal => ({
+  ...(await importOriginal()),
+  shouldIgnoreAttribute: vi.fn(() => false),
+  shouldRemoveAttribute: vi.fn(() => false),
+}));
+vi.mock("../src/utils", async importOriginal => ({ ...(await importOriginal()), setPixiValue: vi.fn() }));
 
 describe("PixiPropertyOperations", () => {
   describe("setValueForProperty", () => {
     const instance = {};
-    const setPixiValue = jest.fn();
-    const shouldIgnoreAttribute = jest.fn(() => false);
-    const shouldRemoveAttribute = jest.fn(() => false);
-
-    beforeAll(() => {
-      PixiPropertyOperationsRewireAPI.__Rewire__("setPixiValue", setPixiValue);
-      PixiPropertyOperationsRewireAPI.__Rewire__("shouldIgnoreAttribute", shouldIgnoreAttribute);
-      PixiPropertyOperationsRewireAPI.__Rewire__("shouldRemoveAttribute", shouldRemoveAttribute);
-    });
-
-    afterAll(() => {
-      PixiPropertyOperationsRewireAPI.__ResetDependency__("setPixiValue");
-      PixiPropertyOperationsRewireAPI.__ResetDependency__("shouldIgnoreAttribute");
-      PixiPropertyOperationsRewireAPI.__ResetDependency__("shouldRemoveAttribute");
-    });
 
     afterEach(() => {
       setPixiValue.mockReset();

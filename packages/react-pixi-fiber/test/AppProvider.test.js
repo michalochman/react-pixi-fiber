@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import PropTypes from "prop-types";
 import renderer from "react-test-renderer";
@@ -6,9 +7,10 @@ import { isNewContextAvailable } from "../src/compat";
 import { createStageClass, createStageFunction } from "../src/Stage";
 import { createRender } from "../src/render";
 import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
-import { __RewireAPI__ as HooksRewireAPI } from "../src/Stage/hooks";
-import { __RewireAPI__ as StageRewireAPI } from "../src/Stage/legacy";
+import { createPixiApplication } from "../src/utils";
 import * as PIXI from "pixi.js";
+
+vi.mock("../src/utils", async importOriginal => ({ ...(await importOriginal()), createPixiApplication: vi.fn() }));
 
 const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 
@@ -22,7 +24,7 @@ if (isNewContextAvailable()) {
 
     it("passes app prop to wrapped component", () => {
       const app = new PIXI.Application();
-      const TestComponent = jest.fn(() => null);
+      const TestComponent = vi.fn(() => null);
 
       renderer.act(() => {
         render(
@@ -40,20 +42,13 @@ if (isNewContextAvailable()) {
   // Legacy Context API
   describe("AppProvider using Legacy Context API (React <16.3.0)", () => {
     let app;
-    const createPixiApplication = jest.fn(options => {
-      app = new PIXI.Application(options);
-      return app;
-    });
 
     beforeEach(() => {
-      HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
-      StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
-      createPixiApplication.mockClear();
-    });
-
-    afterEach(() => {
-      HooksRewireAPI.__ResetDependency__("createPixiApplication");
-      StageRewireAPI.__ResetDependency__("createPixiApplication");
+      createPixiApplication.mockReset();
+      createPixiApplication.mockImplementation(options => {
+        app = new PIXI.Application(options);
+        return app;
+      });
     });
 
     it("exports null AppContext", () => {
@@ -62,7 +57,7 @@ if (isNewContextAvailable()) {
 
     it("passes app context to component rendered inside AppProvider", () => {
       const app = new PIXI.Application();
-      const TestComponent = jest.fn(() => null);
+      const TestComponent = vi.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
       };
@@ -81,7 +76,7 @@ if (isNewContextAvailable()) {
 
     it("passes app context to component rendered inside Stage (class)", () => {
       const Stage = createStageClass();
-      const TestComponent = jest.fn(() => null);
+      const TestComponent = vi.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
       };
@@ -99,7 +94,7 @@ if (isNewContextAvailable()) {
 
     it("passes app context to component rendered inside Stage (function)", () => {
       const Stage = createStageFunction();
-      const TestComponent = jest.fn(() => null);
+      const TestComponent = vi.fn(() => null);
       TestComponent.contextTypes = {
         app: PropTypes.object,
       };
@@ -119,25 +114,18 @@ if (isNewContextAvailable()) {
 
 describe("withApp", () => {
   let app;
-  const createPixiApplication = jest.fn(options => {
-    app = new PIXI.Application(options);
-    return app;
-  });
 
   beforeEach(() => {
-    HooksRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
-    StageRewireAPI.__Rewire__("createPixiApplication", createPixiApplication);
-    createPixiApplication.mockClear();
-  });
-
-  afterEach(() => {
-    HooksRewireAPI.__ResetDependency__("createPixiApplication");
-    StageRewireAPI.__ResetDependency__("createPixiApplication");
+    createPixiApplication.mockReset();
+    createPixiApplication.mockImplementation(options => {
+      app = new PIXI.Application(options);
+      return app;
+    });
   });
 
   it("passes app prop to component rendered inside AppProvider", () => {
     const app = new PIXI.Application();
-    const TestComponent = jest.fn(() => null);
+    const TestComponent = vi.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
     renderer.act(() => {
@@ -156,7 +144,7 @@ describe("withApp", () => {
 
   it("passes app prop to component rendered inside Stage (class)", () => {
     const Stage = createStageClass();
-    const TestComponent = jest.fn(() => null);
+    const TestComponent = vi.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
     renderer.act(() => {
@@ -172,7 +160,7 @@ describe("withApp", () => {
 
   it("passes app prop to component rendered inside Stage (function)", () => {
     const Stage = createStageFunction();
-    const TestComponent = jest.fn(() => null);
+    const TestComponent = vi.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
     renderer.act(() => {

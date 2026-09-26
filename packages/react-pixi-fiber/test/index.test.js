@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import * as ReactPixiFiber from "../src/index";
 import CustomPIXIComponent from "../src/CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "../src/AppProvider";

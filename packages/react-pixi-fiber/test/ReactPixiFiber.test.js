@@ -1,44 +1,65 @@
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
 import React from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
-import { __RewireAPI__ as ReactPixiFiberRewireAPI } from "../src/ReactPixiFiber";
-import { __RewireAPI__ as ReactPixiFiberUnknownPropertyHookRewireAPI } from "../src/ReactPixiFiberUnknownPropertyHook";
+import { diffProperties, setInitialProperties, updateProperties } from "../src/ReactPixiFiberComponent";
+import { validateProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
 import { createRender } from "../src/render";
 import { TYPES } from "../src/types";
+import { findStrictRoot } from "../src/utils";
 
-jest.mock("pixi.js", () => {
-  return Object.assign({}, jest.requireActual("pixi.js"), {
-    Container: jest.fn(),
-    Graphics: jest.fn(),
-    Sprite: jest.fn(),
-    Text: jest.fn(),
+vi.mock("pixi.js", async importOriginal => {
+  return Object.assign({}, await importOriginal(), {
+    Container: vi.fn(),
+    Graphics: vi.fn(),
+    Sprite: vi.fn(),
+    Text: vi.fn(),
     extras: {
-      BitmapText: jest.fn(),
-      TilingSprite: jest.fn(),
+      BitmapText: vi.fn(),
+      TilingSprite: vi.fn(),
     },
     particles: {
-      ParticleContainer: jest.fn(),
+      ParticleContainer: vi.fn(),
     },
   });
 });
-jest.mock("../src/utils", () => {
-  return Object.assign({}, jest.requireActual("../src/utils.js"), {
-    setPixiValue: jest.fn(),
+vi.mock("../src/utils", async importOriginal => {
+  return Object.assign({}, await importOriginal(), {
+    findStrictRoot: vi.fn(),
+    setPixiValue: vi.fn(),
   });
 });
+// The ReactPixiFiber tests stub these, ReactPixiFiberComponent.diffProperties is real until then
+vi.mock("../src/ReactPixiFiberComponent", async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    diffProperties: vi.fn(actual.diffProperties),
+    setInitialProperties: vi.fn(actual.setInitialProperties),
+    updateProperties: vi.fn(actual.updateProperties),
+  };
+});
+vi.mock("../src/ReactPixiFiberUnknownPropertyHook", async importOriginal => ({
+  ...(await importOriginal()),
+  validateProperties: vi.fn(),
+}));
+
+// validatePropertiesInDevelopment is internal to ReactPixiFiber: in development it looks for a strict root
+// and validates the properties when there is one
+const strictRoot = {};
 
 describe("ReactPixiFiber", () => {
   describe("appendChild", () => {
     const parent = {
-      addChild: jest.fn(),
-      removeChild: jest.fn(),
+      addChild: vi.fn(),
+      removeChild: vi.fn(),
     };
     const child = { id: 1 };
 
     beforeEach(() => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
     });
 
     it("removes child from parentInstance", () => {
@@ -57,7 +78,7 @@ describe("ReactPixiFiber", () => {
 
     it("delegates custom attach to child if _customDidAttach is defined", () => {
       const child = {
-        _customDidAttach: jest.fn(),
+        _customDidAttach: vi.fn(),
       };
       ReactPixiFiber.appendChild(parent, child);
 
@@ -68,15 +89,15 @@ describe("ReactPixiFiber", () => {
 
   describe("removeChild", () => {
     const parent = {
-      removeChild: jest.fn(),
+      removeChild: vi.fn(),
     };
     const child = {
-      destroy: jest.fn(),
+      destroy: vi.fn(),
       id: 1,
     };
 
     beforeEach(() => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
     });
 
     it("removes child from parentInstance", () => {
@@ -95,8 +116,8 @@ describe("ReactPixiFiber", () => {
 
     it("delegates custom detach to child if _customWillDetach is defined", () => {
       const child = {
-        _customWillDetach: jest.fn(),
-        destroy: jest.fn(),
+        _customWillDetach: vi.fn(),
+        destroy: vi.fn(),
       };
       ReactPixiFiber.removeChild(parent, child);
 
@@ -114,15 +135,15 @@ describe("ReactPixiFiber", () => {
     };
 
     beforeEach(() => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
     });
 
     it("adds child at specified index if child is already added to parent", () => {
       const parent = {
-        addChildAt: jest.fn(),
-        removeChild: jest.fn(),
+        addChildAt: vi.fn(),
+        removeChild: vi.fn(),
         children: [child1, child2],
-        getChildIndex: jest.fn(child => child.idx),
+        getChildIndex: vi.fn(child => child.idx),
       };
 
       ReactPixiFiber.insertBefore(parent, child1, child2);
@@ -134,10 +155,10 @@ describe("ReactPixiFiber", () => {
 
     it("adds child at specified index if child is not already added to parent", () => {
       const parent = {
-        addChildAt: jest.fn(),
-        removeChild: jest.fn(),
+        addChildAt: vi.fn(),
+        removeChild: vi.fn(),
         children: [child2],
-        getChildIndex: jest.fn(child => child.idx),
+        getChildIndex: vi.fn(child => child.idx),
       };
 
       ReactPixiFiber.insertBefore(parent, child1, child2);
@@ -157,31 +178,24 @@ describe("ReactPixiFiber", () => {
   describe("commitUpdate", () => {
     const type = "type";
     const instance = {};
-    const updateProperties = jest.fn();
-    const validatePropertiesInDevelopment = jest.fn();
 
     afterEach(() => {
-      updateProperties.mockReset();
-      validatePropertiesInDevelopment.mockReset();
+      updateProperties.mockClear();
+      findStrictRoot.mockClear();
+      validateProperties.mockClear();
     });
 
     beforeAll(() => {
-      ReactPixiFiberRewireAPI.__Rewire__("updateProperties", updateProperties);
-      ReactPixiFiberRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
+      updateProperties.mockImplementation(() => {});
+      findStrictRoot.mockImplementation(() => strictRoot);
     });
 
     afterAll(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("isInjectedType");
-      ReactPixiFiberRewireAPI.__ResetDependency__("updateProperties");
-      ReactPixiFiberRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("isInjectedType");
+      updateProperties.mockReset();
+      findStrictRoot.mockReset();
     });
 
     it("calls updateProperties with all props for injected types", () => {
-      const isInjectedType = jest.fn(() => true);
-      ReactPixiFiberRewireAPI.__Rewire__("isInjectedType", isInjectedType);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("isInjectedType", isInjectedType);
-
       const oldProps = { answer: 42 };
       const newProps = { answer: 1337, scale: 2 };
       const updatePayload = ReactPixiFiberComponent.diffProperties(type, instance, oldProps, newProps);
@@ -192,11 +206,6 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls updateProperties with only changed props for regular types", () => {
-      ReactPixiFiberRewireAPI.__Rewire__(
-        "isInjectedType",
-        jest.fn(() => false)
-      );
-
       const type = TYPES.TEXT;
       const oldProps = { text: "42" };
       const newProps = { text: "42", scale: 2 };
@@ -216,10 +225,11 @@ describe("ReactPixiFiber", () => {
       ReactPixiFiber.commitUpdate(instance, updatePayload, type, oldProps, newProps, internalHandle);
 
       if (__DEV__) {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledWith("Text", newProps, internalHandle);
+        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle);
+        expect(validateProperties).toHaveBeenCalledTimes(1);
+        expect(validateProperties).toHaveBeenCalledWith("Text", newProps);
       } else {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(0);
+        expect(validateProperties).toHaveBeenCalledTimes(0);
       }
     });
   });
@@ -238,10 +248,9 @@ describe("ReactPixiFiber", () => {
     const props = {};
     const rootContainer = {};
     const hostContext = {};
-    const setInitialProperties = jest.fn();
 
-    afterEach(() => {
-      setInitialProperties.mockReset();
+    beforeEach(() => {
+      setInitialProperties.mockClear();
     });
 
     it("returns true", () => {
@@ -249,11 +258,9 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls setInitialProperties", () => {
-      ReactPixiFiberRewireAPI.__Rewire__("setInitialProperties", setInitialProperties);
       ReactPixiFiber.finalizeInitialChildren(instance, type, props, rootContainer, hostContext);
       expect(setInitialProperties).toHaveBeenCalledTimes(1);
       expect(setInitialProperties).toHaveBeenCalledWith(type, instance, props, rootContainer, hostContext);
-      ReactPixiFiberRewireAPI.__ResetDependency__("setInitialProperties");
     });
   });
 
@@ -293,18 +300,17 @@ describe("ReactPixiFiber", () => {
     const instance = {};
     const type = "type";
     const returnValue = ["scale", 2];
-    const diffProperties = jest.fn(() => returnValue);
 
-    afterEach(() => {
-      diffProperties.mockReset();
+    beforeEach(() => {
+      diffProperties.mockClear();
     });
 
     beforeAll(() => {
-      ReactPixiFiberRewireAPI.__Rewire__("diffProperties", diffProperties);
+      diffProperties.mockImplementation(() => returnValue);
     });
 
     afterAll(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("diffProperties");
+      diffProperties.mockReset();
     });
 
     it("calls diffProperties", () => {
@@ -347,18 +353,17 @@ describe("ReactPixiFiber", () => {
   });
 
   describe("commitMount", () => {
-    const validatePropertiesInDevelopment = jest.fn();
-
     afterEach(() => {
-      validatePropertiesInDevelopment.mockReset();
+      findStrictRoot.mockClear();
+      validateProperties.mockClear();
     });
 
     beforeAll(() => {
-      ReactPixiFiberRewireAPI.__Rewire__("validatePropertiesInDevelopment", validatePropertiesInDevelopment);
+      findStrictRoot.mockImplementation(() => strictRoot);
     });
 
     afterAll(() => {
-      ReactPixiFiberRewireAPI.__ResetDependency__("validatePropertiesInDevelopment");
+      findStrictRoot.mockReset();
     });
 
     it("does nothing", () => {
@@ -374,10 +379,11 @@ describe("ReactPixiFiber", () => {
       ReactPixiFiber.commitMount(instance, type, props, internalHandle);
 
       if (__DEV__) {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(1);
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledWith("Text", props, internalHandle);
+        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle);
+        expect(validateProperties).toHaveBeenCalledTimes(1);
+        expect(validateProperties).toHaveBeenCalledWith("Text", props);
       } else {
-        expect(validatePropertiesInDevelopment).toHaveBeenCalledTimes(0);
+        expect(validateProperties).toHaveBeenCalledTimes(0);
       }
     });
   });

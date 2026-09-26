@@ -1,35 +1,31 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import emptyFunction from "fbjs/lib/emptyFunction";
+import warning from "fbjs/lib/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
-import { __RewireAPI__ as ReactPixiFiberUnknownPropertyHookRewireAPI } from "../src/ReactPixiFiberUnknownPropertyHook";
+import { isInjectedType } from "../src/inject";
+import { shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
+import { TYPES } from "../src/types";
+
+vi.mock("fbjs/lib/emptyFunction", () => ({ default: vi.fn() }));
+vi.mock("fbjs/lib/warning", () => ({ default: vi.fn() }));
+vi.mock("../src/inject", async importOriginal => ({ ...(await importOriginal()), isInjectedType: vi.fn() }));
+vi.mock("../src/PixiProperty", async importOriginal => ({
+  ...(await importOriginal()),
+  getPropertyInfo: vi.fn(() => null),
+  getCustomPropertyInfo: vi.fn(() => null),
+  shouldRemoveAttributeWithWarning: vi.fn(() => false),
+}));
+vi.mock("../src/ReactGlobalSharedState", async importOriginal => ({
+  ...(await importOriginal()),
+  getStackAddendum: () => "stack",
+}));
 
 describe("ReactPixiFiberUnknownPropertyHook", () => {
   describe("validateProperty", () => {
     const type = "type";
     const stack = "stack";
-    const getPropertyInfo = jest.fn();
-    const validateProperty = jest.fn();
-    const shouldRemoveAttributeWithWarning = jest.fn();
-    const warning = jest.fn();
-
-    beforeAll(() => {
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("getPropertyInfo", () => getPropertyInfo);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("getStackAddendum", () => stack);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__(
-        "shouldRemoveAttributeWithWarning",
-        shouldRemoveAttributeWithWarning
-      );
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("warning", warning);
-    });
-
-    afterAll(() => {
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("getPropertyInfo");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("getStackAddendum");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("shouldRemoveAttributeWithWarning");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("warning");
-    });
 
     afterEach(() => {
-      validateProperty.mockReset();
       warning.mockReset();
     });
 
@@ -91,22 +87,10 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
   describe("validateProperties", () => {
     const type = "type";
     const props = { position: "0,0" };
-    const isInjectedType = jest.fn();
-    const warnUnknownProperties = jest.fn();
-
-    beforeAll(() => {
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("isInjectedType", isInjectedType);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("warnUnknownProperties", warnUnknownProperties);
-    });
-
-    afterAll(() => {
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("isInjectedType");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("warnUnknownProperties");
-    });
 
     afterEach(() => {
       isInjectedType.mockReset();
-      warnUnknownProperties.mockReset();
+      warning.mockReset();
     });
 
     it("should not call warnUnknownProperties for injected types", () => {
@@ -114,52 +98,58 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       isInjectedType.mockImplementation(() => true);
       ReactPixiFiberUnknownPropertyHook.validateProperties(type, props, strictRoot);
 
-      expect(warnUnknownProperties).toHaveBeenCalledTimes(0);
+      // warnUnknownProperties is internal to the module, it would have warned about `position`
+      expect(warning).toHaveBeenCalledTimes(0);
     });
   });
 
   describe("warnUnknownProperties", () => {
-    const type = "type";
+    const type = TYPES.SPRITE;
     const props = { position: "0,0", scale: 2 };
     const stack = "stack";
-    const validateProperty = jest.fn();
-    const warning = jest.fn();
 
-    beforeAll(() => {
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("getStackAddendum", () => stack);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("validateProperty", validateProperty);
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__Rewire__("warning", warning);
-    });
+    // validateProperty is internal to the module and remembers which props it warned about, so every test
+    // gets a fresh module. Its result is controlled through what it depends on: in development the props are
+    // known Sprite properties and shouldRemoveAttributeWithWarning decides if they are valid, in production
+    // it is fbjs emptyFunction, mocked above.
+    let warnUnknownProperties;
+    const mockValidateProperty = isValid => {
+      if (__DEV__) {
+        shouldRemoveAttributeWithWarning.mockImplementation((type, name) => !isValid(name));
+      } else {
+        emptyFunction.mockImplementation((type, name) => isValid(name));
+      }
+    };
 
-    afterAll(() => {
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("getStackAddendum");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("validateProperty");
-      ReactPixiFiberUnknownPropertyHookRewireAPI.__ResetDependency__("warning");
+    beforeEach(async () => {
+      vi.resetModules();
+      ({ warnUnknownProperties } = await import("../src/ReactPixiFiberUnknownPropertyHook"));
     });
 
     afterEach(() => {
-      validateProperty.mockReset();
+      emptyFunction.mockReset();
+      shouldRemoveAttributeWithWarning.mockReset();
       warning.mockReset();
     });
 
     it("should not warn is props are valid", () => {
-      validateProperty.mockImplementation(() => true);
-      ReactPixiFiberUnknownPropertyHook.warnUnknownProperties(type, props);
+      mockValidateProperty(() => true);
+      warnUnknownProperties(type, props);
 
       expect(warning).toHaveBeenCalledTimes(0);
     });
 
     it("should warn if one prop is not valid", () => {
-      validateProperty.mockImplementationOnce(() => true).mockImplementationOnce(() => false);
-      ReactPixiFiberUnknownPropertyHook.warnUnknownProperties(type, props);
+      mockValidateProperty(name => name === "position");
+      warnUnknownProperties(type, props);
 
       expect(warning).toHaveBeenCalledTimes(1);
       expect(warning).toHaveBeenCalledWith(false, "Invalid value for prop %s on `<%s />`.%s", "`scale`", type, stack);
     });
 
     it("should warn if more than one prop is not valid", () => {
-      validateProperty.mockImplementation(() => false);
-      ReactPixiFiberUnknownPropertyHook.warnUnknownProperties(type, props);
+      mockValidateProperty(() => false);
+      warnUnknownProperties(type, props);
 
       expect(warning).toHaveBeenCalledTimes(1);
       expect(warning).toHaveBeenCalledWith(

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from "vitest";
 import * as PIXI from "pixi.js";
 import { filterByKey, including, isPointType, not, parsePoint, setPixiValue, copyPoint } from "../src/utils";
 
@@ -7,15 +8,15 @@ describe("not", () => {
   });
 
   it("calls wrapped function when called", () => {
-    const fn = jest.fn();
+    const fn = vi.fn();
     not(fn)();
 
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
   it("negates wrapped function return value", () => {
-    const returnTrue = jest.fn(() => true);
-    const returnFalse = jest.fn(() => false);
+    const returnTrue = vi.fn(() => true);
+    const returnFalse = vi.fn(() => false);
 
     expect(not(returnTrue)()).toBeFalsy();
     expect(not(returnFalse)()).toBeTruthy();
@@ -24,7 +25,7 @@ describe("not", () => {
 
 describe("filterByKey", () => {
   it("should return an object when called with object and function", () => {
-    expect(typeof filterByKey({}, jest.fn())).toEqual("object");
+    expect(typeof filterByKey({}, vi.fn())).toEqual("object");
   });
 
   it("should return an object with keys matching filter only", () => {
@@ -33,8 +34,8 @@ describe("filterByKey", () => {
       bar: 2,
       baz: 3,
     };
-    const fooOnly = jest.fn(key => key === "foo");
-    const withoutFoo = jest.fn(key => key !== "foo");
+    const fooOnly = vi.fn(key => key === "foo");
+    const withoutFoo = vi.fn(key => key !== "foo");
 
     expect(filterByKey(obj, fooOnly)).toEqual({
       foo: 1,
@@ -101,7 +102,7 @@ describe("isPointType", () => {
     expect(isPointType(new PIXI.Point(x, y))).toBeTruthy();
   });
   it("returns true if value is instance of PIXI.ObservablePoint", () => {
-    expect(isPointType(new PIXI.ObservablePoint(jest.fn, null, x, y))).toBeTruthy();
+    expect(isPointType(new PIXI.ObservablePoint(vi.fn, null, x, y))).toBeTruthy();
   });
   it("returns false if value is not instance of PIXI.Point or PIXI.ObservablePoint", () => {
     expect(isPointType(`${x},${y}`)).toBeFalsy();
@@ -111,7 +112,7 @@ describe("isPointType", () => {
 describe("setPixiValue", () => {
   it("copies value if current and next value are point types", () => {
     class JestPoint extends PIXI.Point {}
-    JestPoint.prototype.copyFrom = jest.fn(PIXI.Point.prototype.copyFrom);
+    JestPoint.prototype.copyFrom = vi.fn(PIXI.Point.prototype.copyFrom);
     const obj = {
       test: new JestPoint(0, 0),
     };
@@ -125,7 +126,7 @@ describe("setPixiValue", () => {
 
   it("parses next value and sets current if only current value is point", () => {
     class JestPoint extends PIXI.Point {}
-    JestPoint.prototype.set = jest.fn(PIXI.Point.prototype.set);
+    JestPoint.prototype.set = vi.fn(PIXI.Point.prototype.set);
     const obj = {
       test: new JestPoint(0, 0),
     };
@@ -155,9 +156,9 @@ describe("setPixiValue", () => {
 // Should react-pixi-fiber ever be updated to use 5.0,
 // this test should probably be updated test for existance of copyForm instead.
 describe("copyPoint", () => {
-  const PixiJSv4Point = { copy: jest.fn() };
+  const PixiJSv4Point = { copy: vi.fn() };
   // Method Point.copy is still available in PixiJS v5 but it is deprecated
-  const PixiJSv5Point = { copy: jest.fn(), copyFrom: jest.fn() };
+  const PixiJSv5Point = { copy: vi.fn(), copyFrom: vi.fn() };
 
   it("copies value using copy method when using PixiJS v4", () => {
     const instance = {

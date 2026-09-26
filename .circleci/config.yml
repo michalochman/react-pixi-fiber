@@ -37,9 +37,9 @@ jobs:
       - run: pnpm check-package
 
       # run tests
-      # Cap workers: jest sizes its pool from the host CPU count and OOMs the 4 GB container.
-      - run: pnpm --filter react-pixi-fiber test:dev --ci --maxWorkers=2
-      - run: pnpm --filter react-pixi-fiber test:prod --ci --maxWorkers=2
+      # Cap workers: vitest sizes its pool from the host CPU count and OOMs the 4 GB container.
+      - run: pnpm --filter react-pixi-fiber test:dev --maxWorkers=2
+      - run: pnpm --filter react-pixi-fiber test:prod --maxWorkers=2
 
       # typecheck the TypeScript fixture and the examples against the local index.d.ts
       - run: pnpm check-types

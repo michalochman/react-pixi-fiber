@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { defaultProps } from "../src/props";
 
 describe("props", () => {

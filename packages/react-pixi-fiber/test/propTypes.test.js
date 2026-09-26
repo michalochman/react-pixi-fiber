@@ -1,19 +1,12 @@
+import { describe, it, expect, vi, afterEach } from "vitest";
 import React from "react";
 import { validateApp, validateCanvas } from "../src/propTypes";
-import { __RewireAPI__ as PropTypesRewireAPI } from "../src/propTypes";
+import warning from "fbjs/lib/warning";
 import * as PIXI from "pixi.js";
 
+vi.mock("fbjs/lib/warning", () => ({ default: vi.fn() }));
+
 describe("validateApp", () => {
-  const warning = jest.fn();
-
-  beforeAll(() => {
-    PropTypesRewireAPI.__Rewire__("warning", warning);
-  });
-
-  afterAll(() => {
-    PropTypesRewireAPI.__ResetDependency__("warning");
-  });
-
   afterEach(() => {
     warning.mockReset();
   });

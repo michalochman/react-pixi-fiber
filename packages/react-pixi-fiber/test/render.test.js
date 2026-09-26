@@ -1,35 +1,36 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { Container, Text } from "../src/index";
 import { ReactPixiFiberAsPrimaryRenderer as ReactPixiFiber } from "../src/ReactPixiFiber";
 import { createRender, createUnmount, getDevToolsVersion, roots } from "../src/render";
 import * as PIXI from "pixi.js";
 
-jest.mock("../src/ReactPixiFiber", () => {
-  const actual = jest.requireActual("../src/ReactPixiFiber");
+vi.mock("../src/ReactPixiFiber", async importOriginal => {
+  const actual = await importOriginal();
   return Object.assign({}, actual, {
     ReactPixiFiberAsPrimaryRenderer: Object.assign({}, actual.ReactPixiFiberAsPrimaryRenderer, {
-      createContainer: jest.fn(),
-      getPublicRootInstance: jest.fn(),
-      injectIntoDevTools: jest.fn(),
-      updateContainer: jest.fn(),
+      createContainer: vi.fn(),
+      getPublicRootInstance: vi.fn(),
+      injectIntoDevTools: vi.fn(),
+      updateContainer: vi.fn(),
     }),
   });
 });
 
 describe("getDevToolsVersion", () => {
   it("should return React version", () => {
-    expect(getDevToolsVersion()).toEqual(require("react").version);
+    expect(getDevToolsVersion()).toEqual(React.version);
   });
 });
 
 describe("render", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   const render = createRender(ReactPixiFiber);
   const app = new PIXI.Application();
-  const callback = jest.fn();
+  const callback = vi.fn();
   const root = app.stage;
   const element = (
     <Container>
@@ -77,7 +78,7 @@ describe("render", () => {
 describe("unmount", () => {
   beforeEach(() => {
     roots.clear();
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   const unmount = createUnmount(ReactPixiFiber);

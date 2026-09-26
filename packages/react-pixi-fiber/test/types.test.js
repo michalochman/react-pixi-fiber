@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { TYPES } from "../src/types";
 
 describe("TYPES", () => {

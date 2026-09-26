@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import * as ReactPIXI from "../../src/react-pixi-alias/index";
 import * as ReactPixiFiber from "react-pixi-fiber";
 import ReactDOM from "react-dom";

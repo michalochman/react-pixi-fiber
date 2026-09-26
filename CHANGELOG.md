@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `index.d.ts` is a regular module instead of a `declare module "react-pixi-fiber"` block, and `index.d.mts` covers the ES build. The exported types are unchanged; `tsconfig.json` `paths` pointing `react-pixi-fiber` at `index.d.ts` are no longer needed
 - Code is formatted and linted with Biome instead of Prettier and ESLint
 - The library is built with [tsdown](https://tsdown.dev) instead of Rollup 2 and Babel. The output files, exports and bundled dependencies are the same; the code targets ES2018 instead of ES5 and is minified with Oxc instead of terser, which makes the development builds about 20% and the production builds about 3% smaller
+- The library tests run with [Vitest](https://vitest.dev) instead of Jest 26; `pnpm test` still runs the development and production suites. Babel and babel-plugin-rewire are gone, the tests mock modules with `vi.mock` instead
 
 
 ## [2.0.0-rc.4] - 2026-09-28
