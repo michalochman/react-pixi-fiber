@@ -87,7 +87,7 @@ function LayersExample() {
   return (
     <Stage options={OPTIONS}>
       {/* specify display list component */}
-      <LayeredStage enableSort>
+      <LayeredStage>
         {/* sorry, group cant exist without layer yet :( */}
         <Layer group={blueGroup} />
         <Layer group={greenGroup} />

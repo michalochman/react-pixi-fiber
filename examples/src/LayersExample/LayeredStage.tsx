@@ -2,9 +2,9 @@ import { CustomPIXIComponent } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 import { display } from "./pixiLayers";
 
-export type LayeredStageProps = {
-  enableSort?: boolean;
-};
+// No custom props, the stage is always sortable
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type LayeredStageProps = {};
 
 type LayeredStageInstance = PIXI.Container & {
   _updateStageRafId: number;
@@ -15,7 +15,7 @@ const TYPE = "LayeredStage";
 
 export default CustomPIXIComponent<LayeredStageInstance, LayeredStageProps>(
   {
-    customDisplayObject: ({ enableSort = false }) => {
+    customDisplayObject: () => {
       const stage: LayeredStageInstance = new display.Stage();
       stage.sortableChildren = true;
       return stage;
