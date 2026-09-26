@@ -1,40 +1,62 @@
 import { CustomPIXIComponent } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 
-const TYPE = "DraggableContainer";
-const behavior = {
-  customDisplayObject: () => new PIXI.Container(),
-  customDidAttach: function (instance) {
-    instance.interactive = true;
-    instance.cursor = "pointer";
+type DragHandler = (instance: DraggableContainerInstance) => void;
 
-    let draggedObject = null;
-    this.dragStart = () => {
-      draggedObject = instance;
-      if (typeof instance.onDragStart === "function") instance.onDragStart(instance);
-    };
-    this.dragEnd = () => {
-      draggedObject = null;
-      if (typeof instance.onDragEnd === "function") instance.onDragEnd(instance);
-    };
-    this.dragMove = e => {
-      if (draggedObject === null) {
-        return;
-      }
-      draggedObject.position.x += e.data.originalEvent.movementX;
-      draggedObject.position.y += e.data.originalEvent.movementY;
-      if (typeof instance.onDragMove === "function") instance.onDragMove(instance);
-    };
-
-    instance.on("mousedown", this.dragStart);
-    instance.on("mouseup", this.dragEnd);
-    instance.on("mousemove", this.dragMove);
-  },
-  customWillDetach: function (instance) {
-    instance.off("mousedown", this.dragStart);
-    instance.off("mouseup", this.dragEnd);
-    instance.off("mousemove", this.dragMove);
-  },
+export type DraggableContainerProps = {
+  onDragEnd?: DragHandler;
+  onDragMove?: DragHandler;
+  onDragStart?: DragHandler;
 };
 
-export default CustomPIXIComponent(behavior, TYPE);
+// Drag handlers passed as props are set on the instance by react-pixi-fiber,
+// listeners are stored on the instance so `customWillDetach` can remove them.
+export class DraggableContainerInstance extends PIXI.Container implements DraggableContainerProps {
+  onDragEnd?: DragHandler;
+  onDragMove?: DragHandler;
+  onDragStart?: DragHandler;
+
+  private draggedObject: DraggableContainerInstance | null = null;
+
+  dragStart = () => {
+    this.draggedObject = this;
+    this.onDragStart?.(this);
+  };
+
+  dragEnd = () => {
+    this.draggedObject = null;
+    this.onDragEnd?.(this);
+  };
+
+  dragMove = (e: PIXI.InteractionEvent) => {
+    if (this.draggedObject === null) {
+      return;
+    }
+    const { movementX, movementY } = e.data.originalEvent as MouseEvent;
+    this.draggedObject.position.x += movementX;
+    this.draggedObject.position.y += movementY;
+    this.onDragMove?.(this);
+  };
+}
+
+const TYPE = "DraggableContainer";
+
+export default CustomPIXIComponent<DraggableContainerInstance, DraggableContainerProps>(
+  {
+    customDisplayObject: () => new DraggableContainerInstance(),
+    customDidAttach: instance => {
+      instance.interactive = true;
+      instance.cursor = "pointer";
+
+      instance.on("mousedown", instance.dragStart);
+      instance.on("mouseup", instance.dragEnd);
+      instance.on("mousemove", instance.dragMove);
+    },
+    customWillDetach: instance => {
+      instance.off("mousedown", instance.dragStart);
+      instance.off("mouseup", instance.dragEnd);
+      instance.off("mousemove", instance.dragMove);
+    },
+  },
+  TYPE
+);

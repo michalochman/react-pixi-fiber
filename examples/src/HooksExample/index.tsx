@@ -1,11 +1,12 @@
 import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Stage, Text, usePixiTicker } from "react-pixi-fiber";
+import * as PIXI from "pixi.js";
 import Circle from "../CustomPIXIComponentExample/Circle";
 import Rect from "../CustomPIXIComponentExample/Rect";
 
 // returns a base 10 translation of a gray scale hex string build from a single
 // number between 0 and 255. if num is > 255 or < 0 it's clamped to the limit.
-const grayFromNum = num => {
+const grayFromNum = (num: number) => {
   const hex = ("00" + Math.max(0, Math.min(255, num)).toString(16)).substr(-2);
   return parseInt(`${hex.repeat(3)}`, 16);
 };
@@ -14,8 +15,15 @@ const grayFromNum = num => {
  * Implements `react-pixi-fiber`'s `usePixiTicker` hook, and the `useState` hook.
  * Handles animation of the circle and square background.
  */
-function useAnimatedValue({ direction, max, min, value }) {
-  const [data, setData] = useState({
+type AnimatedValueOptions = {
+  direction: number;
+  max: number;
+  min: number;
+  value: number;
+};
+
+function useAnimatedValue({ direction, max, min, value }: AnimatedValueOptions) {
+  const [data, setData] = useState<{ direction: number; max?: number; min?: number; value: number }>({
     direction,
     value,
   });
@@ -29,8 +37,8 @@ function useAnimatedValue({ direction, max, min, value }) {
 
       // flip direction once min or max has been reached.
       if (
-        (current.value >= current.max && current.direction === 1) ||
-        (current.value <= current.min && current.direction === -1)
+        (current.max !== undefined && current.value >= current.max && current.direction === 1) ||
+        (current.min !== undefined && current.value <= current.min && current.direction === -1)
       ) {
         data.direction *= -1;
       }
@@ -47,18 +55,20 @@ function useAnimatedValue({ direction, max, min, value }) {
   return data.value;
 }
 
-const AnimationContext = React.createContext();
+const AnimationContext = React.createContext({ title: "" });
 
 /**
  * implements `useContext`, `useEffect` and `useRef`.
  */
 const Title = () => {
   const { title } = useContext(AnimationContext);
-  const pixiText = useRef(null);
+  const pixiText = useRef<PIXI.Text>(null);
 
   // horizontally center the title's pivot point. this also works fine with `useEffect`.
   useEffect(() => {
-    pixiText.current.pivot.set(pixiText.current.width / 2, 0);
+    if (pixiText.current) {
+      pixiText.current.pivot.set(pixiText.current.width / 2, 0);
+    }
   }, [title]);
 
   return <Text ref={pixiText} text={title} x={400} y={0} />;

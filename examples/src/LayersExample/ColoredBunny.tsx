@@ -1,10 +1,13 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { Container } from "react-pixi-fiber";
 import Bunny from "../Bunny";
 import Rect from "../CustomPIXIComponentExample/Rect";
 
-function ColoredBunny({ fill, ...rest }) {
+type ColoredBunnyProps = React.ComponentProps<typeof Container> & {
+  fill: number;
+};
+
+function ColoredBunny({ fill, ...rest }: ColoredBunnyProps) {
   return (
     <Container {...rest}>
       <Rect x={-21} y={-21} width={42} height={42} fill={0x0} />
@@ -13,9 +16,5 @@ function ColoredBunny({ fill, ...rest }) {
     </Container>
   );
 }
-
-ColoredBunny.propTypes = {
-  fill: PropTypes.number.isRequired,
-};
 
 export default ColoredBunny;

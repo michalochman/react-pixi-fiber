@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { Stage } from "react-pixi-fiber";
 import Animated from "./animatedPixiTarget";
 import * as PIXI from "pixi.js";

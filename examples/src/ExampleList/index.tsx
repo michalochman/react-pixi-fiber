@@ -1,18 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import { Example } from "../App/App";
 
-const propTypes = {
-  examples: PropTypes.arrayOf(
-    PropTypes.shape({
-      component: PropTypes.func.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-    })
-  ),
+type ExampleListProps = {
+  examples: Example[];
 };
 
-function ExampleList({ examples }) {
+function ExampleList({ examples }: ExampleListProps) {
   return (
     <ul>
       {examples.map(example => (
@@ -23,7 +16,5 @@ function ExampleList({ examples }) {
     </ul>
   );
 }
-
-ExampleList.propTypes = propTypes;
 
 export default ExampleList;

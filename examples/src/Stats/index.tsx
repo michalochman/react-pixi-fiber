@@ -6,7 +6,7 @@ function Stats() {
     const stats = new StatsJS();
     document.body.appendChild(stats.domElement);
 
-    let rafId;
+    let rafId: number;
     const update = () => {
       stats.update();
       rafId = window.requestAnimationFrame(update);

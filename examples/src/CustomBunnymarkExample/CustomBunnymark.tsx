@@ -1,8 +1,7 @@
-import React, { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { usePixiTicker, withApp, ParticleContainer, Sprite, Text } from "react-pixi-fiber";
+import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
+import { usePixiTicker, withApp, ParticleContainer, PixiAppProperties, Sprite, Text } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
-import Particle from "./Particle";
+import Particle, { ParticleInstance } from "./Particle";
 import bunnysImage from "./bunnys.png";
 
 const maxSize = 200000;
@@ -22,13 +21,19 @@ const particleContainerProperties = {
   tint: false,
 };
 
-const generateBunny = texture => ({
+type Bunny = {
+  speedX: number;
+  speedY: number;
+  texture: number;
+};
+
+const generateBunny = (texture: number): Bunny => ({
   speedX: Math.random() * 10,
   speedY: Math.random() * 10 - 5,
   texture: texture,
 });
 
-const moveBunny = function () {
+const moveBunny = function (this: ParticleInstance) {
   this.x += this.speedX;
   this.y += this.speedY;
   this.speedY += gravity;
@@ -53,15 +58,15 @@ const moveBunny = function () {
   }
 };
 
-function CustomBunnymark() {
-  const particleContainer = useRef(null);
-  const [bunnys, setBunnys] = useState([]);
-  const [bunnyTextures, setBunnyTextures] = useState([]);
+function CustomBunnymark(props: PixiAppProperties) {
+  const particleContainer = useRef<PIXI.ParticleContainer>(null);
+  const [bunnys, setBunnys] = useState<Bunny[]>([]);
+  const [bunnyTextures, setBunnyTextures] = useState<PIXI.Texture[]>([]);
   const [currentTexture, setCurrentTexture] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
 
   useLayoutEffect(() => {
-    const bunnyTextures = new PIXI.Texture.from(bunnysImage);
+    const bunnyTextures = PIXI.Texture.from(bunnysImage);
     const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
     const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
     const bunny3 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37));
@@ -76,7 +81,7 @@ function CustomBunnymark() {
 
   const animate = useCallback(() => {
     if (isAdding) {
-      const addedBunnys = [];
+      const addedBunnys: Bunny[] = [];
 
       if (bunnys.length < maxSize) {
         for (let i = 0; i < bunniesAddedPerFrame; i++) {
@@ -89,7 +94,7 @@ function CustomBunnymark() {
     }
 
     if (particleContainer.current) {
-      particleContainer.current.children.forEach(bunny => bunny.update(bunny));
+      (particleContainer.current.children as ParticleInstance[]).forEach(bunny => bunny.update?.(bunny));
     }
   }, [bunnys, currentTexture, isAdding]);
 
@@ -132,8 +137,4 @@ function CustomBunnymark() {
     </Fragment>
   );
 }
-CustomBunnymark.propTypes = {
-  app: PropTypes.object,
-};
-
 export default withApp(CustomBunnymark);

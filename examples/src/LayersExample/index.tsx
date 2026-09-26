@@ -1,16 +1,15 @@
 // This is demo of pixi-display.js, https://github.com/gameofbombs/pixi-display
 // Drag the rabbits to understand what's going on
 // https://pixijs.io/examples/#/layers/zorder.js
-import React from "react";
 import { CustomPIXIProperty, Container, Stage } from "react-pixi-fiber";
 import ColoredBunny from "./ColoredBunny";
 import DraggableContainer from "../CustomPIXIComponentExample/DraggableContainer";
 import Layer from "./Layer";
 import LayeredStage from "./LayeredStage";
 import Rect from "../CustomPIXIComponentExample/Rect";
-const PIXI = require("pixi.js");
-window.PIXI = PIXI;
-require("pixi-layers/dist/pixi-layers.js");
+import { DraggableContainerInstance } from "../CustomPIXIComponentExample/DraggableContainer";
+import * as PIXI from "pixi.js";
+import { display } from "./pixiLayers";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
@@ -19,44 +18,48 @@ const OPTIONS = {
 };
 
 // Mark parentGroup prop as legal on Container as long as it's a valid display group
-CustomPIXIProperty(Container, "parentGroup", value => value instanceof PIXI.display.Group);
+CustomPIXIProperty(Container, "parentGroup", value => value instanceof display.Group);
 
 //META STUFF, groups exist without stage just fine
 
 // z-index = 0, sorting = true;
-const greenGroup = new PIXI.display.Group(0, true);
+const greenGroup = new display.Group(0, true);
 
 // green bunnies go down
-greenGroup.on("sort", bunny => {
+greenGroup.on("sort", (bunny: PIXI.DisplayObject) => {
   // we are dragging bunny parent, not the bunny itself
   bunny.zOrder = bunny.parent.y;
 });
 
 // blue bunnies go up
 // z-index = 1, sorting = true, we can provide zOrder function directly in constructor
-const blueGroup = new PIXI.display.Group(1, bunny => {
+const blueGroup = new display.Group(1, (bunny: PIXI.DisplayObject) => {
   // we are dragging bunny parent, not the bunny itself
   bunny.zOrder = -bunny.parent.y;
 });
 
 // Drag is the best layer, dragged element is above everything else
-const dragGroup = new PIXI.display.Group(2, false);
+const dragGroup = new display.Group(2, false);
 
 // Shadows are the lowest
-const shadowGroup = new PIXI.display.Group(-1, false);
+const shadowGroup = new display.Group(-1, false);
 
 const blurFilter = new PIXI.filters.BlurFilter();
 blurFilter.blur = 0.5;
 
-const onBunnyDragEnd = instance => {
+type BunnyWithGroup = PIXI.DisplayObject & { oldGroup?: unknown };
+
+const onBunnyDragEnd = (instance: DraggableContainerInstance) => {
   // we are dragging bunny parent, not the bunny itself
-  instance.children[1].parentGroup = instance.children[1].oldGroup;
+  const bunny = instance.children[1] as BunnyWithGroup;
+  bunny.parentGroup = bunny.oldGroup;
 };
 
-const onBunnyDragStart = instance => {
+const onBunnyDragStart = (instance: DraggableContainerInstance) => {
   // we are dragging bunny parent, not the bunny itself
-  instance.children[1].oldGroup = instance.children[1].parentGroup;
-  instance.children[1].parentGroup = dragGroup;
+  const bunny = instance.children[1] as BunnyWithGroup;
+  bunny.oldGroup = bunny.parentGroup;
+  bunny.parentGroup = dragGroup;
 };
 
 const blueBunnies = Array(10)
@@ -77,7 +80,7 @@ const shadowProps = {
   y: -22,
 };
 
-const stage = new PIXI.display.Stage();
+const stage = new display.Stage();
 stage.group.enableSort = true;
 
 function LayersExample() {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Stage, Text } from "react-pixi-fiber";
 import Circle from "./Circle";
 import DraggableContainer from "./DraggableContainer";

@@ -11,6 +11,7 @@ import {
   Text,
   TilingSprite,
   CustomPIXIComponent,
+  CustomPIXIProperty,
   createStageClass,
 } from "react-pixi-fiber";
 
@@ -88,7 +89,40 @@ const WickedContainer = CustomPIXIComponent<WickedContainerClass, WickedContaine
   "WickedContainer"
 );
 
-const CustomPIXIComponentExample: React.FC = () => <AnimatedSprite textures={[]} />;
+type CircleProps = {
+  fill: number;
+  radius: number;
+};
+// `function` form of `customApplyProps` gets bound `this.applyDisplayObjectProps`.
+const Circle = CustomPIXIComponent<PIXI.Graphics, CircleProps>(
+  {
+    customDisplayObject: () => new PIXI.Graphics(),
+    customApplyProps: function (instance, oldProps, newProps) {
+      const { fill, radius, ...newPropsRest } = newProps;
+      const { fill: oldFill, radius: oldRadius, ...oldPropsRest }: Partial<CircleProps> = oldProps ?? {};
+      if (oldFill !== fill || oldRadius !== radius) {
+        instance.clear();
+        instance.beginFill(fill);
+        instance.drawCircle(0, 0, radius);
+        instance.endFill();
+      }
+      this.applyDisplayObjectProps(oldPropsRest, newPropsRest);
+    },
+  },
+  "Circle"
+);
+
+// Custom properties can be registered on one, many or all component types.
+CustomPIXIProperty(Sprite, "id", value => typeof value === "number");
+CustomPIXIProperty([Container, "Sprite"], "parentGroup");
+CustomPIXIProperty(undefined, "zOrder");
+
+const CustomPIXIComponentExample: React.FC = () => (
+  <>
+    <AnimatedSprite textures={[]} />
+    <Circle fill={0xffff00} radius={10} position="10,10" />
+  </>
+);
 
 type WithRestProps<P, T> = P & Omit<T, keyof P>;
 type RestPropsExampleProps = WithRestProps<
@@ -151,7 +185,13 @@ const StageClassExample: React.FC = () => {
         <Container position="10,10">
           <BitmapText text="" />
         </Container>
-        <Graphics />
+        {/* Point-like props accept a single value, a comma-separated string, a 1 or 2 element tuple, an object or a PIXI point. */}
+        <Graphics position={1} />
+        <Graphics position="1,2" />
+        <Graphics position={[1]} />
+        <Graphics position={[1, 2]} />
+        <Graphics position={{ x: 1, y: 2 }} />
+        <Graphics position={new PIXI.Point(1, 2)} />
         <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
         <ParticleContainer autoResize={false}>
           <Sprite texture={PIXI.Texture.WHITE} />
@@ -219,7 +259,13 @@ const StageFunctionExample: React.FC = () => {
         <Container position="10,10">
           <BitmapText text="" />
         </Container>
-        <Graphics />
+        {/* Point-like props accept a single value, a comma-separated string, a 1 or 2 element tuple, an object or a PIXI point. */}
+        <Graphics position={1} />
+        <Graphics position="1,2" />
+        <Graphics position={[1]} />
+        <Graphics position={[1, 2]} />
+        <Graphics position={{ x: 1, y: 2 }} />
+        <Graphics position={new PIXI.Point(1, 2)} />
         <NineSlicePlane texture={texture} leftWidth={10} bottomHeight={5} rightWidth={15} topHeight={0} />
         <ParticleContainer autoResize={false}>
           <Sprite texture={PIXI.Texture.WHITE} />

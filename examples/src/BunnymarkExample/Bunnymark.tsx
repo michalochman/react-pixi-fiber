@@ -1,6 +1,5 @@
-import React, { Fragment, useCallback, useLayoutEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { usePixiTicker, withApp, ParticleContainer, Sprite, Text } from "react-pixi-fiber";
+import { Fragment, useCallback, useLayoutEffect, useState } from "react";
+import { usePixiTicker, withApp, ParticleContainer, PixiAppProperties, Sprite, Text } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 import bunnysImage from "./bunnys.png";
 
@@ -21,7 +20,15 @@ const particleContainerProperties = {
   tint: false,
 };
 
-const generateBunny = texture => ({
+type Bunny = {
+  speedX: number;
+  speedY: number;
+  texture: number;
+  x: number;
+  y: number;
+};
+
+const generateBunny = (texture: number): Bunny => ({
   speedX: Math.random() * 10,
   speedY: Math.random() * 10 - 5,
   texture: texture,
@@ -29,7 +36,7 @@ const generateBunny = texture => ({
   y: 0,
 });
 
-const moveBunny = bunny => {
+const moveBunny = (bunny: Bunny): Bunny => {
   const movedBunny = { ...bunny };
 
   movedBunny.x += movedBunny.speedX;
@@ -58,14 +65,14 @@ const moveBunny = bunny => {
   return movedBunny;
 };
 
-function Bunnymark() {
-  const [bunnys, setBunnys] = useState([]);
-  const [bunnyTextures, setBunnyTextures] = useState([]);
+function Bunnymark(props: PixiAppProperties) {
+  const [bunnys, setBunnys] = useState<Bunny[]>([]);
+  const [bunnyTextures, setBunnyTextures] = useState<PIXI.Texture[]>([]);
   const [currentTexture, setCurrentTexture] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
 
   useLayoutEffect(() => {
-    const bunnyTextures = new PIXI.Texture.from(bunnysImage);
+    const bunnyTextures = PIXI.Texture.from(bunnysImage);
     const bunny1 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 47, 26, 37));
     const bunny2 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 86, 26, 37));
     const bunny3 = new PIXI.Texture(bunnyTextures.baseTexture, new PIXI.Rectangle(2, 125, 26, 37));
@@ -79,7 +86,7 @@ function Bunnymark() {
   }, []);
 
   const animate = useCallback(() => {
-    const addedBunnys = [];
+    const addedBunnys: Bunny[] = [];
 
     if (isAdding) {
       if (bunnys.length < maxSize) {
@@ -126,8 +133,4 @@ function Bunnymark() {
     </Fragment>
   );
 }
-Bunnymark.propTypes = {
-  app: PropTypes.object,
-};
-
 export default withApp(Bunnymark);

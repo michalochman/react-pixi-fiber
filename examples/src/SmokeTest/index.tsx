@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { createStageClass, Stage } from "react-pixi-fiber";
 import RotatingBunny from "../RotatingBunny";
 

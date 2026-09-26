@@ -1,4 +1,3 @@
-import React from "react";
 import { Stage } from "react-pixi-fiber";
 import CustomBunnymark from "./CustomBunnymark";
 

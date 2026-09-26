@@ -1,4 +1,3 @@
-import React from "react";
 import { Container, Stage } from "react-pixi-fiber";
 import RotatingBunny from "../RotatingBunny";
 

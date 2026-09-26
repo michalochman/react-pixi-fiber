@@ -1,9 +1,16 @@
-/*global PIXI*/
 import { CustomPIXIComponent } from "react-pixi-fiber";
+import * as PIXI from "pixi.js";
+import { display } from "./pixiLayers";
 
-const TYPE = "Layer";
-const behavior = {
-  customDisplayObject: ({ group }) => new PIXI.display.Layer(group),
+export type LayerProps = {
+  group: unknown;
 };
 
-export default CustomPIXIComponent(behavior, TYPE);
+const TYPE = "Layer";
+
+export default CustomPIXIComponent<PIXI.Container, LayerProps>(
+  {
+    customDisplayObject: ({ group }) => new display.Layer(group),
+  },
+  TYPE
+);

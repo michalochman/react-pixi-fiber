@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, CustomPIXIProperty, Sprite, Stage } from "react-pixi-fiber";
-import RotatingBunny from "../RotatingBunny";
+import RotatingBunnyComponent from "../RotatingBunny";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
@@ -8,7 +8,18 @@ const OPTIONS = {
   width: 800,
 };
 
+// Register `id` as a legal prop on `Sprite` in development, validated as number.
 CustomPIXIProperty(Sprite, "id", value => typeof value === "number");
+
+// TypeScript cannot know about custom properties registered at runtime, so widen the props type here.
+// `bunnyName` is intentionally not registered and `id` is intentionally allowed to be a string to trigger dev warnings.
+type CustomProps = {
+  bunnyName?: string;
+  id?: number | string;
+};
+const RotatingBunny = RotatingBunnyComponent as React.ComponentType<
+  React.ComponentProps<typeof RotatingBunnyComponent> & CustomProps
+>;
 
 function CustomPIXIPropertyExample() {
   return (

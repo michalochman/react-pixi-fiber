@@ -1,11 +1,11 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Stage } from "react-pixi-fiber";
 import RotatingBunny from "../RotatingBunny";
 import * as PIXI from "pixi.js";
 
 function CustomApplicationExample() {
-  const div = useRef();
-  const [app, setApp] = useState(null);
+  const div = useRef<HTMLDivElement>(null);
+  const [app, setApp] = useState<PIXI.Application | null>(null);
 
   useLayoutEffect(() => {
     if (!div.current) {

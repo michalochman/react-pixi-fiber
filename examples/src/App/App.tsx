@@ -19,7 +19,13 @@ import SmokeTest from "../SmokeTest";
 import SuspenseExample from "../SuspenseExample";
 import Stats from "../Stats";
 
-const examples = [
+export type Example = {
+  name: string;
+  slug: string;
+  component: React.ComponentType;
+};
+
+const examples: Example[] = [
   {
     name: "Animated",
     slug: "animated",
@@ -102,7 +108,7 @@ function App() {
       </header>
       <div className="App-intro">
         <Switch>
-          <Route exact path="/" render={props => <ExampleList {...props} examples={examples} />} />
+          <Route exact path="/" render={() => <ExampleList examples={examples} />} />
           {examples.map(example => (
             <Route key={example.slug} exact path={`/${example.slug}`} component={example.component} />
           ))}
