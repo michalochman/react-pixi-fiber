@@ -7,13 +7,15 @@
   "scripts": {
     "build": "pnpm --filter react-pixi-fiber build",
     "test": "pnpm --filter react-pixi-fiber test",
-    "eslint": "pnpm --filter react-pixi-fiber eslint",
+    "lint": "biome check",
+    "format": "biome check --write",
     "check-types": "pnpm --filter react-pixi-fiber test:ts && pnpm --filter examples check-types",
     "start": "pnpm --filter examples start",
     "check-package": "node scripts/check-package.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "2.5.14",
     "esbuild": "^0.28.2",
     "publint": "^0.3.24"
   }

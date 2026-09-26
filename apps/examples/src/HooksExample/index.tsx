@@ -65,6 +65,7 @@ const Title = () => {
   const pixiText = useRef<PIXI.Text>(null);
 
   // horizontally center the title's pivot point. this also works fine with `useEffect`.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the text width changes with the title
   useEffect(() => {
     if (pixiText.current) {
       pixiText.current.pivot.set(pixiText.current.width / 2, 0);

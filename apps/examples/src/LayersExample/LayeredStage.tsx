@@ -3,7 +3,6 @@ import * as PIXI from "pixi.js";
 import { display } from "./pixiLayers";
 
 // No custom props, the stage is always sortable
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type LayeredStageProps = {};
 
 type LayeredStageInstance = PIXI.Container & {

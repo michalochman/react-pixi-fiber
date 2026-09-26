@@ -26,6 +26,7 @@ export function usePreviousProps(value) {
 
 export function useStageRenderer(props, appRef, canvasRef) {
   // create app on mount
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once on mount, prop changes are handled by useStageRerenderer
   useLayoutEffect(() => {
     const { app, options } = props;
 
@@ -55,7 +56,6 @@ export function useStageRenderer(props, appRef, canvasRef) {
         cleanupStage(appRef.current, STAGE_OPTIONS_UNMOUNT);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 
@@ -68,7 +68,6 @@ export function useStageRerenderer(props, appRef, canvasRef) {
   const prevProps = usePreviousProps(props);
   const [canvasKey, setCanvasKey] = useState(0);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     // This is first render, no need to do anything
     if (prevProps === emptyObject) return;

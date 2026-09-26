@@ -6,9 +6,7 @@ import * as ReactPixiFiber from "react-pixi-fiber";
 
 export const CustomPIXIComponent = ReactPixiFiber.CustomPIXIComponent;
 // react-pixi exposed the legacy ReactDOM API, keep it for compatibility.
-// eslint-disable-next-line react/no-deprecated
 export const render = ReactDOM.render;
-// eslint-disable-next-line react/no-deprecated
 export const unmountComponentAtNode = ReactDOM.unmountComponentAtNode;
 export const BitmapText = ReactPixiFiber.BitmapText;
 export const DisplayObjectContainer = ReactPixiFiber.Container;

@@ -23,9 +23,8 @@
   <a href="https://codecov.io/gh/michalochman/react-pixi-fiber/branch/master">
     <img alt="codecov" src="https://img.shields.io/codecov/c/github/michalochman/react-pixi-fiber/master.svg" />
   </a>
-  <a href="
-  [![styled with prettier]()](">
-    <img alt="styled with prettier" src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" />
+  <a href="https://biomejs.dev">
+    <img alt="formatted with Biome" src="https://img.shields.io/badge/formatted_with-Biome-60a5fa.svg" />
   </a>
   <a href="https://gitter.im/react-pixi-fiber/Lobby">
     <img alt="gitter" src="https://img.shields.io/gitter/room/react-pixi-fiber/Lobby.svg" />

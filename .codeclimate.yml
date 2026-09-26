@@ -27,11 +27,6 @@ checks:
       threshold: 4
 
 plugins:
-  eslint:
-    enabled: true
-    channel: "eslint-5"
-    config:
-      config: packages/react-pixi-fiber/.eslintrc.json
   fixme:
     enabled: true
   git-legal:

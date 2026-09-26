@@ -27,6 +27,9 @@ jobs:
             - ~/.local/share/pnpm/store
           key: pnpm-store-{{ checksum ".nvmrc" }}-{{ checksum "pnpm-lock.yaml" }}
 
+      # check formatting and lint
+      - run: pnpm lint
+
       # run build
       - run: pnpm build
 
