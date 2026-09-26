@@ -30,6 +30,9 @@ jobs:
       # run build
       - run: pnpm build
 
+      # check the packed package with publint and attw, and which files Node and esbuild resolve
+      - run: pnpm check-package
+
       # run tests
       # Cap workers: jest sizes its pool from the host CPU count and OOMs the 4 GB container.
       - run: pnpm --filter react-pixi-fiber test:dev --ci --maxWorkers=2

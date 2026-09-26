@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Build output moved from `cjs/`, `es/` and `umd/` to `dist/cjs/`, `dist/es/` and `dist/umd/`. Imports of `react-pixi-fiber` and `react-pixi-fiber/react-pixi-alias` are unaffected; direct paths to the built files (e.g. `react-pixi-fiber/umd/react-pixi-fiber.production.min.js` on a CDN) need the `dist/` prefix
 - Examples are built with Vite instead of Create React App
+- `package.json` has an `exports` map. Bundlers that understand it (webpack 5, Vite) get the ES build directly, the development or production file picked by the `development` condition; Node and `require` still get the CommonJS entry points. Only `react-pixi-fiber`, `react-pixi-fiber/react-pixi-alias` and `react-pixi-fiber/package.json` can be imported, deep imports into `dist/` or `src/` no longer resolve
+- The `module` and `jsnext:main` fields and `index.es.js` are removed. `index.es.js` was a CommonJS wrapper around the ES build; bundlers that ignore `exports` now use `main`
+- `index.d.ts` is a regular module instead of a `declare module "react-pixi-fiber"` block, and `index.d.mts` covers the ES build. The exported types are unchanged; `tsconfig.json` `paths` pointing `react-pixi-fiber` at `index.d.ts` are no longer needed
 
 
 ## [2.0.0-rc.4] - 2026-09-28

@@ -20,12 +20,13 @@ The repository is a [pnpm](https://pnpm.io) workspace. The pnpm version is pinne
 Run these in the repository root:
 
 ```sh
-pnpm install      # install every workspace package
-pnpm build        # build the library, the examples load the built files
-pnpm test         # run the library tests
-pnpm eslint       # lint the library source
-pnpm check-types  # typecheck the TypeScript fixture and the examples against index.d.ts
-pnpm start        # start the examples dev server
+pnpm install        # install every workspace package
+pnpm build          # build the library, the examples load the built files
+pnpm test           # run the library tests
+pnpm eslint         # lint the library source
+pnpm check-types    # typecheck the TypeScript fixture and the examples against index.d.ts
+pnpm check-package  # pack the library and check what Node and esbuild resolve (after pnpm build)
+pnpm start          # start the examples dev server
 ```
 
 Rebuild the library after changing its source before running or typechecking the examples.

@@ -14,12 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    // index.d.ts augments "react-pixi-fiber" from inside itself. Through the workspace symlink it is loaded
-    // from the repository root, where that name does not resolve, so point it back at the file.
-    "paths": {
-      "react-pixi-fiber": ["../../packages/react-pixi-fiber/index.d.ts"]
-    }
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }

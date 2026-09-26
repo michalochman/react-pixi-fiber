@@ -10,6 +10,3 @@ pnpm start
 ```
 
 `pnpm --filter examples build` writes a production build to `dist/`.
-
-Vite pre-bundles react-pixi-fiber when the dev server starts. After rebuilding the library, restart it with
-`pnpm --filter examples start --force` to pick up the new build.

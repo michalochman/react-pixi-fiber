@@ -7,9 +7,4 @@ export default defineConfig({
   define: {
     global: "globalThis",
   },
-  // react-pixi-fiber is linked from the workspace and its entry points are CommonJS, so pre-bundle it like a
-  // dependency installed from npm.
-  optimizeDeps: {
-    include: ["react-pixi-fiber"],
-  },
 });
