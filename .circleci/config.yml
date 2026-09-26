@@ -33,6 +33,9 @@ jobs:
       - run: npm run test:prod -- --ci --maxWorkers=2
       - run: npm run test:ts
 
+      # typecheck examples against local index.d.ts
+      - run: cd examples && npm ci && sh link.sh && npm run check-types
+
       # upload coverage report
       # TODO: Migrate to new uploader
       # - run: npm exec codecov

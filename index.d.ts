@@ -99,8 +99,8 @@ declare module "react-pixi-fiber" {
   }
 
   // Point-like tuple with `x` and `y` encoded as a single value or provided as a separate values.
-  // e.g. `pivot={[13, 37]}`
-  export type PointLikeTuple = [number, number];
+  // e.g. `pivot={[13, 37]}` or `scale={[2]}` (single element sets both `x` and `y`)
+  export type PointLikeTuple = [number] | [number, number];
 
   // Point-like number with `x` and `y` encoded  as a single value.
   // e.g. `scale={2}`
@@ -279,8 +279,21 @@ declare module "react-pixi-fiber" {
   // Also used as a `CustomPIXIComponent` `behavior` factory function.
   export type CustomDisplayObjectCreator<T extends PIXI.DisplayObject, P> = (props: P) => CustomDisplayObject<T, P>;
 
+  // Props accepted by a `CustomPIXIComponent`: props defined on custom component overwrite props of underlying DisplayObject.
+  export type CustomPIXIComponentProps<T extends PIXI.DisplayObject, P> = P & DisplayObjectProps<Omit<T, keyof P>>;
+
+  // `this` available inside `customApplyProps`, see `inject.js`.
+  // `applyDisplayObjectProps` is already bound to `type` and `displayObject`.
+  export interface CustomDisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> {
+    applyDisplayObjectProps: (
+      oldProps: Partial<CustomPIXIComponentProps<T, P>> | undefined,
+      newProps: Partial<CustomPIXIComponentProps<T, P>>
+    ) => void;
+  }
+
   // Used to apply `newProps` to your `CustomPIXIComponent` in a custom way.
   export type CustomDisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
+    this: CustomDisplayObjectPropSetterContext<T, P>,
     displayObject: T,
     oldProps: P | undefined,
     newProps: P
@@ -294,7 +307,8 @@ declare module "react-pixi-fiber" {
 
   // Inject API adds `_customApplyProps`, `_customDidAttach`, `_customWillDetach` methods.
   export interface CustomDisplayObject<T extends PIXI.DisplayObject, P> extends PIXI.DisplayObject {
-    _customApplyProps?: CustomDisplayObjectPropSetter<T, P>;
+    // Already bound, see `inject.js`.
+    _customApplyProps?: OmitThisParameter<CustomDisplayObjectPropSetter<T, P>>;
     _customDidAttach?: CustomDisplayObjectAttachHandler<T>;
     _customWillDetach?: CustomDisplayObjectDetachHandler<T>;
   }
@@ -316,8 +330,16 @@ declare module "react-pixi-fiber" {
   export function CustomPIXIComponent<T extends PIXI.DisplayObject, P>(
     behavior: CustomPIXIComponentBehavior<T, P>,
     type: string
-  ): // Props defined on custom component overwrite props of underlying DisplayObject
-  PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>, T>;
+  ): PixiComponent<CustomPIXIComponentProps<T, P>, T>;
+
+  // Register a custom property on given component type(s) so it is not reported as unknown prop in development.
+  // `maybeComponentType` accepts a component type (e.g. `Sprite`), a list of them, or `null`/`undefined` for all types.
+  // No-op in production.
+  export function CustomPIXIProperty(
+    maybeComponentType: string | PixiComponent<any, any> | Array<string | PixiComponent<any, any>> | null | undefined,
+    propertyName: string,
+    validator?: (value: unknown) => boolean
+  ): void;
 
   // Used to apply `newProps` to your `DisplayObject`.
   export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(

@@ -7,6 +7,7 @@ echo "- ok"
 echo "Injecting local react-pixi-fiber into node_modules"
 mkdir -p node_modules/react-pixi-fiber && \
 cp -R ../index.js node_modules/react-pixi-fiber/ && \
+cp -R ../index.d.ts node_modules/react-pixi-fiber/ && \
 cp -R ../cjs node_modules/react-pixi-fiber/ && \
 cp ../package.json node_modules/react-pixi-fiber/ && \
 echo "- ok"
