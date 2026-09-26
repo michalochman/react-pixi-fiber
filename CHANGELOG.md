@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The `module` and `jsnext:main` fields and `index.es.js` are removed. `index.es.js` was a CommonJS wrapper around the ES build; bundlers that ignore `exports` now use `main`
 - `index.d.ts` is a regular module instead of a `declare module "react-pixi-fiber"` block, and `index.d.mts` covers the ES build. The exported types are unchanged; `tsconfig.json` `paths` pointing `react-pixi-fiber` at `index.d.ts` are no longer needed
 - Code is formatted and linted with Biome instead of Prettier and ESLint
+- The library is built with [tsdown](https://tsdown.dev) instead of Rollup 2 and Babel. The output files, exports and bundled dependencies are the same; the code targets ES2018 instead of ES5 and is minified with Oxc instead of terser, which makes the development builds about 20% and the production builds about 3% smaller
 
 
 ## [2.0.0-rc.4] - 2026-09-28
