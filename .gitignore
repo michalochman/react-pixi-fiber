@@ -1,9 +1,7 @@
 .DS_STORE
 node_modules
 *~
-cjs/
-es/
-umd/
+dist/
 coverage/
 .module-cache
 *.log*

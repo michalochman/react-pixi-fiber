@@ -22,9 +22,7 @@
     "index.js",
     "index.umd.js",
     "react-pixi-alias.js",
-    "cjs/",
-    "es/",
-    "umd/",
+    "dist/",
     "src/"
   ],
   "sideEffects": false,

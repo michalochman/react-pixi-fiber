@@ -1,5 +1,5 @@
 if (process.env.NODE_ENV === "production") {
-  module.exports = require("./cjs/react-pixi-alias.production.min.js");
+  module.exports = require("./dist/cjs/react-pixi-alias.production.min.js");
 } else {
-  module.exports = require("./cjs/react-pixi-alias.development.js");
+  module.exports = require("./dist/cjs/react-pixi-alias.development.js");
 }

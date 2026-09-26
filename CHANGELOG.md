@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Build output moved from `cjs/`, `es/` and `umd/` to `dist/cjs/`, `dist/es/` and `dist/umd/`. Imports of `react-pixi-fiber` and `react-pixi-fiber/react-pixi-alias` are unaffected; direct paths to the built files (e.g. `react-pixi-fiber/umd/react-pixi-fiber.production.min.js` on a CDN) need the `dist/` prefix
+
 
 ## [2.0.0-rc.4] - 2026-09-28
 

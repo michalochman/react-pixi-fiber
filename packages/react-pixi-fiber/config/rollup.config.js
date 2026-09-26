@@ -12,7 +12,7 @@ const isProduction = NODE_ENV === "production";
 
 const getOutputFile = (entry, format) => {
   const suffix = isProduction ? "production.min" : "development";
-  return `${format}/${entry}.${suffix}.js`;
+  return `dist/${format}/${entry}.${suffix}.js`;
 };
 
 const getPlugins = entry => [
