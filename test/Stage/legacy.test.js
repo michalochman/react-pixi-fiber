@@ -200,6 +200,41 @@ describe("Stage (class)", () => {
     expect(app.renderer.width).toEqual(newWidth);
   });
 
+  it("creates new PIXI.Application with a new canvas when non-dimensional options change", () => {
+    // Give each mounted <canvas /> a real element, like react-dom would
+    const createNodeMock = () => document.createElement("canvas");
+    const options = { width: 400, height: 300, backgroundColor: 0x000000 };
+    const newOptions = { width: 400, height: 300, backgroundColor: 0xffffff };
+
+    const element = renderer.create(<Stage options={options} />, { createNodeMock });
+    const instance = element.getInstance();
+    const firstApp = instance._app.current;
+    element.update(<Stage options={newOptions} />);
+
+    expect(createPixiApplication).toHaveBeenCalledTimes(2);
+    const [[firstCall], [secondCall]] = createPixiApplication.mock.calls;
+    expect(firstCall.view).toBeInstanceOf(HTMLCanvasElement);
+    expect(secondCall.view).toBeInstanceOf(HTMLCanvasElement);
+    // Destroying the old PIXI.Application unbinds or loses the WebGL context of its canvas,
+    // so the new PIXI.Application must not share that canvas
+    expect(secondCall.view).not.toBe(firstCall.view);
+    expect(instance._app.current).not.toBe(firstApp);
+    expect(instance._app.current.view).toBe(secondCall.view);
+    expect(element.toJSON()).toHaveProperty("type", "canvas");
+  });
+
+  it("keeps canvas provided in options when non-dimensional options change", () => {
+    const view = document.createElement("canvas");
+    const options = { width: 400, height: 300, backgroundColor: 0x000000, view };
+    const newOptions = { width: 400, height: 300, backgroundColor: 0xffffff, view };
+
+    const element = renderer.create(<Stage options={options} />);
+    element.update(<Stage options={newOptions} />);
+
+    expect(createPixiApplication).toHaveBeenCalledTimes(2);
+    expect(createPixiApplication).toHaveBeenLastCalledWith({ ...newOptions, view });
+  });
+
   it("can be umounted", () => {
     const element = renderer.create(<Stage />);
 

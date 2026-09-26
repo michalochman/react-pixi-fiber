@@ -23,6 +23,9 @@ export default function createStageClass() {
       this._app = createRef();
       // Store canvas if it was rendered
       this._canvas = createRef();
+      // Changes every time PIXI.Application has to be recreated, so it gets a fresh canvas.
+      // See `getPixiApplication`.
+      this.state = { canvasKey: 0 };
     }
 
     componentDidMount() {
@@ -38,6 +41,9 @@ export default function createStageClass() {
     componentDidUpdate(prevProps) {
       const app = this.getPixiApplication(this.props, prevProps);
 
+      // Waiting for a new canvas to be rendered, PIXI.Application is created in the next update
+      if (app === null) return;
+
       this.renderStage(app, this.props);
       this.rerenderStage(app, this.props, prevProps);
 
@@ -49,7 +55,8 @@ export default function createStageClass() {
       const { app } = this.props;
 
       // Destroy PIXI.Application if it was not provided in props
-      if (!(app instanceof PIXI.Application)) {
+      // There is no PIXI.Application while waiting for a new canvas, see `getPixiApplication`
+      if (!(app instanceof PIXI.Application) && this._app.current != null) {
         cleanupStage(this._app.current, STAGE_OPTIONS_UNMOUNT);
       }
     }
@@ -69,7 +76,7 @@ export default function createStageClass() {
 
       const canvasProps = getCanvasProps(this.props);
 
-      return <canvas ref={this._canvas} {...canvasProps} />;
+      return <canvas key={this.state.canvasKey} ref={this._canvas} {...canvasProps} />;
     }
 
     getPixiApplication(props, prevProps) {
@@ -83,7 +90,7 @@ export default function createStageClass() {
 
       const view = this._canvas.current;
 
-      // Render stage for the first time
+      // Render stage for the first time, or on a new canvas after PIXI.Application was destroyed
       if (this._app.current == null) {
         // Create new PIXI.Application
         // Canvas passed in options as `view` will be used if provided
@@ -103,9 +110,17 @@ export default function createStageClass() {
         // Destroy PIXI.Application
         cleanupStage(this._app.current, STAGE_OPTIONS_RECREATE);
 
-        // Create new PIXI.Application
-        // Canvas passed in options as `view` will be used if provided
-        return createPixiApplication({ view, ...options });
+        // Canvas passed in options as `view` is not ours to replace, reuse it
+        if (options.view) {
+          return createPixiApplication({ view, ...options });
+        }
+
+        // Destroying the old PIXI.Application later unbinds or loses the WebGL context of its canvas,
+        // so render a new canvas and create PIXI.Application on it in the next update
+        this._app.current = null;
+        this.setState(({ canvasKey }) => ({ canvasKey: canvasKey + 1 }));
+
+        return null;
       }
 
       // Return already existing Application otherwise
