@@ -315,6 +315,39 @@ describe("useStageRerenderer", () => {
     expect(renderStage).toHaveBeenCalledTimes(1);
   });
 
+  it("returns new canvas key only if non-dimensional options changed", () => {
+    const options = { width: 400, height: 400, backgroundColor: 0x000000 };
+    const resizedOptions = { width: 600, height: 600, backgroundColor: 0x000000 };
+    const newOptions = { width: 600, height: 600, backgroundColor: 0xffffff };
+
+    const appRef = createRef();
+    const canvasRef = createRef();
+    canvasRef.current = view;
+    const keys = [];
+
+    const TestContainer = props => {
+      keys.push(useStageRerenderer(props, appRef, canvasRef));
+
+      return null;
+    };
+
+    let instance;
+    renderer.act(() => {
+      instance = renderer.create(<TestContainer options={options} />);
+    });
+    appRef.current = app;
+    renderer.act(() => {
+      instance.update(<TestContainer options={resizedOptions} />);
+    });
+    expect(new Set(keys).size).toEqual(1);
+
+    renderer.act(() => {
+      instance.update(<TestContainer options={newOptions} />);
+    });
+    expect(new Set(keys).size).toEqual(2);
+    expect(keys[keys.length - 1]).not.toEqual(keys[0]);
+  });
+
   it("rerenders stage if dimensional options changed", () => {
     const options = { width: 400, height: 400 };
     const newOptions = { width: 600, height: 600 };
@@ -541,6 +574,49 @@ describe("Stage (function)", () => {
     const element = renderer.create(<Stage />);
 
     expect(() => element.unmount()).not.toThrow();
+  });
+
+  it("creates new PIXI.Application with a new canvas when non-dimensional options change", () => {
+    // Give each mounted <canvas /> a real element, like react-dom would
+    const createNodeMock = () => document.createElement("canvas");
+    const options = { width: 400, height: 300, backgroundColor: 0x000000 };
+    const newOptions = { width: 400, height: 300, backgroundColor: 0xffffff };
+
+    let instance;
+    renderer.act(() => {
+      instance = renderer.create(<Stage options={options} />, { createNodeMock });
+    });
+    const firstApp = app;
+    renderer.act(() => {
+      instance.update(<Stage options={newOptions} />);
+    });
+
+    expect(createPixiApplication).toHaveBeenCalledTimes(2);
+    const [[firstCall], [secondCall]] = createPixiApplication.mock.calls;
+    expect(firstCall.view).toBeInstanceOf(HTMLCanvasElement);
+    expect(secondCall.view).toBeInstanceOf(HTMLCanvasElement);
+    // Destroying the old PIXI.Application unbinds or loses the WebGL context of its canvas,
+    // so the new PIXI.Application must not share that canvas
+    expect(secondCall.view).not.toBe(firstCall.view);
+    expect(app).not.toBe(firstApp);
+    expect(instance.toJSON()).toHaveProperty("type", "canvas");
+  });
+
+  it("keeps canvas provided in options when non-dimensional options change", () => {
+    const view = document.createElement("canvas");
+    const options = { width: 400, height: 300, backgroundColor: 0x000000, view };
+    const newOptions = { width: 400, height: 300, backgroundColor: 0xffffff, view };
+
+    let instance;
+    renderer.act(() => {
+      instance = renderer.create(<Stage options={options} />);
+    });
+    renderer.act(() => {
+      instance.update(<Stage options={newOptions} />);
+    });
+
+    expect(createPixiApplication).toHaveBeenCalledTimes(2);
+    expect(createPixiApplication).toHaveBeenLastCalledWith({ ...newOptions, view });
   });
 
   it("calls render on first render", () => {

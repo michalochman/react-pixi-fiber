@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
 import shallowEqual from "fbjs/lib/shallowEqual";
@@ -50,21 +50,30 @@ export function useStageRenderer(props, appRef, canvasRef) {
 
     // Cleanup current PIXI.Application when unmounting
     return function cleanup() {
-      cleanupStage(appRef.current, STAGE_OPTIONS_UNMOUNT);
+      // There is no PIXI.Application while waiting for a new canvas, see `useStageRerenderer`
+      if (appRef.current != null) {
+        cleanupStage(appRef.current, STAGE_OPTIONS_UNMOUNT);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 
+// Returns `key` for the rendered canvas. It changes every time PIXI.Application has to be recreated,
+// so the new PIXI.Application gets a fresh canvas and WebGL context. The old PIXI.Application is
+// destroyed later (see `cleanupStage`) and destroying a renderer unbinds the current program
+// (PixiJS v6) or loses the context (PixiJS v7) of its canvas, which would break the new
+// PIXI.Application if it was sharing that canvas.
 export function useStageRerenderer(props, appRef, canvasRef) {
   const prevProps = usePreviousProps(props);
+  const [canvasKey, setCanvasKey] = useState(0);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     // This is first render, no need to do anything
-    if (!appRef.current || prevProps === emptyObject) return;
+    if (prevProps === emptyObject) return;
 
-    const { app } = props;
+    const { app, options } = props;
 
     if (app instanceof PIXI.Application) {
       // Update stage tree
@@ -73,14 +82,24 @@ export function useStageRerenderer(props, appRef, canvasRef) {
       return;
     }
 
+    const view = canvasRef.current;
+
+    // Previous update destroyed PIXI.Application and rendered a new canvas, create PIXI.Application on it
+    if (appRef.current == null) {
+      appRef.current = createPixiApplication({ view, ...options });
+
+      // Set initial properties
+      renderStage(appRef.current, props);
+
+      return;
+    }
+
     const {
-      options,
       options: { height, width, ...otherOptions },
     } = props;
     const {
       options: { height: prevHeight, width: prevWidth, ...prevOtherOptions },
     } = prevProps;
-    const view = canvasRef.current;
 
     // We need to create new PIXI.Application when options other than dimensions
     // are changed because some renderer settings are immutable.
@@ -88,12 +107,17 @@ export function useStageRerenderer(props, appRef, canvasRef) {
       // Destroy PIXI.Application
       cleanupStage(appRef.current, STAGE_OPTIONS_RECREATE);
 
-      // Create new PIXI.Application
-      // Canvas passed in options as `view` will be used if provided
-      appRef.current = createPixiApplication({ view, ...options });
+      if (options.view) {
+        // Canvas passed in options as `view` is not ours to replace, reuse it
+        appRef.current = createPixiApplication({ view, ...options });
 
-      // Set initial properties
-      renderStage(appRef.current, props);
+        // Set initial properties
+        renderStage(appRef.current, props);
+      } else {
+        // Render a new canvas, PIXI.Application is created on it in the next update
+        appRef.current = null;
+        setCanvasKey(canvasKey => canvasKey + 1);
+      }
     } else {
       // Update stage tree
       rerenderStage(appRef.current, prevProps, props);
@@ -101,6 +125,8 @@ export function useStageRerenderer(props, appRef, canvasRef) {
       resizeRenderer(appRef.current, prevProps, props);
     }
   });
+
+  return canvasKey;
 }
 
 export default function createStageFunction() {
@@ -125,7 +151,7 @@ export default function createStageFunction() {
     // - useStageRenderer:
     //   - is only called once
     //   - is responsible for creating first PIXI.Application and destroying it when Stage is finally unmounted
-    useStageRerenderer(props, appRef, canvasRef);
+    const canvasKey = useStageRerenderer(props, appRef, canvasRef);
     useStageRenderer(props, appRef, canvasRef);
 
     // Do not render anything if PIXI.Application was provided in props
@@ -140,7 +166,7 @@ export default function createStageFunction() {
 
     const canvasProps = getCanvasProps(props);
 
-    return <canvas ref={canvasRef} {...canvasProps} />;
+    return <canvas key={canvasKey} ref={canvasRef} {...canvasProps} />;
   });
 
   Stage.propTypes = propTypes;

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- `Stage` renders a new canvas when `PIXI.Application` is recreated after non-dimensional `options` change. Previously the new `PIXI.Application` shared the canvas with the one being destroyed, and destroying it unbound the current WebGL program (PixiJS v6) or lost the context (PixiJS v7), leaving only the background color rendered
+
 
 ## [2.0.0-rc.1] - 2026-09-26
 
