@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [2.0.0-rc.3] - 2026-09-26
+
 ### Fixed
 - Create React App 5 (and other webpack builds with strict export checks) failed with "Attempted import error: 'extras' is not exported from 'pixi.js'" when using PixiJS v5+. The ES build read the PixiJS v4 `extras`, `mesh` and `particles` namespaces straight from the `pixi.js` import, the fallback to the top-level classes is unchanged
 

@@ -1,6 +1,6 @@
 {
   "name": "react-pixi-fiber",
-  "version": "2.0.0-rc.2",
+  "version": "2.0.0-rc.3",
   "description": "React Fiber renderer for PixiJS",
   "main": "index.js",
   "umd:main": "index.umd.js",
