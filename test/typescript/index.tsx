@@ -233,6 +233,11 @@ const StageFunctionExample: React.FC = () => {
           }
         }} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
           <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
+          {/* Every wrapped display object is a Container, so leaf components accept children. */}
+          <Sprite texture={texture}>
+            {/* Callback ref parameter is the `PIXI.Sprite` instance, not the props type. */}
+            <Sprite texture={texture} ref={(sprite) => sprite?.position.set(0, 0)} />
+          </Sprite>
           <Text text="Regular text" />
           <TilingSprite texture={texture} />
           <CompositionExample />

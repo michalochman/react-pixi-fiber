@@ -5,9 +5,11 @@ import { Container } from "../src/index";
 import { usePixiApp, usePixiTicker } from "../src/hooks";
 import { AppContext } from "../src/AppProvider";
 import { createRender } from "../src/render";
-import { ReactPixiFiberAsSecondaryRenderer } from "../src/ReactPixiFiber";
+import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
 
-const render = createRender(ReactPixiFiberAsSecondaryRenderer);
+// react-test-renderer is a secondary renderer, so the pixi renderer must be primary
+// or both stamp the same context slot and React warns about multiple renderers.
+const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 
 describe("usePixiApp", () => {
   it("will provide app from the context above", () => {

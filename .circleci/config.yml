@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:18.16.0
+      - image: cimg/node:24.15.0
 
     working_directory: ~/react-pixi-fiber
 
@@ -28,7 +28,9 @@ jobs:
       - run: npm run build
 
       # run tests
-      - run: npm run test --coverage --ci --silent
+      # Cap workers: jest sizes its pool from the host CPU count and OOMs the 4 GB container.
+      - run: npm run test:dev -- --ci --maxWorkers=2
+      - run: npm run test:prod -- --ci --maxWorkers=2
       - run: npm run test:ts
 
       # upload coverage report

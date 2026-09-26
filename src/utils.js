@@ -4,7 +4,10 @@ import { getStackAddendum } from "./ReactGlobalSharedState";
 
 /* Helper Methods */
 
-export const not = fn => (...args) => !fn(...args);
+export const not =
+  fn =>
+  (...args) =>
+    !fn(...args);
 
 export const including = props => key => props.indexOf(key) !== -1;
 
