@@ -6,7 +6,7 @@
   <h1>ReactPixiFiber – React Fiber renderer for PixiJS</h1>
 
   <p>
-    ReactPixiFiber is a JavaScript library for writing <a href="https://pixijs.com/">PixiJS</a> applications using <a href="https://reactjs.org/">React</a> declarative style in React 16 and above.
+    ReactPixiFiber is a JavaScript library for writing <a href="https://pixijs.com/">PixiJS</a> applications using <a href="https://reactjs.org/">React</a> declarative style in React 18 and above.
     <br />
     For React <16.0.0 see <a href="https://github.com/Izzimach/react-pixi">react-pixi</a>.
   </p>
@@ -103,6 +103,8 @@ The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html
   <summary>
     <strong>With ReactDOM (React 16 and 17)</strong>
   </summary>
+
+React 16 and 17 are supported by `react-pixi-fiber@1.x` only. `react-pixi-fiber@2.x` requires React 18.2 or newer.
 
 ```jsx harmony
 import { render } from "react-dom";

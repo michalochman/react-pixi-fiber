@@ -10,11 +10,12 @@ let validateProperty = emptyFunction;
 
 if (__DEV__) {
   const warnedProperties = {};
-  const hasOwnProperty = Object.prototype.hasOwnProperty;
   const EVENT_NAME_REGEX = /^on./;
 
   validateProperty = function (type, name, value) {
-    if (hasOwnProperty.call(warnedProperties, name) && warnedProperties[name]) {
+    // Inlined: babel-plugin-rewire rewrites a block-scoped `hasOwnProperty` binding to `_get__("hasOwnProperty")`
+    // without registering it, which made this `undefined` under test.
+    if (Object.prototype.hasOwnProperty.call(warnedProperties, name) && warnedProperties[name]) {
       return true;
     }
 

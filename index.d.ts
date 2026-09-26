@@ -64,8 +64,9 @@ declare module "react-pixi-fiber" {
   // Returns keys `K` of `T` where type of `T[K]` is not specifically `any`.
   type KeysThatAreNotAny<T> = { [K in keyof T]: any extends T[K] ? never : K }[keyof T];
 
-  // The shape of `T` with `children` property omitted.
-  type WithoutChildren<T> = Omit<T, "children">;
+  // The shape of `T` with `children` property that React understands.
+  // Every `PIXI.DisplayObject` we wrap is a `PIXI.Container`, so all of them accept children.
+  type PropsWithReactChildren<T> = Omit<T, "children"> & { children?: React.ReactNode };
 
   // Returns `T` when it extends `PIXI.DisplayObject`, otherwise returns `U`.
   // This is a hack which we use to be able to use these types with types from PixiJS v4 and v5
@@ -137,15 +138,17 @@ declare module "react-pixi-fiber" {
    * Base components
    */
 
-  type PixiElement<Props> = Props & React.ClassAttributes<Props> & InteractiveComponent;
+  // `Instance` is the display object a `ref` on the component receives.
+  type PixiElement<Props, Instance = Props> = Props & React.ClassAttributes<Instance> & InteractiveComponent;
 
   // This is similar to React.FunctionComponent<P>
-  export interface PixiComponent<P = {}> {
-    (props: PixiElement<P>): React.ReactElement<P>;
+  // `I` is the display object a `ref` on the component receives.
+  export interface PixiComponent<P = {}, I = P> {
+    (props: PixiElement<P, I>): React.ReactElement<P>;
   }
 
   // Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
-  export type DisplayObjectProps<T> = WithoutChildren<Partial<WithPointLike<T>>>;
+  export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>>;
 
   // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.BitmapText.html
@@ -165,17 +168,17 @@ declare module "react-pixi-fiber" {
       >
     >[1];
   };
-  export const BitmapText: PixiComponent<BitmapText>;
+  export const BitmapText: PixiComponent<BitmapText, PIXI.BitmapText>;
 
   // A component wrapper for `PIXI.Container`.
   // see: http://pixijs.download/dev/docs/PIXI.Container.html
-  export type Container = DisplayObjectProps<PIXI.Container> & { children?: React.ReactNode };
-  export const Container: PixiComponent<Container>;
+  export type Container = DisplayObjectProps<PIXI.Container>;
+  export const Container: PixiComponent<Container, PIXI.Container>;
 
   // A component wrapper for `PIXI.Graphics`.
   // see: http://pixijs.download/dev/docs/PIXI.Graphics.html
   export type Graphics = DisplayObjectProps<PIXI.Graphics>;
-  export const Graphics: PixiComponent<Graphics>;
+  export const Graphics: PixiComponent<Graphics, PIXI.Graphics>;
 
   // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.NineSlicePlane.html
@@ -185,8 +188,8 @@ declare module "react-pixi-fiber" {
       PIXI.mesh.NineSlicePlane,
       PIXI.NineSlicePlane
     >
-  > & { children?: React.ReactNode };
-  export const NineSlicePlane: PixiComponent<NineSlicePlane>;
+  >;
+  export const NineSlicePlane: PixiComponent<NineSlicePlane, PIXI.NineSlicePlane>;
 
   // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
@@ -196,18 +199,18 @@ declare module "react-pixi-fiber" {
       PIXI.particles.ParticleContainer,
       PIXI.ParticleContainer
     >
-  > & { children?: React.ReactNode };
-  export const ParticleContainer: PixiComponent<ParticleContainer>;
+  >;
+  export const ParticleContainer: PixiComponent<ParticleContainer, PIXI.ParticleContainer>;
 
   // A component wrapper for `PIXI.Sprite`.
   // see: http://pixijs.download/dev/docs/PIXI.Sprite.html
   export type Sprite = DisplayObjectProps<PIXI.Sprite>;
-  export const Sprite: PixiComponent<Sprite>;
+  export const Sprite: PixiComponent<Sprite, PIXI.Sprite>;
 
   // A component wrapper for `PIXI.Text`.
   // see: http://pixijs.download/dev/docs/PIXI.Text.html
   export type Text = DisplayObjectProps<PIXI.Text>;
-  export const Text: PixiComponent<Text>;
+  export const Text: PixiComponent<Text, PIXI.Text>;
 
   // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
   // see: http://pixijs.download/dev/docs/PIXI.TilingSprite.html
@@ -218,7 +221,7 @@ declare module "react-pixi-fiber" {
       PIXI.TilingSprite
     >
   >;
-  export const TilingSprite: PixiComponent<TilingSprite>;
+  export const TilingSprite: PixiComponent<TilingSprite, PIXI.TilingSprite>;
 
   /**
    * Rendering: using Stage component or using render and unmount
@@ -314,7 +317,7 @@ declare module "react-pixi-fiber" {
     behavior: CustomPIXIComponentBehavior<T, P>,
     type: string
   ): // Props defined on custom component overwrite props of underlying DisplayObject
-  PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>>;
+  PixiComponent<P & DisplayObjectProps<Omit<T, keyof P>>, T>;
 
   // Used to apply `newProps` to your `DisplayObject`.
   export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(

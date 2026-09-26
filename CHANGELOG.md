@@ -8,8 +8,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [2.0.0-rc.1] - 2026-09-26
+
+### Changed
+- `ref` on built-in and custom components is now typed as the underlying `PIXI.DisplayObject` instance instead of the props type
+- Every component accepts `children` again in TypeScript, as every wrapped display object is a `PIXI.Container`
+- Declared `pixi.js` peer dependency as `>=4.4.0 <8.0.0`, PixiJS v8 is not supported
+
 ### Removed
 - Removed unstable_batchedUpdates API ([#89])
+
+
+## [2.0.0-alpha.1] - 2025-01-16
+
+### Changed
+- Requires React 18.2 or newer, `react-reconciler` updated to 0.29
 
 
 ## [1.0.6] - 2023-01-13
@@ -440,7 +454,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.1...HEAD
+[2.0.0-rc.1]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-alpha.1...v2.0.0-rc.1
+[2.0.0-alpha.1]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.6...v2.0.0-alpha.1
 [1.0.6]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.4...v1.0.6
 [1.0.4]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.2...v1.0.3
