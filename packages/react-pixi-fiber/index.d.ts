@@ -17,10 +17,10 @@ export type InteractionEventCompatibility = Exclude<keyof typeof PIXI.Interactio
 export type InteractionEvent = string extends InteractionEventCompatibility
   ? never
   : string extends InteractionCompatibility
-  ? // @ts-ignore TS2694
-    PIXI.InteractionEvent
-  : // @ts-ignore TS2694
-    PIXI.interaction.InteractionEvent;
+    ? // @ts-ignore TS2694
+      PIXI.InteractionEvent
+    : // @ts-ignore TS2694
+      PIXI.interaction.InteractionEvent;
 // Hardcoded due to the InteractionEventTypes being removed since pixi.js@6.0.0
 export type InteractionPointerEvents =
   | "pointerdown"
@@ -31,7 +31,13 @@ export type InteractionPointerEvents =
   | "pointermove"
   | "pointerover"
   | "pointerout";
-export type InteractionTouchEvents = "touchstart" | "touchcancel" | "touchend" | "touchendoutside" | "touchmove" | "tap";
+export type InteractionTouchEvents =
+  | "touchstart"
+  | "touchcancel"
+  | "touchend"
+  | "touchendoutside"
+  | "touchmove"
+  | "tap";
 export type InteractionMouseEvents =
   | "rightdown"
   | "mousedown"
@@ -77,7 +83,9 @@ export type LengthOfTuple<T extends any[]> = T extends { length: infer L } ? L :
 
 // Drops the first element of a tuple.
 // see: https://dev.to/kjleitz/comment/gb5d
-export type DropFirstInTuple<T extends any[]> = ((...args: T) => any) extends (arg: any, ...rest: infer U) => any ? U : T;
+export type DropFirstInTuple<T extends any[]> = ((...args: T) => any) extends (arg: any, ...rest: infer U) => any
+  ? U
+  : T;
 
 // Gets the type of the last element of a tuple.
 // see: https://dev.to/kjleitz/comment/gb5d

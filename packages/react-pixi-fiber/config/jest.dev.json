@@ -6,11 +6,7 @@
     "__DEV__": true
   },
   "rootDir": "..",
-  "setupFiles": [
-    "jest-webgl-canvas-mock",
-    "./config/jest/setupGlobals.js",
-    "./config/jest/setupPixi.js"
-  ],
+  "setupFiles": ["jest-webgl-canvas-mock", "./config/jest/setupGlobals.js", "./config/jest/setupPixi.js"],
   "moduleNameMapper": {
     "^react-pixi-fiber$": "src/index.js"
   },

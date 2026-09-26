@@ -25,13 +25,19 @@ describe("PixiProperty", () => {
     });
 
     it("should return false for injected types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => true));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => true)
+      );
       expect(PixiProperty.shouldIgnoreAttribute("type", "prop", null)).toBeFalsy();
       PixiPropertyRewireAPI.__ResetDependency__("isInjectedType");
     });
 
     it("should return false otherwise", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(PixiProperty.shouldIgnoreAttribute("type", "prop", null)).toBeFalsy();
       PixiPropertyRewireAPI.__ResetDependency__("isInjectedType");
     });
@@ -45,21 +51,30 @@ describe("PixiProperty", () => {
     });
 
     it("should return false if value is boolean for injected types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => true));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => true)
+      );
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, null)).toBeFalsy();
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", false, null)).toBeFalsy();
       PixiPropertyRewireAPI.__ResetDependency__("isInjectedType");
     });
 
     it("should return true if value is boolean and property info is null for regular types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, null)).toBeTruthy();
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", false, null)).toBeTruthy();
       PixiPropertyRewireAPI.__ResetDependency__("isInjectedType");
     });
 
     it("should return true if value is boolean and property does not accept booleans for regular types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, { acceptsBooleans: false })
       ).toBeTruthy();
@@ -70,7 +85,10 @@ describe("PixiProperty", () => {
     });
 
     it("should return false if value is boolean and property accepts booleans for regular types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, { acceptsBooleans: true })
       ).toBeFalsy();
@@ -81,19 +99,28 @@ describe("PixiProperty", () => {
     });
 
     it("should return false if value is function for injected types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => true));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => true)
+      );
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, null)).toBeFalsy();
       PixiPropertyRewireAPI.__ResetDependency__("isInjectedType");
     });
 
     it("should return true if value is function and property info is null for regular types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, null)).toBeTruthy();
       PixiPropertyRewireAPI.__ResetDependency__("isInjectedType");
     });
 
     it("should return true if value is function and property is not a callback for regular types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, { type: PixiProperty.STRING })
       ).toBeTruthy();
@@ -101,7 +128,10 @@ describe("PixiProperty", () => {
     });
 
     it("should return false if value is function and property is a callback for regular types", () => {
-      PixiPropertyRewireAPI.__Rewire__("isInjectedType", jest.fn(() => false));
+      PixiPropertyRewireAPI.__Rewire__(
+        "isInjectedType",
+        jest.fn(() => false)
+      );
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, { type: PixiProperty.CALLBACK })
       ).toBeFalsy();
@@ -122,7 +152,10 @@ describe("PixiProperty", () => {
     });
 
     it("should return true if shouldRemoveAttributeWithWarning returns true", () => {
-      PixiPropertyRewireAPI.__Rewire__("shouldRemoveAttributeWithWarning", jest.fn(() => true));
+      PixiPropertyRewireAPI.__Rewire__(
+        "shouldRemoveAttributeWithWarning",
+        jest.fn(() => true)
+      );
       expect(PixiProperty.shouldRemoveAttribute(type, name, "value", null)).toBeTruthy();
       PixiPropertyRewireAPI.__ResetDependency__("shouldRemoveAttributeWithWarning");
     });

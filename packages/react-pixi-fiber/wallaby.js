@@ -1,4 +1,4 @@
-module.exports = function(wallaby) {
+module.exports = function (wallaby) {
   return {
     files: ["src/**/*.js", "package.json", "./config/jest/**/*.js", "./config/jest.dev.json"],
     tests: ["test/**/*.js"],
@@ -10,7 +10,7 @@ module.exports = function(wallaby) {
     },
     // https://wallabyjs.com/docs/integration/jest.html
     testFramework: "jest",
-    setup: function(wallaby) {
+    setup: function (wallaby) {
       const jestConfig = require("./config/jest.dev.json");
       delete jestConfig.coverageDirectory;
       delete jestConfig.coverageReporters;

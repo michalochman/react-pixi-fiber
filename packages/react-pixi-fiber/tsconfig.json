@@ -9,14 +9,10 @@
     "esModuleInterop": true,
     "paths": {
       // Loaders needs this to use the more strict mini-signal types
-      "mini-signals": [
-        "node_modules/resource-loader/typings/mini-signals.d.ts"
-      ],
+      "mini-signals": ["node_modules/resource-loader/typings/mini-signals.d.ts"],
       "react-pixi-fiber": ["index.d.ts"]
     },
     "types": []
   },
-  "files": [
-    "test/typescript/index.tsx"
-  ]
+  "files": ["test/typescript/index.tsx"]
 }

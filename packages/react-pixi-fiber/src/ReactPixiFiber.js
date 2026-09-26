@@ -230,15 +230,15 @@ const hostConfig = {
     typeof queueMicrotask === "function"
       ? queueMicrotask
       : typeof Promise !== "undefined"
-      ? callback =>
-          Promise.resolve(null)
-            .then(callback)
-            .catch(error => {
-              setTimeout(() => {
-                throw error;
-              });
-            })
-      : setTimeout,
+        ? callback =>
+            Promise.resolve(null)
+              .then(callback)
+              .catch(error => {
+                setTimeout(() => {
+                  throw error;
+                });
+              })
+        : setTimeout,
   supportsMicrotasks: true,
   supportsMutation: supportsMutation,
   supportsPersistence: supportsPersistence,

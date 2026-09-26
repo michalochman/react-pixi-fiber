@@ -197,13 +197,19 @@ const StageClassExample: React.FC = () => {
           <Sprite texture={PIXI.Texture.WHITE} />
         </ParticleContainer>
       </Stage>
-      <Stage key="stage2" ref={(stage) => {
-        if (stage) {
-          console.log("stage", stage._app);
-          console.log("stage", stage._canvas);
-          console.log("stage", stage.props);
-        }
-      }} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
+      <Stage
+        key="stage2"
+        ref={stage => {
+          if (stage) {
+            console.log("stage", stage._app);
+            console.log("stage", stage._canvas);
+            console.log("stage", stage.props);
+          }
+        }}
+        options={{ backgroundColor: 0xffffff }}
+        position="0,0"
+        scale={1}
+      >
         <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
         <Text text="Regular text" />
         <Text text="Styled text" style={{ fontSize: 12 }} />
@@ -273,28 +279,34 @@ const StageFunctionExample: React.FC = () => {
           <Sprite texture={PIXI.Texture.WHITE} />
         </ParticleContainer>
       </Stage>
-      <Stage key="stage2" ref={(stage) => {
+      <Stage
+        key="stage2"
+        ref={stage => {
           if (stage) {
             console.log("stage", stage._app);
             console.log("stage", stage._canvas);
             console.log("stage", stage.props);
           }
-        }} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
-          <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
-          {/* Every wrapped display object is a Container, so leaf components accept children. */}
-          <Sprite texture={texture}>
-            {/* Callback ref parameter is the `PIXI.Sprite` instance, not the props type. */}
-            <Sprite texture={texture} ref={(sprite) => sprite?.position.set(0, 0)} />
-          </Sprite>
-          <Text text="Regular text" />
+        }}
+        options={{ backgroundColor: 0xffffff }}
+        position="0,0"
+        scale={1}
+      >
+        <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
+        {/* Every wrapped display object is a Container, so leaf components accept children. */}
+        <Sprite texture={texture}>
+          {/* Callback ref parameter is the `PIXI.Sprite` instance, not the props type. */}
+          <Sprite texture={texture} ref={sprite => sprite?.position.set(0, 0)} />
+        </Sprite>
+        <Text text="Regular text" />
         <Text text="Styled text" style={{ fontSize: 12 }} />
         <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
-          <TilingSprite texture={texture} />
-          <CompositionExample />
-          <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
-          <WickedContainer isWicked={false} />
-          <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
-          <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
+        <TilingSprite texture={texture} />
+        <CompositionExample />
+        <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+        <WickedContainer isWicked={false} />
+        <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
+        <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
       </Stage>
     </>
   );

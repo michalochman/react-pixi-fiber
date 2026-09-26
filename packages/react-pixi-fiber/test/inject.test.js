@@ -72,7 +72,7 @@ describe("inject", () => {
       const type = "INJECTED_TYPE";
       const behavior = {
         customDisplayObject: () => ({}),
-        customApplyProps: function(instance, oldProps, newProps) {
+        customApplyProps: function (instance, oldProps, newProps) {
           // returning `this` so we can test bound `this` value
           return this;
         },
