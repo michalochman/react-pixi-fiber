@@ -64,7 +64,7 @@ or
 
 Refer to next sections to see usage examples.
 
-This package works flawlessly with [Create React App](https://github.com/facebookincubator/create-react-app) – see examples below, they already use it.
+This package works with [Vite](https://vite.dev) and webpack based setups such as [Create React App](https://github.com/facebookincubator/create-react-app) – the examples below use Vite.
 
 ## Usage
 

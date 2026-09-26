@@ -11,7 +11,7 @@ This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React
 | Path | Contents |
 | --- | --- |
 | [`packages/react-pixi-fiber`](./packages/react-pixi-fiber) | The library published to npm |
-| [`apps/examples`](./apps/examples) | Create React App examples that use the local package |
+| [`apps/examples`](./apps/examples) | Examples built with Vite that use the local package |
 
 The repository is a [pnpm](https://pnpm.io) workspace. The pnpm version is pinned in the `packageManager` field of `package.json`, and Node comes from `.nvmrc`.
 

@@ -46,6 +46,7 @@ const shadowGroup = new display.Group(-1, false);
 
 const blurFilter = new PIXI.filters.BlurFilter();
 blurFilter.blur = 0.5;
+const shadowFilters = [blurFilter];
 
 type BunnyWithGroup = PIXI.DisplayObject & { oldGroup?: unknown };
 
@@ -73,7 +74,6 @@ const oddBunnies = greenBunnies.filter(index => index % 2 !== 0);
 
 const shadowProps = {
   fill: 0x0,
-  filters: [blurFilter],
   height: 44,
   width: 44,
   x: -22,
@@ -92,7 +92,8 @@ function LayersExample() {
         <Layer group={blueGroup} />
         <Layer group={greenGroup} />
         <Layer group={dragGroup} />
-        <Layer group={shadowGroup} />
+        {/* one blur for all shadows, a filter per shadow costs a render pass each */}
+        <Layer group={shadowGroup} filters={shadowFilters} />
         {/* make obsolete containers. Why do we need them?
          * Just to show that we can do everything without
          * caring of actual parent container */}

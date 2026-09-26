@@ -38,6 +38,9 @@ jobs:
       # typecheck the TypeScript fixture and the examples against the local index.d.ts
       - run: pnpm check-types
 
+      # build the examples against the local package
+      - run: pnpm --filter examples build
+
       # upload coverage report
       # TODO: Migrate to new uploader
       # - run: npm exec codecov
