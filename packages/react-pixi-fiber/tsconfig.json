@@ -2,15 +2,14 @@
   "compilerOptions": {
     "lib": ["es2015", "dom"],
     "noEmit": true,
+    // pixi.js 6 typings conflict with lib.dom in TypeScript 5+ (CanvasRenderingContext2D.letterSpacing)
+    "skipLibCheck": true,
     "strict": true,
     "jsx": "react",
-    "baseUrl": "./",
     // Required for importing 3rd-party dependencies like EventEmitter3
     "esModuleInterop": true,
     "paths": {
-      // Loaders needs this to use the more strict mini-signal types
-      "mini-signals": ["node_modules/resource-loader/typings/mini-signals.d.ts"],
-      "react-pixi-fiber": ["index.d.ts"]
+      "react-pixi-fiber": ["./index.d.ts"]
     },
     "types": []
   },
