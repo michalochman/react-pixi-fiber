@@ -478,7 +478,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.2...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.4...HEAD
+[2.0.0-rc.4]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.3...v2.0.0-rc.4
+[2.0.0-rc.3]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.2...v2.0.0-rc.3
 [2.0.0-rc.2]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.1...v2.0.0-rc.2
 [2.0.0-rc.1]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-alpha.1...v2.0.0-rc.1
 [2.0.0-alpha.1]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.6...v2.0.0-alpha.1
