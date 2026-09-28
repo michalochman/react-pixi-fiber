@@ -209,7 +209,10 @@ declare module "react-pixi-fiber" {
 
   // A component wrapper for `PIXI.Text`.
   // see: http://pixijs.download/dev/docs/PIXI.Text.html
-  export type Text = DisplayObjectProps<PIXI.Text>;
+  export type Text = Omit<DisplayObjectProps<PIXI.Text>, "style"> & {
+    // `PIXI.Text` reads `style` as `TextStyle` but its setter also accepts a partial style.
+    style?: PIXI.TextStyle | Partial<PIXI.ITextStyle>;
+  };
   export const Text: PixiComponent<Text, PIXI.Text>;
 
   // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
