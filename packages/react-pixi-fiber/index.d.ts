@@ -158,7 +158,7 @@ export interface PixiComponent<P = {}, I = P> {
 export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>>;
 
 // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
-// see: http://pixijs.download/dev/docs/PIXI.BitmapText.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
 export type BitmapText = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
@@ -178,17 +178,17 @@ export type BitmapText = DisplayObjectProps<
 export const BitmapText: PixiComponent<BitmapText, PIXI.BitmapText>;
 
 // A component wrapper for `PIXI.Container`.
-// see: http://pixijs.download/dev/docs/PIXI.Container.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.Container.html
 export type Container = DisplayObjectProps<PIXI.Container>;
 export const Container: PixiComponent<Container, PIXI.Container>;
 
 // A component wrapper for `PIXI.Graphics`.
-// see: http://pixijs.download/dev/docs/PIXI.Graphics.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
 export type Graphics = DisplayObjectProps<PIXI.Graphics>;
 export const Graphics: PixiComponent<Graphics, PIXI.Graphics>;
 
 // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
-// see: http://pixijs.download/dev/docs/PIXI.NineSlicePlane.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.NineSlicePlane.html
 export type NineSlicePlane = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
@@ -199,7 +199,7 @@ export type NineSlicePlane = DisplayObjectProps<
 export const NineSlicePlane: PixiComponent<NineSlicePlane, PIXI.NineSlicePlane>;
 
 // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
-// see: http://pixijs.download/dev/docs/PIXI.ParticleContainer.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
 export type ParticleContainer = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
@@ -210,12 +210,12 @@ export type ParticleContainer = DisplayObjectProps<
 export const ParticleContainer: PixiComponent<ParticleContainer, PIXI.ParticleContainer>;
 
 // A component wrapper for `PIXI.Sprite`.
-// see: http://pixijs.download/dev/docs/PIXI.Sprite.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.Sprite.html
 export type Sprite = DisplayObjectProps<PIXI.Sprite>;
 export const Sprite: PixiComponent<Sprite, PIXI.Sprite>;
 
 // A component wrapper for `PIXI.Text`.
-// see: http://pixijs.download/dev/docs/PIXI.Text.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.Text.html
 export type Text = Omit<DisplayObjectProps<PIXI.Text>, "style"> & {
   // `PIXI.Text` reads `style` as `TextStyle` but its setter also accepts a partial style.
   style?: PIXI.TextStyle | Partial<PIXI.ITextStyle>;
@@ -223,7 +223,7 @@ export type Text = Omit<DisplayObjectProps<PIXI.Text>, "style"> & {
 export const Text: PixiComponent<Text, PIXI.Text>;
 
 // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
-// see: http://pixijs.download/dev/docs/PIXI.TilingSprite.html
+// see: https://pixijs.download/v6.5.10/docs/PIXI.TilingSprite.html
 export type TilingSprite = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
@@ -265,7 +265,7 @@ export type StageRef = {
 export type Stage = React.ForwardRefExoticComponent<StageProps & { ref?: React.Ref<StageRef> }> & StageRef;
 
 // A component wrapper for PIXI `Stage` as function component.
-// see: http://pixijs.download/dev/docs/PIXI.Application.html#stage
+// see: https://pixijs.download/v6.5.10/docs/PIXI.Application.html#stage
 export const Stage: Stage;
 
 // Factory returning Stage as class component.

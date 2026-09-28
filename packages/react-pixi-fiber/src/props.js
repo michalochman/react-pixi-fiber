@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js";
 
 export const CHILDREN = "children";
 
-// http://pixijs.download/release/docs/PIXI.DisplayObject.html
+// https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html
 const displayObjectDefaultProps = {
   alpha: 1,
   angle: 0,
@@ -22,13 +22,13 @@ const displayObjectDefaultProps = {
   y: 0,
 };
 
-// http://pixijs.download/release/docs/PIXI.Container.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Container.html
 const containerDefaultProps = {
   ...displayObjectDefaultProps,
   interactiveChildren: true,
 };
 
-// http://pixijs.download/release/docs/PIXI.Sprite.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Sprite.html
 const spriteDefaultProps = {
   ...containerDefaultProps,
   anchor: 0,
@@ -38,7 +38,7 @@ const spriteDefaultProps = {
   tint: 0xffffff,
 };
 
-// http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
+// https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
 const bitmapTextDefaultProps = {
   ...containerDefaultProps,
   align: "left",
@@ -50,7 +50,7 @@ const bitmapTextDefaultProps = {
   tint: 0xffffff,
 };
 
-// http://pixijs.download/release/docs/PIXI.Graphics.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
 const graphicsDefaultProps = {
   ...containerDefaultProps,
   blendMode: PIXI.BLEND_MODES.NORMAL,
@@ -58,7 +58,7 @@ const graphicsDefaultProps = {
   tint: 0xffffff,
 };
 
-// http://pixijs.download/release/docs/PIXI.particles.ParticleContainer.html
+// https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
 const particleContainerDefaultProps = {
   ...containerDefaultProps,
   autoResize: false,
@@ -70,14 +70,14 @@ const particleContainerDefaultProps = {
   tint: 0xffffff,
 };
 
-// http://pixijs.download/release/docs/PIXI.Text.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Text.html
 const textDefaultProps = {
   ...spriteDefaultProps,
   resolution: 1,
   text: "",
 };
 
-// http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
+// https://pixijs.download/v6.5.10/docs/PIXI.TilingSprite.html
 const tilingSpriteDefaultProps = {
   ...spriteDefaultProps,
   clampMargin: 0.5,

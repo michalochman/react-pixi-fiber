@@ -1,7 +1,7 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/possibleStandardNames.js
 import { TYPES } from "./types";
 
-// http://pixijs.download/release/docs/PIXI.DisplayObject.html
+// https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html
 const eventsStandardNames = {
   // pixi.js < 7.0
   added: "added",
@@ -64,7 +64,7 @@ const eventsStandardNames = {
   onwheel: "onwheel",
 };
 
-// http://pixijs.download/release/docs/PIXI.DisplayObject.html
+// https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html
 const displayObjectStandardNames = {
   ...eventsStandardNames,
   alpha: "alpha",
@@ -90,7 +90,7 @@ const displayObjectStandardNames = {
   y: "y",
 };
 
-// http://pixijs.download/release/docs/PIXI.Container.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Container.html
 const containerStandardNames = {
   ...displayObjectStandardNames,
   height: "height",
@@ -100,7 +100,7 @@ const containerStandardNames = {
   width: "width",
 };
 
-// http://pixijs.download/release/docs/PIXI.Sprite.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Sprite.html
 const spriteStandardNames = {
   ...containerStandardNames,
   anchor: "anchor",
@@ -112,7 +112,7 @@ const spriteStandardNames = {
   tint: "tint",
 };
 
-// http://pixijs.download/release/docs/PIXI.extras.BitmapText.html
+// https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
 const bitmapTextStandardNames = {
   ...containerStandardNames,
   align: "align",
@@ -126,7 +126,7 @@ const bitmapTextStandardNames = {
   tint: "tint",
 };
 
-// http://pixijs.download/release/docs/PIXI.Graphics.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
 const graphicsStandardNames = {
   ...containerStandardNames,
   blendmode: "blendMode",
@@ -135,7 +135,7 @@ const graphicsStandardNames = {
   tint: "tint",
 };
 
-// http://pixijs.download/release/docs/PIXI.particles.ParticleContainer.html
+// https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
 const particleContainerStandardNames = {
   ...containerStandardNames,
   autoresize: "autoResize",
@@ -148,7 +148,7 @@ const particleContainerStandardNames = {
   tint: "tint",
 };
 
-// http://pixijs.download/release/docs/PIXI.Text.html
+// https://pixijs.download/v6.5.10/docs/PIXI.Text.html
 const textStandardNames = {
   ...spriteStandardNames,
   canvas: "canvas",
@@ -158,7 +158,7 @@ const textStandardNames = {
   text: "text",
 };
 
-// http://pixijs.download/release/docs/PIXI.extras.TilingSprite.html
+// https://pixijs.download/v6.5.10/docs/PIXI.TilingSprite.html
 const tilingSpriteStandardNames = {
   ...spriteStandardNames,
   clampmargin: "clampMargin",

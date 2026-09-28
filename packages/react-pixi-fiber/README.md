@@ -171,7 +171,7 @@ Renders [`PIXI.Graphics`].
 
 #### `<ParticleContainer />`
 
-Renders [`PIXI.ParticleContainer`] (or [`PIXI.particles.ParticleContainer`] if you're using PixiJS 4).
+Renders [`PIXI.ParticleContainer`] (or `PIXI.particles.ParticleContainer` if you're using PixiJS 4).
 
 #### `<Sprite />`
 
@@ -179,7 +179,7 @@ Renders [`PIXI.Sprite`].
 
 #### `<TilingSprite />`
 
-Renders [`PIXI.TilingSprite`] (or [`PIXI.extras.TilingSprite`] if you're using PixiJS 4).
+Renders [`PIXI.TilingSprite`] (or `PIXI.extras.TilingSprite` if you're using PixiJS 4).
 
 #### `<Text />`
 
@@ -187,7 +187,7 @@ Renders [`PIXI.Text`].
 
 #### `<BitmapText />`
 
-Renders [`PIXI.BitmapText`] (or [`PIXI.extras.BitmapText`] if you're using PixiJS 4).
+Renders [`PIXI.BitmapText`] (or `PIXI.extras.BitmapText` if you're using PixiJS 4).
 
 #### `<NineSlicePlane />`
 
@@ -813,20 +813,17 @@ For making an awesome project structure and documentation that is used in simila
 
 [PixiJS]: https://github.com/pixijs/pixi.js
 [React]: https://github.com/facebook/react
-[Root Container]: http://pixijs.download/release/docs/PIXI.Application.html#stage
-[`PIXI.Application`]: http://pixijs.download/release/docs/PIXI.Application.html
-[`PIXI.BitmapText`]: http://pixijs.download/release/docs/PIXI.BitmapText.html
-[`PIXI.Container`]: http://pixijs.download/release/docs/PIXI.Container.html
-[`PIXI.DisplayObject`]: http://pixijs.download/release/docs/PIXI.DisplayObject.html 
-[`PIXI.extras.BitmapText`]: https://pixijs.download/v4.8.8/docs/PIXI.extras.BitmapText.html
-[`PIXI.extras.TilingSprite`]: https://pixijs.download/v4.8.8/docs/PIXI.extras.TilingSprite.html
-[`PIXI.Graphics`]: http://pixijs.download/release/docs/PIXI.Graphics.html
-[`PIXI.NineSlicePlane`]: http://pixijs.download/release/docs/PIXI.NineSlicePlane.html
-[`PIXI.ObservablePoint`]: http://pixijs.download/release/docs/PIXI.ObservablePoint.html
-[`PIXI.ParticleContainer`]: http://pixijs.download/release/docs/PIXI.ParticleContainer.html
-[`PIXI.particles.ParticleContainer`]: https://pixijs.download/v4.8.8/docs/PIXI.particles.ParticleContainer.html
-[`PIXI.Point`]: http://pixijs.download/release/docs/PIXI.Point.html
-[`PIXI.Sprite`]: http://pixijs.download/release/docs/PIXI.Sprite.html
-[`PIXI.Text`]: http://pixijs.download/release/docs/PIXI.Text.html
-[`PIXI.TilingSprite`]: http://pixijs.download/release/docs/PIXI.TilingSprite.html
+[Root Container]: https://pixijs.download/v6.5.10/docs/PIXI.Application.html#stage
+[`PIXI.Application`]: https://pixijs.download/v6.5.10/docs/PIXI.Application.html
+[`PIXI.BitmapText`]: https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
+[`PIXI.Container`]: https://pixijs.download/v6.5.10/docs/PIXI.Container.html
+[`PIXI.DisplayObject`]: https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html 
+[`PIXI.Graphics`]: https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
+[`PIXI.NineSlicePlane`]: https://pixijs.download/v6.5.10/docs/PIXI.NineSlicePlane.html
+[`PIXI.ObservablePoint`]: https://pixijs.download/v6.5.10/docs/PIXI.ObservablePoint.html
+[`PIXI.ParticleContainer`]: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
+[`PIXI.Point`]: https://pixijs.download/v6.5.10/docs/PIXI.Point.html
+[`PIXI.Sprite`]: https://pixijs.download/v6.5.10/docs/PIXI.Sprite.html
+[`PIXI.Text`]: https://pixijs.download/v6.5.10/docs/PIXI.Text.html
+[`PIXI.TilingSprite`]: https://pixijs.download/v6.5.10/docs/PIXI.TilingSprite.html
 [`react-pixi`]: https://github.com/Izzimach/react-pixi
