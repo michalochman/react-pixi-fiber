@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- TypeScript: `Text` accepts a plain style object in `style` (`Partial<PIXI.ITextStyle>`), matching the `PIXI.Text` setter. PixiJS v7 types the `style` getter as `TextStyle` only, so passing an object literal failed to typecheck
+
 
 ## [2.0.0-rc.3] - 2026-09-26
 

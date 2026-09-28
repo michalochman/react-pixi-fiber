@@ -206,6 +206,8 @@ const StageClassExample: React.FC = () => {
       }} options={{ backgroundColor: 0xffffff }} position="0,0" scale={1}>
         <Sprite anchor={anchor} texture={texture} ref={spriteRef} interactive pointerup={(): void => {}} />
         <Text text="Regular text" />
+        <Text text="Styled text" style={{ fontSize: 12 }} />
+        <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
         <TilingSprite texture={texture} />
         <CompositionExample />
         <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
@@ -285,6 +287,8 @@ const StageFunctionExample: React.FC = () => {
             <Sprite texture={texture} ref={(sprite) => sprite?.position.set(0, 0)} />
           </Sprite>
           <Text text="Regular text" />
+        <Text text="Styled text" style={{ fontSize: 12 }} />
+        <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
           <TilingSprite texture={texture} />
           <CompositionExample />
           <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
