@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { CONTAINER_PROP_NAMES, STAGE_PROP_NAMES, getCanvasProps, getContainerProps } from "../../src/Stage/props";
 import { getStandardNames } from "../../src/PixiProperty";
-import builtins from "../../src/builtins";
+import pixi6 from "@react-pixi-fiber/pixi-6";
 
-const typedNames = Object.values(getStandardNames(builtins));
+const adapter = pixi6();
+
+const typedNames = Object.values(getStandardNames(adapter));
 const toProps = names => Object.fromEntries(names.map(name => [name, 1]));
 
 describe("Container and canvas prop split", () => {

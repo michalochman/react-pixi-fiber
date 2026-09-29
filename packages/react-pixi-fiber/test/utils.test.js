@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import * as PIXI from "pixi.js";
-import builtins from "../src/builtins";
+import pixi6 from "@react-pixi-fiber/pixi-6";
 import {
   filterByKey,
   findStrictRoot,
@@ -11,6 +11,8 @@ import {
   setPixiValue,
   copyPoint,
 } from "../src/utils";
+
+const adapter = pixi6();
 
 describe("not", () => {
   it("returns a function", () => {
@@ -109,13 +111,13 @@ describe("isPointType", () => {
   const y = 50;
 
   it("returns true if value is instance of PIXI.Point", () => {
-    expect(isPointType(new PIXI.Point(x, y), builtins)).toBeTruthy();
+    expect(isPointType(new PIXI.Point(x, y), adapter)).toBeTruthy();
   });
   it("returns true if value is instance of PIXI.ObservablePoint", () => {
-    expect(isPointType(new PIXI.ObservablePoint(vi.fn, null, x, y), builtins)).toBeTruthy();
+    expect(isPointType(new PIXI.ObservablePoint(vi.fn, null, x, y), adapter)).toBeTruthy();
   });
   it("returns false if value is not instance of PIXI.Point or PIXI.ObservablePoint", () => {
-    expect(isPointType(`${x},${y}`, builtins)).toBeFalsy();
+    expect(isPointType(`${x},${y}`, adapter)).toBeFalsy();
   });
 });
 
@@ -128,7 +130,7 @@ describe("setPixiValue", () => {
     };
     const test = new PIXI.Point(13, 37);
 
-    setPixiValue(obj, "test", test, builtins);
+    setPixiValue(obj, "test", test, adapter);
     expect(JestPoint.prototype.copyFrom).toHaveBeenCalledTimes(1);
     expect(JestPoint.prototype.copyFrom).toHaveBeenCalledWith(test);
     expect(obj.test).toEqual(new PIXI.Point(13, 37));
@@ -140,7 +142,7 @@ describe("setPixiValue", () => {
     const obj = {
       test: new JestPoint(0, 0),
     };
-    setPixiValue(obj, "test", "13,37", builtins);
+    setPixiValue(obj, "test", "13,37", adapter);
     expect(JestPoint.prototype.set).toHaveBeenCalledTimes(1);
     expect(JestPoint.prototype.set).toHaveBeenCalledWith(13, 37);
     expect(obj.test).toEqual(new PIXI.Point(13, 37));
@@ -150,7 +152,7 @@ describe("setPixiValue", () => {
     const obj = {};
     const value = "value";
     expect(obj.test).not.toEqual(value);
-    setPixiValue(obj, "test", value, builtins);
+    setPixiValue(obj, "test", value, adapter);
     expect(obj.test).toEqual(value);
   });
 
@@ -158,7 +160,7 @@ describe("setPixiValue", () => {
     const obj = {
       test: new PIXI.Point(0, 0),
     };
-    expect(() => setPixiValue(obj, "test", false, builtins)).toThrow();
+    expect(() => setPixiValue(obj, "test", false, adapter)).toThrow();
   });
 });
 

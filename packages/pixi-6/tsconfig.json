@@ -6,18 +6,14 @@
     "skipLibCheck": true,
     "strict": true,
     "jsx": "react",
-    // Required for importing 3rd-party dependencies like EventEmitter3
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
-      "react-pixi-fiber": ["./src/index.ts"],
-      "@react-pixi-fiber/pixi-6": ["../pixi-6/src/index.ts"],
+      "react-pixi-fiber": ["../react-pixi-fiber/src/index.ts"],
       "@react-pixi-fiber/react-18": ["../react-18/src/index.ts"]
     },
     "types": []
   },
-  "include": ["src", "test/typescript"],
-  // Compiled without an adapter by tsconfig.fallback.json
-  "exclude": ["test/typescript/fallback.tsx"]
+  "include": ["src", "test"]
 }

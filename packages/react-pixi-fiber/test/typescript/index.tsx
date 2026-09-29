@@ -1,5 +1,17 @@
+import "@react-pixi-fiber/pixi-6"; // loads the PixiInstances augmentation
+import {
+  type InteractionCompatibility,
+  type InteractionEventCompatibility,
+  type InteractiveComponent,
+  type PixiTypeFallback,
+  SimpleMesh,
+  SimplePlane,
+  SimpleRope,
+  NineSlicePlane as Pixi6NineSlicePlane,
+} from "@react-pixi-fiber/pixi-6";
 import * as PIXI from "pixi.js";
 import * as React from "react";
+import type { InteractiveComponent as CoreInteractiveComponent } from "react-pixi-fiber";
 import {
   AnimatedSprite,
   BitmapText,
@@ -21,6 +33,29 @@ import {
   getInstanceTag,
   createStageClass,
 } from "react-pixi-fiber";
+
+// @ts-expect-error x is a number on PixiJS 6; if this line is unused, the augmentation did not merge
+const WrongProp = <Sprite x="1" />;
+console.log(WrongProp);
+
+// The 2.x compatibility types.
+const interactionKey: InteractionCompatibility = "anything";
+const interactionEventKey: InteractionEventCompatibility = "prototype";
+const interactive: InteractiveComponent = { click: (event: PIXI.InteractionEvent) => console.log(event.data) };
+const coreInteractive: CoreInteractiveComponent = interactive;
+const fallback: PixiTypeFallback<PIXI.Sprite, number> = new PIXI.Sprite();
+console.log(interactionKey, interactionEventKey, coreInteractive, fallback);
+
+// The PixiJS 6 class names are components too.
+const AliasExample: React.FC<{ texture: PIXI.Texture }> = ({ texture }) => (
+  <>
+    <Pixi6NineSlicePlane texture={texture} leftWidth={1} />
+    <SimpleMesh texture={texture} uvs={new Float32Array([0, 0])} />
+    <SimplePlane texture={texture} verticesX={2} />
+    <SimpleRope texture={texture} points={[new PIXI.Point(0, 0)]} />
+  </>
+);
+console.log(AliasExample);
 
 const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
 
@@ -339,3 +374,8 @@ const StageAsTypeExample: React.FC = () => {
 const OnInitExample: React.FC = () => (
   <Stage options={{ width: 1, height: 1 }} onInit={app => console.log(app.stage)} />
 );
+
+const app = new PIXI.Application();
+const StageWithAppExample: React.FC = () => <Stage app={app} />;
+// @ts-expect-error `app` and `options` are exclusive
+const StageWithAppAndOptionsExample: React.FC = () => <Stage app={app} options={{ width: 1 }} />;

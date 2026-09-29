@@ -1,28 +1,27 @@
 import type * as React from "react";
-import type * as PIXI from "pixi.js";
 import type { Behavior } from "./registry";
+// Declared in index.ts, not here: `declare module "react-pixi-fiber" { interface PixiInstances … }` merges only with an
+// interface declared in the module itself, not with one reached through `export * from "./types"` (the reason
+// express augmentations target express-serve-static-core). index.ts declares the three empty interfaces and types.ts imports them.
+import type { PixiExtraProps, PixiInstances, PixiTypes } from "./index";
 
 /**
- * Compatibility
+ * PixiJS types, filled by a PixiJS adapter's augmentation, with loose fallbacks
  */
 
-// Returns either real keys of `PIXI.interaction` (if it exists) or generic `string` (if it doesn't exist).
-// `PIXI.interaction` was removed without deprecation notice in https://github.com/pixijs/pixi.js/pull/6681
-// shipped in pixi.js@5.3.0. We want to support earlier versions of PixiJS as well so we need this hack for now.
-// @ts-ignore TS2694
-export type InteractionCompatibility = Exclude<keyof typeof PIXI.interaction, number | symbol>;
-// Returns either real keys of `PIXI.InteractionEvent` (if it exists) or generic `string` (if it doesn't exist).
-// `PIXI.InteractionEvent` was removed in pixi.js@7.0.0.
-// @ts-ignore TS2694
-export type InteractionEventCompatibility = Exclude<keyof typeof PIXI.InteractionEvent, number | symbol>;
-export type InteractionEvent = string extends InteractionEventCompatibility
-  ? never
-  : string extends InteractionCompatibility
-    ? // @ts-ignore TS2694
-      PIXI.InteractionEvent
-    : // @ts-ignore TS2694
-      PIXI.interaction.InteractionEvent;
-// Hardcoded due to the InteractionEventTypes being removed since pixi.js@6.0.0
+type Fallback = Record<string, unknown>;
+export type InstanceOf<K extends string> = K extends keyof PixiInstances ? PixiInstances[K] : Fallback;
+export type PixiApplication = PixiTypes extends { Application: infer T } ? T : Record<string, any>;
+export type PixiApplicationOptions = PixiTypes extends { ApplicationOptions: infer T } ? T : Record<string, unknown>;
+export type PixiPoint = PixiTypes extends { Point: infer T } ? T : PointLikeObject;
+// `never` when the adapter declares no interaction event.
+export type InteractionEvent = PixiTypes extends { InteractionEvent: infer T } ? T : never;
+
+/**
+ * Interactivity
+ */
+
+// Hardcoded event names, kept from 2.x.
 export type InteractionPointerEvents =
   | "pointerdown"
   | "pointercancel"
@@ -57,6 +56,8 @@ export type InteractionEventTypes =
   | InteractionTouchEvents
   | InteractionMouseEvents
   | InteractionPixiEvents;
+/** @deprecated Import `InteractiveComponent` from the PixiJS adapter. */
+export type InteractiveComponent = PixiExtraProps;
 
 /**
  * Helpers
@@ -73,10 +74,6 @@ export type KeysThatAreNotAny<T> = { [K in keyof T]: any extends T[K] ? never : 
 // The shape of `T` with `children` property that React understands.
 // Every `PIXI.DisplayObject` we wrap is a `PIXI.Container`, so all of them accept children.
 export type PropsWithReactChildren<T> = Omit<T, "children"> & { children?: React.ReactNode };
-
-// Returns `T` when it extends `PIXI.DisplayObject`, otherwise returns `U`.
-// This is a hack which we use to be able to use these types with types from PixiJS v4 and v5
-export type PixiTypeFallback<T, U> = T extends PIXI.DisplayObject ? T : U;
 
 // Gets the length of an array/tuple type.
 // see: https://dev.to/kjleitz/comment/gb5d
@@ -95,9 +92,6 @@ export type LastInTuple<T extends any[]> = T[LengthOfTuple<DropFirstInTuple<T>>]
 /**
  * Points
  */
-
-// Point types used by PixiJS. PIXI.IPoint exists in PIXIJS v5 only.
-export type PixiPoint = PIXI.Point | PIXI.ObservablePoint | PIXI.IPoint;
 
 // Point-like object with `x`, `y` keys.
 // e.g. `position={{ x: 13, y: 37 }}`
@@ -132,22 +126,11 @@ export type WithPointLike<T> =
     Pick<{ [U in PointProperties<T>]: PointLike }, PointProperties<T>>;
 
 /**
- * Interactivity
- */
-
-// Extra properties to add to allow us to set event handlers using props.
-export type InteractiveComponent = InteractionEvent extends never
-  ? // pixi.js >= 7
-    {}
-  : // pixi.js <= 6
-    { [P in InteractionEventTypes]?: (event: InteractionEvent) => void };
-
-/**
  * Base components
  */
 
 // `Instance` is the display object a `ref` on the component receives.
-export type PixiElement<Props, Instance = Props> = Props & React.ClassAttributes<Instance> & InteractiveComponent;
+export type PixiElement<Props, Instance = Props> = Props & React.ClassAttributes<Instance>;
 
 // This is similar to React.FunctionComponent<P>
 // `I` is the display object a `ref` on the component receives.
@@ -155,125 +138,62 @@ export interface PixiComponent<P = {}, I = P> {
   (props: PixiElement<P, I>): React.ReactElement<P>;
 }
 
-// Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
-export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>>;
+// Takes a display object type and updates its fields to be used with `ReactPixiFiber`. `PixiExtraProps` adds the props
+// the adapter declares for every tag.
+export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>> & PixiExtraProps;
+export type Props<T> = DisplayObjectProps<T>;
 
-// A component wrapper for `PIXI.AnimatedSprite`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.AnimatedSprite.html
-export type AnimatedSpriteProps = DisplayObjectProps<PIXI.AnimatedSprite> & {
-  // `autoUpdate` is not a property on `PIXI.AnimatedSprite`, but is used in constructor
+export type AnimatedSpriteProps = Props<InstanceOf<"AnimatedSprite">> & {
+  // `autoUpdate` is not a property on the instance, but is used in constructor
   autoUpdate?: boolean;
 };
-
-// A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
-// see: https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
-export type BitmapTextProps = DisplayObjectProps<
-  PixiTypeFallback<
-    // @ts-ignore TS2694
-    PIXI.extras.BitmapText,
-    PIXI.BitmapText
-  >
-> & {
-  // `style` is not a property on `PIXI.BitmapText`, but is used in constructor
-  style?: ConstructorParameters<
-    PixiTypeFallback<
-      // @ts-ignore TS2694
-      typeof PIXI.extras.BitmapText,
-      typeof PIXI.BitmapText
-    >
-  >[1];
+export type BitmapTextProps = Props<InstanceOf<"BitmapText">> & {
+  // `font` and `style` are not properties on the instance, but are used in constructor
+  font?: unknown;
+  style?: unknown;
 };
-
-// A component wrapper for `PIXI.Container`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.Container.html
-export type ContainerProps = DisplayObjectProps<PIXI.Container>;
-
-// A component wrapper for `PIXI.Graphics`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
-export type GraphicsProps = DisplayObjectProps<PIXI.Graphics>;
-
-// A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
-// see: https://pixijs.download/v6.5.10/docs/PIXI.NineSlicePlane.html
-export type NineSliceSpriteProps = DisplayObjectProps<
-  PixiTypeFallback<
-    // @ts-ignore TS2694
-    PIXI.mesh.NineSlicePlane,
-    PIXI.NineSlicePlane
-  >
->;
-/** @deprecated Renamed to `NineSliceSpriteProps`, removed in 4.0.0 */
-export type NineSlicePlaneProps = NineSliceSpriteProps;
-
-// A component wrapper for `PIXI.Mesh`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.Mesh.html
-export type MeshProps = DisplayObjectProps<PIXI.Mesh>;
-
-// A component wrapper for `PIXI.SimpleMesh`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.SimpleMesh.html
-export type MeshSimpleProps = DisplayObjectProps<PIXI.SimpleMesh> & {
-  // Constructor arguments that are not properties on `PIXI.SimpleMesh`
-  uvs?: Float32Array | number[];
-  indices?: Uint16Array | number[];
-};
-
-// A component wrapper for `PIXI.SimplePlane`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.SimplePlane.html
-export type MeshPlaneProps = DisplayObjectProps<PIXI.SimplePlane> & {
-  // Constructor arguments that are not properties on `PIXI.SimplePlane`
+export type ContainerProps = Props<InstanceOf<"Container">>;
+export type GraphicsProps = Props<InstanceOf<"Graphics">>;
+export type MeshProps = Props<InstanceOf<"Mesh">>;
+export type MeshPlaneProps = Props<InstanceOf<"MeshPlane">> & {
+  // Constructor arguments that are not properties on the instance
   verticesX?: number;
   verticesY?: number;
 };
-
-// A component wrapper for `PIXI.SimpleRope`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.SimpleRope.html
-export type MeshRopeProps = DisplayObjectProps<PIXI.SimpleRope> & {
-  // Constructor arguments that are not properties on `PIXI.SimpleRope`
-  points?: PIXI.IPoint[];
+export type MeshRopeProps = Props<InstanceOf<"MeshRope">> & {
+  // Constructor arguments that are not properties on the instance
+  points?: PointLikeObject[];
   textureScale?: number;
 };
-
-// A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
-// see: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
-export type ParticleContainerProps = DisplayObjectProps<
-  PixiTypeFallback<
-    // @ts-ignore TS2694
-    PIXI.particles.ParticleContainer,
-    PIXI.ParticleContainer
-  >
->;
-
-// A component wrapper for `PIXI.Sprite`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.Sprite.html
-export type SpriteProps = DisplayObjectProps<PIXI.Sprite>;
-
-// A component wrapper for `PIXI.Text`.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.Text.html
-export type TextProps = Omit<DisplayObjectProps<PIXI.Text>, "style"> & {
-  // `PIXI.Text` reads `style` as `TextStyle` but its setter also accepts a partial style.
-  style?: PIXI.TextStyle | Partial<PIXI.ITextStyle>;
+export type MeshSimpleProps = Props<InstanceOf<"MeshSimple">> & {
+  // Constructor arguments that are not properties on the instance
+  indices?: Uint16Array | number[];
+  uvs?: Float32Array | number[];
 };
-
-// A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
-// see: https://pixijs.download/v6.5.10/docs/PIXI.TilingSprite.html
-export type TilingSpriteProps = DisplayObjectProps<
-  PixiTypeFallback<
-    // @ts-ignore TS2694
-    PIXI.extras.TilingSprite,
-    PIXI.TilingSprite
-  >
->;
+/** @deprecated Renamed to `NineSliceSpriteProps`, removed in 4.0.0 */
+export type NineSlicePlaneProps = NineSliceSpriteProps;
+export type NineSliceSpriteProps = Props<InstanceOf<"NineSliceSprite">>;
+export type ParticleContainerProps = Props<InstanceOf<"ParticleContainer">> & {
+  // Constructor arguments that are not properties on the instance
+  maxSize?: number;
+  properties?: Partial<Record<"alpha" | "position" | "rotation" | "scale" | "tint" | "uvs" | "vertices", boolean>>;
+};
+export type SpriteProps = Props<InstanceOf<"Sprite">>;
+// `style` stays loose here; an adapter exports a `TextProps` with its own style types.
+export type TextProps = Omit<Props<InstanceOf<"Text">>, "style"> & { style?: unknown };
+export type TilingSpriteProps = Props<InstanceOf<"TilingSprite">>;
 
 /**
  * PixiJS adapter
  */
 
-// Prop names the core types, by kind. Names not listed are set on the instance as-is (decision 1).
+// Prop names the core types, by kind. Names not listed are set on the instance as-is.
 export interface PixiPropertyTable {
   boolean: readonly string[];
+  callback: readonly string[];
   numeric: readonly string[];
   positiveNumeric: readonly string[];
   vector: readonly string[];
-  callback: readonly string[];
 }
 
 export interface PixiAdapter {
@@ -337,32 +257,29 @@ export interface ReactAdapter {
  */
 
 export interface StagePropsWithApp {
-  app: PIXI.Application;
+  app: PixiApplication;
   options?: never;
 }
 export interface StagePropsWithOptions {
   app?: never;
-  // Take last element of constructor parameters which returns ApplicationOptions for both PixiJS v4 and v5
-  options: LastInTuple<ConstructorParameters<typeof PIXI.Application>>;
+  options?: PixiApplicationOptions;
 }
 
 export type StageAsCanvasProps = React.CanvasHTMLAttributes<HTMLCanvasElement>;
-export type StageAsContainerProps = DisplayObjectProps<PIXI.Container>;
+export type StageAsContainerProps = ContainerProps;
 // Allow either `app` or `options` passed to `Stage` but not both.
-export type StageProps = Omit<
-  (StagePropsWithApp | StagePropsWithOptions) & StageAsCanvasProps & StageAsContainerProps,
-  "height" | "width"
-> & {
-  /** Called with the application after the first render of `children` into `app.stage`. */
-  onInit?: (app: PIXI.Application) => void;
-  /** @deprecated Pass `width` in `options`. */
-  width?: number;
+export type StageProps = (StagePropsWithApp | StagePropsWithOptions) &
+  Omit<StageAsCanvasProps & StageAsContainerProps, "height" | "width"> & {
   /** @deprecated Pass `height` in `options`. */
   height?: number;
+  /** Called with the application after the first render of `children` into `app.stage`. */
+  onInit?: (app: PixiApplication) => void;
+  /** @deprecated Pass `width` in `options`. */
+  width?: number;
 };
 
 export type StageRef = {
-  _app: React.RefObject<PIXI.Application>;
+  _app: React.RefObject<PixiApplication>;
   _canvas: React.RefObject<HTMLCanvasElement>;
   props: StageProps;
 };
@@ -375,18 +292,18 @@ export type StageComponent = React.ForwardRefExoticComponent<StageProps & { ref?
  */
 
 // A display object created by a `PIXIComponent` behavior.
-export type PIXIComponentInstance<T extends PIXI.DisplayObject, P> = T;
+export type PIXIComponentInstance<T extends object, P> = T;
 
 // Used create an instance of `PIXI.DisplayObject`.
 // Also used as a `PIXIComponent` `behavior` factory function.
-export type DisplayObjectCreator<T extends PIXI.DisplayObject, P> = (props: P) => PIXIComponentInstance<T, P>;
+export type DisplayObjectCreator<T extends object, P> = (props: P) => PIXIComponentInstance<T, P>;
 
 // Props accepted by a `PIXIComponent`: props defined on the component overwrite props of underlying DisplayObject.
-export type PIXIComponentProps<T extends PIXI.DisplayObject, P> = P & DisplayObjectProps<Omit<T, keyof P>>;
+export type PIXIComponentProps<T extends object, P> = P & DisplayObjectProps<Omit<T, keyof P>>;
 
 // `this` available inside `applyProps`, see `registry.ts`.
 // `applyDisplayObjectProps` is already bound to `type` and `displayObject`.
-export interface DisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> {
+export interface DisplayObjectPropSetterContext<T extends object, P> {
   applyDisplayObjectProps: (
     oldProps: Partial<PIXIComponentProps<T, P>> | undefined,
     newProps: Partial<PIXIComponentProps<T, P>>
@@ -394,7 +311,7 @@ export interface DisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P>
 }
 
 // Used to apply `newProps` to your `PIXIComponent` in a custom way.
-export type DisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
+export type DisplayObjectPropSetter<T extends object, P> = (
   this: DisplayObjectPropSetterContext<T, P>,
   displayObject: T,
   oldProps: P | undefined,
@@ -402,13 +319,13 @@ export type DisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
 ) => void;
 
 // Used to do something after `displayObject` is added to its parent, which happens before `componentDidMount`.
-export type DisplayObjectAttachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
+export type DisplayObjectAttachHandler<T extends object> = (displayObject: T) => void;
 
 // Used to do something (usually cleanup) before removing `displayObject`, which happens after `componentWillUnmount`.
-export type DisplayObjectDetachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
+export type DisplayObjectDetachHandler<T extends object> = (displayObject: T) => void;
 
 // `PIXIComponent` `behavior` object.
-export interface PIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P> {
+export interface PIXIComponentBehaviorDefinition<T extends object, P> {
   create: DisplayObjectCreator<T, P>;
   applyProps?: DisplayObjectPropSetter<T, P>;
   afterAdd?: DisplayObjectAttachHandler<T>;
@@ -416,7 +333,7 @@ export interface PIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P
 }
 
 // The 2.x `behavior` object keys. The registry maps them to the new keys and warns once per key in development.
-export interface LegacyPIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P> {
+export interface LegacyPIXIComponentBehaviorDefinition<T extends object, P> {
   /** @deprecated use `create` */
   customDisplayObject: DisplayObjectCreator<T, P>;
   /** @deprecated use `applyProps` */
@@ -428,35 +345,29 @@ export interface LegacyPIXIComponentBehaviorDefinition<T extends PIXI.DisplayObj
 }
 
 // `PIXIComponent` has `behavior` defined either as an object or factory function.
-export type PIXIComponentBehavior<T extends PIXI.DisplayObject, P> =
+export type PIXIComponentBehavior<T extends object, P> =
   | PIXIComponentBehaviorDefinition<T, P>
   | LegacyPIXIComponentBehaviorDefinition<T, P>
   | DisplayObjectCreator<T, P>;
 
 /** @deprecated Renamed to `PIXIComponentInstance`, removed in 4.0.0 */
-export type CustomDisplayObject<T extends PIXI.DisplayObject, P> = PIXIComponentInstance<T, P>;
+export type CustomDisplayObject<T extends object, P> = PIXIComponentInstance<T, P>;
 /** @deprecated Renamed to `DisplayObjectCreator`, removed in 4.0.0 */
-export type CustomDisplayObjectCreator<T extends PIXI.DisplayObject, P> = DisplayObjectCreator<T, P>;
+export type CustomDisplayObjectCreator<T extends object, P> = DisplayObjectCreator<T, P>;
 /** @deprecated Renamed to `PIXIComponentProps`, removed in 4.0.0 */
-export type CustomPIXIComponentProps<T extends PIXI.DisplayObject, P> = PIXIComponentProps<T, P>;
+export type CustomPIXIComponentProps<T extends object, P> = PIXIComponentProps<T, P>;
 /** @deprecated Renamed to `DisplayObjectPropSetterContext`, removed in 4.0.0 */
-export type CustomDisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> = DisplayObjectPropSetterContext<
-  T,
-  P
->;
+export type CustomDisplayObjectPropSetterContext<T extends object, P> = DisplayObjectPropSetterContext<T, P>;
 /** @deprecated Renamed to `DisplayObjectPropSetter`, removed in 4.0.0 */
-export type CustomDisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = DisplayObjectPropSetter<T, P>;
+export type CustomDisplayObjectPropSetter<T extends object, P> = DisplayObjectPropSetter<T, P>;
 /** @deprecated Renamed to `DisplayObjectAttachHandler`, removed in 4.0.0 */
-export type CustomDisplayObjectAttachHandler<T extends PIXI.DisplayObject> = DisplayObjectAttachHandler<T>;
+export type CustomDisplayObjectAttachHandler<T extends object> = DisplayObjectAttachHandler<T>;
 /** @deprecated Renamed to `DisplayObjectDetachHandler`, removed in 4.0.0 */
-export type CustomDisplayObjectDetachHandler<T extends PIXI.DisplayObject> = DisplayObjectDetachHandler<T>;
+export type CustomDisplayObjectDetachHandler<T extends object> = DisplayObjectDetachHandler<T>;
 /** @deprecated Renamed to `PIXIComponentBehaviorDefinition` (new keys), removed in 4.0.0 */
-export type CustomPIXIComponentBehaviorDefinition<
-  T extends PIXI.DisplayObject,
-  P,
-> = LegacyPIXIComponentBehaviorDefinition<T, P>;
+export type CustomPIXIComponentBehaviorDefinition<T extends object, P> = LegacyPIXIComponentBehaviorDefinition<T, P>;
 /** @deprecated Renamed to `PIXIComponentBehavior`, removed in 4.0.0 */
-export type CustomPIXIComponentBehavior<T extends PIXI.DisplayObject, P> = PIXIComponentBehavior<T, P>;
+export type CustomPIXIComponentBehavior<T extends object, P> = PIXIComponentBehavior<T, P>;
 
 /**
  * `PIXI.Application` context.
@@ -464,5 +375,5 @@ export type CustomPIXIComponentBehavior<T extends PIXI.DisplayObject, P> = PIXIC
 
 // You can use `interface ComponentProps extends PixiAppProperties {}` with component wrapped by `withApp`.
 export interface PixiAppProperties {
-  app: PIXI.Application;
+  app: PixiApplication;
 }

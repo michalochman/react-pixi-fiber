@@ -36,9 +36,9 @@ describe("configure", () => {
 
   it("throws when given an uncalled factory", async () => {
     const { configure } = await import("../src/configure");
-    const builtins = (await import("../src/builtins")).default;
-    expect(() => configure({ react: react18, pixi: builtins })).toThrow(/`react` to be/);
-    expect(() => configure({ react: react18(), pixi: () => builtins })).toThrow(/`pixi` to be/);
+    const pixi6 = (await import("@react-pixi-fiber/pixi-6")).default;
+    expect(() => configure({ react: react18, pixi: pixi6() })).toThrow(/`react` to be/);
+    expect(() => configure({ react: react18(), pixi: pixi6 })).toThrow(/`pixi` to be/);
   });
 
   it("throws when the PixiJS adapter misses a member", async () => {
@@ -71,11 +71,11 @@ describe("configure", () => {
   it("a second call after a render warns once in development and the new adapters win", async () => {
     const { configure } = await import("../src/configure");
     const { render, Container } = await import("../src/index");
-    const builtins = (await import("../src/builtins")).default;
-    configure({ react: react18(), pixi: builtins });
+    const adapter = (await import("@react-pixi-fiber/pixi-6")).default();
+    configure({ react: react18(), pixi: adapter });
     render(<Container />, new PIXI.Container());
     const marker = new PIXI.Container();
-    const other = { ...builtins, components: { ...builtins.components, Container: { create: () => marker } } };
+    const other = { ...adapter, components: { ...adapter.components, Container: { create: () => marker } } };
     configure({ react: react18(), pixi: other });
     render(<Container />, new PIXI.Container());
     configure({ react: react18(), pixi: other });
@@ -87,12 +87,12 @@ describe("configure", () => {
   it("keeps updating and unmounting a tree rendered before a second call on its own renderer", async () => {
     const { configure } = await import("../src/configure");
     const { render, unmount, Container, Sprite } = await import("../src/index");
-    const builtins = (await import("../src/builtins")).default;
-    configure({ react: react18(), pixi: builtins });
+    const adapter = (await import("@react-pixi-fiber/pixi-6")).default();
+    configure({ react: react18(), pixi: adapter });
     const stage = new PIXI.Container();
     render(<Container x={1} />, stage);
     const first = stage.children[0];
-    configure({ react: react18(), pixi: builtins });
+    configure({ react: react18(), pixi: adapter });
     render(
       <Container x={2}>
         <Sprite />
@@ -111,9 +111,9 @@ describe("configure", () => {
     const { configure } = await import("../src/configure");
     const Stage = (await import("../src/Stage")).default;
     const { Container } = await import("../src/index");
-    const builtins = (await import("../src/builtins")).default;
+    const adapter = (await import("@react-pixi-fiber/pixi-6")).default();
     const app = { stage: new PIXI.Container(), renderer: { resize() {} } };
-    const pixi = { ...builtins, createApplication: () => app, destroyApplication: vi.fn() };
+    const pixi = { ...adapter, createApplication: () => app, destroyApplication: vi.fn() };
     configure({ react: react18(), pixi });
     let tree;
     act(() => {

@@ -39,7 +39,6 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
-    "pixi.js": ">=4.4.0 <8.0.0",
     "react": ">=17.0.0 <20.0.0"
   },
   "devDependencies": {
@@ -53,7 +52,7 @@
     "build": "rm -rf dist && pnpm run build:prod && pnpm run build:dev",
     "build:dev": "cross-env NODE_ENV=development tsdown",
     "build:prod": "cross-env NODE_ENV=production tsdown",
-    "check-types": "tsc -p tsconfig.json && tsc -p tsconfig.dist-es.json && tsc -p tsconfig.dist-cjs.json",
+    "check-types": "tsc -p tsconfig.json && tsc -p tsconfig.fallback.json && tsc -p tsconfig.dist-es.json && tsc -p tsconfig.dist-cjs.json",
     "prepublishOnly": "pnpm run test && pnpm run build && pnpm -w check-package",
     "test": "pnpm run test:dev && pnpm run test:prod",
     "test:cov": "pnpm run test:dev --coverage --reporter=blob --outputFile=.vitest-reports/blob-dev.json && pnpm run test:prod --coverage --reporter=blob --outputFile=.vitest-reports/blob-prod.json && vitest run --merge-reports=.vitest-reports --coverage --coverage.reportsDirectory=coverage",

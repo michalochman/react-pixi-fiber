@@ -63,7 +63,7 @@ if (__DEV__) {
 
     // Known attributes should match the casing specified in the property config.
     // A name is typed by the adapter table, or was registered by `PIXIProperty` on the tag or on all tags.
-    // Any other name is set on the instance as-is and not reported (decision 1).
+    // Any other name is set on the instance as-is and not reported.
     const standardName =
       getOwn(getStandardNames(pixi), lowerCasedName) ??
       getOwn(customStandardNames[tag], lowerCasedName) ??

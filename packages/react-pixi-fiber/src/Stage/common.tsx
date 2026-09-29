@@ -1,8 +1,7 @@
-import type * as PIXI from "pixi.js";
+import type { PixiAdapter, PixiApplication } from "../types";
 import React from "react";
 import { AppProvider } from "../AppProvider";
 import { diffProperties, setInitialProperties, updateProperties } from "../ReactPixiFiberComponent";
-import { getPixiAdapter } from "../configure";
 import { renderWith, unmountWith } from "../render";
 import { getContainerProps } from "./props";
 import { TAGS } from "../tags";
@@ -23,7 +22,12 @@ export const STAGE_OPTIONS_RECREATE = false;
 export const STAGE_OPTIONS_UNMOUNT = true;
 
 // `null` unmounts the stage tree without destroying the application: a provided application is not ours to destroy.
-export function cleanupStage(app: PIXI.Application, stageOptions: boolean | null): void {
+// Otherwise returns a promise that settles once the application is destroyed, by `pixi`, the adapter that created it.
+export function cleanupStage(
+  pixi: PixiAdapter,
+  app: PixiApplication,
+  stageOptions: boolean | null
+): Promise<void> | undefined {
   // Do not remove canvas from DOM, there are two ways canvas made it's way to PIXI.Application:
   // 1) canvas was rendered by Stage component - it will be removed by React when Stage is unmounted
   // 2) canvas was passed in options as `view` - removing canvas created externally may have unexpected consequences
@@ -35,10 +39,16 @@ export function cleanupStage(app: PIXI.Application, stageOptions: boolean | null
   if (stageOptions === null) return;
 
   // Give components a chance to finish unmounting before destroying PIXI.Application
-  setTimeout(() => {
-    // Destroy PIXI.Application and what it rendered if necessary
-    getPixiAdapter().destroyApplication(app, removeView, stageOptions);
-  }, 0);
+  return new Promise(resolve => {
+    setTimeout(() => {
+      try {
+        // Destroy PIXI.Application and what it rendered if necessary
+        pixi.destroyApplication(app, removeView, stageOptions);
+      } finally {
+        resolve();
+      }
+    }, 0);
+  });
 }
 
 export function getDimensions(props: Props): [number | undefined, number | undefined] {
@@ -47,11 +57,11 @@ export function getDimensions(props: Props): [number | undefined, number | undef
   return [width, height];
 }
 
-export function renderApp(app: PIXI.Application, props: Props): void {
+export function renderApp(app: PixiApplication, props: Props): void {
   render(<AppProvider app={app}>{props.children}</AppProvider>, app.stage);
 }
 
-export function renderStage(app: PIXI.Application, props: Props): void {
+export function renderStage(app: PixiApplication, props: Props): void {
   // Determine what props to apply
   const stageProps = getContainerProps(props);
 
@@ -59,7 +69,7 @@ export function renderStage(app: PIXI.Application, props: Props): void {
   renderApp(app, props);
 }
 
-export function rerenderStage(app: PIXI.Application, oldProps: Props, newProps: Props): void {
+export function rerenderStage(app: PixiApplication, oldProps: Props, newProps: Props): void {
   // Determine what has changed
   const oldStageProps = getContainerProps(oldProps);
   const newStageProps = getContainerProps(newProps);
@@ -72,7 +82,7 @@ export function rerenderStage(app: PIXI.Application, oldProps: Props, newProps: 
   renderApp(app, newProps);
 }
 
-export function resizeRenderer(app: PIXI.Application, oldProps: Props, newProps: Props): void {
+export function resizeRenderer(app: PixiApplication, oldProps: Props, newProps: Props): void {
   const [oldWidth, oldHeight] = getDimensions(oldProps);
   const [newWidth, newHeight] = getDimensions(newProps);
 

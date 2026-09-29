@@ -50,6 +50,9 @@ importers:
 
   apps/examples:
     dependencies:
+      '@react-pixi-fiber/pixi-6':
+        specifier: workspace:*
+        version: link:../../packages/pixi-6
       animated:
         specifier: ^0.2.2
         version: 0.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -99,6 +102,24 @@ importers:
       vite:
         specifier: ^8.3.1
         version: 8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(terser@5.51.2)
+
+  packages/pixi-6:
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.8
+        version: 18.3.31
+      pixi.js:
+        specifier: ^6.5.10
+        version: 6.5.10
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-pixi-fiber:
+        specifier: workspace:*
+        version: link:../react-pixi-fiber
+      react-test-renderer:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
 
   packages/react-18:
     devDependencies:

@@ -6,7 +6,7 @@
   "repository": "github:michalochman/react-pixi-fiber",
   "packageManager": "pnpm@10.24.0",
   "scripts": {
-    "build": "pnpm --filter react-pixi-fiber build",
+    "build": "pnpm --filter \"./packages/*\" build",
     "test": "pnpm --filter react-pixi-fiber test",
     "lint": "biome check",
     "format": "biome check --write",

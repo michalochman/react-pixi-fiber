@@ -89,12 +89,18 @@ function Stage(props: StageProps, ref: Ref<StageRef>) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pendingRef = useRef<InitToken | null>(null);
   const latestProps = useRef(props);
-  latestProps.current = props;
+  // Written on commit, before the effects below read it: a render React discards never reaches the application.
+  useLayoutEffect(() => {
+    latestProps.current = props;
+  });
   // The props the current application has had applied. Null while init is pending.
   const appliedProps = useRef<StageProps | null>(null);
   const recreating = useRef(false);
   // An application created with outdated options, destroyed in the next cleanup.
   const doomedRef = useRef<any>(null);
+  // Settles once the previous application is destroyed. The next one waits for it: it may share the canvas and its
+  // WebGL context, and a destroy resets state of that context, like the bound shader program, that a renderer caches.
+  const previousRef = useRef<Promise<unknown> | null>(null);
   const [canvasKey, setCanvasKey] = useState(0);
 
   // Once per Stage: the ref object is rebuilt on every props change, the warned flag is not.
@@ -115,12 +121,22 @@ function Stage(props: StageProps, ref: Ref<StageRef>) {
     pendingRef.current = token;
     const { app: providedApp, options: initialOptions = {} } = latestProps.current;
     const provided = providedApp != null;
-    const created = provided ? providedApp : pixi.createApplication({ view: canvasRef.current, ...initialOptions });
+    const previous = previousRef.current;
+    previousRef.current = null;
+    const create = () =>
+      pixi.createApplication({ view: canvasRef.current, ...(initialOptions as Record<string, unknown>) });
+    const created = provided
+      ? providedApp
+      : previous
+        ? previous.then(() => (token.cancelled ? null : create()))
+        : create();
+    // Set once the stage is rendered: an application that failed before that is destroyed by the rejection below.
+    let rendered = false;
 
-    Promise.resolve(created)
+    const settled = Promise.resolve(created)
       .then((resolved: any) => {
         if (token.cancelled) {
-          if (!provided) pixi.destroyApplication(resolved, false, STAGE_OPTIONS_UNMOUNT);
+          if (!provided && resolved != null) pixi.destroyApplication(resolved, false, STAGE_OPTIONS_UNMOUNT);
           return;
         }
         pendingRef.current = null;
@@ -142,6 +158,7 @@ function Stage(props: StageProps, ref: Ref<StageRef>) {
         }
         appRef.current = resolved;
         renderStage(resolved, current);
+        rendered = true;
         appliedProps.current = current;
         if (!provided) resizeRenderer(resolved, { options: initialOptions }, current);
         // Once per created application: after a recreate it fires again with the new one.
@@ -150,6 +167,10 @@ function Stage(props: StageProps, ref: Ref<StageRef>) {
       .catch(error => {
         if (token.cancelled) return;
         pendingRef.current = null;
+        if (!rendered && appRef.current != null) {
+          if (!provided) pixi.destroyApplication(appRef.current, false, STAGE_OPTIONS_UNMOUNT);
+          appRef.current = null;
+        }
         setInitError(() => {
           throw error;
         });
@@ -161,11 +182,13 @@ function Stage(props: StageProps, ref: Ref<StageRef>) {
         pixi.destroyApplication(doomedRef.current, false, STAGE_OPTIONS_RECREATE);
         doomedRef.current = null;
       }
+      // A pending init destroys its application once it resolves.
+      if (pendingRef.current === token && !provided) previousRef.current = settled;
       token.cancelled = true;
       pendingRef.current = null;
       if (appRef.current != null) {
         const stageOptions = provided ? null : recreating.current ? STAGE_OPTIONS_RECREATE : STAGE_OPTIONS_UNMOUNT;
-        cleanupStage(appRef.current, stageOptions);
+        previousRef.current = cleanupStage(pixi, appRef.current, stageOptions) ?? null;
         appRef.current = null;
         appliedProps.current = null;
       }

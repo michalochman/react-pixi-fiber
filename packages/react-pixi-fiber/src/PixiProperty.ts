@@ -117,7 +117,7 @@ export function getPropertyInfo(name: string, pixi: PixiAdapter): PropertyInfoRe
   return Object.prototype.hasOwnProperty.call(info, name) ? info[name] : null;
 }
 
-// Lowercase name to canonical name for the typed names, for the casing warning. No per-tag list (decision 1).
+// Lowercase name to canonical name for the typed names, for the casing warning.
 export function getStandardNames(pixi: PixiAdapter): Record<string, string> {
   let names = namesCache.get(pixi);
   if (!names) {

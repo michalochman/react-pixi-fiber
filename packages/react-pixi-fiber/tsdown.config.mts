@@ -21,9 +21,9 @@ const declareStageValue: TsdownHooks["build:done"] = ({ chunks }) => {
   }
 };
 
-// pixi.js leaves the list in Task 12.
 export default createTsdownConfig({
   name: "react-pixi-fiber",
-  external: ["react", "pixi.js"],
+  external: ["react"],
   hooks: { "build:done": declareStageValue },
+  tsconfig: "tsconfig.build.json",
 });

@@ -4,7 +4,7 @@ import * as PixiPropertyOperations from "../src/PixiPropertyOperations";
 import { setValueForProperty } from "../src/PixiPropertyOperations";
 import { shouldIgnoreAttribute, shouldRemoveAttribute } from "../src/PixiProperty";
 import { setPixiValue } from "../src/utils";
-import builtins from "../src/builtins";
+import { getPixiAdapter } from "../src/configure";
 import { strictModeBit } from "@react-pixi-fiber/react-18";
 
 // The mocks call the real implementations unless a test overrides them; `mockReset` restores that.
@@ -21,14 +21,17 @@ vi.mock("../src/utils", async importOriginal => {
   return { ...actual, setPixiValue: vi.fn(actual.setPixiValue) };
 });
 
-// Fresh modules whose adapter has the given `defaults` override.
+// Fresh modules whose adapter has the given `defaults` override. The adapter has no `NineSlicePlane` alias, so the
+// core's deprecated tag map is what resolves that tag.
 async function withDefaults(defaults) {
   vi.resetModules();
   vi.doMock("../src/configure", async () => {
-    const builtins = (await vi.importActual("../src/builtins")).default;
+    const pixi = (await vi.importActual("@react-pixi-fiber/pixi-6")).default();
+    const { NineSlicePlane, ...components } = pixi.components;
+    const adapter = { ...pixi, components };
     const { registerAdapterComponents } = await import("../src/registry");
-    registerAdapterComponents(builtins.components);
-    return { getPixiAdapter: () => ({ ...builtins, defaults }), getStrictModeBit: () => strictModeBit };
+    registerAdapterComponents(components);
+    return { getPixiAdapter: () => ({ ...adapter, defaults }), getStrictModeBit: () => strictModeBit };
   });
   return {
     ...(await import("../src/PixiPropertyOperations")),
@@ -58,7 +61,7 @@ describe("PixiPropertyOperations", () => {
       shouldRemoveAttribute.mockImplementation(() => true);
       PixiPropertyOperations.setValueForProperty("Sprite", instance, "roundPixels", undefined);
       expect(setPixiValue).toHaveBeenCalledTimes(1);
-      expect(setPixiValue).toHaveBeenCalledWith(instance, "roundPixels", false, builtins);
+      expect(setPixiValue).toHaveBeenCalledWith(instance, "roundPixels", false, getPixiAdapter());
     });
 
     it("should not call setPixiValue if property should be removed and default is not available", () => {
@@ -77,7 +80,7 @@ describe("PixiPropertyOperations", () => {
       const instance = {};
       PixiPropertyOperations.setValueForProperty("Sprite", instance, "roundPixels", true);
       expect(setPixiValue).toHaveBeenCalledTimes(1);
-      expect(setPixiValue).toHaveBeenCalledWith(instance, "roundPixels", true, builtins);
+      expect(setPixiValue).toHaveBeenCalledWith(instance, "roundPixels", true, getPixiAdapter());
     });
   });
 
@@ -107,9 +110,9 @@ describe("PixiPropertyOperations", () => {
     it("prefers the adapter defaults override over the recorded value", async () => {
       vi.resetModules();
       vi.doMock("../src/configure", async () => {
-        const builtins = (await vi.importActual("../src/builtins")).default;
+        const adapter = (await vi.importActual("@react-pixi-fiber/pixi-6")).default();
         return {
-          getPixiAdapter: () => ({ ...builtins, defaults: { Sprite: { alpha: 0.25 } } }),
+          getPixiAdapter: () => ({ ...adapter, defaults: { Sprite: { alpha: 0.25 } } }),
           getStrictModeBit: () => strictModeBit,
         };
       });

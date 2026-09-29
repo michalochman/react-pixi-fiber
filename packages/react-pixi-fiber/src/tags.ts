@@ -1,18 +1,18 @@
 // The 13 core tags, PixiJS 8 spelling. Every PixiJS adapter implements all of them.
 export const TAGS = {
-  Container: "Container",
-  Sprite: "Sprite",
   AnimatedSprite: "AnimatedSprite",
-  Text: "Text",
   BitmapText: "BitmapText",
+  Container: "Container",
   Graphics: "Graphics",
-  TilingSprite: "TilingSprite",
-  NineSliceSprite: "NineSliceSprite",
-  ParticleContainer: "ParticleContainer",
   Mesh: "Mesh",
-  MeshSimple: "MeshSimple",
   MeshPlane: "MeshPlane",
   MeshRope: "MeshRope",
+  MeshSimple: "MeshSimple",
+  NineSliceSprite: "NineSliceSprite",
+  ParticleContainer: "ParticleContainer",
+  Sprite: "Sprite",
+  Text: "Text",
+  TilingSprite: "TilingSprite",
 } as const;
 export type Tag = keyof typeof TAGS;
 // 2.x tag names, resolved after the registry and the adapter. Removed in 4.0.0.

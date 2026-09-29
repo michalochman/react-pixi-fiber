@@ -1,0 +1,12 @@
+// The build emits declarations for src only. tsgo writes a source outside dirname(tsconfig) next to that source, so the
+// adapter paths of tsconfig.json (used by the type fixture) would put .d.ts files into ../pixi-6/src, see scripts/tsdown.config.ts.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "react-pixi-fiber": ["./src/index.ts"]
+    }
+  },
+  "include": ["src"],
+  "exclude": []
+}

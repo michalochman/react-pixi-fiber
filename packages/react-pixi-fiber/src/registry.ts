@@ -74,7 +74,7 @@ export function registerComponent(type: string, behavior: BehaviorInput): string
   return type;
 }
 
-// Called by configure (and by the Phase 1 shim) with the adapter's components. Replaces the previous adapter set.
+// Called by configure with the adapter's components. Replaces the previous adapter set.
 export function registerAdapterComponents(components: Record<string, BehaviorInput>): void {
   const next: Record<string, Behavior> = {};
   for (const type of Object.keys(components)) next[type] = normalizeBehavior(type, components[type]);
@@ -89,7 +89,7 @@ export function getAdapterComponent(type: string): Behavior | undefined {
   return Object.prototype.hasOwnProperty.call(adapterComponents, type) ? adapterComponents[type] : undefined;
 }
 
-// User registration wins over the adapter's; see decisions 3 and 11.
+// User registration wins over the adapter's.
 export function resolveComponent(type: string): { behavior: Behavior; source: "user" | "adapter" } | undefined {
   const user = getUserComponent(type);
   if (user) return { behavior: user, source: "user" };

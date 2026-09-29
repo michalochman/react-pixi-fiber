@@ -3,94 +3,56 @@ import React from "react";
 import * as PIXI from "pixi.js";
 import { act } from "react-test-renderer";
 import { TAGS } from "../src/tags";
-import builtins from "../src/builtins";
 import { PIXIComponent, applyProps, getInstanceTag, render, unmount } from "../src/index";
 import { createInstance } from "../src/ReactPixiFiberComponent";
 import { validateProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
 
+// The core against pixi-6, which test/setup.ts configures. packages/pixi-6/test covers the adapter's own data.
 const texture = PIXI.Texture.WHITE;
-const nineSliceProps = { texture, leftWidth: 1, topHeight: 1, rightWidth: 1, bottomHeight: 1 };
 const propsFor = {
-  Container: {},
-  Sprite: { texture },
   AnimatedSprite: { textures: [texture] },
-  Text: { text: "t" },
-  BitmapText: { text: "t", style: { fontName: "test" } },
+  BitmapText: { style: { fontName: "test" }, text: "t" },
+  Container: {},
   Graphics: {},
-  TilingSprite: { texture, width: 1, height: 1 },
-  NineSliceSprite: nineSliceProps,
-  ParticleContainer: {},
   Mesh: { geometry: new PIXI.PlaneGeometry(1, 1, 2, 2), shader: new PIXI.MeshMaterial(texture) },
-  MeshSimple: { texture },
   MeshPlane: { texture, verticesX: 2, verticesY: 2 },
-  MeshRope: { texture, points: [new PIXI.Point(0, 0), new PIXI.Point(1, 1)] },
-};
-const classFor = {
-  Container: PIXI.Container,
-  Sprite: PIXI.Sprite,
-  AnimatedSprite: PIXI.AnimatedSprite,
-  Text: PIXI.Text,
-  BitmapText: PIXI.BitmapText,
-  Graphics: PIXI.Graphics,
-  TilingSprite: PIXI.TilingSprite,
-  NineSliceSprite: PIXI.NineSlicePlane,
-  ParticleContainer: PIXI.ParticleContainer,
-  Mesh: PIXI.Mesh,
-  MeshSimple: PIXI.SimpleMesh,
-  MeshPlane: PIXI.SimplePlane,
-  MeshRope: PIXI.SimpleRope,
+  MeshRope: { points: [new PIXI.Point(0, 0), new PIXI.Point(1, 1)], texture },
+  MeshSimple: { texture },
+  NineSliceSprite: { bottomHeight: 1, leftWidth: 1, rightWidth: 1, texture, topHeight: 1 },
+  ParticleContainer: {},
+  Sprite: { texture },
+  Text: { text: "t" },
+  TilingSprite: { height: 1, texture, width: 1 },
 };
 
 PIXI.BitmapFont.from("test", { fontFamily: "Arial" }, { chars: [["a", "z"]] });
 
-describe("builtins", () => {
+describe("the core with pixi-6", () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it("implements every core tag with the PixiJS 6 class", () => {
-    expect(PIXI.BitmapFont.available.test).toBeDefined();
-    for (const tag of Object.keys(TAGS)) {
-      expect(builtins.components[tag].create(propsFor[tag]), tag).toBeInstanceOf(classFor[tag]);
-    }
-    expect(Object.keys(builtins.components).sort()).toEqual(Object.keys(TAGS).sort());
-  });
-
-  it("has the five property lists and the point helpers", () => {
-    expect(Object.keys(builtins.properties).sort()).toEqual([
-      "boolean",
-      "callback",
-      "numeric",
-      "positiveNumeric",
-      "vector",
-    ]);
-    expect(builtins.isPoint(new PIXI.Point(1, 2))).toBe(true);
-    expect(builtins.isPoint({ x: 1, y: 2 })).toBe(false);
-    const target = new PIXI.Point();
-    builtins.copyPoint(target, { x: 3, y: 4 });
-    expect([target.x, target.y]).toEqual([3, 4]);
-    const app = new PIXI.Application();
-    try {
-      expect(builtins.isApplication(app)).toBe(true);
-    } finally {
-      app.destroy(true);
-    }
+  it("resolves the adapter's NineSlicePlane alias before the deprecated tag map, without a warning", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const instance = createInstance("NineSlicePlane", {
+      bottomHeight: 1,
+      leftWidth: 1,
+      rightWidth: 1,
+      texture,
+      topHeight: 1,
+    });
+    expect(instance).toBeInstanceOf(PIXI.NineSlicePlane);
+    expect(getInstanceTag(instance)).toBe("NineSlicePlane");
+    expect(error).not.toHaveBeenCalled();
   });
 
   it("creates every core tag through createInstance and records its tag", () => {
     for (const tag of Object.keys(TAGS)) {
       const instance = createInstance(tag, propsFor[tag]);
-      expect(instance, tag).toBeInstanceOf(classFor[tag]);
+      expect(instance, tag).toBeInstanceOf(PIXI.Container);
       expect(getInstanceTag(instance)).toBe(tag);
     }
   });
 
-  it("records the deprecated NineSlicePlane tag as NineSliceSprite", () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    const instance = createInstance("NineSlicePlane", nineSliceProps);
-    expect(instance).toBeInstanceOf(PIXI.NineSlicePlane);
-    expect(getInstanceTag(instance)).toBe("NineSliceSprite");
-  });
-
-  it("applyProps works on built-in tag instances", () => {
+  it("applyProps works on adapter tag instances", () => {
     const sprite = createInstance("Sprite", { texture });
     applyProps(sprite, {}, { alpha: 0.5, position: "3,4" });
     expect(sprite.alpha).toBe(0.5);

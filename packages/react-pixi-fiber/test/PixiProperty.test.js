@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 import * as PIXI from "pixi.js";
 import * as PixiProperty from "../src/PixiProperty";
-import builtins from "../src/builtins";
+import pixi6 from "@react-pixi-fiber/pixi-6";
+
+const adapter = pixi6();
 
 describe("PixiProperty", () => {
   describe("types", () => {
@@ -88,7 +90,7 @@ describe("PixiProperty", () => {
     it("keeps a boolean or function on an untyped name for every component", () => {
       expect(PixiProperty.shouldRemoveAttribute("Container", "sortableChildren", true, null)).toBe(false);
       expect(PixiProperty.shouldRemoveAttribute("Container", "onSomething", () => {}, null)).toBe(false);
-      expect(PixiProperty.shouldRemoveAttribute("Sprite", "x", true, PixiProperty.getPropertyInfo("x", builtins))).toBe(
+      expect(PixiProperty.shouldRemoveAttribute("Sprite", "x", true, PixiProperty.getPropertyInfo("x", adapter))).toBe(
         true
       );
     });
@@ -159,14 +161,14 @@ describe("PixiProperty", () => {
 
   describe("getPropertyInfo", () => {
     it("types the names of the adapter table and reserves children and parent", () => {
-      expect(PixiProperty.getPropertyInfo("buttonMode", builtins).type).toBe(PixiProperty.BOOLEAN);
-      expect(PixiProperty.getPropertyInfo("alpha", builtins).type).toBe(PixiProperty.POSITIVE_NUMERIC);
-      expect(PixiProperty.getPropertyInfo("x", builtins).type).toBe(PixiProperty.NUMERIC);
-      expect(PixiProperty.getPropertyInfo("scale", builtins).type).toBe(PixiProperty.VECTOR);
-      expect(PixiProperty.getPropertyInfo("onclick", builtins).type).toBe(PixiProperty.CALLBACK);
-      expect(PixiProperty.getPropertyInfo("children", builtins).type).toBe(PixiProperty.RESERVED);
-      expect(PixiProperty.getPropertyInfo("texture", builtins)).toBeNull();
-      expect(PixiProperty.getPropertyInfo("constructor", builtins)).toBeNull();
+      expect(PixiProperty.getPropertyInfo("buttonMode", adapter).type).toBe(PixiProperty.BOOLEAN);
+      expect(PixiProperty.getPropertyInfo("alpha", adapter).type).toBe(PixiProperty.POSITIVE_NUMERIC);
+      expect(PixiProperty.getPropertyInfo("x", adapter).type).toBe(PixiProperty.NUMERIC);
+      expect(PixiProperty.getPropertyInfo("scale", adapter).type).toBe(PixiProperty.VECTOR);
+      expect(PixiProperty.getPropertyInfo("click", adapter).type).toBe(PixiProperty.CALLBACK);
+      expect(PixiProperty.getPropertyInfo("children", adapter).type).toBe(PixiProperty.RESERVED);
+      expect(PixiProperty.getPropertyInfo("texture", adapter)).toBeNull();
+      expect(PixiProperty.getPropertyInfo("constructor", adapter)).toBeNull();
     });
 
     it("reads each adapter's own table", () => {
@@ -178,12 +180,12 @@ describe("PixiProperty", () => {
 
   describe("getStandardNames", () => {
     it("maps the lowercase typed names to their canonical names", () => {
-      const names = PixiProperty.getStandardNames(builtins);
+      const names = PixiProperty.getStandardNames(adapter);
       expect(names.buttonmode).toBe("buttonMode");
       expect(names.tileposition).toBe("tilePosition");
-      expect(names.onclick).toBe("onclick");
+      expect(names.click).toBe("click");
       expect(names.texture).toBeUndefined();
-      expect(PixiProperty.getStandardNames(builtins)).toBe(names);
+      expect(PixiProperty.getStandardNames(adapter)).toBe(names);
     });
   });
 

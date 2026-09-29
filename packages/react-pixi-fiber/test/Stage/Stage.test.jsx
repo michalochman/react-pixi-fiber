@@ -164,8 +164,13 @@ describe("Stage", () => {
           </StrictMode>
         );
       });
+      // The second mount creates its application on the same canvas once the first one is destroyed.
+      expect(adapter.createApplication).toHaveBeenCalledTimes(1);
+      act(() => pending[0]());
+      await flush();
+      expect(adapter.destroyApplication).toHaveBeenCalledTimes(1);
       expect(adapter.createApplication).toHaveBeenCalledTimes(2);
-      act(() => pending.forEach(r => r()));
+      act(() => pending[1]());
       await flush();
       expect(onInit).toHaveBeenCalledTimes(1);
       expect(adapter.destroyApplication).toHaveBeenCalledTimes(1);
@@ -366,6 +371,22 @@ describe("Stage", () => {
     expect(renderMock.mock.calls.at(-1)[1]).toBe(apps[1].stage);
     // onInit fires once per created application, so a consumer gets the new reference after a recreate.
     expect(onInit.mock.calls).toEqual([[apps[0]], [apps[1]]]);
+    tree.unmount();
+  });
+
+  it("recreates on an options change with `options.view` only after the old application is destroyed", async () => {
+    const view = {};
+    const tree = renderer.create(<Stage options={{ view, antialias: false }} />);
+    act(() => resolveInit());
+    await flush();
+    act(() => tree.update(<Stage options={{ view, antialias: true }} />));
+    expect(adapter.createApplication).toHaveBeenCalledTimes(1);
+    await tick();
+    expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, false);
+    expect(adapter.createApplication).toHaveBeenCalledTimes(2);
+    expect(adapter.destroyApplication.mock.invocationCallOrder[0]).toBeLessThan(
+      adapter.createApplication.mock.invocationCallOrder[1]
+    );
     tree.unmount();
   });
 

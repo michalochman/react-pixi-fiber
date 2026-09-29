@@ -1,14 +1,14 @@
 import React, { createContext, useContext } from "react";
 import type { ComponentType, ReactNode } from "react";
-import type * as PIXI from "pixi.js";
+import type { PixiApplication } from "./types";
 
-export const AppContext = createContext<PIXI.Application | null>(null);
+export const AppContext = createContext<PixiApplication | null>(null);
 
-export function AppProvider({ app, children }: { app: PIXI.Application; children?: ReactNode }) {
+export function AppProvider({ app, children }: { app: PixiApplication; children?: ReactNode }) {
   return <AppContext.Provider value={app}>{children}</AppContext.Provider>;
 }
 
-export function withApp<P extends { app: PIXI.Application }>(WrappedComponent: ComponentType<P>) {
+export function withApp<P extends { app: PixiApplication }>(WrappedComponent: ComponentType<P>) {
   function WithApp(props: Omit<P, "app">) {
     const app = useContext(AppContext);
     return <WrappedComponent {...(props as P)} app={app} />;

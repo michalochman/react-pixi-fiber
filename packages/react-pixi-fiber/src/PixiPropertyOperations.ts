@@ -1,6 +1,5 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/DOMPropertyOperations.js
 import warning from "./warning";
-import type * as PIXI from "pixi.js";
 import { getPixiAdapter, getStackAddendum, getStrictModeBit } from "./configure";
 import { getRecordedDefault, recordDefault } from "./defaults";
 import { getOwn, getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
@@ -11,14 +10,14 @@ import { findStrictRoot, setPixiValue } from "./utils";
  * Sets the value for a property on a PIXI.DisplayObject instance.
  *
  * @param {string} type
- * @param {PIXI.DisplayObject} instance
+ * @param {object} instance
  * @param {string} propName
  * @param {*} value
  * @param {*} internalHandle
  */
 export function setValueForProperty(
   type: string,
-  instance: PIXI.DisplayObject,
+  instance: Record<string, any>,
   propName: string,
   value: unknown,
   internalHandle?: unknown

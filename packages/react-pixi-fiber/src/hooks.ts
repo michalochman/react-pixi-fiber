@@ -1,9 +1,9 @@
-import type * as PIXI from "pixi.js";
+import type { PixiApplication } from "./types";
 import React from "react";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./AppProvider";
 
-export function usePixiApp(): PIXI.Application {
+export function usePixiApp(): PixiApplication {
   const app = useContext(AppContext);
 
   if (app === null) {

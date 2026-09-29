@@ -1,7 +1,6 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/ReactDOMFiberComponent.js
 import invariant from "./invariant";
 import warning from "./warning";
-import type * as PIXI from "pixi.js";
 import { getPixiAdapter } from "./configure";
 import {
   createRegisteredInstance,
@@ -12,7 +11,7 @@ import {
 } from "./registry";
 import { setValueForProperty } from "./PixiPropertyOperations";
 
-type Instance = PIXI.DisplayObject;
+type Instance = Record<string, any>;
 type Props = Record<string, any>;
 
 export const CHILDREN = "children";
@@ -27,7 +26,7 @@ export function createInstance(
   rootContainer?: unknown,
   hostContext?: unknown,
   internalHandle?: unknown
-): PIXI.DisplayObject {
+): Instance {
   getPixiAdapter(); // throws the missing-configure error before anything else
   let tag = type;
   let resolved = resolveComponent(type);
@@ -56,7 +55,7 @@ export function createInstance(
     type,
     type
   );
-  return createRegisteredInstance(tag, resolved.behavior, props, applyDisplayObjectProps) as PIXI.DisplayObject;
+  return createRegisteredInstance(tag, resolved.behavior, props, applyDisplayObjectProps) as Instance;
 }
 
 export function setInitialPixiProperties(
@@ -139,7 +138,7 @@ export function diffProperties(
 }
 
 // Used to apply `newProps` to your `DisplayObject`.
-export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(
+export function applyDisplayObjectProps<T extends object, P>(
   type: string,
   instance: T,
   oldProps: P,
