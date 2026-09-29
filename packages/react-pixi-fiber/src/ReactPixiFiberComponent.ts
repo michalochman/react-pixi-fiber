@@ -3,12 +3,10 @@ import invariant from "./invariant";
 import * as PIXI from "pixi.js";
 import { CHILDREN } from "./props";
 import { TYPES } from "./tags";
-import { createInjectedTypeInstance, isInjectedType } from "./inject";
+import { createRegisteredInstance, getBoundBehavior, getUserComponent } from "./registry";
 import { setValueForProperty } from "./PixiPropertyOperations";
-import type { CustomDisplayObject } from "./types";
 
-// A display object the reconciler creates, with the callbacks `inject.ts` may add.
-type Instance = PIXI.DisplayObject & CustomDisplayObject<any, any>;
+type Instance = PIXI.DisplayObject;
 type Props = Record<string, any>;
 
 // PixiJS v4 keeps these classes under extras/mesh/particles, which v5+ does not export. Reading them from a
@@ -90,31 +88,17 @@ export function createInstance(
         instance = new PIXI.TilingSprite(props.texture, props.width, props.height);
       }
       break;
-    default:
-      instance = createInjectedTypeInstance(
-        type,
-        props,
-        rootContainer,
-        hostContext,
-        internalHandle,
-        applyDisplayObjectProps
-      );
+    default: {
+      const behavior = getUserComponent(type);
+      invariant(behavior, "ReactPixiFiber does not support the type: `%s`.", type);
+      instance = createRegisteredInstance(type, behavior, props, applyDisplayObjectProps) as PIXI.DisplayObject;
       break;
+    }
   }
 
   invariant(instance, "ReactPixiFiber does not support the type: `%s`.", type);
 
   return instance;
-}
-
-export function setInitialCustomComponentProperties(
-  type: string,
-  instance: Instance,
-  rawProps: Props,
-  rootContainer?: unknown,
-  hostContext?: unknown
-): void {
-  instance._customApplyProps!(instance, undefined, rawProps);
 }
 
 export function setInitialPixiProperties(
@@ -144,9 +128,10 @@ export function setInitialProperties(
   rootContainer?: unknown,
   hostContext?: unknown
 ): void {
-  // injected types with customApplyProps need to have full control over passed props
-  if (isInjectedType(type) && typeof instance._customApplyProps === "function") {
-    setInitialCustomComponentProperties(type, instance, rawProps, rootContainer, hostContext);
+  // components with their own applyProps need to have full control over passed props
+  const bound = getBoundBehavior(instance);
+  if (bound && bound.applyProps) {
+    bound.applyProps(instance, undefined, rawProps);
     return;
   }
 
@@ -209,17 +194,6 @@ export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(
   }
 }
 
-export function updateCustomComponentProperties(
-  type: string,
-  instance: Instance,
-  updatePayload: unknown[],
-  prevProps?: Props,
-  nextProps?: Props,
-  internalHandle?: unknown
-): void {
-  instance._customApplyProps!(instance, prevProps, nextProps);
-}
-
 export function updatePixiProperties(
   type: string,
   instance: Instance,
@@ -248,11 +222,31 @@ export function updateProperties(
   nextProps?: Props,
   internalHandle?: unknown
 ): void {
-  // injected types with customApplyProps need to have full control over passed props
-  if (isInjectedType(type) && typeof instance._customApplyProps === "function") {
-    updateCustomComponentProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
+  // components with their own applyProps need to have full control over passed props
+  const bound = getBoundBehavior(instance);
+  if (bound && bound.applyProps) {
+    bound.applyProps(instance, prevProps, nextProps);
     return;
   }
 
   updatePixiProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
+}
+
+// Re-applies props to an instance the way the component that created it does: through its own `applyProps`
+// when it has one, otherwise through the display-object prop pipeline for its tag.
+export function applyProps(
+  instance: any,
+  oldProps: Record<string, unknown> | undefined,
+  newProps: Record<string, unknown>
+): void {
+  const bound = getBoundBehavior(instance);
+  invariant(
+    bound,
+    "`applyProps` expects an instance that react-pixi-fiber created. Use `applyDisplayObjectProps(type, instance, oldProps, newProps)` for other display objects."
+  );
+  if (bound.applyProps) {
+    bound.applyProps(instance, oldProps, newProps);
+  } else {
+    applyDisplayObjectProps(bound.tag, instance, oldProps || {}, newProps);
+  }
 }

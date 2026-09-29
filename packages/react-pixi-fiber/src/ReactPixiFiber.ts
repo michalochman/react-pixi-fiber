@@ -4,11 +4,10 @@ import invariant from "./invariant";
 import type * as PIXI from "pixi.js";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
-import type { CustomDisplayObject } from "./types";
+import { getBoundBehavior } from "./registry";
 import { findStrictRoot } from "./utils";
 
-// A display object the reconciler creates, with the callbacks `inject.ts` may add.
-type Instance = PIXI.Container & CustomDisplayObject<any, any>;
+type Instance = PIXI.Container;
 type Props = Record<string, any>;
 
 const emptyObject = Object.freeze({}) as Record<string, never>;
@@ -39,15 +38,13 @@ export function appendChild(parentInstance: PIXI.Container | null | undefined, c
   parentInstance.removeChild(child);
 
   parentInstance.addChild(child);
-  if (typeof child._customDidAttach === "function") {
-    child._customDidAttach(child);
-  }
+  const bound = getBoundBehavior(child);
+  if (bound && bound.afterAdd) bound.afterAdd(child);
 }
 
 export function removeChild(parentInstance: PIXI.Container, child: Instance): void {
-  if (typeof child._customWillDetach === "function") {
-    child._customWillDetach(child);
-  }
+  const bound = getBoundBehavior(child);
+  if (bound && bound.beforeRemove) bound.beforeRemove(child);
 
   parentInstance.removeChild(child);
 
@@ -65,6 +62,8 @@ export function insertBefore(parentInstance: PIXI.Container, child: Instance, be
 
   const index = parentInstance.getChildIndex(beforeChild);
   parentInstance.addChildAt(child, index);
+  const bound = getBoundBehavior(child);
+  if (bound && bound.afterAdd) bound.afterAdd(child);
 }
 
 export function commitUpdate(

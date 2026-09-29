@@ -1,12 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import warning from "../src/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
-import { isInjectedType } from "../src/inject";
-import { shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
+import { customStandardNames, shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
 import { TYPES } from "../src/tags";
 
 vi.mock("../src/warning", () => ({ default: vi.fn() }));
-vi.mock("../src/inject", async importOriginal => ({ ...(await importOriginal()), isInjectedType: vi.fn() }));
 vi.mock("../src/PixiProperty", async importOriginal => ({
   ...(await importOriginal()),
   getPropertyInfo: vi.fn(() => null),
@@ -73,6 +71,28 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       }
     });
 
+    it.skipIf(!__DEV__)("treats names registered with PIXIProperty as known and checks their casing", () => {
+      customStandardNames.Circle = { radius: "radius" };
+      customStandardNames["*"] = { zorder: "zOrder" };
+      try {
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Circle", "radius", 1)).toBe(true);
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Circle", "zOrder", 1)).toBe(true);
+        expect(warning).toHaveBeenCalledTimes(0);
+        ReactPixiFiberUnknownPropertyHook.validateProperty("Circle", "zorder", 1);
+        expect(warning).toHaveBeenCalledWith(
+          false,
+          "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
+          "zorder",
+          "Circle",
+          "zOrder",
+          stack
+        );
+      } finally {
+        delete customStandardNames.Circle;
+        delete customStandardNames["*"];
+      }
+    });
+
     it.skip("should warn about invalid prop casing", () => {});
 
     it.skip("should warn about unknown properties if they are not reserved", () => {});
@@ -85,21 +105,24 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
   });
 
   describe("validateProperties", () => {
-    const type = "type";
-    const props = { position: "0,0" };
-
     afterEach(() => {
-      isInjectedType.mockReset();
       warning.mockReset();
     });
 
-    it("should not call warnUnknownProperties for injected types", () => {
-      const strictRoot = null;
-      isInjectedType.mockImplementation(() => true);
-      ReactPixiFiberUnknownPropertyHook.validateProperties(type, props, strictRoot);
+    it("validates the props of every type", () => {
+      // `alpha` is a known Sprite prop no earlier test in this module warned about. In development
+      // shouldRemoveAttributeWithWarning reports it invalid; in production validateProperty is a no-op, so every
+      // prop counts as invalid. Either way warnUnknownProperties (internal) reports it.
+      shouldRemoveAttributeWithWarning.mockImplementationOnce(() => true);
+      ReactPixiFiberUnknownPropertyHook.validateProperties(TYPES.SPRITE, { alpha: 2 });
 
-      // warnUnknownProperties is internal to the module, it would have warned about `position`
-      expect(warning).toHaveBeenCalledTimes(0);
+      expect(warning).toHaveBeenCalledWith(
+        false,
+        "Invalid value for prop %s on `<%s />`.%s",
+        "`alpha`",
+        TYPES.SPRITE,
+        "stack"
+      );
     });
   });
 

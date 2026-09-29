@@ -257,59 +257,92 @@ export type StageRef = {
 export type StageComponent = React.ForwardRefExoticComponent<StageProps & { ref?: React.Ref<StageRef> }> & StageRef;
 
 /**
- * Custom components
+ * Components registered with `PIXIComponent`
  */
 
+// A display object created by a `PIXIComponent` behavior.
+export type PIXIComponentInstance<T extends PIXI.DisplayObject, P> = T;
+
 // Used create an instance of `PIXI.DisplayObject`.
-// Also used as a `CustomPIXIComponent` `behavior` factory function.
-export type CustomDisplayObjectCreator<T extends PIXI.DisplayObject, P> = (props: P) => CustomDisplayObject<T, P>;
+// Also used as a `PIXIComponent` `behavior` factory function.
+export type DisplayObjectCreator<T extends PIXI.DisplayObject, P> = (props: P) => PIXIComponentInstance<T, P>;
 
-// Props accepted by a `CustomPIXIComponent`: props defined on custom component overwrite props of underlying DisplayObject.
-export type CustomPIXIComponentProps<T extends PIXI.DisplayObject, P> = P & DisplayObjectProps<Omit<T, keyof P>>;
+// Props accepted by a `PIXIComponent`: props defined on the component overwrite props of underlying DisplayObject.
+export type PIXIComponentProps<T extends PIXI.DisplayObject, P> = P & DisplayObjectProps<Omit<T, keyof P>>;
 
-// `this` available inside `customApplyProps`, see `inject.ts`.
+// `this` available inside `applyProps`, see `registry.ts`.
 // `applyDisplayObjectProps` is already bound to `type` and `displayObject`.
-export interface CustomDisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> {
+export interface DisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> {
   applyDisplayObjectProps: (
-    oldProps: Partial<CustomPIXIComponentProps<T, P>> | undefined,
-    newProps: Partial<CustomPIXIComponentProps<T, P>>
+    oldProps: Partial<PIXIComponentProps<T, P>> | undefined,
+    newProps: Partial<PIXIComponentProps<T, P>>
   ) => void;
 }
 
-// Used to apply `newProps` to your `CustomPIXIComponent` in a custom way.
-export type CustomDisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
-  this: CustomDisplayObjectPropSetterContext<T, P>,
+// Used to apply `newProps` to your `PIXIComponent` in a custom way.
+export type DisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = (
+  this: DisplayObjectPropSetterContext<T, P>,
   displayObject: T,
   oldProps: P | undefined,
   newProps: P
 ) => void;
 
-// Used to do something after `displayObject` is attached, which happens after `componentDidMount` lifecycle method.
-export type CustomDisplayObjectAttachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
+// Used to do something after `displayObject` is added to its parent, which happens before `componentDidMount`.
+export type DisplayObjectAttachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
 
-// Used to do something (usually cleanup) before detaching `displayObject`, which happens before `componentWillUnmount` lifecycle method.
-export type CustomDisplayObjectDetachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
+// Used to do something (usually cleanup) before removing `displayObject`, which happens after `componentWillUnmount`.
+export type DisplayObjectDetachHandler<T extends PIXI.DisplayObject> = (displayObject: T) => void;
 
-// Inject API adds `_customApplyProps`, `_customDidAttach`, `_customWillDetach` methods.
-export interface CustomDisplayObject<T extends PIXI.DisplayObject, P> extends PIXI.DisplayObject {
-  // Already bound, see `inject.ts`.
-  _customApplyProps?: OmitThisParameter<CustomDisplayObjectPropSetter<T, P>>;
-  _customDidAttach?: CustomDisplayObjectAttachHandler<T>;
-  _customWillDetach?: CustomDisplayObjectDetachHandler<T>;
+// `PIXIComponent` `behavior` object.
+export interface PIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P> {
+  create: DisplayObjectCreator<T, P>;
+  applyProps?: DisplayObjectPropSetter<T, P>;
+  afterAdd?: DisplayObjectAttachHandler<T>;
+  beforeRemove?: DisplayObjectDetachHandler<T>;
 }
 
-// `CustomPIXIComponent` `behavior` object.
-export interface CustomPIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P> {
-  customDisplayObject: CustomDisplayObjectCreator<T, P>;
-  customApplyProps?: CustomDisplayObjectPropSetter<T, P>;
-  customDidAttach?: CustomDisplayObjectAttachHandler<T>;
-  customWillDetach?: CustomDisplayObjectDetachHandler<T>;
+// The 2.x `behavior` object keys. The registry maps them to the new keys and warns once per key in development.
+export interface LegacyPIXIComponentBehaviorDefinition<T extends PIXI.DisplayObject, P> {
+  /** @deprecated use `create` */
+  customDisplayObject: DisplayObjectCreator<T, P>;
+  /** @deprecated use `applyProps` */
+  customApplyProps?: DisplayObjectPropSetter<T, P>;
+  /** @deprecated use `afterAdd` */
+  customDidAttach?: DisplayObjectAttachHandler<T>;
+  /** @deprecated use `beforeRemove` */
+  customWillDetach?: DisplayObjectDetachHandler<T>;
 }
 
-// `CustomPIXIComponent` has `behavior` defined either as an object or factory function.
-export type CustomPIXIComponentBehavior<T extends PIXI.DisplayObject, P> =
-  | CustomPIXIComponentBehaviorDefinition<T, P>
-  | CustomDisplayObjectCreator<T, P>;
+// `PIXIComponent` has `behavior` defined either as an object or factory function.
+export type PIXIComponentBehavior<T extends PIXI.DisplayObject, P> =
+  | PIXIComponentBehaviorDefinition<T, P>
+  | LegacyPIXIComponentBehaviorDefinition<T, P>
+  | DisplayObjectCreator<T, P>;
+
+/** @deprecated Renamed to `PIXIComponentInstance`, removed in 4.0.0 */
+export type CustomDisplayObject<T extends PIXI.DisplayObject, P> = PIXIComponentInstance<T, P>;
+/** @deprecated Renamed to `DisplayObjectCreator`, removed in 4.0.0 */
+export type CustomDisplayObjectCreator<T extends PIXI.DisplayObject, P> = DisplayObjectCreator<T, P>;
+/** @deprecated Renamed to `PIXIComponentProps`, removed in 4.0.0 */
+export type CustomPIXIComponentProps<T extends PIXI.DisplayObject, P> = PIXIComponentProps<T, P>;
+/** @deprecated Renamed to `DisplayObjectPropSetterContext`, removed in 4.0.0 */
+export type CustomDisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> = DisplayObjectPropSetterContext<
+  T,
+  P
+>;
+/** @deprecated Renamed to `DisplayObjectPropSetter`, removed in 4.0.0 */
+export type CustomDisplayObjectPropSetter<T extends PIXI.DisplayObject, P> = DisplayObjectPropSetter<T, P>;
+/** @deprecated Renamed to `DisplayObjectAttachHandler`, removed in 4.0.0 */
+export type CustomDisplayObjectAttachHandler<T extends PIXI.DisplayObject> = DisplayObjectAttachHandler<T>;
+/** @deprecated Renamed to `DisplayObjectDetachHandler`, removed in 4.0.0 */
+export type CustomDisplayObjectDetachHandler<T extends PIXI.DisplayObject> = DisplayObjectDetachHandler<T>;
+/** @deprecated Renamed to `PIXIComponentBehaviorDefinition` (new keys), removed in 4.0.0 */
+export type CustomPIXIComponentBehaviorDefinition<
+  T extends PIXI.DisplayObject,
+  P,
+> = LegacyPIXIComponentBehaviorDefinition<T, P>;
+/** @deprecated Renamed to `PIXIComponentBehavior`, removed in 4.0.0 */
+export type CustomPIXIComponentBehavior<T extends PIXI.DisplayObject, P> = PIXIComponentBehavior<T, P>;
 
 /**
  * `PIXI.Application` context.

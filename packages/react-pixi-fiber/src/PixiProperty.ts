@@ -1,5 +1,4 @@
 // Based on: https://github.com/facebook/react/blob/9c77ffb444598c32c8f92c8d79e406959a10445b/packages/react-dom/src/shared/DOMProperty.js
-import { isInjectedType } from "./inject";
 import { parsePoint } from "./utils";
 
 // A reserved attribute.
@@ -31,13 +30,7 @@ export const VECTOR = 5;
 export const CALLBACK = 6;
 
 export function shouldIgnoreAttribute(type: string, name: string, propertyInfo: PropertyInfoRecord | null): boolean {
-  if (propertyInfo !== null) {
-    return propertyInfo.type === RESERVED;
-  }
-  if (isInjectedType(type)) {
-    return false;
-  }
-  return false;
+  return propertyInfo !== null && propertyInfo.type === RESERVED;
 }
 
 export function shouldRemoveAttributeWithWarning(
@@ -49,17 +42,12 @@ export function shouldRemoveAttributeWithWarning(
   if (propertyInfo !== null && propertyInfo.type === RESERVED) {
     return false;
   }
+  // An untyped name is never removed for its value type.
   switch (typeof value) {
     case "boolean":
-      if (isInjectedType(type)) {
-        return false;
-      }
-      return propertyInfo === null || !propertyInfo.acceptsBooleans;
+      return propertyInfo !== null && !propertyInfo.acceptsBooleans;
     case "function":
-      if (isInjectedType(type)) {
-        return false;
-      }
-      return propertyInfo === null || propertyInfo.type !== CALLBACK;
+      return propertyInfo !== null && propertyInfo.type !== CALLBACK;
     case "symbol":
       return true;
     default:
@@ -99,16 +87,19 @@ export function getPropertyInfo(name: string): PropertyInfoRecord | null {
   return properties.hasOwnProperty(name) ? properties[name] : null;
 }
 
-export function getCustomPropertyInfo(
-  name: string,
-  type: string
-): PropertyInfoRecord<(value: unknown) => boolean> | null {
-  return customProperties.hasOwnProperty(type) && customProperties[type].hasOwnProperty(name)
-    ? customProperties[type][name]
-    : null;
+// Checks the properties registered on `type`, then the ones registered on all types (`"*"`).
+export function getCustomPropertyInfo(name: string, type: string): PropertyInfoRecord<Validator> | null {
+  return getOwn(getOwn(customProperties, type), name) ?? getOwn(getOwn(customProperties, "*"), name) ?? null;
 }
 
-// `type` is one of the constants above, or the validator of a custom property (see `CustomPIXIProperty`).
+// Own keys only, so a prop named like an `Object.prototype` member (`constructor`) is not found.
+export function getOwn<T>(record: Record<string, T> | undefined, key: string): T | undefined {
+  return record !== undefined && Object.prototype.hasOwnProperty.call(record, key) ? record[key] : undefined;
+}
+
+type Validator = (value: unknown) => boolean;
+
+// `type` is one of the constants above, or the validator of a custom property (see `PIXIProperty`).
 export interface PropertyInfoRecord<T = number> {
   acceptsBooleans: boolean;
   propertyName: string;
@@ -126,7 +117,10 @@ export function PropertyInfoRecord(this: PropertyInfoRecord<unknown>, name: stri
 // the `possibleStandardNames` module to ensure casing and incorrect
 // name warnings.
 const properties: Record<string, PropertyInfoRecord> = {};
-export const customProperties: Record<string, Record<string, PropertyInfoRecord<(value: unknown) => boolean>>> = {};
+// Registered by `PIXIProperty`, keyed by tag or `"*"` for all tags.
+export const customProperties: Record<string, Record<string, PropertyInfoRecord<Validator>>> = {};
+// Lowercase name to registered name, keyed like `customProperties`, for the casing warning.
+export const customStandardNames: Record<string, Record<string, string>> = {};
 
 // These props are reserved by React. They shouldn't be written to the DOM.
 ["children", "parent"].forEach(name => {

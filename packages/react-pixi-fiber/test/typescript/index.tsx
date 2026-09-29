@@ -12,6 +12,10 @@ import {
   TilingSprite,
   CustomPIXIComponent,
   CustomPIXIProperty,
+  PIXIComponent,
+  PIXIProperty,
+  applyProps,
+  getInstanceTag,
   createStageClass,
 } from "react-pixi-fiber";
 
@@ -28,24 +32,23 @@ const CompositionExample: React.FC = () => (
 type AnimatedSpriteProps = {
   textures: PIXI.AnimatedSprite["textures"];
 };
-const AnimatedSprite = CustomPIXIComponent<PIXI.AnimatedSprite, AnimatedSpriteProps>(
-  {
-    customDisplayObject: props => new PIXI.AnimatedSprite(props.textures),
-    customApplyProps: (instance, oldProps, newProps) => {
-      console.log(instance.animationSpeed);
-      console.log(instance.textures);
-      console.log(oldProps?.textures);
-      console.log(newProps.textures);
-    },
-    customDidAttach: instance => {
-      console.log(instance.textures);
-    },
-    customWillDetach: instance => {
-      console.log(instance.textures);
-    },
+const AnimatedSprite = PIXIComponent<PIXI.AnimatedSprite, AnimatedSpriteProps>("AnimatedSprite", {
+  create: props => new PIXI.AnimatedSprite(props.textures),
+  applyProps: (instance, oldProps, newProps) => {
+    console.log(instance.animationSpeed);
+    console.log(instance.textures);
+    console.log(oldProps?.textures);
+    console.log(newProps.textures);
   },
-  "AnimatedSprite"
-);
+  afterAdd: instance => {
+    console.log(instance.textures);
+  },
+  beforeRemove: instance => {
+    console.log(instance.textures);
+  },
+});
+
+// The deprecated 2.x argument order and behavior keys still typecheck.
 
 interface WickedContainerProps {
   isJungleMassive?: boolean;
@@ -94,33 +97,42 @@ type CircleProps = {
   radius: number;
 };
 // `function` form of `customApplyProps` gets bound `this.applyDisplayObjectProps`.
-const Circle = CustomPIXIComponent<PIXI.Graphics, CircleProps>(
-  {
-    customDisplayObject: () => new PIXI.Graphics(),
-    customApplyProps: function (instance, oldProps, newProps) {
-      const { fill, radius, ...newPropsRest } = newProps;
-      const { fill: oldFill, radius: oldRadius, ...oldPropsRest }: Partial<CircleProps> = oldProps ?? {};
-      if (oldFill !== fill || oldRadius !== radius) {
-        instance.clear();
-        instance.beginFill(fill);
-        instance.drawCircle(0, 0, radius);
-        instance.endFill();
-      }
-      this.applyDisplayObjectProps(oldPropsRest, newPropsRest);
-    },
+const Circle = PIXIComponent<PIXI.Graphics, CircleProps>("Circle", {
+  create: () => new PIXI.Graphics(),
+  applyProps: function (instance, oldProps, newProps) {
+    const { fill, radius, ...newPropsRest } = newProps;
+    const { fill: oldFill, radius: oldRadius, ...oldPropsRest }: Partial<CircleProps> = oldProps ?? {};
+    if (oldFill !== fill || oldRadius !== radius) {
+      instance.clear();
+      instance.beginFill(fill);
+      instance.drawCircle(0, 0, radius);
+      instance.endFill();
+    }
+    this.applyDisplayObjectProps(oldPropsRest, newPropsRest);
   },
-  "Circle"
-);
+});
+
+// A bare function is the `create` of a behavior.
+const PlainGraphics = PIXIComponent("PlainGraphics", () => new PIXI.Graphics());
 
 // Custom properties can be registered on one, many or all component types.
-CustomPIXIProperty(Sprite, "id", value => typeof value === "number");
-CustomPIXIProperty([Container, "Sprite"], "parentGroup");
-CustomPIXIProperty(undefined, "zOrder");
+PIXIProperty(Sprite, "id", value => typeof value === "number");
+PIXIProperty([Container, "Sprite"], "parentGroup");
+PIXIProperty(undefined, "zOrder");
+CustomPIXIProperty(null, "legacyZOrder");
+
+// Re-apply props the way the component that created the instance does.
+const reapply = (instance: PIXI.DisplayObject): string | undefined => {
+  applyProps(instance, {}, { alpha: 1 });
+  return getInstanceTag(instance);
+};
+console.log(reapply);
 
 const CustomPIXIComponentExample: React.FC = () => (
   <>
     <AnimatedSprite textures={[]} />
     <Circle fill={0xffff00} radius={10} position="10,10" />
+    <PlainGraphics x={1} />
   </>
 );
 

@@ -27,6 +27,8 @@ exports[`ReactPixiFiber public API > should match snapshot 1`] = `
   "CustomPIXIProperty": [Function],
   "Graphics": "Graphics",
   "NineSlicePlane": "NineSlicePlane",
+  "PIXIComponent": [Function],
+  "PIXIProperty": [Function],
   "ParticleContainer": "ParticleContainer",
   "Sprite": "Sprite",
   "Stage": {
@@ -36,7 +38,9 @@ exports[`ReactPixiFiber public API > should match snapshot 1`] = `
   "Text": "Text",
   "TilingSprite": "TilingSprite",
   "applyDisplayObjectProps": [Function],
+  "applyProps": [Function],
   "createStageClass": [Function],
+  "getInstanceTag": [Function],
   "render": [Function],
   "unmount": [Function],
   "usePixiApp": [Function],

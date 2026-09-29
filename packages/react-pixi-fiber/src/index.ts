@@ -1,13 +1,14 @@
 import type * as PIXI from "pixi.js";
 import type * as React from "react";
-import CustomPIXIComponent, { CustomPIXIProperty } from "./CustomPIXIComponent";
+import { CustomPIXIComponent, CustomPIXIProperty, PIXIComponent, PIXIProperty } from "./PIXIComponent";
+import { getInstanceTag } from "./registry";
 import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage, { createStageClass } from "./Stage";
 import { TYPES } from "./tags";
 import { usePixiApp, usePixiTicker } from "./hooks";
 import { createRender, createUnmount } from "./render";
 import { ReactPixiFiberAsPrimaryRenderer } from "./ReactPixiFiber";
-import { applyDisplayObjectProps } from "./ReactPixiFiberComponent";
+import { applyDisplayObjectProps, applyProps } from "./ReactPixiFiberComponent";
 import type {
   BitmapTextProps,
   ContainerProps,
@@ -43,9 +44,13 @@ export {
   AppProvider,
   CustomPIXIComponent,
   CustomPIXIProperty,
+  PIXIComponent,
+  PIXIProperty,
   Stage,
   applyDisplayObjectProps,
+  applyProps,
   createStageClass,
+  getInstanceTag,
   render,
   unmount,
   withApp,

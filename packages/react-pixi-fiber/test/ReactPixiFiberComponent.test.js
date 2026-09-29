@@ -1,19 +1,11 @@
-import { describe, it, expect, vi, afterAll, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
-import { createInjectedTypeInstance, isInjectedType } from "../src/inject";
+import { createRegisteredInstance, normalizeBehavior, registerComponent } from "../src/registry";
 import { setValueForProperty } from "../src/PixiPropertyOperations";
 import { TYPES } from "../src/tags";
 
-vi.mock("../src/inject", async importOriginal => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    createInjectedTypeInstance: vi.fn(actual.createInjectedTypeInstance),
-    isInjectedType: vi.fn(actual.isInjectedType),
-  };
-});
 vi.mock("../src/PixiPropertyOperations", async importOriginal => ({
   ...(await importOriginal()),
   setValueForProperty: vi.fn(),
@@ -138,10 +130,13 @@ describe("ReactPixiFiber", () => {
       expect(PIXI.extras.TilingSprite).toHaveBeenCalledWith(texture, width, height);
     });
 
-    it("returns injected instance if type was injected", () => {
+    it("returns the registered instance if type was registered", () => {
       const instance = {};
-      createInjectedTypeInstance.mockImplementationOnce(() => instance);
-      expect(() => ReactPixiFiberComponent.createInstance("INJECTED_TYPE", {})).not.toThrow();
+      const create = vi.fn(() => instance);
+      registerComponent("REGISTERED_TYPE", create);
+      const props = { prop: "value" };
+      expect(ReactPixiFiberComponent.createInstance("REGISTERED_TYPE", props)).toBe(instance);
+      expect(create).toHaveBeenCalledWith(props);
     });
 
     it("throws if type is not supported", () => {
@@ -158,26 +153,30 @@ describe("ReactPixiFiber", () => {
     const rootContainer = {};
     const hostContext = {};
 
-    // setInitialCustomComponentProperties and setInitialPixiProperties are internal to the module, so the tests
-    // observe what they do: call instance._customApplyProps or setValueForProperty for each prop
-    afterAll(() => {
-      isInjectedType.mockReset();
-    });
-
-    it("calls setInitialCustomComponentProperties for injected types with _customApplyProps defined", () => {
-      const instance = {
-        _customApplyProps: vi.fn(),
-      };
-      isInjectedType.mockImplementation(() => true);
+    // setInitialPixiProperties is internal to the module, so the tests observe what it does: call the bound
+    // applyProps of a registered instance, or setValueForProperty for each prop
+    it("calls the bound applyProps for registered instances with applyProps defined", () => {
+      const applyProps = vi.fn();
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, { create: () => ({}), applyProps }),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setValueForProperty).toHaveBeenCalledTimes(0);
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
+      expect(applyProps).toHaveBeenCalledTimes(1);
+      expect(applyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
     });
 
-    it("calls setInitialPixiProperties for injected types without _customApplyProps defined", () => {
-      isInjectedType.mockImplementation(() => true);
+    it("calls setInitialPixiProperties for registered instances without applyProps defined", () => {
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, () => ({})),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setValueForProperty).toHaveBeenCalledTimes(1);
@@ -185,27 +184,10 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls setInitialPixiProperties for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setValueForProperty).toHaveBeenCalledTimes(1);
       expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", rawProps.position);
-    });
-  });
-
-  describe("setInitialCustomComponentProperties", () => {
-    const instance = {
-      _customApplyProps: vi.fn(),
-    };
-    const type = "type";
-    const rawProps = { position: "0,0" };
-    const rootContainerElement = {};
-
-    it("calls _customApplyProps on instance", () => {
-      ReactPixiFiberComponent.setInitialCustomComponentProperties(type, instance, rawProps, rootContainerElement);
-
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
     });
   });
 
@@ -267,17 +249,16 @@ describe("ReactPixiFiber", () => {
     const updatePayload = ["position", "1,1"];
     const internalInstanceHandle = {};
 
-    // updateCustomComponentProperties and updatePixiProperties are internal to the module, so the tests observe
-    // what they do: call instance._customApplyProps or setValueForProperty for each prop
-    afterAll(() => {
-      isInjectedType.mockReset();
-    });
-
-    it("calls updateCustomComponentProperties for injected types with _customApplyProps defined", () => {
-      const instance = {
-        _customApplyProps: vi.fn(),
-      };
-      isInjectedType.mockImplementation(() => true);
+    // updatePixiProperties is internal to the module, so the tests observe what it does: call the bound
+    // applyProps of a registered instance, or setValueForProperty for each prop
+    it("calls the bound applyProps for registered instances with applyProps defined", () => {
+      const applyProps = vi.fn();
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, { create: () => ({}), applyProps }),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.updateProperties(
         type,
         instance,
@@ -288,12 +269,17 @@ describe("ReactPixiFiber", () => {
       );
 
       expect(setValueForProperty).toHaveBeenCalledTimes(0);
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
+      expect(applyProps).toHaveBeenCalledTimes(1);
+      expect(applyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
     });
 
-    it("calls updatePixiProperties for injected types without _customApplyProps defined", () => {
-      isInjectedType.mockImplementation(() => true);
+    it("calls updatePixiProperties for registered instances without applyProps defined", () => {
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, () => ({})),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.updateProperties(
         type,
         instance,
@@ -314,7 +300,6 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls updatePixiProperties for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
       ReactPixiFiberComponent.updateProperties(
         type,
         instance,
@@ -335,28 +320,18 @@ describe("ReactPixiFiber", () => {
     });
   });
 
-  describe("updateCustomComponentProperties", () => {
-    const instance = {
-      _customApplyProps: vi.fn(),
-    };
-    const type = "type";
-    const lastRawProps = { position: "0,0" };
-    const nextRawProps = { position: "1,1" };
-    const updatePayload = ["position", "1,1"];
-    const internalInstanceHandle = {};
-
-    it("calls _customApplyProps on instance", () => {
-      ReactPixiFiberComponent.updateCustomComponentProperties(
-        type,
-        instance,
-        updatePayload,
-        lastRawProps,
-        nextRawProps,
-        internalInstanceHandle
-      );
-
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
+  describe("applyProps", () => {
+    it("applyProps delegates to the component's applyProps or to the display-object pipeline", () => {
+      const custom = vi.fn();
+      registerComponent("WithApply", { create: () => ({ kind: "custom" }), applyProps: custom });
+      registerComponent("Plain", () => ({ kind: "plain" }));
+      const a = ReactPixiFiberComponent.createInstance("WithApply", {});
+      ReactPixiFiberComponent.applyProps(a, { x: 1 }, { x: 2 });
+      expect(custom).toHaveBeenCalledWith(a, { x: 1 }, { x: 2 });
+      const b = ReactPixiFiberComponent.createInstance("Plain", {});
+      ReactPixiFiberComponent.applyProps(b, undefined, { x: 3 });
+      expect(setValueForProperty).toHaveBeenCalledWith("Plain", b, "x", 3, undefined);
+      expect(() => ReactPixiFiberComponent.applyProps({}, {}, {})).toThrow("react-pixi-fiber created");
     });
   });
 

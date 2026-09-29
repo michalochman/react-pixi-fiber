@@ -5,6 +5,7 @@ import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
 import { diffProperties, setInitialProperties, updateProperties } from "../src/ReactPixiFiberComponent";
 import { validateProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
+import { createRegisteredInstance, normalizeBehavior } from "../src/registry";
 import { createRender } from "../src/render";
 import { TYPES } from "../src/tags";
 import { findStrictRoot } from "../src/utils";
@@ -75,14 +76,18 @@ describe("ReactPixiFiber", () => {
       expect(parent.addChild).toHaveBeenCalledWith(child);
     });
 
-    it("delegates custom attach to child if _customDidAttach is defined", () => {
-      const child = {
-        _customDidAttach: vi.fn(),
-      };
+    it("calls afterAdd of a registered child", () => {
+      const afterAdd = vi.fn();
+      const child = createRegisteredInstance(
+        "T",
+        normalizeBehavior("T", { create: () => ({}), afterAdd }),
+        {},
+        () => {}
+      );
       ReactPixiFiber.appendChild(parent, child);
 
-      expect(child._customDidAttach).toHaveBeenCalledTimes(1);
-      expect(child._customDidAttach).toHaveBeenCalledWith(child);
+      expect(afterAdd).toHaveBeenCalledTimes(1);
+      expect(afterAdd).toHaveBeenCalledWith(child);
     });
   });
 
@@ -113,15 +118,19 @@ describe("ReactPixiFiber", () => {
       expect(child.destroy).toHaveBeenCalledWith({ children: true });
     });
 
-    it("delegates custom detach to child if _customWillDetach is defined", () => {
-      const child = {
-        _customWillDetach: vi.fn(),
-        destroy: vi.fn(),
-      };
+    it("calls beforeRemove of a registered child before removing it", () => {
+      const beforeRemove = vi.fn(() => expect(parent.removeChild).not.toHaveBeenCalled());
+      const child = createRegisteredInstance(
+        "T",
+        normalizeBehavior("T", { create: () => ({ destroy: vi.fn() }), beforeRemove }),
+        {},
+        () => {}
+      );
       ReactPixiFiber.removeChild(parent, child);
 
-      expect(child._customWillDetach).toHaveBeenCalledTimes(1);
-      expect(child._customWillDetach).toHaveBeenCalledWith(child);
+      expect(beforeRemove).toHaveBeenCalledTimes(1);
+      expect(beforeRemove).toHaveBeenCalledWith(child);
+      expect(parent.removeChild).toHaveBeenCalledWith(child);
     });
   });
 
@@ -164,6 +173,22 @@ describe("ReactPixiFiber", () => {
       expect(parent.removeChild).not.toHaveBeenCalled();
       expect(parent.addChildAt).toHaveBeenCalledTimes(1);
       expect(parent.addChildAt).toHaveBeenCalledWith(child1, child2.idx);
+    });
+
+    // pixi.js is mocked in this file, so the parent is a plain object like in the tests above.
+    it("calls afterAdd after inserting a registered instance", () => {
+      const afterAdd = vi.fn();
+      const behavior = normalizeBehavior("T", { create: () => ({ idx: 5 }), afterAdd });
+      const child = createRegisteredInstance("T", behavior, {}, () => {});
+      const parent = {
+        addChildAt: vi.fn(),
+        removeChild: vi.fn(),
+        children: [child1],
+        getChildIndex: vi.fn(child => child.idx),
+      };
+      ReactPixiFiber.insertBefore(parent, child, child1);
+      expect(afterAdd).toHaveBeenCalledWith(child);
+      expect(parent.addChildAt).toHaveBeenCalledWith(child, 0);
     });
 
     it("throws if child and beforeChild is the same instance", () => {

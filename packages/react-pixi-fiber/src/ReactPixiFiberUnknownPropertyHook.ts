@@ -1,8 +1,14 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/ReactDOMUnknownPropertyHook.js
 import warning from "./warning";
-import { RESERVED, getPropertyInfo, getCustomPropertyInfo, shouldRemoveAttributeWithWarning } from "./PixiProperty";
+import {
+  RESERVED,
+  customStandardNames,
+  getOwn,
+  getPropertyInfo,
+  getCustomPropertyInfo,
+  shouldRemoveAttributeWithWarning,
+} from "./PixiProperty";
 import { getStackAddendum } from "./ReactGlobalSharedState";
-import { isInjectedType } from "./inject";
 import possibleStandardNames from "./possibleStandardNames";
 
 const emptyFunction = () => {};
@@ -52,11 +58,12 @@ if (__DEV__) {
     const isReserved = propertyInfo !== null && propertyInfo.type === RESERVED;
 
     // Known attributes should match the casing specified in the property config.
-    if (
-      typeof possibleStandardNames[type] !== "undefined" &&
-      possibleStandardNames[type].hasOwnProperty(lowerCasedName)
-    ) {
-      const standardName = possibleStandardNames[type][lowerCasedName];
+    // A name is known to the tag's standard names, or was registered by `PIXIProperty` on the tag or on all tags.
+    const standardName =
+      getOwn(possibleStandardNames[type], lowerCasedName) ??
+      getOwn(customStandardNames[type], lowerCasedName) ??
+      getOwn(customStandardNames["*"], lowerCasedName);
+    if (standardName !== undefined) {
       if (standardName !== name) {
         warning(
           false,
@@ -124,8 +131,5 @@ export const warnUnknownProperties = function (type: string, props: Record<strin
 };
 
 export function validateProperties(type: string, props: Record<string, unknown>): void {
-  if (isInjectedType(type)) {
-    return;
-  }
   warnUnknownProperties(type, props);
 }
