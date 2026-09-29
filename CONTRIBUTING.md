@@ -45,6 +45,7 @@ The core team is monitoring for pull requests. We will review your pull request 
 3. If you've fixed a bug or added code that should be tested, add tests!
 4. Ensure the test suite passes (`pnpm test`), the types check (`pnpm check-types`) and, if you changed `package.json` or the build, the package check (`pnpm check-package`).
 5. Format your code (`pnpm format`) and make sure it lints (`pnpm lint`).
+6. Write your commit messages as [Conventional Commits](#commit-messages).
 
 Every pull request gets a preview of the examples on Cloudflare Pages; the URL is posted as a comment on the pull request.
 
@@ -53,6 +54,30 @@ Every pull request gets a preview of the examples on Cloudflare Pages; the URL i
 We use [Biome](https://biomejs.dev) to format and lint the code. Run `pnpm format` after making any changes to the code, and `pnpm lint` to check it.
 
 However, there are still some styles that the linter cannot pick up. If you are unsure about something, looking at [Airbnb's Style Guide](https://github.com/airbnb/javascript) will guide you in the right direction.
+
+
+## Commit Messages
+
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). The reasons are in [ADR 0006](./docs/adr/0006-use-conventional-commits.md).
+
+```
+type(scope): description
+```
+
+- **type** is one of `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`, or `chore`.
+- **scope** is the directory name of the package or app that the commit changes, for example `pixi-8`, `react-18`, or `examples`. The core package `react-pixi-fiber` uses the scope `core`. Leave out the scope when the commit changes the whole repository, or more than one package for one reason.
+- **description** is an imperative sentence that starts with a lowercase letter and has no period at the end.
+- Add `!` after the type or the scope, or a `BREAKING CHANGE:` footer, for a breaking change.
+
+A `feat` or `fix` commit that changes a published package also adds a changeset for that package, in the same commit or in the same pull request.
+
+```
+feat(pixi-8): support ParticleContainer and Particle
+fix(core): restore the recorded default when a prop is removed
+ci: run the package check on every change
+```
+
+The review of a pull request checks its commit messages.
 
 
 ## License
