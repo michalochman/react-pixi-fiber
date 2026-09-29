@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@types/react-router>@types/react': ^18.3.0
+
 importers:
 
   .:

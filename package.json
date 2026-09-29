@@ -34,5 +34,10 @@
     "typescript": "^7.0.2",
     "vitest": "4.1.10",
     "vitest-webgl-canvas-mock": "1.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react-router>@types/react": "^18.3.0"
+    }
   }
 }
