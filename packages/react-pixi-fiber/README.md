@@ -503,7 +503,7 @@ Note: this replaces the default method of transferring `props` to the specified 
 
 #### `afterAdd(displayObject)` (optional)
 
-Use this to do something after `displayObject` is added to its parent.
+Use this to do something after `displayObject` is added to its parent. It runs once per add: when React reorders a child within the same parent, neither `afterAdd` nor `beforeRemove` runs, so listeners added here and removed in `beforeRemove` are never doubled.
 
 #### `beforeRemove(displayObject)` (optional)
 

@@ -57,6 +57,50 @@ describe("hostOps", () => {
     });
   });
 
+  describe("afterAdd on a move", () => {
+    const create = () => {
+      const afterAdd = vi.fn();
+      const beforeRemove = vi.fn();
+      const behavior = normalizeBehavior("T", { create: () => new PIXI.Container(), afterAdd, beforeRemove });
+      return { afterAdd, beforeRemove, child: createRegisteredInstance("T", behavior, {}, () => {}) };
+    };
+
+    it("appendChild of a child already in the parent moves it without afterAdd or beforeRemove", () => {
+      const parent = new PIXI.Container();
+      const a = create();
+      const b = create();
+      hostOps.appendChild(parent, a.child);
+      hostOps.appendChild(parent, b.child);
+      hostOps.appendChild(parent, a.child);
+      expect(parent.children).toEqual([b.child, a.child]);
+      expect(a.afterAdd).toHaveBeenCalledTimes(1);
+      expect(a.beforeRemove).not.toHaveBeenCalled();
+    });
+
+    it("insertBefore of a child already in the parent moves it without afterAdd or beforeRemove", () => {
+      const parent = new PIXI.Container();
+      const a = create();
+      const b = create();
+      hostOps.appendChild(parent, a.child);
+      hostOps.insertBefore(parent, b.child, a.child);
+      expect(b.afterAdd).toHaveBeenCalledTimes(1);
+      hostOps.insertBefore(parent, a.child, b.child);
+      expect(parent.children).toEqual([a.child, b.child]);
+      expect(a.afterAdd).toHaveBeenCalledTimes(1);
+      expect(a.beforeRemove).not.toHaveBeenCalled();
+    });
+
+    it("calls afterAdd when the child comes from another parent", () => {
+      const first = new PIXI.Container();
+      const second = new PIXI.Container();
+      const a = create();
+      hostOps.appendChild(first, a.child);
+      hostOps.appendChild(second, a.child);
+      expect(second.children).toEqual([a.child]);
+      expect(a.afterAdd).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe("removeChild", () => {
     const parent = {
       removeChild: vi.fn(),
@@ -226,6 +270,32 @@ describe("hostOps", () => {
         ["afterAdd", child],
       ]);
       expectNoDisplayObjectCalls(parent);
+    });
+
+    it("a child the parent ops already hold is moved, not added, by appendChild and insertBefore", () => {
+      const parent = createParent();
+      const child = createChild();
+      const other = createChild();
+      hostOps.appendChild(parent, child);
+      hostOps.appendChild(parent, other);
+      hostOps.appendChild(parent, child);
+      hostOps.insertBefore(parent, child, other);
+      expect(calls.filter(([name]) => name === "afterAdd")).toEqual([
+        ["afterAdd", child],
+        ["afterAdd", other],
+      ]);
+    });
+
+    it("a child removed through the parent ops is added again", () => {
+      const parent = createParent();
+      const child = createChild();
+      hostOps.appendChild(parent, child);
+      hostOps.removeChild(parent, child);
+      hostOps.appendChild(parent, child);
+      expect(calls.filter(([name]) => name === "afterAdd")).toEqual([
+        ["afterAdd", child],
+        ["afterAdd", child],
+      ]);
     });
 
     it("removeChild calls beforeRemove, then the op, and skips destroy on a child without one", () => {

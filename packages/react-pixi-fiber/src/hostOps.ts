@@ -12,19 +12,27 @@ import { findStrictRoot } from "./utils";
 import invariant from "./invariant";
 import type { HostOps, PixiFragmentInstance } from "./types";
 
+// The parent that holds a child through its own ops, for children that have no `parent` of their own.
+const heldBy = new WeakMap<object, object>();
+
 // A parent's behavior may own its child operations; otherwise the display-object methods are used.
+// `afterAdd` runs only when the child joins the parent. A reorder within the same parent is a move, not an add,
+// and calls neither `afterAdd` nor `beforeRemove`.
 export function appendChild(parentInstance: any, child: any): void {
   if (parentInstance == null) return;
 
+  const isMove = child.parent === parentInstance || heldBy.get(child) === parentInstance;
   const ops = getBoundBehavior(parentInstance);
   if (ops && ops.appendChild) {
     ops.appendChild(parentInstance, child);
+    heldBy.set(child, parentInstance);
   } else {
     // TODO do we need to remove the child first if it's already added?
     parentInstance.removeChild(child);
 
     parentInstance.addChild(child);
   }
+  if (isMove) return;
   const bound = getBoundBehavior(child);
   if (bound && bound.afterAdd) bound.afterAdd(child);
 }
@@ -36,6 +44,7 @@ export function removeChild(parentInstance: any, child: any): void {
   const ops = getBoundBehavior(parentInstance);
   if (ops && ops.removeChild) {
     ops.removeChild(parentInstance, child);
+    heldBy.delete(child);
   } else {
     parentInstance.removeChild(child);
   }
@@ -47,9 +56,11 @@ export function removeChild(parentInstance: any, child: any): void {
 export function insertBefore(parentInstance: any, child: any, beforeChild: any): void {
   invariant(child !== beforeChild, "ReactPixiFiber cannot insert node before itself");
 
+  const isMove = child.parent === parentInstance || heldBy.get(child) === parentInstance;
   const ops = getBoundBehavior(parentInstance);
   if (ops && ops.insertBefore) {
     ops.insertBefore(parentInstance, child, beforeChild);
+    heldBy.set(child, parentInstance);
   } else {
     const childExists = parentInstance.children.indexOf(child) !== -1;
 
@@ -60,6 +71,7 @@ export function insertBefore(parentInstance: any, child: any, beforeChild: any):
     const index = parentInstance.getChildIndex(beforeChild);
     parentInstance.addChildAt(child, index);
   }
+  if (isMove) return;
   const bound = getBoundBehavior(child);
   if (bound && bound.afterAdd) bound.afterAdd(child);
 }
