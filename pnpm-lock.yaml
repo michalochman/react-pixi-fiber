@@ -14,12 +14,39 @@ importers:
       '@biomejs/biome':
         specifier: 2.5.14
         version: 2.5.14
+      '@vitest/coverage-v8':
+        specifier: 4.1.10
+        version: 4.1.10(vitest@4.1.10)
+      canvas:
+        specifier: ^3.2.3
+        version: 3.2.3
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
+      jsdom:
+        specifier: 28.1.0
+        version: 28.1.0(canvas@3.2.3)
       publint:
         specifier: ^0.3.24
         version: 0.3.24
+      rolldown:
+        specifier: 1.1.5
+        version: 1.1.5
+      tsdown:
+        specifier: 0.22.8
+        version: 0.22.8(@arethetypeswrong/core@0.18.5)(publint@0.3.24)(typescript@7.0.2)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.6.3)(@vitest/coverage-v8@4.1.10)(jsdom@28.1.0(canvas@3.2.3))(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(terser@5.51.2))
+      vitest-webgl-canvas-mock:
+        specifier: 1.1.0
+        version: 1.1.0
 
   apps/examples:
     dependencies:
@@ -82,18 +109,6 @@ importers:
       '@types/react':
         specifier: ^18.2.8
         version: 18.3.31
-      '@vitest/coverage-v8':
-        specifier: 4.1.10
-        version: 4.1.10(vitest@4.1.10)
-      canvas:
-        specifier: ^3.2.3
-        version: 3.2.3
-      cross-env:
-        specifier: ^7.0.3
-        version: 7.0.3
-      jsdom:
-        specifier: 28.1.0
-        version: 28.1.0(canvas@3.2.3)
       pixi.js:
         specifier: ^6.0.2
         version: 6.5.10
@@ -106,21 +121,6 @@ importers:
       react-test-renderer:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
-      rolldown:
-        specifier: 1.1.5
-        version: 1.1.5
-      tsdown:
-        specifier: 0.22.8
-        version: 0.22.8(@arethetypeswrong/core@0.18.5)(publint@0.3.24)(typescript@7.0.2)
-      typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-      vitest:
-        specifier: 4.1.10
-        version: 4.1.10(@types/node@26.6.3)(@vitest/coverage-v8@4.1.10)(jsdom@28.1.0(canvas@3.2.3))(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(terser@5.51.2))
-      vitest-webgl-canvas-mock:
-        specifier: 1.1.0
-        version: 1.1.0
 
 packages:
 
