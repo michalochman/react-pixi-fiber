@@ -32,9 +32,6 @@ importers:
       pixi.js:
         specifier: ^6.0.4
         version: 6.5.10
-      prop-types:
-        specifier: ^15.7.2
-        version: 15.8.1
       react:
         specifier: ^18.2.0
         version: 18.3.1

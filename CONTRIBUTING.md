@@ -19,7 +19,7 @@ React Pixi Fiber follows [semantic versioning](http://semver.org/). We release p
 
 ## Changelog
 
-Every significant change is documented in the [changelog file](https://github.com/michalochman/react-pixi-fiber/blob/master/CHANGELOG.md).
+Every significant change is documented in the [changelog file](https://github.com/michalochman/react-pixi-fiber/blob/master/packages/react-pixi-fiber/CHANGELOG.md).
 
 
 ## Bugs

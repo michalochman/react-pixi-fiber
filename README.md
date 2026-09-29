@@ -38,7 +38,7 @@ Rebuild the library after changing its source before running or typechecking the
 
 ## Contributing
 
-See the [Contributing Guide](./CONTRIBUTING.md), the [Code of Conduct](./CODE_OF_CONDUCT.md) and the [changelog](./CHANGELOG.md).
+See the [Contributing Guide](./CONTRIBUTING.md), the [Code of Conduct](./CODE_OF_CONDUCT.md) and the [changelog](./packages/react-pixi-fiber/CHANGELOG.md).
 
 ## License
 

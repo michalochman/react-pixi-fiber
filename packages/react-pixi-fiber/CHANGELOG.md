@@ -8,15 +8,47 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `PIXIComponent(type, behavior)` and `PIXIProperty` replace `CustomPIXIComponent(behavior, type)` and `CustomPIXIProperty`. Behavior keys are `create`, `applyProps`, `afterAdd`, `beforeRemove`
+- Tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope` and `NineSliceSprite`
+- `Stage` `onInit(app)` prop, called once the PixiJS application exists and the children are rendered
+
 ### Changed
-- Build output moved from `cjs/`, `es/` and `umd/` to `dist/cjs/`, `dist/es/` and `dist/umd/`. Imports of `react-pixi-fiber` and `react-pixi-fiber/react-pixi-alias` are unaffected; direct paths to the built files (e.g. `react-pixi-fiber/umd/react-pixi-fiber.production.min.js` on a CDN) need the `dist/` prefix
+- Build output moved from `cjs/` and `es/` to `dist/cjs/` and `dist/es/`. Imports of `react-pixi-fiber` are unaffected; direct paths to the built files need the `dist/` prefix
 - Examples are built with Vite instead of Create React App
-- `package.json` has an `exports` map. Bundlers that understand it (webpack 5, Vite) get the ES build directly, the development or production file picked by the `development` condition; Node and `require` still get the CommonJS entry points. Only `react-pixi-fiber`, `react-pixi-fiber/react-pixi-alias` and `react-pixi-fiber/package.json` can be imported, deep imports into `dist/` or `src/` no longer resolve
+- `package.json` has an `exports` map. Bundlers that understand it (webpack 5, Vite) get the ES build directly, the development or production file picked by the `development` condition; Node and `require` still get the CommonJS entry points. Only `react-pixi-fiber` and `react-pixi-fiber/package.json` can be imported, deep imports into `dist/` or `src/` no longer resolve
 - The `module` and `jsnext:main` fields and `index.es.js` are removed. `index.es.js` was a CommonJS wrapper around the ES build; bundlers that ignore `exports` now use `main`
-- `index.d.ts` is a regular module instead of a `declare module "react-pixi-fiber"` block, and `index.d.mts` covers the ES build. The exported types are unchanged; `tsconfig.json` `paths` pointing `react-pixi-fiber` at `index.d.ts` are no longer needed
+- The type declarations are regular modules for the CommonJS and the ES build instead of a `declare module "react-pixi-fiber"` block. `tsconfig.json` `paths` pointing `react-pixi-fiber` at `index.d.ts` are no longer needed
 - Code is formatted and linted with Biome instead of Prettier and ESLint
 - The library is built with [tsdown](https://tsdown.dev) instead of Rollup 2 and Babel. The output files, exports and bundled dependencies are the same; the code targets ES2018 instead of ES5 and is minified with Oxc instead of terser, which makes the development builds about 20% and the production builds about 3% smaller
 - The library tests run with [Vitest](https://vitest.dev) instead of Jest 26; `pnpm test` still runs the development and production suites. Babel and babel-plugin-rewire are gone, the tests mock modules with `vi.mock` instead
+- `Stage` creates the PixiJS application asynchronously. Children mount after `Stage` commits; `ref._app.current` is `null` until `onInit` fires and warns in development when read before that
+- `Stage` calls `onInit` once for every application it creates and keeps, so again after an `options` change recreates the application. An `options` change while the application is being created is applied once it exists. A failed application creation (a thrown error or a rejected promise) reaches the nearest error boundary. Unmounting `Stage` before the application exists destroys the application when it is ready and never calls `onInit`
+- `Stage` has no `defaultProps`: `ref.current.props.options` is `undefined` when `options` is omitted (it was `{}`)
+- `Stage` passes typed prop names and Container prop names (for example `buttonMode`, `interactiveChildren`) to `app.stage`. 2.x compared the names in lowercase, so these props went to the `<canvas>` element
+- A prop set to `undefined` is reset to the value PixiJS had before the first write, recorded per instance, instead of a value from a table. This covers every PixiJS version and custom components. For example `Text` `text` set to `undefined` goes back to the value the `PIXI.Text` was created with, not `""`
+- Development prop validation under `<StrictMode>` fires on React 18 and 19. It never did before because the mode bit was React 17's
+- A boolean or function value on a prop the library does not type is set on the instance instead of being dropped (`<Container sortableChildren />` works). Unknown prop names are no longer reported in development; they are set as-is, as `@pixi/react` does
+- `applyProps(instance, oldProps, newProps)` is exported for higher-order components; `_customApplyProps`, `_customDidAttach`, `_customWillDetach` are no longer attached to display objects
+- A behavior object is read with `{ ...behavior }`, so only its own properties count. A behavior that is a class instance must set `create`, `applyProps`, `afterAdd` and `beforeRemove` as own properties, methods on its prototype are not found
+- `Graphics` passes `props.geometry` to the `PIXI.Graphics` constructor
+- `AppContext` is typed `Context<Application | null>`, its default value is `null`. `withApp` accepts any component with an `app` prop, `PixiAppProperties` is still exported for that prop. The `displayName` of a `withApp` component is `withApp(Name)` instead of the source of the wrapped function
+- The source is TypeScript; the types ship from the build instead of a handwritten `index.d.ts`. `CustomDisplayObject*` and `CustomPIXIComponent*` types are renamed without the `Custom` prefix
+
+### Deprecated
+Each deprecated item warns once in development and is removed in 4.0.0. The deprecated functions, behavior keys, type names and tag keep working in 3.x.
+- `CustomPIXIComponent(behavior, type)` and `CustomPIXIProperty`, use `PIXIComponent(type, behavior)` and `PIXIProperty`
+- Behavior keys `customDisplayObject`, `customApplyProps`, `customDidAttach` and `customWillDetach`, use `create`, `applyProps`, `afterAdd` and `beforeRemove`
+- The `Custom*` type names (`CustomDisplayObject*`, `CustomPIXIComponent*`), use the names without the prefix. Types do not warn
+- `createStageClass`, it returns the function `Stage`
+- Tag `NineSlicePlane`, it maps to `NineSliceSprite`
+- `Stage` `width` and `height` props (deprecated since 0.12.0, the warning no longer needs `prop-types`). As in 2.x they set `app.stage.width` and `app.stage.height` and never size the renderer or reach the `<canvas>`; the renderer size comes from `options.width` and `options.height`
+
+### Removed
+- The `react-pixi-fiber/react-pixi-alias` subpath and the `react-dom` peer dependency
+- UMD builds, the `prop-types` peer dependency and runtime prop-types validation, `fbjs`
+- `Stage` as a class component
+- The PixiJS 4 fallbacks to the `PIXI.extras`, `PIXI.mesh` and `PIXI.particles` namespaces are removed from the core; PixiJS 4 support moves to the `@react-pixi-fiber/pixi-4` adapter
 
 
 ## [2.0.0-rc.4] - 2026-09-28

@@ -34,11 +34,11 @@ The [examples](../../apps/examples) cover the API. They are hosted at https://re
 
 The current version assumes [React] >16.0.0 and [PixiJS] >4.4.0
 
-    yarn add react-pixi-fiber prop-types pixi.js
+    yarn add react-pixi-fiber pixi.js
 
 or
 
-    npm install react-pixi-fiber prop-types pixi.js --save
+    npm install react-pixi-fiber pixi.js --save
 
 Refer to next sections to see usage examples.
 
@@ -543,6 +543,10 @@ Yes, you can pass `app` property to `Stage` component, e.g. `<Stage app={app} />
 
 Yes, read [migration guide](#migrating-from-react-pixi-fiber0xy-before-version-100).
 
+### Can I migrate from `react-pixi-fiber@2.x`?
+
+Yes, read [migration guide](#migrating-to-300).
+
 ### Can I migrate from `react-pixi`?
 
 Yes, it is easy, read [migration guide](#migrating-from-react-pixi).
@@ -728,43 +732,191 @@ Refer to the implementation, when in doubt:
 
 ## Migrating from `react-pixi`
 
-It is possible to use React Pixi Fiber as a drop-in replacement for `react-pixi`. 
+React Pixi Fiber covers the `react-pixi` API with named exports. The `react-pixi-fiber/react-pixi-alias` drop-in subpath was removed in 3.0.0, so import from `react-pixi-fiber` and drop any `react-pixi` bundler alias.
 
-There are two options:
-
-<details>
-  <summary>Changing <code>import</code> or <code>require</code> statements</summary>
-
-Change:
-
-```js
+```jsx
+// react-pixi
 import ReactPIXI from "react-pixi";
-// or
-const ReactPIXI = require("react-pixi");
+const { Stage, DisplayObjectContainer, Sprite } = ReactPIXI;
+ReactPIXI.render(<Stage width={800} height={600}>…</Stage>, element);
+
+// react-pixi-fiber
+import { createRoot } from "react-dom/client";
+import { Stage, Container, Sprite } from "react-pixi-fiber";
+createRoot(element).render(<Stage options={{ width: 800, height: 600 }}>…</Stage>);
 ```
 
-to:
-
- ```js
-import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
-// or
-const ReactPIXI = require("react-pixi-fiber/react-pixi-alias");
-```
-</details>
+`DisplayObjectContainer` is `Container`, and `CustomPIXIComponent` is `PIXIComponent` (see [Migrating to 3.0.0](#migrating-to-300)). `ReactPIXI.factories` has no equivalent.
 
 ---
 
-<details>
-  <summary>Using <code>webpack</code> resolve <code>alias</code></summary>
+## Migrating to 3.0.0
+
+Every change is listed in the [changelog](./CHANGELOG.md). These are the ones that need a code change.
+
+### `CustomPIXIComponent` is `PIXIComponent`
 
 ```js
-resolve: {
-  alias: {
-    "react-pixi$": "react-pixi-fiber/react-pixi-alias"
-  }
-}
+// 2.x
+const Circle = CustomPIXIComponent(
+  {
+    customDisplayObject: props => new PIXI.Graphics(),
+    customApplyProps: (instance, oldProps, newProps) => { /* draw */ },
+    customDidAttach: instance => {},
+    customWillDetach: instance => {},
+  },
+  "Circle"
+);
+CustomPIXIProperty("Circle", "radius", value => typeof value === "number");
+// 3.0.0
+const Circle = PIXIComponent("Circle", {
+  create: props => new PIXI.Graphics(),
+  applyProps: (instance, oldProps, newProps) => { /* draw */ },
+  afterAdd: instance => {},
+  beforeRemove: instance => {},
+});
+PIXIProperty("Circle", "radius", value => typeof value === "number");
 ```
-</details>
+
+The type comes first and the behavior keys are `create`, `applyProps`, `afterAdd` and `beforeRemove`. The TypeScript types lose the `Custom` prefix: `CustomPIXIComponentBehavior` is `PIXIComponentBehavior`, `CustomDisplayObjectPropSetter` is `DisplayObjectPropSetter`, and so on. The 2.x names, argument order and keys keep working in 3.x with a development warning and are removed in 4.0.0.
+
+The behavior is read with `{ ...behavior }`, so only its own properties count. A behavior that is a class instance must set its functions as own properties, methods on the prototype are not found.
+
+### Re-apply props from a higher-order component with `applyProps`
+
+```js
+// 2.x, for example an `animated` binding
+if (typeof instance._customApplyProps === "function") instance._customApplyProps(instance, {}, props);
+else applyDisplayObjectProps(instance.constructor.name, instance, {}, props);
+// 3.0.0
+import { applyProps } from "react-pixi-fiber";
+applyProps(instance, {}, props);
+```
+
+`_customApplyProps`, `_customDidAttach` and `_customWillDetach` are no longer set on the display object. `applyProps` works for every instance React Pixi Fiber created, built-in or custom, and `getInstanceTag(instance)` returns its tag.
+
+### Read the application in `onInit`, not from the ref at mount
+
+```jsx
+// 2.x
+<Stage ref={ref} />;  useEffect(() => { ref.current._app.current.ticker.add(tick); }, []);
+// 3.0.0
+<Stage onInit={app => app.ticker.add(tick)} />
+```
+
+`Stage` creates the application asynchronously and renders its children after it commits. `ref.current._app.current` is `null` until then, and reading it early warns in development. `onInit(app)` runs once the application exists and the children are rendered, and again with the new application when an `options` change recreates it.
+
+Tests that check what `Stage` rendered right after `act()` need an async `act`:
+
+```js
+// 2.x
+act(() => { renderer = create(<Stage><Sprite /></Stage>); });
+// 3.0.0
+await act(async () => { renderer = create(<Stage><Sprite /></Stage>); });
+```
+
+### `createStageClass` returns the function `Stage`
+
+```js
+// 2.x
+const Stage = createStageClass();
+// 3.0.0
+import { Stage } from "react-pixi-fiber";
+```
+
+`Stage` is no longer a class component. `createStageClass()` returns the function `Stage` with a development warning and is removed in 4.0.0. `Stage` has no `defaultProps`, so `ref.current.props.options` is `undefined` when `options` is not passed.
+
+### No UMD build, no `prop-types`
+
+```html
+<!-- 2.x -->
+<script src="https://unpkg.com/react-pixi-fiber/umd/react-pixi-fiber.production.min.js"></script>
+```
+
+```js
+// 3.0.0: install and import the package through a bundler
+import { Stage, Sprite } from "react-pixi-fiber";
+```
+
+`prop-types` is no longer a peer dependency and props are not checked with it. Remove it from your dependencies if nothing else uses it.
+
+### The `react-pixi-alias` subpath is removed
+
+```js
+// 2.x
+import ReactPIXI from "react-pixi-fiber/react-pixi-alias";
+// webpack: resolve: { alias: { "react-pixi$": "react-pixi-fiber/react-pixi-alias" } }
+// 3.0.0
+import { Stage, Container, Sprite } from "react-pixi-fiber";
+```
+
+Drop the alias from your build and test config. See [Migrating from `react-pixi`](#migrating-from-react-pixi) for the names.
+
+### Prop validation warnings under `<StrictMode>`
+
+```jsx
+<Stage>
+  <StrictMode>
+    <Container buttonmode />
+  </StrictMode>
+</Stage>
+// 2.x on React 18: no warning
+// 3.0.0 in development: warns that `buttonmode` should be `buttonMode`
+```
+
+Development prop validation runs only under a `<StrictMode>` inside `Stage` (or inside the tree passed to `render`). On React 18 and 19 it never ran in 2.x, because the library checked React 17's mode bit. You may see new warnings for casing, wrong value types and `PIXIProperty` validators. They are warnings, not errors.
+
+### Unknown props are set on the instance
+
+```jsx
+<Container sortableChildren zIndex={2} textur={texture} />
+// 2.x: `sortableChildren` was dropped (untyped boolean), `textur` was reported in development
+// 3.0.0: all three are set on the PIXI.Container, nothing is reported
+```
+
+A prop name the library does not type is set as-is, like `@pixi/react` does, so a typo is not reported. A boolean or function value on such a name is set instead of dropped.
+
+### New tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope`, `NineSliceSprite`
+
+```jsx
+// 2.x
+const AnimatedSprite = CustomPIXIComponent(props => new PIXI.AnimatedSprite(props.textures), "AnimatedSprite");
+// 3.0.0
+import { AnimatedSprite } from "react-pixi-fiber";
+<AnimatedSprite textures={textures} />
+```
+
+A component you register under one of these names keeps winning over the built-in tag, with a development warning. Rename your component or remove it and use the built-in one.
+
+### Pass the `Stage` size in `options`
+
+```jsx
+// 2.x and 3.0.0: sets `app.stage.width` and `app.stage.height`, the renderer keeps its default size
+<Stage width={800} height={600} />
+// 3.0.0: sizes the renderer and the canvas
+<Stage options={{ width: 800, height: 600 }} />
+```
+
+The renderer size comes only from `options.width` and `options.height`, in 2.x and in 3.0.0. The `width` and `height` props never sized the renderer and never reached the `<canvas>` element: both versions set them on `app.stage`, the root `PIXI.Container`, which scales its content. 3.0.0 does the same and warns in development. The props are removed in 4.0.0.
+
+### `NineSlicePlane` is `NineSliceSprite`
+
+```jsx
+// 2.x
+<NineSlicePlane texture={texture} leftWidth={10} />
+// 3.0.0
+<NineSliceSprite texture={texture} leftWidth={10} />
+```
+
+`NineSlicePlane` keeps working in 3.x with a development warning and creates the same `PIXI.NineSlicePlane`. It is removed in 4.0.0.
+
+### Smaller changes
+
+- A prop set to `undefined` resets to the value the instance had before React Pixi Fiber first set it. For example, `Text` `text` goes back to the value the `PIXI.Text` was created with, not `""`.
+- `Stage` passes typed prop names and Container prop names, for example `buttonMode` and `interactiveChildren`, to `app.stage`. In 2.x these props went to the `<canvas>` element.
+- `AppContext` is typed `Context<Application | null>` and its default value is `null`.
+- `Graphics` passes `props.geometry` to the `PIXI.Graphics` constructor.
+- The fallbacks to the PixiJS 4 `PIXI.extras`, `PIXI.mesh` and `PIXI.particles` namespaces are removed from the core; PixiJS 4 support moves to the `@react-pixi-fiber/pixi-4` adapter.
 
 ---
 
