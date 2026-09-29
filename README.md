@@ -32,6 +32,10 @@ pnpm start          # start the examples dev server
 
 Rebuild the library after changing its source before running or typechecking the examples.
 
+## Hosted examples
+
+[Cloudflare Pages](https://pages.cloudflare.com) builds the examples from this repository with `pnpm build && pnpm --filter examples build` and serves `apps/examples/dist`. Pushes to `master` deploy to https://react-pixi-fiber.pages.dev, and every pull request gets a preview URL, posted as a comment on the pull request.
+
 ## Contributing
 
 See the [Contributing Guide](./CONTRIBUTING.md), the [Code of Conduct](./CODE_OF_CONDUCT.md) and the [changelog](./CHANGELOG.md).

@@ -46,6 +46,8 @@ The core team is monitoring for pull requests. We will review your pull request 
 4. Ensure the test suite passes (`pnpm test`), the types check (`pnpm check-types`) and, if you changed `package.json` or the build, the package check (`pnpm check-package`).
 5. Format your code (`pnpm format`) and make sure it lints (`pnpm lint`).
 
+Every pull request gets a preview of the examples on Cloudflare Pages; the URL is posted as a comment on the pull request.
+
 ## Style Guide
 
 We use [Biome](https://biomejs.dev) to format and lint the code. Run `pnpm format` after making any changes to the code, and `pnpm lint` to check it.

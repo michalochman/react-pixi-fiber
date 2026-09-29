@@ -27,7 +27,7 @@
 
 ## Demo
 
-The [examples](../../apps/examples) cover the API; run them with `pnpm install`, `pnpm build` and `pnpm start` in the repository.
+The [examples](../../apps/examples) cover the API. They are hosted at https://react-pixi-fiber.pages.dev; to run them locally, use `pnpm install`, `pnpm build` and `pnpm start` in the repository.
 
 
 ## Installing
