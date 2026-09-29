@@ -1,6 +1,6 @@
 # @react-pixi-fiber/react-19
 
-React 19 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It bundles `react-reconciler` 0.33.0 and builds the renderer that `react-pixi-fiber` uses to render PixiJS display objects.
+React 19 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It bundles `react-reconciler` 0.34.0 and builds the renderer that `react-pixi-fiber` uses to render PixiJS display objects.
 
 Install it next to `react-pixi-fiber`, `react` 19 and a PixiJS adapter from the [adapter table](https://github.com/michalochman/react-pixi-fiber/tree/master/packages/react-pixi-fiber#setup), then configure once in the app entry, before the first render:
 

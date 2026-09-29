@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import React, { StrictMode } from "react";
+import React, { StrictMode, ViewTransition, startTransition } from "react";
 import react19, { strictModeBit } from "../src/index";
 import type { HostOps } from "react-pixi-fiber";
 
@@ -170,6 +170,35 @@ describe("react19", () => {
     expect(updateProperties).not.toHaveBeenCalled();
     renderer.render(<node x={2} />, container);
     expect(updateProperties).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws the <ViewTransition> error when a transition commits one, not a TypeError", async () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    let setX: (x: number) => void = () => {};
+    const Scene = () => {
+      const [x, setState] = React.useState(1);
+      setX = setState;
+      return (
+        <ViewTransition>
+          <node x={x} />
+        </ViewTransition>
+      );
+    };
+    renderer.render(<Scene />, { children: [] });
+    // A transition commits from a scheduler task, so the error surfaces as an uncaught exception. Vitest's own
+    // handler is set aside so it does not fail the run.
+    const process = (globalThis as any).process;
+    const handlers: Array<(...args: unknown[]) => void> = process.listeners("uncaughtException");
+    process.removeAllListeners("uncaughtException");
+    const uncaught = new Promise<Error>(resolve => process.once("uncaughtException", resolve));
+    startTransition(() => setX(2));
+    const error = await uncaught;
+    for (const handler of handlers) process.on("uncaughtException", handler);
+    expect(error).toBeInstanceOf(Error);
+    expect(error.message).toBe(
+      "react-pixi-fiber does not support <ViewTransition>. Remove it from the tree rendered inside Stage."
+    );
   });
 
   it("validates props with the fiber so the core can find <StrictMode>", () => {

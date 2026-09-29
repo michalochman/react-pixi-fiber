@@ -59,7 +59,7 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | Adapter | Supports |
 | --- | --- |
 | [`@react-pixi-fiber/react-18`](https://www.npmjs.com/package/@react-pixi-fiber/react-18) | `react` ^18.3.1 |
-| [`@react-pixi-fiber/react-19`](https://www.npmjs.com/package/@react-pixi-fiber/react-19) | `react` ^19.2.0 |
+| [`@react-pixi-fiber/react-19`](https://www.npmjs.com/package/@react-pixi-fiber/react-19) | `react` ^19.3.0 |
 | [`@react-pixi-fiber/pixi-6`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-6) | `pixi.js` ^6.0.0 |
 | [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.0.0 |
 

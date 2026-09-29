@@ -7,6 +7,13 @@ import type { HostOps, ReactAdapter, Renderer } from "react-pixi-fiber";
 export const strictModeBit = 8;
 const emptyObject = Object.freeze({});
 
+const viewTransitionError =
+  "react-pixi-fiber does not support <ViewTransition>. Remove it from the tree rendered inside Stage.";
+
+function unsupportedViewTransition(): never {
+  throw new Error(viewTransitionError);
+}
+
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
@@ -25,11 +32,11 @@ const scheduleMicrotask: (callback: () => void) => void =
             })
       : setTimeout;
 
-// The mutation host config of react-reconciler 0.33.0. Keys left out, and why the reconciler never reads them here:
-// hydration, persistence and test selectors sit behind supportsHydration, supportsPersistence and supportsTestSelectors;
-// resources and singletons behind supportsResources and supportsSingletons (both undefined); the view transition, gesture
-// and fragment instance keys appear in this build only as bare `$$$config.key;` statements, because the features are
-// compiled out, so no code path calls them.
+// The mutation host config of react-reconciler 0.34.0. Keys left out, and the guard that keeps the reconciler from
+// reading them: hydration, persistence and test selectors sit behind supportsHydration, supportsPersistence and
+// supportsTestSelectors; resources and singletons behind supportsResources and supportsSingletons (both undefined);
+// cloneRootViewTransitionContainer, removeRootViewTransitionClone, startGestureTransition and getCurrentGestureOffset
+// appear only as bare `config.key;` statements and are never called.
 // Typed loosely on purpose: it goes straight into Reconciler, and the declaration stays free of inferred core types.
 export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
   let currentUpdatePriority: number = NoEventPriority;
@@ -120,6 +127,27 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     resetFormInstance() {},
     bindToConsole: (methodName: "error", args: unknown[]) =>
       Function.prototype.bind.apply(console[methodName], [console, ...args]),
+    addViewTransitionFinishedListener: unsupportedViewTransition,
+    applyViewTransitionName: unsupportedViewTransition,
+    cancelRootViewTransitionName: unsupportedViewTransition,
+    cancelViewTransitionName: unsupportedViewTransition,
+    createFragmentInstance() {
+      invariant(false, "react-pixi-fiber does not support Fragment refs. Remove the ref from the Fragment.");
+    },
+    createViewTransitionInstance: unsupportedViewTransition,
+    commitNewChildToFragmentInstance() {},
+    deleteChildFromFragmentInstance() {},
+    hasInstanceAffectedParent: unsupportedViewTransition,
+    hasInstanceChanged: unsupportedViewTransition,
+    measureClonedInstance: unsupportedViewTransition,
+    measureInstance: unsupportedViewTransition,
+    restoreRootViewTransitionName: unsupportedViewTransition,
+    restoreViewTransitionName: unsupportedViewTransition,
+    startViewTransition: unsupportedViewTransition,
+    stopViewTransition: unsupportedViewTransition,
+    suspendOnActiveViewTransition: unsupportedViewTransition,
+    updateFragmentInstanceFiber() {},
+    wasInstanceInViewport: unsupportedViewTransition,
     NotPendingTransition: null,
     HostTransitionContext: {
       $$typeof: Symbol.for("react.context"),
@@ -169,6 +197,7 @@ export default function react19(): ReactAdapter {
               onError,
               onError,
               () => {},
+              // The published types declare an 11th parameter, transitionCallbacks, that the runtime does not take.
               null
             );
             roots.set(container, root);
