@@ -4,7 +4,7 @@ import * as PIXI from "pixi.js";
 import Bunny from "../Bunny";
 
 // Scale mode for all textures, will retain pixelation
-PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
@@ -25,7 +25,7 @@ function ClickExample() {
         // Shows hand cursor
         cursor="pointer"
         // Opt-in to interactivity
-        interactive
+        eventMode="static"
         // Pointers normalize touch and mouse
         onpointerdown={handleClick}
         scale={new PIXI.Point(scale, scale)}

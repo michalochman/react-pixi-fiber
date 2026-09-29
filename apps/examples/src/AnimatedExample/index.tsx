@@ -26,7 +26,7 @@ function BunnyExample() {
       <Bunny
         anchor={centerAnchor}
         as={Animated.Sprite}
-        interactive
+        eventMode="static"
         onpointerdown={handleDown}
         onpointerup={handleUp}
         position="400,300"

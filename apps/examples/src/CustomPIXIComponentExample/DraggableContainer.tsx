@@ -44,7 +44,7 @@ const TYPE = "DraggableContainer";
 export default PIXIComponent<DraggableContainerInstance, DraggableContainerProps>(TYPE, {
   create: () => new DraggableContainerInstance(),
   afterAdd: instance => {
-    instance.interactive = true;
+    instance.eventMode = "static";
     instance.cursor = "pointer";
 
     instance.on("mousedown", instance.dragStart);

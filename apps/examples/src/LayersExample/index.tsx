@@ -44,7 +44,7 @@ const dragGroup = new Group(2, false);
 // Shadows are the lowest
 const shadowGroup = new Group(-1, false);
 
-const blurFilter = new PIXI.filters.BlurFilter();
+const blurFilter = new PIXI.BlurFilter();
 blurFilter.blur = 0.5;
 const shadowFilters = [blurFilter];
 
