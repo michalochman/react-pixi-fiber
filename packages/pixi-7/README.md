@@ -16,4 +16,4 @@ configure({ react: reactN(), pixi: pixi7() });
 
 The PixiJS 7 class names work as tags too: `NineSlicePlane`, `SimpleMesh`, `SimplePlane` and `SimpleRope` render the same display objects as `NineSliceSprite`, `MeshSimple`, `MeshPlane` and `MeshRope`. Each is a tag of its own: `defaults` and `PIXIProperty` keyed by `NineSliceSprite` do not apply to `<NineSlicePlane />`, and `getInstanceTag` returns `"NineSlicePlane"` for it.
 
-Importing the package also loads its types: the props of every tag follow the PixiJS 7 classes. PixiJS 7 fires the event names (`click`, `pointerdown`, …) and the `onclick`, `onpointerdown`, … properties, and both spellings are accepted as props. The type `PixiTypeFallback` imports from this package.
+Importing the package also loads its types: the props of every tag follow the PixiJS 7 classes. PixiJS 7 fires the event names (`click`, `pointerdown`, …) and the `onclick`, `onpointerdown`, … properties, and both spellings are accepted as props. `PixiTypeFallback` is exported from this package.

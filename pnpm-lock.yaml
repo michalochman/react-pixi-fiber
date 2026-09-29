@@ -135,6 +135,9 @@ importers:
       '@types/react':
         specifier: ^18.2.8
         version: 18.3.31
+      '@types/react-test-renderer':
+        specifier: ^18.3.1
+        version: 18.3.1
       pixi.js:
         specifier: ^7.4.3
         version: 7.4.3

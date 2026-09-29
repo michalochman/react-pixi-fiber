@@ -65,6 +65,7 @@ describe("pixi7", () => {
   it("lists both the event names and their on-prefixed properties as callbacks", () => {
     expect(adapter.properties.callback).toContain("onclick");
     expect(adapter.properties.callback).toContain("click");
+    expect(adapter.properties.callback).toContain("onglobalpointermove");
   });
   it("passes the defaults override through", () => {
     expect(pixi7({ defaults: { Text: { text: "" } } }).defaults).toEqual({ Text: { text: "" } });
