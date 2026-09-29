@@ -10,6 +10,22 @@ export interface Behavior<I = any, P = any> {
   applyProps?(this: ApplyPropsContext<P>, instance: I, oldProps: P | undefined, newProps: P): void;
   afterAdd?(instance: I): void;
   beforeRemove?(instance: I): void;
+  /**
+   * Adds `child` to the end of this parent's children, or moves it there, in place of `parent.addChild(child)`.
+   * For adapters whose container keeps children that are not display objects. Unstable: may change in a minor.
+   */
+  appendChild?(parent: I, child: unknown): void;
+  /**
+   * Adds `child` before `before`, or moves it there, in place of `parent.addChildAt(child, index)`.
+   * For adapters whose container keeps children that are not display objects. Unstable: may change in a minor.
+   */
+  insertBefore?(parent: I, child: unknown, before: unknown): void;
+  /**
+   * Removes `child` from this parent's children, in place of `parent.removeChild(child)`. The core destroys the child
+   * afterwards when it has a `destroy` method.
+   * For adapters whose container keeps children that are not display objects. Unstable: may change in a minor.
+   */
+  removeChild?(parent: I, child: unknown): void;
 }
 export interface LegacyBehavior<I = any, P = any> {
   customDisplayObject: (props: P) => I;
@@ -22,7 +38,10 @@ export interface BoundBehavior {
   tag: string;
   applyProps?: (instance: any, oldProps: any, newProps: any) => void;
   afterAdd?: (instance: any) => void;
+  appendChild?: (parent: any, child: any) => void;
   beforeRemove?: (instance: any) => void;
+  insertBefore?: (parent: any, child: any, before: any) => void;
+  removeChild?: (parent: any, child: any) => void;
 }
 
 const LEGACY_KEYS = {
@@ -136,6 +155,9 @@ export function createRegisteredInstance(
   }
   if (typeof behavior.afterAdd === "function") bound.afterAdd = behavior.afterAdd;
   if (typeof behavior.beforeRemove === "function") bound.beforeRemove = behavior.beforeRemove;
+  if (typeof behavior.appendChild === "function") bound.appendChild = behavior.appendChild;
+  if (typeof behavior.insertBefore === "function") bound.insertBefore = behavior.insertBefore;
+  if (typeof behavior.removeChild === "function") bound.removeChild = behavior.removeChild;
   boundBehaviors.set(instance, bound);
   return instance;
 }

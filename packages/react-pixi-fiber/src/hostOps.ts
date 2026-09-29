@@ -12,13 +12,19 @@ import { findStrictRoot } from "./utils";
 import invariant from "./invariant";
 import type { HostOps, PixiFragmentInstance } from "./types";
 
+// A parent's behavior may own its child operations; otherwise the display-object methods are used.
 export function appendChild(parentInstance: any, child: any): void {
   if (parentInstance == null) return;
 
-  // TODO do we need to remove the child first if it's already added?
-  parentInstance.removeChild(child);
+  const ops = getBoundBehavior(parentInstance);
+  if (ops && ops.appendChild) {
+    ops.appendChild(parentInstance, child);
+  } else {
+    // TODO do we need to remove the child first if it's already added?
+    parentInstance.removeChild(child);
 
-  parentInstance.addChild(child);
+    parentInstance.addChild(child);
+  }
   const bound = getBoundBehavior(child);
   if (bound && bound.afterAdd) bound.afterAdd(child);
 }
@@ -27,22 +33,33 @@ export function removeChild(parentInstance: any, child: any): void {
   const bound = getBoundBehavior(child);
   if (bound && bound.beforeRemove) bound.beforeRemove(child);
 
-  parentInstance.removeChild(child);
+  const ops = getBoundBehavior(parentInstance);
+  if (ops && ops.removeChild) {
+    ops.removeChild(parentInstance, child);
+  } else {
+    parentInstance.removeChild(child);
+  }
 
-  child.destroy({ children: true });
+  // A child that is not a display object may have nothing to destroy.
+  if (typeof child.destroy === "function") child.destroy({ children: true });
 }
 
 export function insertBefore(parentInstance: any, child: any, beforeChild: any): void {
   invariant(child !== beforeChild, "ReactPixiFiber cannot insert node before itself");
 
-  const childExists = parentInstance.children.indexOf(child) !== -1;
+  const ops = getBoundBehavior(parentInstance);
+  if (ops && ops.insertBefore) {
+    ops.insertBefore(parentInstance, child, beforeChild);
+  } else {
+    const childExists = parentInstance.children.indexOf(child) !== -1;
 
-  if (childExists) {
-    parentInstance.removeChild(child);
+    if (childExists) {
+      parentInstance.removeChild(child);
+    }
+
+    const index = parentInstance.getChildIndex(beforeChild);
+    parentInstance.addChildAt(child, index);
   }
-
-  const index = parentInstance.getChildIndex(beforeChild);
-  parentInstance.addChildAt(child, index);
   const bound = getBoundBehavior(child);
   if (bound && bound.afterAdd) bound.afterAdd(child);
 }

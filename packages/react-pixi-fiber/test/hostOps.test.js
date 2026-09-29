@@ -164,6 +164,90 @@ describe("hostOps", () => {
     });
   });
 
+  describe("a parent whose behavior owns its child operations", () => {
+    const calls = [];
+    const displayObjectMethods = () => ({
+      addChild: vi.fn(),
+      addChildAt: vi.fn(),
+      children: [],
+      getChildIndex: vi.fn(),
+      removeChild: vi.fn(),
+    });
+    const createParent = () =>
+      createRegisteredInstance(
+        "P",
+        normalizeBehavior("P", {
+          appendChild: (parent, child) => calls.push(["appendChild", parent, child]),
+          create: displayObjectMethods,
+          insertBefore: (parent, child, before) => calls.push(["insertBefore", parent, child, before]),
+          removeChild: (parent, child) => calls.push(["removeChild", parent, child]),
+        }),
+        {},
+        () => {}
+      );
+    const createChild = () =>
+      createRegisteredInstance(
+        "C",
+        normalizeBehavior("C", {
+          afterAdd: child => calls.push(["afterAdd", child]),
+          beforeRemove: child => calls.push(["beforeRemove", child]),
+          create: () => ({}),
+        }),
+        {},
+        () => {}
+      );
+    const expectNoDisplayObjectCalls = parent => {
+      for (const method of ["addChild", "addChildAt", "getChildIndex", "removeChild"])
+        expect(parent[method], method).not.toHaveBeenCalled();
+    };
+
+    beforeEach(() => {
+      calls.length = 0;
+    });
+
+    it("appendChild calls the op, then afterAdd", () => {
+      const parent = createParent();
+      const child = createChild();
+      hostOps.appendChild(parent, child);
+      expect(calls).toEqual([
+        ["appendChild", parent, child],
+        ["afterAdd", child],
+      ]);
+      expectNoDisplayObjectCalls(parent);
+    });
+
+    it("insertBefore calls the op, then afterAdd", () => {
+      const parent = createParent();
+      const child = createChild();
+      const before = createChild();
+      hostOps.insertBefore(parent, child, before);
+      expect(calls).toEqual([
+        ["insertBefore", parent, child, before],
+        ["afterAdd", child],
+      ]);
+      expectNoDisplayObjectCalls(parent);
+    });
+
+    it("removeChild calls beforeRemove, then the op, and skips destroy on a child without one", () => {
+      const parent = createParent();
+      const child = createChild();
+      expect(() => hostOps.removeChild(parent, child)).not.toThrow();
+      expect(calls).toEqual([
+        ["beforeRemove", child],
+        ["removeChild", parent, child],
+      ]);
+      expectNoDisplayObjectCalls(parent);
+    });
+
+    it("removeChild still destroys a child that has destroy", () => {
+      const parent = createParent();
+      const child = { destroy: vi.fn() };
+      hostOps.removeChild(parent, child);
+      expect(calls).toEqual([["removeChild", parent, child]]);
+      expect(child.destroy).toHaveBeenCalledWith({ children: true });
+    });
+  });
+
   describe("clearContainer", () => {
     it("removes all children of the container", () => {
       const container = { removeChildren: vi.fn() };

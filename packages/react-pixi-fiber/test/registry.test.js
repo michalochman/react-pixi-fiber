@@ -60,6 +60,19 @@ describe("registry", () => {
     expect(instance._customApplyProps).toBeUndefined();
   });
 
+  it("binds the child operations of a parent", () => {
+    const behavior = { appendChild: vi.fn(), create: () => ({}), insertBefore: vi.fn(), removeChild: vi.fn() };
+    const instance = registry.createRegisteredInstance("T", registry.normalizeBehavior("T", behavior), {}, vi.fn());
+    const bound = registry.getBoundBehavior(instance);
+    expect(bound.appendChild).toBe(behavior.appendChild);
+    expect(bound.insertBefore).toBe(behavior.insertBefore);
+    expect(bound.removeChild).toBe(behavior.removeChild);
+    const plain = registry.getBoundBehavior(
+      registry.createRegisteredInstance("U", registry.normalizeBehavior("U", { create: () => ({}) }), {}, vi.fn())
+    );
+    expect(plain).toEqual({ tag: "U" });
+  });
+
   it("resolves the user entry before the adapter entry and names the source", () => {
     const adapter = { create: () => ({}) };
     const user = { create: () => ({}) };
