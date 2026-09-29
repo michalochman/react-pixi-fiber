@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { type Behavior, getInstanceTag } from "react-pixi-fiber";
+import type { Behavior } from "react-pixi-fiber";
 
 // PixiJS 8 constructors spread their options over the class defaults, so a key set to `undefined` would win over the
 // default. Only the props that are set are passed.
@@ -14,10 +14,39 @@ const particleParents = new WeakMap<PIXI.Particle, PIXI.ParticleContainer>();
 
 function asParticle(child: unknown): PIXI.Particle {
   if (!(child instanceof PIXI.Particle)) {
-    const tag = getInstanceTag(child as object) ?? String(child);
-    throw new Error(`\`ParticleContainer\` takes only \`Particle\` children, got \`${tag}\`.`);
+    throw new Error(
+      "`ParticleContainer` takes only `Particle` children from `@react-pixi-fiber/pixi-8`, not display objects."
+    );
   }
   return child;
+}
+
+// The buffer attributes each prop of a Particle feeds. A prop not listed here re-uploads everything.
+const PARTICLE_ATTRIBUTES: Record<string, string[]> = {
+  alpha: ["color"],
+  anchorX: ["vertex"],
+  anchorY: ["vertex"],
+  rotation: ["rotation"],
+  scaleX: ["vertex"],
+  scaleY: ["vertex"],
+  texture: ["uvs", "vertex"],
+  tint: ["color"],
+  x: ["position"],
+  y: ["position"],
+};
+
+// PixiJS uploads the dynamic attributes every frame and the static ones only after `update()`.
+function changesStaticAttributes(
+  container: PIXI.ParticleContainer,
+  oldProps: Record<string, unknown> = {},
+  newProps: Record<string, unknown>
+): boolean {
+  for (const key of new Set([...Object.keys(oldProps), ...Object.keys(newProps)])) {
+    if (key === "children" || oldProps[key] === newProps[key]) continue;
+    const attributes = PARTICLE_ATTRIBUTES[key];
+    if (attributes === undefined || !attributes.every(name => container._properties[name]?.dynamic)) return true;
+  }
+  return false;
 }
 
 export const components: Record<string, Behavior> = {
@@ -61,8 +90,8 @@ export const components: Record<string, Behavior> = {
     },
     applyProps(particle: PIXI.Particle, oldProps, newProps) {
       this.applyDisplayObjectProps(oldProps, newProps);
-      // Only the dynamic properties are uploaded every frame; the rest waits for `update()`.
-      particleParents.get(particle)?.update();
+      const container = particleParents.get(particle);
+      if (container && changesStaticAttributes(container, oldProps, newProps)) container.update();
     },
   },
   ParticleContainer: {

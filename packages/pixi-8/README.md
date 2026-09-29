@@ -31,7 +31,7 @@ import { Particle } from "@react-pixi-fiber/pixi-8";
 </ParticleContainer>;
 ```
 
-A `Particle` needs a `texture` and takes the `Particle` fields as props (`x`, `y`, `scaleX`, `scaleY`, `anchorX`, `anchorY`, `rotation`, `tint`, `alpha`). PixiJS uploads only the `dynamicProperties` every frame, so a prop change on a `Particle` calls the container's `update()`. `ParticleContainer` takes `dynamicProperties`, `roundPixels`, `shader` and `texture`; `ParticleContainerProps` types them. Limitations: Suspense does not hide particles while it shows a fallback, a `ParticleContainer` cannot be the container passed to `render`, and a `<Particle>` under any other container fails inside PixiJS.
+A `Particle` needs a `texture` and takes the `Particle` fields as props (`x`, `y`, `scaleX`, `scaleY`, `anchorX`, `anchorY`, `rotation`, `tint`, `alpha`). PixiJS uploads only the `dynamicProperties` every frame, so a change to any other prop of a `Particle` calls the container's `update()`, which uploads every particle again. `ParticleContainer` takes `dynamicProperties`, `roundPixels`, `shader` and `texture`, read when it is created; `ParticleContainerProps` types them. Limitations: a Suspense boundary inside a `ParticleContainer` does not hide its particles while it shows a fallback (a boundary above the container hides the container), a `ParticleContainer` cannot be the container passed to `render`, and a `<Particle>` under any other container fails inside PixiJS.
 
 Importing the package also loads its types: the props of every tag follow the PixiJS 8 classes. Event handlers are the `onclick`, `onpointerdown`, … properties, and `eventMode` makes an object interactive.
 

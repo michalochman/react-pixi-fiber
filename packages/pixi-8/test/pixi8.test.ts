@@ -73,6 +73,13 @@ describe("pixi8", () => {
     expect(mesh.geometry.positions.every(Number.isFinite)).toBe(true);
     expect((adapter.components.Text.create({}) as PIXI.Text).text).toBe("");
   });
+  it("ParticleContainer throws when it inserts before a particle it does not hold", () => {
+    const { create, insertBefore } = adapter.components.ParticleContainer;
+    const container = create({});
+    expect(() => insertBefore?.(container, new PIXI.Particle(texture), new PIXI.Particle(texture))).toThrow(
+      "`ParticleContainer` cannot insert a `Particle` before one it does not hold."
+    );
+  });
   it("lists the on-prefixed event properties as callbacks", () => {
     expect(adapter.properties.callback).toContain("onclick");
     expect(adapter.properties.callback).not.toContain("click");
