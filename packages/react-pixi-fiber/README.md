@@ -61,6 +61,7 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | [`@react-pixi-fiber/react-17`](https://www.npmjs.com/package/@react-pixi-fiber/react-17) | `react` ^17.0.2 |
 | [`@react-pixi-fiber/react-18`](https://www.npmjs.com/package/@react-pixi-fiber/react-18) | `react` ^18.3.1 |
 | [`@react-pixi-fiber/react-19`](https://www.npmjs.com/package/@react-pixi-fiber/react-19) | `react` ^19.3.0 |
+| [`@react-pixi-fiber/pixi-4`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-4) | `pixi.js` ^4.4.0 |
 | [`@react-pixi-fiber/pixi-5`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-5) | `pixi.js` ^5.0.0 |
 | [`@react-pixi-fiber/pixi-6`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-6) | `pixi.js` ^6.0.0 |
 | [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.0.0 |
@@ -228,15 +229,17 @@ Each tag names a display object concept. The configured PixiJS adapter creates t
 | `<BitmapText />` | bitmap font text, [`PIXI.BitmapText`] |
 | `<Container />` | a container, [`PIXI.Container`] |
 | `<Graphics />` | vector graphics, [`PIXI.Graphics`] |
-| `<Mesh />` | a mesh from geometry and a shader, `PIXI.Mesh` |
+| `<Mesh />` | a mesh from `geometry` and `shader`, `PIXI.Mesh`; on PixiJS 4 the texture mesh, like `<MeshSimple />` |
 | `<MeshPlane />` | a textured plane mesh |
 | `<MeshRope />` | a textured rope mesh |
-| `<MeshSimple />` | a simple textured mesh |
+| `<MeshSimple />` | a simple textured mesh from `texture`, `vertices`, `uvs` and `indices` |
 | `<NineSliceSprite />` | a nine-slice scaled sprite |
 | `<ParticleContainer />` | a fast container for many sprites, [`PIXI.ParticleContainer`] |
 | `<Sprite />` | a sprite, [`PIXI.Sprite`] |
 | `<Text />` | canvas text, [`PIXI.Text`] |
 | `<TilingSprite />` | a repeating texture, [`PIXI.TilingSprite`] |
+
+For code that runs on every PixiJS version, use `<MeshSimple texture vertices uvs indices />`. `<Mesh />` takes `geometry` and `shader` on PixiJS 5 and later, and is the texture mesh on PixiJS 4.
 
 ### Props
 

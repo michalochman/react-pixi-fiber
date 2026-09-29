@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `@react-pixi-fiber/react-17`, the React 17 adapter, needs React 17.0.2 or a later 17.x
 - `@react-pixi-fiber/react-19`, the React 19 adapter, needs React 19.3 or newer. It reports render errors on `console.error` and renders a `<ViewTransition>` inside `Stage` without animating
 - Fragment refs on React 19: a `<Fragment ref>` inside `Stage` receives a `PixiFragmentInstance` with `children`, `getBounds()`, `off(event, fn)` and `on(event, fn)` over the fragment's top-level display objects
+- `@react-pixi-fiber/pixi-4`, the PixiJS 4 adapter. `Mesh` and `MeshSimple` both create `PIXI.mesh.Mesh`
 - `@react-pixi-fiber/pixi-5`, the PixiJS 5 adapter
 - `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter with the `DOMContainer`, `HTMLText`, `Particle`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` tags and a `compat` option that translates the 2.x interaction props. `ParticleContainer` takes `Particle` children on it
 - A PixiJS adapter can rename props with `translateProps` before they are validated, set or diffed; a `PIXIComponent` with its own `applyProps` receives the props as written

@@ -1,4 +1,5 @@
 ---
+"@react-pixi-fiber/pixi-4": major
 "@react-pixi-fiber/pixi-5": major
 "@react-pixi-fiber/pixi-6": major
 "@react-pixi-fiber/pixi-7": major
