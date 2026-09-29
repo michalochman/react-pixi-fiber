@@ -55,7 +55,7 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
-    "pixi.js": "^7.0.0",
+    "pixi.js": "^7.2.0",
     "react-pixi-fiber": "^3.0.0"
   },
   "devDependencies": {

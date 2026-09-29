@@ -2,7 +2,7 @@
 
 PixiJS 8 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It tells `react-pixi-fiber` how to create the PixiJS 8 display objects for all 13 core tags, which props it types, and how to create and initialize a `PIXI.Application`.
 
-Install it next to `react-pixi-fiber`, `pixi.js` 8 and a React adapter from the [adapter table](../react-pixi-fiber/README.md#setup), then configure once in the app entry, before the first render:
+Install it next to `react-pixi-fiber`, `pixi.js` 8.9 or newer (the first with every tag this adapter exports) and a React adapter from the [adapter table](../react-pixi-fiber/README.md#setup), then configure once in the app entry, before the first render:
 
 ```js
 import { configure } from "react-pixi-fiber";
@@ -127,7 +127,7 @@ Not translated: `cacheAsBitmap` still works in PixiJS 8 (its replacement `cacheA
 
 ## Migrating from `@react-pixi-fiber/pixi-7`
 
-1. Install `@react-pixi-fiber/pixi-8` and `pixi.js` 8, and pass `pixi8()` to `configure` instead of `pixi7()`. To keep the PixiJS 7 props while you migrate, pass `compat` from `@react-pixi-fiber/pixi-8/compat/pixi7`, see [above](#compatibility-with-the-2x-props).
+1. Install `@react-pixi-fiber/pixi-8` and `pixi.js` 8.9 or newer, and pass `pixi8()` to `configure` instead of `pixi7()`. To keep the PixiJS 7 props while you migrate, pass `compat` from `@react-pixi-fiber/pixi-8/compat/pixi7`, see [above](#compatibility-with-the-2x-props).
 2. Follow the [PixiJS 8 migration guide](https://pixijs.com/8.x/guides/migrations/v8) for the PixiJS calls in your app.
 
 What changes for `react-pixi-fiber` code:

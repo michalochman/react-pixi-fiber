@@ -64,8 +64,8 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | [`@react-pixi-fiber/pixi-4`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-4) | `pixi.js` ^4.4.0 |
 | [`@react-pixi-fiber/pixi-5`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-5) | `pixi.js` ^5.0.0 |
 | [`@react-pixi-fiber/pixi-6`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-6) | `pixi.js` ^6.0.0 |
-| [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.0.0 |
-| [`@react-pixi-fiber/pixi-8`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-8) | `pixi.js` ^8.0.0 |
+| [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.2.0 |
+| [`@react-pixi-fiber/pixi-8`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-8) | `pixi.js` ^8.9.0 |
 
 Without `configure`, the first render throws an error that prints the install line and these setup lines.
 
@@ -79,7 +79,7 @@ Read the major version of `react` in your `package.json` for the React adapter (
 
 Every React adapter works with every PixiJS adapter:
 
-| | `pixi-4`<br>`pixi.js` ^4.4.0 | `pixi-5`<br>`pixi.js` ^5.0.0 | `pixi-6`<br>`pixi.js` ^6.0.0 | `pixi-7`<br>`pixi.js` ^7.0.0 | `pixi-8`<br>`pixi.js` ^8.0.0 |
+| | `pixi-4`<br>`pixi.js` ^4.4.0 | `pixi-5`<br>`pixi.js` ^5.0.0 | `pixi-6`<br>`pixi.js` ^6.0.0 | `pixi-7`<br>`pixi.js` ^7.2.0 | `pixi-8`<br>`pixi.js` ^8.9.0 |
 | --- | --- | --- | --- | --- | --- |
 | `react-17`, `react` ^17.0.2, `react-reconciler` 0.26.2 | supported | supported | supported | supported | supported |
 | `react-18`, `react` ^18.3.1, `react-reconciler` 0.29.2 | tested | tested | tested | tested | tested |
@@ -106,11 +106,13 @@ Every React adapter works with every PixiJS adapter:
 
 ### PixiJS 7
 
+- `@react-pixi-fiber/pixi-7` needs PixiJS 7.2 or newer, the first with `eventMode`.
 - PixiJS 7 calls only the handler properties such as `onclick` and `onpointerdown`, and no longer reads `buttonMode`. The 2.x props `click`, `pointerdown`, …, and `buttonMode` are set on the instance, do nothing, and warn once in development.
 - `pixi7({ compat })`, with `compat` imported from `@react-pixi-fiber/pixi-7/compat/pixi6`, translates them: the event names to `onclick`, `onpointerdown`, …, `mousemove`, `pointermove` and `touchmove` to `onglobalmousemove`, `onglobalpointermove` and `onglobaltouchmove`, which run on every move as the 2.x move props did, `buttonMode` to `cursor` and `interactive` to `eventMode`. In development each translated prop warns once and names the replacement. PixiJS 4 and 5 apps use `compat/pixi6` too. Without the import, `pixi-7` holds no compat code.
 
 ### PixiJS 8
 
+- `@react-pixi-fiber/pixi-8` needs PixiJS 8.9 or newer, the first with every tag it exports (`DOMContainer`; `ParticleContainer` with `Particle` since 8.5, `PerspectiveMesh` since 8.3, `RenderLayer` since 8.7).
 - `Stage` creates the application with the asynchronous `app.init()`, so it renders its children after the application exists. Read the application in [`onInit`](#read-the-application-in-oninit-not-from-the-ref-at-mount).
 - `usePixiTicker` callbacks receive the PixiJS 8 `Ticker`, not a delta: read `ticker.deltaTime`.
 - `tint` accepts color strings as well as numbers.

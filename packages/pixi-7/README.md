@@ -2,7 +2,7 @@
 
 PixiJS 7 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It tells `react-pixi-fiber` how to create the PixiJS 7 display objects for all 13 core tags, which props it types, and how to create a `PIXI.Application`.
 
-Install it next to `react-pixi-fiber`, `pixi.js` 7 and a React adapter from the [adapter table](../react-pixi-fiber/README.md#setup), then configure once in the app entry, before the first render:
+Install it next to `react-pixi-fiber`, `pixi.js` 7.2 or newer (the first with `eventMode`) and a React adapter from the [adapter table](../react-pixi-fiber/README.md#setup), then configure once in the app entry, before the first render:
 
 ```js
 import { configure } from "react-pixi-fiber";
@@ -72,7 +72,7 @@ The compat module also types the translated props on every tag, as deprecated, s
 
 ## Migrating from `@react-pixi-fiber/pixi-6`
 
-1. Install `@react-pixi-fiber/pixi-7` and `pixi.js` 7, and pass `pixi7()` to `configure` instead of `pixi6()`. To keep the PixiJS 6 props while you migrate, pass `compat` from `@react-pixi-fiber/pixi-7/compat/pixi6`, see [above](#compatibility-with-the-2x-props).
+1. Install `@react-pixi-fiber/pixi-7` and `pixi.js` 7.2 or newer, and pass `pixi7()` to `configure` instead of `pixi6()`. To keep the PixiJS 6 props while you migrate, pass `compat` from `@react-pixi-fiber/pixi-7/compat/pixi6`, see [above](#compatibility-with-the-2x-props).
 2. Follow the [PixiJS 7 migration guide](https://github.com/pixijs/pixijs/wiki/v7-Migration-Guide) for the PixiJS calls in your app.
 
 What changes for `react-pixi-fiber` code:

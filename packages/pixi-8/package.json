@@ -70,7 +70,7 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
-    "pixi.js": "^8.0.0",
+    "pixi.js": "^8.9.0",
     "react-pixi-fiber": "^3.0.0"
   },
   "devDependencies": {
