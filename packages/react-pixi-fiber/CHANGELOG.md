@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `configure({ react, pixi })`, called once in the app entry before the first render, wires a React adapter and a PixiJS adapter into the core. Without it the first render throws an error that prints the install line and the setup lines
 - `@react-pixi-fiber/react-18`, the React 18 adapter, `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter, and `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter with the `HTMLText` tag
+- `@react-pixi-fiber/react-17`, the React 17 adapter, needs React 17.0.2 or a later 17.x
 - `@react-pixi-fiber/react-19`, the React 19 adapter, needs React 19.3 or newer. It reports render errors on `console.error`, renders a `<ViewTransition>` inside `Stage` without animating and rejects `<Fragment ref>`
 - `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter with the `DOMContainer`, `HTMLText`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` tags and a `compat` option that translates the 2.x interaction props. `ParticleContainer` throws on it
 - A PixiJS adapter can rename props with `translateProps` before they are validated, set or diffed; a `PIXIComponent` with its own `applyProps` receives the props as written
@@ -20,7 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `Stage` `onInit(app)` prop, called once the PixiJS application exists and the children are rendered
 
 ### Changed
-- `react-reconciler` moved from the core into the React adapters; `@react-pixi-fiber/react-18` bundles `react-reconciler` 0.29.2 and `@react-pixi-fiber/react-19` 0.34.0
+- `react-reconciler` moved from the core into the React adapters; `@react-pixi-fiber/react-17` bundles `react-reconciler` 0.26.2, `@react-pixi-fiber/react-18` 0.29.2 and `@react-pixi-fiber/react-19` 0.34.0
 - `pixi.js` is no longer a peer dependency of the core, the PixiJS adapter has it. The core's `react` peer is `>=17.0.0 <20.0.0`
 - A second `configure` call after a render warns once in development. Trees already rendered keep their React renderer; new PixiJS instances use the new adapter
 - The PixiJS 6 types `InteractionCompatibility`, `InteractionEventCompatibility` and `PixiTypeFallback` import from `@react-pixi-fiber/pixi-6`

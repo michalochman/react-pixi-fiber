@@ -1,0 +1,62 @@
+{
+  "name": "@react-pixi-fiber/react-17",
+  "version": "0.0.0",
+  "description": "React 17 adapter for react-pixi-fiber",
+  "main": "index.js",
+  "author": "Michal Ochman",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michalochman/react-pixi-fiber.git",
+    "directory": "packages/react-17"
+  },
+  "typings": "./dist/cjs/react-17.d.ts",
+  "exports": {
+    ".": {
+      "node": {
+        "types": "./dist/cjs/react-17.d.ts",
+        "default": "./index.js"
+      },
+      "import": {
+        "types": "./dist/es/react-17.d.mts",
+        "development": "./dist/es/react-17.development.js",
+        "default": "./dist/es/react-17.production.min.js"
+      },
+      "require": {
+        "types": "./dist/cjs/react-17.d.ts",
+        "default": "./index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "index.js",
+    "dist/",
+    "src/"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-pixi-fiber": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-reconciler": "^0.26.0",
+    "react": "^17.0.2",
+    "react-pixi-fiber": "workspace:*",
+    "react-reconciler": "0.26.2",
+    "react-test-renderer": "^17.0.2"
+  },
+  "scripts": {
+    "build": "rm -rf dist && pnpm run build:prod && pnpm run build:dev",
+    "build:dev": "cross-env NODE_ENV=development tsdown",
+    "build:prod": "cross-env NODE_ENV=production tsdown",
+    "check-types": "tsc -p tsconfig.json",
+    "test": "pnpm run test:dev && pnpm run test:prod",
+    "test:dev": "vitest run --mode development",
+    "test:prod": "vitest run --mode production"
+  }
+}

@@ -58,6 +58,7 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 
 | Adapter | Supports |
 | --- | --- |
+| [`@react-pixi-fiber/react-17`](https://www.npmjs.com/package/@react-pixi-fiber/react-17) | `react` ^17.0.2 |
 | [`@react-pixi-fiber/react-18`](https://www.npmjs.com/package/@react-pixi-fiber/react-18) | `react` ^18.3.1 |
 | [`@react-pixi-fiber/react-19`](https://www.npmjs.com/package/@react-pixi-fiber/react-19) | `react` ^19.3.0 |
 | [`@react-pixi-fiber/pixi-6`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-6) | `pixi.js` ^6.0.0 |
@@ -65,6 +66,10 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | [`@react-pixi-fiber/pixi-8`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-8) | `pixi.js` ^8.0.0 |
 
 Without `configure`, the first render throws an error that prints the install line and these setup lines.
+
+### React 17
+
+`@react-pixi-fiber/react-17` needs React 17.0.2 or a later 17.x, the peer range of the `react-reconciler` it bundles. React 16 is not supported. Render with `ReactDOM.render`, see [Usage](#usage).
 
 ### React 19
 
@@ -96,7 +101,7 @@ The bundled examples run on PixiJS 7. Moved to PixiJS 8 with `compat: "pixi6"`, 
 
 <details open>
   <summary>
-    <strong>With ReactDOM (React 18 and above)</strong>
+    <strong>With ReactDOM (React 18 and 19)</strong>
   </summary>
 
 ```jsx harmony
@@ -127,10 +132,10 @@ The HTML-like syntax; [called JSX](https://reactjs.org/docs/introducing-jsx.html
 
 <details>
   <summary>
-    <strong>With ReactDOM (React 16 and 17)</strong>
+    <strong>With ReactDOM (React 17)</strong>
   </summary>
 
-React 16 and 17 are supported by `react-pixi-fiber@1.x` only. `react-pixi-fiber@2.x` requires React 18.2 or newer.
+Configure `@react-pixi-fiber/react-17` first, as in [Setup](#setup). React 16 is not supported.
 
 ```jsx harmony
 import { render } from "react-dom";
@@ -298,14 +303,14 @@ These won't actually replace the property but they will be applied using the ori
 
 `PIXI.Application` is automatically provided using the following definition (either as a prop or in context):
 * `app` – an instance of PixiJS Application, with properties like:
-  * `loader` – Loader instance to help with asset loading,
+  * `loader` – Loader instance to help with asset loading (PixiJS 6; PixiJS 7 and 8 have `Assets`),
   * `renderer` – WebGL or CanvasRenderer,
   * `ticker` – Ticker for doing render updates,
   * `view` – reference to the renderer's canvas element. 
 
 <details>
   <summary>
-    <strong>Using <code>withApp</code> Higher-Order Component (with all React versions)</strong>
+    <strong>Using <code>withApp</code> Higher-Order Component</strong>
   </summary>
 
 To get `app` prop in your component you may wrap it with `withApp` higher-order component:
@@ -365,7 +370,7 @@ render(
 
 <details>
   <summary>
-    <strong>Using New Context API directly (with React 16.3.0 and newer)</strong>
+    <strong>Using <code>AppContext</code> directly</strong>
   </summary>
 
 ```jsx harmony
@@ -414,65 +419,6 @@ render(
         <RotatingBunny app={app} x={200} y={200} />
       )}
     </AppContext.Consumer>
-  </Stage>,
-  document.getElementById("container")
-);
-```
-
-</details>
-
----
-
-<details>
-  <summary>
-    <strong>Using Legacy Context API directly (with React older than 16.3.0)</strong>
-  </summary>
-
-This approach is not recommended as it is easier to just use `withApp` HoC mentioned above.
-
-```jsx harmony
-import { render } from "react-dom";
-import { Sprite, Stage } from "react-pixi-fiber";
-import bunny from "./bunny.png";
-
-class RotatingBunny extends Component {
-  state = {
-    rotation: 0,
-  };
-
-  componentDidMount() {
-    // Note that `app` is coming from context, NOT from props
-    this.context.app.ticker.add(this.animate);
-  }
-
-  componentWillUnmount() {
-    this.context.app.ticker.remove(this.animate);
-  }
-
-  animate = delta => {
-    this.setState(state => ({
-      rotation: state.rotation + 0.1 * delta,
-    }));
-  };
-
-  render() {
-    return (
-      <Sprite 
-        {...this.props}
-        texture={PIXI.Texture.from(bunny)}
-        rotation={this.state.rotation} 
-      />
-    );
-  }
-}
-// Note that here we tell React to apply `app` via legacy Context API
-RotatingBunny.childContextTypes = {
-  app: PropTypes.object,
-};
-
-render(
-  <Stage options={{ backgroundColor: 0x10bb99, height: 600, width: 800 }}>
-    <RotatingBunny x={200} y={200} />
   </Stage>,
   document.getElementById("container")
 );
