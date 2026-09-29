@@ -1,10 +1,13 @@
 import * as PIXI from "pixi.js";
 import * as React from "react";
 import {
+  AnimatedSprite,
   BitmapText,
   Container,
   Graphics,
+  MeshRope,
   NineSlicePlane,
+  NineSliceSprite,
   ParticleContainer,
   Sprite,
   Stage,
@@ -29,10 +32,10 @@ const CompositionExample: React.FC = () => (
   </Container>
 );
 
-type AnimatedSpriteProps = {
+type CustomAnimatedSpriteProps = {
   textures: PIXI.AnimatedSprite["textures"];
 };
-const AnimatedSprite = PIXIComponent<PIXI.AnimatedSprite, AnimatedSpriteProps>("AnimatedSprite", {
+const CustomAnimatedSprite = PIXIComponent<PIXI.AnimatedSprite, CustomAnimatedSpriteProps>("CustomAnimatedSprite", {
   create: props => new PIXI.AnimatedSprite(props.textures),
   applyProps: (instance, oldProps, newProps) => {
     console.log(instance.animationSpeed);
@@ -130,7 +133,7 @@ console.log(reapply);
 
 const CustomPIXIComponentExample: React.FC = () => (
   <>
-    <AnimatedSprite textures={[]} />
+    <CustomAnimatedSprite textures={[]} />
     <Circle fill={0xffff00} radius={10} position="10,10" />
     <PlainGraphics x={1} />
   </>
@@ -227,8 +230,11 @@ const StageClassExample: React.FC = () => {
         <Text text="Styled text" style={{ fontSize: 12 }} />
         <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
         <TilingSprite texture={texture} />
+        <AnimatedSprite textures={[]} />
+        <MeshRope texture={texture} points={[]} />
+        <NineSliceSprite texture={texture} leftWidth={1} topHeight={1} rightWidth={1} bottomHeight={1} />
         <CompositionExample />
-        <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+        <CustomAnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
         <WickedContainer isWicked={false} />
         <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
         <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
@@ -315,7 +321,7 @@ const StageFunctionExample: React.FC = () => {
         <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
         <TilingSprite texture={texture} />
         <CompositionExample />
-        <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+        <CustomAnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
         <WickedContainer isWicked={false} />
         <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
         <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />

@@ -1,56 +1,27 @@
 import { describe, it, expect } from "vitest";
-import {
-  STAGE_PROP_NAMES,
-  getCanvasProps,
-  getContainerProps,
-  includingCanvasProps,
-  includingContainerProps,
-  includingStageProps,
-} from "../../src/Stage/props";
-import possibleStandardNames from "../../src/possibleStandardNames";
-import { TYPES } from "../../src/tags";
+import { CONTAINER_PROP_NAMES, STAGE_PROP_NAMES, getCanvasProps, getContainerProps } from "../../src/Stage/props";
+import { getStandardNames } from "../../src/PixiProperty";
+import builtins from "../../src/builtins";
 
-describe("includingContainerProps", () => {
-  it("returns true if prop is one of Container members", () => {
-    Object.keys(possibleStandardNames[TYPES.CONTAINER]).forEach(propName => {
-      expect(includingContainerProps(propName)).toBeTruthy();
-    });
+const typedNames = Object.values(getStandardNames(builtins));
+const toProps = names => Object.fromEntries(names.map(name => [name, 1]));
+
+describe("Container and canvas prop split", () => {
+  it("puts the typed names and the plain Container names on app.stage", () => {
+    const names = [...typedNames, ...CONTAINER_PROP_NAMES];
+    expect(Object.keys(getContainerProps(toProps(names))).sort()).toEqual([...new Set(names)].sort());
+    expect(getCanvasProps(toProps(names))).toEqual({});
   });
 
-  it("returns false if prop is not one of Container members", () => {
-    expect(includingContainerProps("className")).toBeFalsy();
-    expect(includingContainerProps("style")).toBeFalsy();
-    expect(includingContainerProps("options")).toBeFalsy();
-  });
-});
-
-describe("includingStageProps", () => {
-  it("returns true if prop is one of Stage props", () => {
-    STAGE_PROP_NAMES.forEach(propName => {
-      expect(includingStageProps(propName)).toBeTruthy();
-    });
+  it("puts other props on the canvas", () => {
+    const props = { className: "c", id: "i", style: {} };
+    expect(getCanvasProps(props)).toEqual(props);
+    expect(getContainerProps(props)).toEqual({});
   });
 
-  it("returns false if prop is not one of Stage props", () => {
-    expect(includingStageProps("className")).toBeFalsy();
-    expect(includingStageProps("position")).toBeFalsy();
-    expect(includingStageProps("style")).toBeFalsy();
-  });
-});
-
-describe("includingCanvasProps", () => {
-  it("returns true if prop is not one of Container members", () => {
-    expect(includingCanvasProps("className")).toBeTruthy();
-    expect(includingCanvasProps("id")).toBeTruthy();
-    expect(includingCanvasProps("style")).toBeTruthy();
-  });
-
-  it("returns false if prop is one of Container members or Stage props", () => {
-    Object.keys(possibleStandardNames[TYPES.CONTAINER])
-      .concat(STAGE_PROP_NAMES)
-      .forEach(propName => {
-        expect(includingCanvasProps(propName)).toBeFalsy();
-      });
+  it("puts Stage's own props on neither, except the typed width and height", () => {
+    expect(getCanvasProps(toProps(STAGE_PROP_NAMES))).toEqual({});
+    expect(Object.keys(getContainerProps(toProps(STAGE_PROP_NAMES))).sort()).toEqual(["height", "width"]);
   });
 });
 

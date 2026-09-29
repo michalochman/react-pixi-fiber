@@ -4,7 +4,7 @@ import { CustomPIXIComponent, CustomPIXIProperty, PIXIComponent, PIXIProperty } 
 import { getInstanceTag } from "../src/registry";
 import { AppContext, AppProvider, withApp } from "../src/AppProvider";
 import Stage, { createStageClass } from "../src/Stage";
-import { TYPES } from "../src/tags";
+import { TAGS } from "../src/tags";
 import { usePixiApp, usePixiTicker } from "../src/hooks";
 import { applyDisplayObjectProps, applyProps } from "../src/ReactPixiFiberComponent";
 
@@ -38,14 +38,8 @@ describe("ReactPixiFiber public API", () => {
   });
 
   it("provides expected components", () => {
-    expect(ReactPixiFiber.BitmapText).toEqual(TYPES.BITMAP_TEXT);
-    expect(ReactPixiFiber.Container).toEqual(TYPES.CONTAINER);
-    expect(ReactPixiFiber.Graphics).toEqual(TYPES.GRAPHICS);
-    expect(ReactPixiFiber.NineSlicePlane).toEqual(TYPES.NINE_SLICE_PLANE);
-    expect(ReactPixiFiber.ParticleContainer).toEqual(TYPES.PARTICLE_CONTAINER);
-    expect(ReactPixiFiber.Sprite).toEqual(TYPES.SPRITE);
+    for (const tag of Object.keys(TAGS)) expect(ReactPixiFiber[tag], tag).toEqual(TAGS[tag]);
+    expect(ReactPixiFiber.NineSlicePlane).toEqual("NineSlicePlane");
     expect(ReactPixiFiber.Stage).toEqual(Stage);
-    expect(ReactPixiFiber.Text).toEqual(TYPES.TEXT);
-    expect(ReactPixiFiber.TilingSprite).toEqual(TYPES.TILING_SPRITE);
   });
 });

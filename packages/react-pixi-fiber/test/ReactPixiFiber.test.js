@@ -7,7 +7,7 @@ import { diffProperties, setInitialProperties, updateProperties } from "../src/R
 import { validateProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
 import { createRegisteredInstance, normalizeBehavior } from "../src/registry";
 import { createRender } from "../src/render";
-import { TYPES } from "../src/tags";
+import { TAGS } from "../src/tags";
 import { findStrictRoot } from "../src/utils";
 
 vi.mock("pixi.js", async importOriginal => {
@@ -230,7 +230,7 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls updateProperties with only changed props for regular types", () => {
-      const type = TYPES.TEXT;
+      const type = TAGS.Text;
       const oldProps = { text: "42" };
       const newProps = { text: "42", scale: 2 };
       const updatePayload = ReactPixiFiberComponent.diffProperties(type, instance, oldProps, newProps);
@@ -242,7 +242,7 @@ describe("ReactPixiFiber", () => {
 
     it("validates properties in development", () => {
       const internalHandle = {};
-      const type = TYPES.TEXT;
+      const type = TAGS.Text;
       const oldProps = { text: "42" };
       const newProps = { text: "42", scale: 2 };
       const updatePayload = ReactPixiFiberComponent.diffProperties(type, instance, oldProps, newProps);
@@ -398,7 +398,7 @@ describe("ReactPixiFiber", () => {
     it("validates properties in development", () => {
       const internalHandle = {};
       const instance = new PIXI.Text();
-      const type = TYPES.TEXT;
+      const type = TAGS.Text;
       const props = { text: "42" };
       ReactPixiFiber.commitMount(instance, type, props, internalHandle);
 

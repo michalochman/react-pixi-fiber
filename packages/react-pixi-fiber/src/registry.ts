@@ -110,7 +110,12 @@ export function createRegisteredInstance(
   applyDisplayObjectProps: (type: string, instance: any, oldProps: any, newProps: any) => void
 ): object {
   const instance = behavior.create(props);
-  invariant(instance != null, "`create` of `%s` returned `%s`, expected a display object.", type, String(instance));
+  invariant(
+    instance !== null && (typeof instance === "object" || typeof instance === "function"),
+    "`create` of `%s` returned `%s`, expected a display object.",
+    type,
+    String(instance)
+  );
   const bound: BoundBehavior = { tag: type };
   if (typeof behavior.applyProps === "function") {
     bound.applyProps = behavior.applyProps.bind({

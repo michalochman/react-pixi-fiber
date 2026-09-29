@@ -1,15 +1,16 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/ReactDOMUnknownPropertyHook.js
 import warning from "./warning";
+import { getPixiAdapter } from "./config";
 import {
   RESERVED,
   customStandardNames,
   getOwn,
   getPropertyInfo,
   getCustomPropertyInfo,
+  getStandardNames,
   shouldRemoveAttributeWithWarning,
 } from "./PixiProperty";
 import { getStackAddendum } from "./ReactGlobalSharedState";
-import possibleStandardNames from "./possibleStandardNames";
 
 const emptyFunction = () => {};
 
@@ -18,7 +19,8 @@ let validateProperty: (type: string, name: string, value: unknown) => boolean | 
 
 if (__DEV__) {
   const warnedProperties: Record<string, boolean> = {};
-  const EVENT_NAME_REGEX = /^on./;
+  // React-style camelCase handlers only: `onclick` is a real PixiJS 7+ prop.
+  const EVENT_NAME_REGEX = /^on[A-Z]/;
 
   validateProperty = function (type, name, value) {
     // Inlined: babel-plugin-rewire rewrites a block-scoped `hasOwnProperty` binding to `_get__("hasOwnProperty")`
@@ -53,36 +55,25 @@ if (__DEV__) {
       return true;
     }
 
-    const propertyInfo = getPropertyInfo(name);
+    const pixi = getPixiAdapter();
+    const propertyInfo = getPropertyInfo(name, pixi);
     const customPropertyInfo = getCustomPropertyInfo(name, type);
     const isReserved = propertyInfo !== null && propertyInfo.type === RESERVED;
 
     // Known attributes should match the casing specified in the property config.
-    // A name is known to the tag's standard names, or was registered by `PIXIProperty` on the tag or on all tags.
+    // A name is typed by the adapter table, or was registered by `PIXIProperty` on the tag or on all tags.
+    // Any other name is set on the instance as-is and not reported (decision 1).
     const standardName =
-      getOwn(possibleStandardNames[type], lowerCasedName) ??
+      getOwn(getStandardNames(pixi), lowerCasedName) ??
       getOwn(customStandardNames[type], lowerCasedName) ??
       getOwn(customStandardNames["*"], lowerCasedName);
-    if (standardName !== undefined) {
-      if (standardName !== name) {
-        warning(
-          false,
-          "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
-          name,
-          type,
-          standardName,
-          getStackAddendum()
-        );
-        warnedProperties[name] = true;
-        return true;
-      }
-    } else if (!isReserved && typeof value !== "undefined") {
+    if (standardName !== undefined && standardName !== name) {
       warning(
         false,
-        "React does not recognize prop `%s` on `<%s />`. If you accidentally passed it from a parent component, remove it from `<%s />`.%s",
+        "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
         name,
         type,
-        type,
+        standardName,
         getStackAddendum()
       );
       warnedProperties[name] = true;

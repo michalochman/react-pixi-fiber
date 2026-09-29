@@ -59,4 +59,41 @@ describe("registry", () => {
     expect(registry.getInstanceTag(instance)).toBe("T");
     expect(instance._customApplyProps).toBeUndefined();
   });
+
+  it("resolves the user entry before the adapter entry and names the source", () => {
+    const adapter = { create: () => ({}) };
+    const user = { create: () => ({}) };
+    registry.registerAdapterComponents({ Sprite: adapter, Text: () => ({}) });
+    expect(registry.resolveComponent("Sprite")).toEqual({ behavior: adapter, source: "adapter" });
+    registry.registerComponent("Sprite", user);
+    expect(registry.resolveComponent("Sprite")).toEqual({ behavior: user, source: "user" });
+    expect(registry.getAdapterComponent("Sprite")).toEqual(adapter);
+    expect(registry.resolveComponent("Nope")).toBeUndefined();
+    expect(registry.resolveComponent("constructor")).toBeUndefined();
+  });
+
+  it("registerAdapterComponents normalizes every entry and replaces the previous set", () => {
+    const create = () => ({});
+    registry.registerAdapterComponents({ Text: create });
+    expect(registry.getAdapterComponent("Text").create).toBe(create);
+    registry.registerAdapterComponents({ Sprite: create });
+    expect(registry.getAdapterComponent("Text")).toBeUndefined();
+    expect(() => registry.registerAdapterComponents({ Broken: {} })).toThrow("Broken");
+  });
+
+  it("throws when create returns no object, naming the component", () => {
+    for (const value of [null, undefined, 1, "x"]) {
+      expect(() => registry.createRegisteredInstance("Odd", { create: () => value }, {}, () => {})).toThrow(
+        "`create` of `Odd` returned"
+      );
+    }
+  });
+
+  it("keeps the new key when a legacy key sits next to it", () => {
+    const create = () => ({});
+    const legacy = () => ({});
+    const behavior = registry.normalizeBehavior("Both", { create, customDisplayObject: legacy });
+    expect(behavior.create).toBe(create);
+    expect(behavior.customDisplayObject).toBeUndefined();
+  });
 });

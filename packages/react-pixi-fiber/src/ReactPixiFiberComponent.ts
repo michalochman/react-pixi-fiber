@@ -1,18 +1,21 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/ReactDOMFiberComponent.js
 import invariant from "./invariant";
-import * as PIXI from "pixi.js";
+import warning from "./warning";
+import type * as PIXI from "pixi.js";
+import { getPixiAdapter } from "./config";
 import { CHILDREN } from "./props";
-import { TYPES } from "./tags";
-import { createRegisteredInstance, getBoundBehavior, getUserComponent } from "./registry";
+import { DEPRECATED_TAGS } from "./tags";
+import { createRegisteredInstance, getAdapterComponent, getBoundBehavior, resolveComponent } from "./registry";
 import { setValueForProperty } from "./PixiPropertyOperations";
+import { getOwn } from "./PixiProperty";
 
 type Instance = PIXI.DisplayObject;
 type Props = Record<string, any>;
 
-// PixiJS v4 keeps these classes under extras/mesh/particles, which v5+ does not export. Reading them from a
-// plain copy of the namespace stops bundlers from reporting them as missing ES module exports.
-const PIXI_V4 = Object.assign({}, PIXI) as unknown as Record<string, any>;
+const warnedDeprecatedTags: Record<string, boolean> = {};
+const warnedShadowedTags: Record<string, boolean> = {};
 
+// Tag resolution: the user `PIXIComponent` registry, then the adapter's components, then the deprecated tag map.
 export function createInstance(
   type: string,
   props: Props,
@@ -20,85 +23,35 @@ export function createInstance(
   hostContext?: unknown,
   internalHandle?: unknown
 ): PIXI.DisplayObject {
-  let instance: PIXI.DisplayObject | undefined;
-
-  switch (type) {
-    case TYPES.BITMAP_TEXT:
-      const style =
-        typeof props.style !== "undefined"
-          ? props.style
-          : {
-              align: props.align,
-              font: props.font,
-              tint: props.tint,
-            };
-      try {
-        instance = new PIXI_V4.extras.BitmapText(props.text, style);
-      } catch (e) {
-        instance = new PIXI.BitmapText(props.text, style);
-      }
-      break;
-    case TYPES.CONTAINER:
-      instance = new PIXI.Container();
-      break;
-    case TYPES.GRAPHICS:
-      instance = new PIXI.Graphics();
-      break;
-    case TYPES.NINE_SLICE_PLANE:
-      try {
-        instance = new PIXI_V4.mesh.NineSlicePlane(
-          props.texture,
-          props.leftWidth,
-          props.topHeight,
-          props.rightWidth,
-          props.bottomHeight
-        );
-      } catch (e) {
-        instance = new PIXI.NineSlicePlane(
-          props.texture,
-          props.leftWidth,
-          props.topHeight,
-          props.rightWidth,
-          props.bottomHeight
-        );
-      }
-      break;
-    case TYPES.PARTICLE_CONTAINER:
-      try {
-        instance = new PIXI_V4.particles.ParticleContainer(
-          props.maxSize,
-          props.properties,
-          props.batchSize,
-          props.autoResize
-        );
-      } catch (e) {
-        instance = new PIXI.ParticleContainer(props.maxSize, props.properties, props.batchSize, props.autoResize);
-      }
-      break;
-    case TYPES.SPRITE:
-      instance = new PIXI.Sprite(props.texture);
-      break;
-    case TYPES.TEXT:
-      instance = new PIXI.Text(props.text, props.style, props.canvas);
-      break;
-    case TYPES.TILING_SPRITE:
-      try {
-        instance = new PIXI_V4.extras.TilingSprite(props.texture, props.width, props.height);
-      } catch (e) {
-        instance = new PIXI.TilingSprite(props.texture, props.width, props.height);
-      }
-      break;
-    default: {
-      const behavior = getUserComponent(type);
-      invariant(behavior, "ReactPixiFiber does not support the type: `%s`.", type);
-      instance = createRegisteredInstance(type, behavior, props, applyDisplayObjectProps) as PIXI.DisplayObject;
-      break;
+  getPixiAdapter(); // throws the missing-configure error before anything else
+  let tag = type;
+  let resolved = resolveComponent(type);
+  if (resolved && resolved.source === "user") {
+    if (__DEV__ && getAdapterComponent(type) && !warnedShadowedTags[type]) {
+      warnedShadowedTags[type] = true;
+      warning(
+        false,
+        "`%s` is registered with PIXIComponent and also defined by the PixiJS adapter. The PIXIComponent registration wins.",
+        type
+      );
     }
   }
-
-  invariant(instance, "ReactPixiFiber does not support the type: `%s`.", type);
-
-  return instance;
+  const deprecatedTag = getOwn(DEPRECATED_TAGS, type);
+  if (!resolved && deprecatedTag !== undefined) {
+    if (__DEV__ && !warnedDeprecatedTags[type]) {
+      warnedDeprecatedTags[type] = true;
+      warning(false, "Tag `%s` is deprecated, use `%s`. It will be removed in 4.0.0.", type, deprecatedTag);
+    }
+    tag = deprecatedTag;
+    resolved = resolveComponent(tag);
+  }
+  invariant(
+    resolved,
+    'ReactPixiFiber does not know the tag `%s`. Register it with `PIXIComponent("%s", behavior)` or pass a PixiJS adapter that defines it to `configure`.',
+    type,
+    type
+  );
+  return createRegisteredInstance(tag, resolved.behavior, props, applyDisplayObjectProps) as PIXI.DisplayObject;
 }
 
 export function setInitialPixiProperties(

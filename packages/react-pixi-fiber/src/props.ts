@@ -1,4 +1,4 @@
-import { TYPES } from "./tags";
+import { TAGS } from "./tags";
 import * as PIXI from "pixi.js";
 
 export const CHILDREN = "children";
@@ -85,11 +85,11 @@ const tilingSpriteDefaultProps = {
 };
 
 export const defaultProps: Record<string, Record<string, unknown>> = {
-  [TYPES.BITMAP_TEXT]: bitmapTextDefaultProps,
-  [TYPES.CONTAINER]: containerDefaultProps,
-  [TYPES.GRAPHICS]: graphicsDefaultProps,
-  [TYPES.PARTICLE_CONTAINER]: particleContainerDefaultProps,
-  [TYPES.SPRITE]: spriteDefaultProps,
-  [TYPES.TEXT]: textDefaultProps,
-  [TYPES.TILING_SPRITE]: tilingSpriteDefaultProps,
+  [TAGS.BitmapText]: bitmapTextDefaultProps,
+  [TAGS.Container]: containerDefaultProps,
+  [TAGS.Graphics]: graphicsDefaultProps,
+  [TAGS.ParticleContainer]: particleContainerDefaultProps,
+  [TAGS.Sprite]: spriteDefaultProps,
+  [TAGS.Text]: textDefaultProps,
+  [TAGS.TilingSprite]: tilingSpriteDefaultProps,
 };

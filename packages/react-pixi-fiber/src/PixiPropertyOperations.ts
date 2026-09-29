@@ -1,13 +1,16 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/DOMPropertyOperations.js
 import warning from "./warning";
 import type * as PIXI from "pixi.js";
-import { getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
+import { getPixiAdapter } from "./config";
+import { getOwn, getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
 import { defaultProps } from "./props";
 import { getStackAddendum } from "./ReactGlobalSharedState";
+import { DEPRECATED_TAGS } from "./tags";
 import { findStrictRoot, setPixiValue } from "./utils";
 
 export function getDefaultValue(type: string, propName: string): unknown {
-  const defaultValues = defaultProps[type];
+  // A deprecated tag creates the instance of the tag it maps to, so it has that tag's defaults.
+  const defaultValues = defaultProps[getOwn(DEPRECATED_TAGS, type) ?? type];
   if (typeof defaultValues !== "undefined") {
     return defaultValues[propName];
   }
@@ -29,7 +32,7 @@ export function setValueForProperty(
   value: unknown,
   internalHandle?: unknown
 ): void {
-  const propertyInfo = getPropertyInfo(propName);
+  const propertyInfo = getPropertyInfo(propName, getPixiAdapter());
   let strictRoot = null;
   if (__DEV__) {
     strictRoot = findStrictRoot(internalHandle);

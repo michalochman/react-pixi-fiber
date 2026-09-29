@@ -1,149 +1,68 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import * as PIXI from "pixi.js";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
 import { createRegisteredInstance, normalizeBehavior, registerComponent } from "../src/registry";
 import { setValueForProperty } from "../src/PixiPropertyOperations";
-import { TYPES } from "../src/tags";
 
 vi.mock("../src/PixiPropertyOperations", async importOriginal => ({
   ...(await importOriginal()),
   setValueForProperty: vi.fn(),
 }));
 
-vi.mock("pixi.js", async importOriginal => {
-  return Object.assign({}, await importOriginal(), {
-    Container: vi.fn(),
-    Graphics: vi.fn(),
-    Sprite: vi.fn(),
-    Text: vi.fn(),
-    extras: {
-      BitmapText: vi.fn(),
-      TilingSprite: vi.fn(),
-    },
-    mesh: {
-      NineSlicePlane: vi.fn(),
-    },
-    particles: {
-      ParticleContainer: vi.fn(),
-    },
+const components = {
+  Container: { create: vi.fn(() => ({ kind: "Container" })) },
+  NineSliceSprite: { create: vi.fn(() => ({ kind: "NineSliceSprite" })) },
+};
+vi.mock("../src/config", () => ({
+  getPixiAdapter: () => ({
+    components,
+    properties: { boolean: [], numeric: [], positiveNumeric: [], vector: [], callback: [] },
+    isPoint: () => false,
+    copyPoint() {},
+  }),
+}));
+
+describe("createInstance", () => {
+  let error;
+  beforeEach(async () => {
+    vi.resetModules();
+    (await import("../src/registry")).registerAdapterComponents(components);
+    error = vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it("resolves the user registry before the adapter", async () => {
+    const { registerComponent } = await import("../src/registry");
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    const user = { kind: "user" };
+    registerComponent("Container", () => user);
+    expect(createInstance("Container", {})).toBe(user);
+    expect(createInstance("Container", {})).toBe(user);
+    expect(error).toHaveBeenCalledTimes(__DEV__ ? 1 : 0); // "also defined by the adapter"
+    if (__DEV__) expect(error.mock.calls[0][0]).toMatch(/`Container`.*PIXIComponent.*adapter/s);
+  });
+  it("resolves adapter components", async () => {
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    expect(createInstance("Container", { a: 1 })).toEqual({ kind: "Container" });
+    expect(components.Container.create).toHaveBeenCalledWith({ a: 1 });
+    expect(error).not.toHaveBeenCalled();
+  });
+  it("maps the deprecated NineSlicePlane tag to NineSliceSprite and warns once", async () => {
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    expect(createInstance("NineSlicePlane", {})).toEqual({ kind: "NineSliceSprite" });
+    expect(createInstance("NineSlicePlane", {})).toEqual({ kind: "NineSliceSprite" });
+    expect(error).toHaveBeenCalledTimes(__DEV__ ? 1 : 0);
+    if (__DEV__) expect(error.mock.calls[0][0]).toMatch(/NineSlicePlane.*NineSliceSprite/s);
+  });
+  it("throws for an unknown tag naming the tag and configure", async () => {
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    expect(() => createInstance("Nope", {})).toThrow(/`Nope`.*PIXIComponent.*configure/s);
   });
 });
 
 describe("ReactPixiFiber", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe("createInstance", () => {
-    it("returns PIXI.BitmapText if type is BITMAP_TEXT with style prop", () => {
-      const text = "Hello World";
-      const style = { font: "16 Arial", align: "left", tint: 0x421337 };
-      ReactPixiFiberComponent.createInstance(TYPES.BITMAP_TEXT, { text, style });
-
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);
-    });
-
-    it("returns PIXI.BitmapText if type is BITMAP_TEXT with font prop", () => {
-      const text = "Hello World";
-      const style = { font: "16 Arial", align: "left", tint: 0x421337 };
-      ReactPixiFiberComponent.createInstance(TYPES.BITMAP_TEXT, {
-        text,
-        font: style.font,
-        align: style.align,
-        tint: style.tint,
-      });
-
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);
-    });
-
-    it("returns PIXI.Container if type is CONTAINER", () => {
-      ReactPixiFiberComponent.createInstance(TYPES.CONTAINER, {});
-
-      expect(PIXI.Container).toHaveBeenCalledTimes(1);
-      expect(PIXI.Container).toHaveBeenCalledWith();
-    });
-
-    it("returns PIXI.Graphics if type is GRAPHICS", () => {
-      ReactPixiFiberComponent.createInstance(TYPES.GRAPHICS, {});
-
-      expect(PIXI.Graphics).toHaveBeenCalledTimes(1);
-      expect(PIXI.Graphics).toHaveBeenCalledWith();
-    });
-
-    it("returns PIXI.NineSlicePlane if type is NINE_SLICE_PLANE", () => {
-      const texture = "TEXTURE";
-      const leftWidth = 15;
-      const topHeight = 20;
-      const rightWidth = 25;
-      const bottomHeight = 30;
-      ReactPixiFiberComponent.createInstance(TYPES.NINE_SLICE_PLANE, {
-        texture,
-        leftWidth,
-        topHeight,
-        rightWidth,
-        bottomHeight,
-      });
-
-      expect(PIXI.mesh.NineSlicePlane).toHaveBeenCalledTimes(1);
-      expect(PIXI.mesh.NineSlicePlane).toHaveBeenCalledWith(texture, leftWidth, topHeight, rightWidth, bottomHeight);
-    });
-
-    it("returns PIXI.ParticleContainer if type is PARTICLE_CONTAINER", () => {
-      const maxSize = 1024;
-      const properties = { rotation: true };
-      const batchSize = 128;
-      const autoResize = false;
-      ReactPixiFiberComponent.createInstance(TYPES.PARTICLE_CONTAINER, { autoResize, batchSize, maxSize, properties });
-
-      expect(PIXI.particles.ParticleContainer).toHaveBeenCalledTimes(1);
-      expect(PIXI.particles.ParticleContainer).toHaveBeenCalledWith(maxSize, properties, batchSize, autoResize);
-    });
-
-    it("returns PIXI.Sprite if type is SPRITE", () => {
-      const texture = "TEXTURE";
-      ReactPixiFiberComponent.createInstance(TYPES.SPRITE, { texture });
-
-      expect(PIXI.Sprite).toHaveBeenCalledTimes(1);
-      expect(PIXI.Sprite).toHaveBeenCalledWith(texture);
-    });
-
-    it("returns PIXI.Text if type is TEXT", () => {
-      const text = "Hello World";
-      const style = { fontFamily: "Arial" };
-      const canvas = document.createElement("canvas");
-      ReactPixiFiberComponent.createInstance(TYPES.TEXT, { text, style, canvas });
-
-      expect(PIXI.Text).toHaveBeenCalledTimes(1);
-      expect(PIXI.Text).toHaveBeenCalledWith(text, style, canvas);
-    });
-
-    it("returns PIXI.TilingSprite if type is TILING_SPRITE", () => {
-      const texture = "TEXTURE";
-      const height = 16;
-      const width = 32;
-      ReactPixiFiberComponent.createInstance(TYPES.TILING_SPRITE, { height, texture, width });
-
-      expect(PIXI.extras.TilingSprite).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.TilingSprite).toHaveBeenCalledWith(texture, width, height);
-    });
-
-    it("returns the registered instance if type was registered", () => {
-      const instance = {};
-      const create = vi.fn(() => instance);
-      registerComponent("REGISTERED_TYPE", create);
-      const props = { prop: "value" };
-      expect(ReactPixiFiberComponent.createInstance("REGISTERED_TYPE", props)).toBe(instance);
-      expect(create).toHaveBeenCalledWith(props);
-    });
-
-    it("throws if type is not supported", () => {
-      expect(() => ReactPixiFiberComponent.createInstance("INJECTED_TYPE", {})).toThrow(
-        "ReactPixiFiber does not support the type: `INJECTED_TYPE`."
-      );
-    });
   });
 
   describe("setInitialProperties", () => {

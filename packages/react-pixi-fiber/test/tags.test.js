@@ -1,17 +1,26 @@
 import { describe, it, expect } from "vitest";
-import { TYPES } from "../src/tags";
+import { TAGS, DEPRECATED_TAGS } from "../src/tags";
 
-describe("TYPES", () => {
-  it("is an object mapping of supported types", () => {
-    expect(TYPES).toEqual({
-      BITMAP_TEXT: "BitmapText",
-      CONTAINER: "Container",
-      GRAPHICS: "Graphics",
-      NINE_SLICE_PLANE: "NineSlicePlane",
-      PARTICLE_CONTAINER: "ParticleContainer",
-      SPRITE: "Sprite",
-      TEXT: "Text",
-      TILING_SPRITE: "TilingSprite",
-    });
+describe("TAGS", () => {
+  it("names the 13 concepts every PixiJS major has, PixiJS 8 spelling", () => {
+    expect(Object.keys(TAGS).sort()).toEqual([
+      "AnimatedSprite",
+      "BitmapText",
+      "Container",
+      "Graphics",
+      "Mesh",
+      "MeshPlane",
+      "MeshRope",
+      "MeshSimple",
+      "NineSliceSprite",
+      "ParticleContainer",
+      "Sprite",
+      "Text",
+      "TilingSprite",
+    ]);
+    for (const [key, value] of Object.entries(TAGS)) expect(value).toBe(key);
+  });
+  it("maps the 2.x NineSlicePlane tag to NineSliceSprite", () => {
+    expect(DEPRECATED_TAGS).toEqual({ NineSlicePlane: "NineSliceSprite" });
   });
 });

@@ -1,5 +1,6 @@
 import type * as React from "react";
 import type * as PIXI from "pixi.js";
+import type { Behavior } from "./registry";
 
 /**
  * Compatibility
@@ -157,6 +158,13 @@ export interface PixiComponent<P = {}, I = P> {
 // Takes `PIXI.DisplayObject` or its subclass and updates its fields to be used with `ReactPixiFiber`.
 export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike<T>>>;
 
+// A component wrapper for `PIXI.AnimatedSprite`.
+// see: https://pixijs.download/v6.5.10/docs/PIXI.AnimatedSprite.html
+export type AnimatedSpriteProps = DisplayObjectProps<PIXI.AnimatedSprite> & {
+  // `autoUpdate` is not a property on `PIXI.AnimatedSprite`, but is used in constructor
+  autoUpdate?: boolean;
+};
+
 // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
 export type BitmapTextProps = DisplayObjectProps<
@@ -186,13 +194,43 @@ export type GraphicsProps = DisplayObjectProps<PIXI.Graphics>;
 
 // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.NineSlicePlane.html
-export type NineSlicePlaneProps = DisplayObjectProps<
+export type NineSliceSpriteProps = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
     PIXI.mesh.NineSlicePlane,
     PIXI.NineSlicePlane
   >
 >;
+/** @deprecated Renamed to `NineSliceSpriteProps`, removed in 4.0.0 */
+export type NineSlicePlaneProps = NineSliceSpriteProps;
+
+// A component wrapper for `PIXI.Mesh`.
+// see: https://pixijs.download/v6.5.10/docs/PIXI.Mesh.html
+export type MeshProps = DisplayObjectProps<PIXI.Mesh>;
+
+// A component wrapper for `PIXI.SimpleMesh`.
+// see: https://pixijs.download/v6.5.10/docs/PIXI.SimpleMesh.html
+export type MeshSimpleProps = DisplayObjectProps<PIXI.SimpleMesh> & {
+  // Constructor arguments that are not properties on `PIXI.SimpleMesh`
+  uvs?: Float32Array | number[];
+  indices?: Uint16Array | number[];
+};
+
+// A component wrapper for `PIXI.SimplePlane`.
+// see: https://pixijs.download/v6.5.10/docs/PIXI.SimplePlane.html
+export type MeshPlaneProps = DisplayObjectProps<PIXI.SimplePlane> & {
+  // Constructor arguments that are not properties on `PIXI.SimplePlane`
+  verticesX?: number;
+  verticesY?: number;
+};
+
+// A component wrapper for `PIXI.SimpleRope`.
+// see: https://pixijs.download/v6.5.10/docs/PIXI.SimpleRope.html
+export type MeshRopeProps = DisplayObjectProps<PIXI.SimpleRope> & {
+  // Constructor arguments that are not properties on `PIXI.SimpleRope`
+  points?: PIXI.IPoint[];
+  textureScale?: number;
+};
 
 // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
@@ -224,6 +262,31 @@ export type TilingSpriteProps = DisplayObjectProps<
     PIXI.TilingSprite
   >
 >;
+
+/**
+ * PixiJS adapter
+ */
+
+// Prop names the core types, by kind. Names not listed are set on the instance as-is (decision 1).
+export interface PixiPropertyTable {
+  boolean: readonly string[];
+  numeric: readonly string[];
+  positiveNumeric: readonly string[];
+  vector: readonly string[];
+  callback: readonly string[];
+}
+
+export interface PixiAdapter {
+  components: Record<string, Behavior>;
+  defaults?: Record<string, Record<string, unknown>>;
+  properties: PixiPropertyTable;
+  isPoint(value: unknown): value is { x: number; y: number };
+  copyPoint(target: { x: number; y: number }, value: { x: number; y: number }): void;
+  createApplication(options: Record<string, unknown>): unknown | Promise<unknown>;
+  destroyApplication(app: any, removeView: boolean, stageOptions: unknown): void;
+  isApplication(value: unknown): boolean;
+  translateProps?(type: string, props: Record<string, unknown>): Record<string, unknown>;
+}
 
 /**
  * Rendering: using Stage component or using render and unmount

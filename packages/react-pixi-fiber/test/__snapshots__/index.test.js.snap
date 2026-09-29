@@ -2,6 +2,7 @@
 
 exports[`ReactPixiFiber public API > should match snapshot 1`] = `
 {
+  "AnimatedSprite": "AnimatedSprite",
   "AppContext": {
     "$$typeof": Symbol(react.context),
     "Consumer": {
@@ -26,7 +27,12 @@ exports[`ReactPixiFiber public API > should match snapshot 1`] = `
   "CustomPIXIComponent": [Function],
   "CustomPIXIProperty": [Function],
   "Graphics": "Graphics",
+  "Mesh": "Mesh",
+  "MeshPlane": "MeshPlane",
+  "MeshRope": "MeshRope",
+  "MeshSimple": "MeshSimple",
   "NineSlicePlane": "NineSlicePlane",
+  "NineSliceSprite": "NineSliceSprite",
   "PIXIComponent": [Function],
   "PIXIProperty": [Function],
   "ParticleContainer": "ParticleContainer",

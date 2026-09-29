@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import * as PixiPropertyOperations from "../src/PixiPropertyOperations";
 import { shouldIgnoreAttribute, shouldRemoveAttribute } from "../src/PixiProperty";
 import { setPixiValue } from "../src/utils";
+import { defaultProps } from "../src/props";
 
 vi.mock("../src/PixiProperty", async importOriginal => ({
   ...(await importOriginal()),
@@ -57,6 +58,18 @@ describe("PixiPropertyOperations", () => {
       PixiPropertyOperations.setValueForProperty(type, instance, propName, true);
       expect(setPixiValue).toHaveBeenCalledTimes(1);
       expect(setPixiValue).toHaveBeenCalledWith(instance, propName, true);
+    });
+  });
+
+  describe("getDefaultValue", () => {
+    it("reads the defaults of the tag a deprecated tag maps to", () => {
+      defaultProps.NineSliceSprite = { alpha: 0.7 };
+      try {
+        expect(PixiPropertyOperations.getDefaultValue("NineSlicePlane", "alpha")).toBe(0.7);
+        expect(PixiPropertyOperations.getDefaultValue("NineSliceSprite", "alpha")).toBe(0.7);
+      } finally {
+        delete defaultProps.NineSliceSprite;
+      }
     });
   });
 });

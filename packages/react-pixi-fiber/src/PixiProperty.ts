@@ -1,4 +1,5 @@
 // Based on: https://github.com/facebook/react/blob/9c77ffb444598c32c8f92c8d79e406959a10445b/packages/react-dom/src/shared/DOMProperty.js
+import type { PixiAdapter } from "./types";
 import { parsePoint } from "./utils";
 
 // A reserved attribute.
@@ -83,8 +84,58 @@ export function shouldRemoveAttribute(
   return false;
 }
 
-export function getPropertyInfo(name: string): PropertyInfoRecord | null {
-  return properties.hasOwnProperty(name) ? properties[name] : null;
+const infoCache = new WeakMap<PixiAdapter, Record<string, PropertyInfoRecord>>();
+const namesCache = new WeakMap<PixiAdapter, Record<string, string>>();
+
+function buildInfo(pixi: PixiAdapter): Record<string, PropertyInfoRecord> {
+  const info: Record<string, PropertyInfoRecord> = {};
+  // These props are reserved by React. They shouldn't be written to the PIXI tree.
+  ["children", "parent"].forEach(name => {
+    info[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, RESERVED);
+  });
+  const table: Array<[readonly string[], number]> = [
+    [pixi.properties.boolean, BOOLEAN],
+    [pixi.properties.positiveNumeric, POSITIVE_NUMERIC],
+    [pixi.properties.numeric, NUMERIC],
+    [pixi.properties.vector, VECTOR],
+    [pixi.properties.callback, CALLBACK],
+  ];
+  table.forEach(([names, type]) =>
+    names.forEach(name => {
+      info[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, type);
+    })
+  );
+  return info;
+}
+
+export function getPropertyInfo(name: string, pixi: PixiAdapter): PropertyInfoRecord | null {
+  let info = infoCache.get(pixi);
+  if (!info) {
+    info = buildInfo(pixi);
+    infoCache.set(pixi, info);
+  }
+  return Object.prototype.hasOwnProperty.call(info, name) ? info[name] : null;
+}
+
+// Lowercase name to canonical name for the typed names, for the casing warning. No per-tag list (decision 1).
+export function getStandardNames(pixi: PixiAdapter): Record<string, string> {
+  let names = namesCache.get(pixi);
+  if (!names) {
+    const built: Record<string, string> = {};
+    const all = [
+      ...pixi.properties.boolean,
+      ...pixi.properties.positiveNumeric,
+      ...pixi.properties.numeric,
+      ...pixi.properties.vector,
+      ...pixi.properties.callback,
+    ];
+    all.forEach(name => {
+      built[name.toLowerCase()] = name;
+    });
+    names = built;
+    namesCache.set(pixi, names);
+  }
+  return names;
 }
 
 // Checks the properties registered on `type`, then the ones registered on all types (`"*"`).
@@ -113,134 +164,7 @@ export function PropertyInfoRecord(this: PropertyInfoRecord<unknown>, name: stri
   this.type = type;
 }
 
-// When adding attributes to this list, be sure to also add them to
-// the `possibleStandardNames` module to ensure casing and incorrect
-// name warnings.
-const properties: Record<string, PropertyInfoRecord> = {};
 // Registered by `PIXIProperty`, keyed by tag or `"*"` for all tags.
 export const customProperties: Record<string, Record<string, PropertyInfoRecord<Validator>>> = {};
 // Lowercase name to registered name, keyed like `customProperties`, for the casing warning.
 export const customStandardNames: Record<string, Record<string, string>> = {};
-
-// These props are reserved by React. They shouldn't be written to the DOM.
-["children", "parent"].forEach(name => {
-  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, RESERVED);
-});
-
-// let otherProps = [
-//   "align",
-//   "blendMode",
-//   "canvas",
-//   "context",
-//   "cursor",
-//   "filterArea",
-//   "filters",
-//   "font",
-//   "hitArea",
-//   "lineWidth",
-//   "mask",
-//   "name",
-//   "pluginName",
-//   "shader",
-//   "style",
-//   "text",
-//   "texture",
-//   "tileTransform",
-//   "transform",
-//   "uvTransform",
-// ];
-
-// These are PIXI boolean attributes.
-[
-  "autoResize",
-  "buttonMode",
-  "cacheAsBitmap",
-  "interactive",
-  "interactiveChildren",
-  "isMask",
-  "nativeLines",
-  "renderable",
-  "roundPixels",
-  "uvRespectAnchor",
-  "visible",
-].forEach(name => {
-  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, BOOLEAN);
-});
-
-// These are PIXI attributes that must be positive numbers.
-["alpha", "fillAlpha", "height", "lineColor", "maxWidth", "resolution", "tint", "width"].forEach(name => {
-  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, POSITIVE_NUMERIC);
-});
-
-// These are PIXI attributes that must be numbers.
-["boundsPadding", "clampMargin", "rotation", "x", "y"].forEach(name => {
-  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, NUMERIC);
-});
-
-["anchor", "pivot", "position", "scale", "skew", "tilePosition", "tileScale"].forEach(name => {
-  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, VECTOR);
-});
-
-[
-  // pixi.js < 7.0
-  "added",
-  "click",
-  "mousedown",
-  "mousemove",
-  "mouseout",
-  "mouseover",
-  "mouseup",
-  "mouseupoutside",
-  "pointercancel",
-  "pointerdown",
-  "pointermove",
-  "pointerout",
-  "pointerover",
-  "pointertap",
-  "pointerup",
-  "pointerupoutside",
-  "removed",
-  "rightclick",
-  "rightdown",
-  "rightup",
-  "rightupoutside",
-  "tap",
-  "touchcancel",
-  "touchend",
-  "touchendoutside",
-  "touchmove",
-  "touchstart",
-  // pixi.js >= 7.1
-  "onclick",
-  "onmousedown",
-  "onmouseenter",
-  "onmouseleave",
-  "onmousemove",
-  "onmouseout",
-  "onmouseover",
-  "onmouseup",
-  "onmouseupoutside",
-  "onpointercancel",
-  "onpointerdown",
-  "onpointerenter",
-  "onpointerleave",
-  "onpointermove",
-  "onpointerout",
-  "onpointerover",
-  "onpointertap",
-  "onpointerup",
-  "onpointerupoutside",
-  "onrightclick",
-  "onrightdown",
-  "onrightup",
-  "onrightupoutside",
-  "ontap",
-  "ontouchcancel",
-  "ontouchend",
-  "ontouchendoutside",
-  "ontouchmove",
-  "ontouchstart",
-  "onwheel",
-].forEach(name => {
-  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, CALLBACK);
-});

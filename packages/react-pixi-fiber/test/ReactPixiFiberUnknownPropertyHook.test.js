@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import warning from "../src/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
 import { customStandardNames, shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
-import { TYPES } from "../src/tags";
+import { TAGS } from "../src/tags";
 
 vi.mock("../src/warning", () => ({ default: vi.fn() }));
 vi.mock("../src/PixiProperty", async importOriginal => ({
@@ -93,9 +93,30 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       }
     });
 
-    it.skip("should warn about invalid prop casing", () => {});
+    it.skipIf(!__DEV__)("checks the casing of the names the adapter table types", () => {
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "buttonMode", true)).toBe(true);
+      expect(warning).toHaveBeenCalledTimes(0);
+      ReactPixiFiberUnknownPropertyHook.validateProperty(type, "buttonmode", true);
+      expect(warning).toHaveBeenCalledWith(
+        false,
+        "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
+        "buttonmode",
+        type,
+        "buttonMode",
+        stack
+      );
+    });
 
-    it.skip("should warn about unknown properties if they are not reserved", () => {});
+    it.skipIf(!__DEV__)("does not report names the adapter table does not type", () => {
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "textur", "value")).toBe(true);
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "sortableChildren", true)).toBe(true);
+      expect(warning).toHaveBeenCalledTimes(0);
+    });
+
+    it.skipIf(!__DEV__)("does not report the lowercase PixiJS 7+ handlers as React-style events", () => {
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "onclick", () => {})).toBe(true);
+      expect(warning).toHaveBeenCalledTimes(0);
+    });
 
     it.skip("should assume that values for reserved properties are valid", () => {});
 
@@ -114,20 +135,20 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       // shouldRemoveAttributeWithWarning reports it invalid; in production validateProperty is a no-op, so every
       // prop counts as invalid. Either way warnUnknownProperties (internal) reports it.
       shouldRemoveAttributeWithWarning.mockImplementationOnce(() => true);
-      ReactPixiFiberUnknownPropertyHook.validateProperties(TYPES.SPRITE, { alpha: 2 });
+      ReactPixiFiberUnknownPropertyHook.validateProperties(TAGS.Sprite, { alpha: 2 });
 
       expect(warning).toHaveBeenCalledWith(
         false,
         "Invalid value for prop %s on `<%s />`.%s",
         "`alpha`",
-        TYPES.SPRITE,
+        TAGS.Sprite,
         "stack"
       );
     });
   });
 
   describe("warnUnknownProperties", () => {
-    const type = TYPES.SPRITE;
+    const type = TAGS.Sprite;
     const props = { position: "0,0", scale: 2 };
     const stack = "stack";
 

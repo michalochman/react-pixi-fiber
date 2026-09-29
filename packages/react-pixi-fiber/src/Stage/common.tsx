@@ -5,7 +5,7 @@ import { ReactPixiFiberAsSecondaryRenderer } from "../ReactPixiFiber";
 import { diffProperties, setInitialProperties, updateProperties } from "../ReactPixiFiberComponent";
 import { createRender, createUnmount } from "../render";
 import { getContainerProps } from "./props";
-import { TYPES } from "../tags";
+import { TAGS } from "../tags";
 
 export const render = createRender(ReactPixiFiberAsSecondaryRenderer);
 export const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
@@ -52,7 +52,7 @@ export function renderStage(app: PIXI.Application, props: Props, instance?: unkn
   // Determine what props to apply
   const stageProps = getContainerProps(props);
 
-  setInitialProperties(TYPES.CONTAINER, app.stage, stageProps);
+  setInitialProperties(TAGS.Container, app.stage, stageProps);
   renderApp(app, props, instance);
 }
 
@@ -60,10 +60,10 @@ export function rerenderStage(app: PIXI.Application, oldProps: Props, newProps: 
   // Determine what has changed
   const oldStageProps = getContainerProps(oldProps);
   const newStageProps = getContainerProps(newProps);
-  const updatePayload = diffProperties(TYPES.CONTAINER, app.stage, oldStageProps, newStageProps);
+  const updatePayload = diffProperties(TAGS.Container, app.stage, oldStageProps, newStageProps);
 
   if (updatePayload !== null) {
-    updateProperties(TYPES.CONTAINER, app.stage, updatePayload);
+    updateProperties(TAGS.Container, app.stage, updatePayload);
   }
 
   renderApp(app, newProps, instance);

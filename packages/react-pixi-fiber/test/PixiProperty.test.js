@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import * as PIXI from "pixi.js";
 import * as PixiProperty from "../src/PixiProperty";
+import builtins from "../src/builtins";
 
 describe("PixiProperty", () => {
   describe("types", () => {
@@ -87,7 +88,9 @@ describe("PixiProperty", () => {
     it("keeps a boolean or function on an untyped name for every component", () => {
       expect(PixiProperty.shouldRemoveAttribute("Container", "sortableChildren", true, null)).toBe(false);
       expect(PixiProperty.shouldRemoveAttribute("Container", "onSomething", () => {}, null)).toBe(false);
-      expect(PixiProperty.shouldRemoveAttribute("Sprite", "x", true, PixiProperty.getPropertyInfo("x"))).toBe(true);
+      expect(PixiProperty.shouldRemoveAttribute("Sprite", "x", true, PixiProperty.getPropertyInfo("x", builtins))).toBe(
+        true
+      );
     });
 
     it("should return true if value is undefined", () => {
@@ -151,6 +154,36 @@ describe("PixiProperty", () => {
       expect(PixiProperty.shouldRemoveAttribute(type, name, "value", null)).toBeFalsy();
       expect(PixiProperty.shouldRemoveAttribute(type, name, 42, { type: PixiProperty.STRING })).toBeFalsy();
       expect(PixiProperty.shouldRemoveAttribute(type, name, "answer", { type: PixiProperty.STRING })).toBeFalsy();
+    });
+  });
+
+  describe("getPropertyInfo", () => {
+    it("types the names of the adapter table and reserves children and parent", () => {
+      expect(PixiProperty.getPropertyInfo("buttonMode", builtins).type).toBe(PixiProperty.BOOLEAN);
+      expect(PixiProperty.getPropertyInfo("alpha", builtins).type).toBe(PixiProperty.POSITIVE_NUMERIC);
+      expect(PixiProperty.getPropertyInfo("x", builtins).type).toBe(PixiProperty.NUMERIC);
+      expect(PixiProperty.getPropertyInfo("scale", builtins).type).toBe(PixiProperty.VECTOR);
+      expect(PixiProperty.getPropertyInfo("onclick", builtins).type).toBe(PixiProperty.CALLBACK);
+      expect(PixiProperty.getPropertyInfo("children", builtins).type).toBe(PixiProperty.RESERVED);
+      expect(PixiProperty.getPropertyInfo("texture", builtins)).toBeNull();
+      expect(PixiProperty.getPropertyInfo("constructor", builtins)).toBeNull();
+    });
+
+    it("reads each adapter's own table", () => {
+      const other = { properties: { boolean: ["flag"], numeric: [], positiveNumeric: [], vector: [], callback: [] } };
+      expect(PixiProperty.getPropertyInfo("flag", other).type).toBe(PixiProperty.BOOLEAN);
+      expect(PixiProperty.getPropertyInfo("buttonMode", other)).toBeNull();
+    });
+  });
+
+  describe("getStandardNames", () => {
+    it("maps the lowercase typed names to their canonical names", () => {
+      const names = PixiProperty.getStandardNames(builtins);
+      expect(names.buttonmode).toBe("buttonMode");
+      expect(names.tileposition).toBe("tilePosition");
+      expect(names.onclick).toBe("onclick");
+      expect(names.texture).toBeUndefined();
+      expect(PixiProperty.getStandardNames(builtins)).toBe(names);
     });
   });
 
