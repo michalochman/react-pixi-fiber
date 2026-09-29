@@ -22,7 +22,7 @@ This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React
 
 [`apps/examples`](./apps/examples) holds the examples, built with Vite on the local packages.
 
-An app installs the core, one React adapter and one PixiJS adapter. Every PixiJS adapter implements all 13 core tags; the version notes (React 17, React 19, PixiJS 4 and PixiJS 8) are in the [package README](./packages/react-pixi-fiber/README.md#setup) and in each adapter's README.
+An app installs the core, one React adapter and one PixiJS adapter. Every PixiJS adapter implements all 13 core tags; the [compatibility matrix](./packages/react-pixi-fiber/README.md#compatibility-matrix) and the version notes (React 17, React 19, PixiJS 4 and PixiJS 8) are in the package README, and each adapter's README lists its supported features.
 
 The repository is a [pnpm](https://pnpm.io) workspace. The pnpm version is pinned in the `packageManager` field of `package.json`, and Node comes from `.nvmrc`.
 

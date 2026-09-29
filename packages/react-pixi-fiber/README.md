@@ -67,9 +67,25 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.0.0 |
 | [`@react-pixi-fiber/pixi-8`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-8) | `pixi.js` ^8.0.0 |
 
-Which adapters do I need: the React adapter is the major version of `react` in your `package.json` (`"react": "^18.3.1"` needs `@react-pixi-fiber/react-18`), and the PixiJS adapter is the major version of `pixi.js` likewise (`"pixi.js": "^7.4.3"` needs `@react-pixi-fiber/pixi-7`). Every PixiJS adapter implements all 13 [tags](#tags).
-
 Without `configure`, the first render throws an error that prints the install line and these setup lines.
+
+Each adapter's README lists the features it supports and what changes when you move to it from the previous major.
+
+### Which adapters do I need
+
+Read the major version of `react` in your `package.json` for the React adapter (`"react": "^18.3.1"` needs `@react-pixi-fiber/react-18`) and the major version of `pixi.js` for the PixiJS adapter (`"pixi.js": "^7.4.3"` needs `@react-pixi-fiber/pixi-7`). Every PixiJS adapter implements all 13 [tags](#tags).
+
+### Compatibility matrix
+
+Every React adapter works with every PixiJS adapter:
+
+| | `pixi-4`<br>`pixi.js` ^4.4.0 | `pixi-5`<br>`pixi.js` ^5.0.0 | `pixi-6`<br>`pixi.js` ^6.0.0 | `pixi-7`<br>`pixi.js` ^7.0.0 | `pixi-8`<br>`pixi.js` ^8.0.0 |
+| --- | --- | --- | --- | --- | --- |
+| `react-17`, `react` ^17.0.2, `react-reconciler` 0.26.2 | supported | supported | supported | supported | supported |
+| `react-18`, `react` ^18.3.1, `react-reconciler` 0.29.2 | tested | tested | tested | tested | tested |
+| `react-19`, `react` ^19.3.0, `react-reconciler` 0.34.0 | supported | supported | supported | supported | supported |
+
+"tested": a test suite in this repository renders through this pair. The core suite runs on `react-18` and `pixi-6`, each PixiJS adapter's suite runs on `react-18`, and the examples run on `react-18` and `pixi-7`. "supported": the React adapter's suite runs against a fake PixiJS adapter and the PixiJS adapter's suite against `react-18`; the two meet only through `configure`, so the pair is expected to work but no test renders through it.
 
 ### React 17
 
