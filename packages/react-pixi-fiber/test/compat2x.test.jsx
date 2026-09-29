@@ -119,6 +119,11 @@ describe("2.x compatibility", () => {
     const Stage = createStageClass();
     const LegacyStage = createStageClass();
     expect(LegacyStage).toBe(Stage);
+    const width = vi.spyOn(PIXI.Container.prototype, "width", "set");
+    const height = vi.spyOn(PIXI.Container.prototype, "height", "set");
+    // The values the setter received with app.stage as `this`.
+    const setOnStage = spy =>
+      spy.mock.calls.filter((_, i) => spy.mock.contexts[i] === app.stage).map(([value]) => value);
     let app = null;
     const tree = renderer.create(
       <Stage
@@ -135,10 +140,12 @@ describe("2.x compatibility", () => {
     await settle();
     expect(app).not.toBeNull();
     expect(app.stage.children[0]).toBeInstanceOf(PIXI.Sprite);
-    // As in 2.x, the props reach app.stage before its children render, so the empty stage keeps its scale.
-    expect(app.stage._width).toBe(32);
-    expect(app.stage._height).toBe(32);
+    // As in 2.x, the props reach app.stage, not the renderer or the canvas.
+    expect(setOnStage(width)).toEqual([32]);
+    expect(setOnStage(height)).toEqual([32]);
     act(() => tree.update(<Stage width={16} height={16} onInit={() => {}} />));
+    expect(setOnStage(width)).toEqual([32, 16]);
+    expect(setOnStage(height)).toEqual([32, 16]);
     act(() => tree.unmount());
     await settle();
 

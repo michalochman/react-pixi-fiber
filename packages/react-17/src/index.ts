@@ -128,6 +128,7 @@ export default function react17(): ReactAdapter {
           const root = roots.get(container);
           invariant(root, "ReactPixiFiber did not render into container provided");
           reconciler.updateContainer(null, root as any, null, null);
+          roots.delete(container);
         },
         getStackAddendum,
       };

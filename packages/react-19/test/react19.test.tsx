@@ -148,6 +148,18 @@ describe("react19", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
+  it("forgets the root on unmount, so a second unmount throws and a new render starts a new root", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    renderer.render(<node />, container);
+    renderer.unmount(container);
+    expect(() => renderer.unmount(container)).toThrow("ReactPixiFiber did not render into container provided");
+    renderer.render(<node x={3} />, container);
+    expect(container.children).toHaveLength(1);
+    expect(container.children[0].props.x).toBe(3);
+  });
+
   it("throws when unmounting a container it never rendered into", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });

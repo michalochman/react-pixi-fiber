@@ -306,6 +306,7 @@ export default function react19(): ReactAdapter {
           invariant(root, "ReactPixiFiber did not render into container provided");
           reconciler.updateContainerSync(null, root as any, null, null);
           reconciler.flushSyncWork();
+          roots.delete(container);
         },
         getStackAddendum,
       };
