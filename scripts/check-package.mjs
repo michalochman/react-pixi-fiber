@@ -28,7 +28,7 @@ const packages = readdirSync(packagesDir)
   }))
   .filter(({ pkg }) => !pkg.private);
 const work = realpathSync(mkdtempSync(join(tmpdir(), "react-pixi-fiber-")));
-// PixiJS 5 reads the DOM globals when it is imported, so the Node checks that import an adapter define them first.
+// PixiJS 5 reads the DOM globals when it is imported, so the Node checks that import a PixiJS adapter define them first.
 const preload = join(work, "dom.cjs");
 writeFileSync(
   preload,
@@ -55,6 +55,7 @@ try {
     const name = pkg.name;
     const base = name.split("/").pop();
     // The builds import only peer dependencies, so nothing else has to be installed.
+    const dom = pkg.peerDependencies?.["pixi.js"] ? ["--require", preload] : [];
     const peers = Object.keys(pkg.peerDependencies || {});
     const pkgWork = join(work, base);
     const installed = join(pkgWork, "node_modules", name);
@@ -187,14 +188,14 @@ try {
           join(pkgWork, "default.mjs"),
           `import factory from ${JSON.stringify(name)};\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
         );
-        run("node", ["--require", preload, "default.mjs"], pkgWork);
+        run("node", [...dom, "default.mjs"], pkgWork);
       });
       await check(`${name} default export is callable from node CJS`, () => {
         writeFileSync(
           join(pkgWork, "default.cjs"),
           `const mod = require(${JSON.stringify(name)});\nconst factory = mod.default ?? mod;\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
         );
-        run("node", ["--require", preload, "default.cjs"], pkgWork);
+        run("node", [...dom, "default.cjs"], pkgWork);
       });
     }
     if (name !== "react-pixi-fiber") {
