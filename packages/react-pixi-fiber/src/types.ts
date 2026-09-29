@@ -214,6 +214,14 @@ export interface PixiAdapter {
  * React adapter
  */
 
+// What `<Fragment ref>` receives: the top-level display objects of the fragment, like react-dom's host children.
+export interface PixiFragmentInstance {
+  readonly children: readonly any[];
+  getBounds(): any[];
+  off(event: string, fn: (...args: any[]) => void): void;
+  on(event: string, fn: (...args: any[]) => void): void;
+}
+
 // The core's tree and prop operations, independent of the react-reconciler version. A React adapter builds its
 // reconciler host config from them.
 export interface HostOps {
@@ -241,6 +249,11 @@ export interface HostOps {
   ): void;
   // Development only. `internalHandle` is the fiber, so the core can gate on <StrictMode> with the adapter's bit.
   validateProperties(type: string, props: Record<string, unknown>, internalHandle?: unknown): void;
+  // Fragment refs, for a reconciler with fragment instances. `readChildren` returns the fragment's current top-level
+  // display objects; the adapter reads them from its fibers.
+  commitNewChildToFragmentInstance(child: any, instance: PixiFragmentInstance): void;
+  createFragmentInstance(readChildren: () => any[]): PixiFragmentInstance;
+  deleteChildFromFragmentInstance(child: any, instance: PixiFragmentInstance): void;
 }
 
 export interface Renderer {

@@ -47,6 +47,9 @@ function createFakeHostOps() {
       instance.props = next;
     },
     validateProperties: validate,
+    commitNewChildToFragmentInstance: () => {},
+    createFragmentInstance: () => ({ children: [], getBounds: () => [], off: () => {}, on: () => {} }),
+    deleteChildFromFragmentInstance: () => {},
   };
   return { ops, validate };
 }

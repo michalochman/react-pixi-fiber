@@ -13,3 +13,12 @@ configure({ react: react19(), pixi: pixiN() });
 ```
 
 `<ViewTransition>` inside `Stage` renders its children without animating.
+
+A `<Fragment ref>` inside `Stage` receives the fragment's top-level display objects:
+
+- `children` lists them.
+- `getBounds()` returns the bounds of each.
+- `off(event, fn)` removes a listener that `on` added.
+- `on(event, fn)` adds a listener to each, including display objects added to the fragment later.
+
+Type the ref with `useRef<PixiFragmentInstance>(null)`, or annotate a callback ref: `ref={(instance: PixiFragmentInstance | null) => ...}` (`PixiFragmentInstance` is a type export of `react-pixi-fiber`).

@@ -12,6 +12,21 @@ function noop() {}
 // A host that does not animate: every measurement is the same inert object.
 const measurement = Object.freeze({});
 
+// https://github.com/facebook/react/blob/v19.3.0/packages/react-reconciler/src/ReactWorkTags.js
+const HostComponent = 5;
+const OffscreenComponent = 22;
+
+// The top-level display objects under `fiber`, skipping hidden subtrees (a hidden <Activity>, a suspended
+// <Suspense>) as the reconciler does when it reports children to the fragment. Portals are walked through: the
+// reconciler reports a portal's children to the fragments above it too.
+function collectHostChildren(fiber: any, children: unknown[]): void {
+  for (; fiber != null; fiber = fiber.sibling) {
+    if (fiber.tag === HostComponent) children.push(fiber.stateNode);
+    else if (!(fiber.tag === OffscreenComponent && fiber.memoizedState !== null))
+      collectHostChildren(fiber.child, children);
+  }
+}
+
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
@@ -38,6 +53,8 @@ const scheduleMicrotask: (callback: () => void) => void =
 // Typed loosely on purpose: it goes straight into Reconciler, and the declaration stays free of inferred core types.
 export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
   let currentUpdatePriority: number = NoEventPriority;
+  // The Fragment fiber of each fragment instance; the reconciler swaps it on update.
+  const fragmentFibers = new WeakMap<object, { current: any }>();
   return {
     supportsMutation: true,
     supportsPersistence: false,
@@ -129,9 +146,16 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     applyViewTransitionName: noop,
     cancelRootViewTransitionName: noop,
     cancelViewTransitionName: noop,
-    commitNewChildToFragmentInstance() {},
-    createFragmentInstance() {
-      invariant(false, "react-pixi-fiber does not support Fragment refs. Remove the ref from the Fragment.");
+    commitNewChildToFragmentInstance: hostOps.commitNewChildToFragmentInstance,
+    createFragmentInstance(fiber: unknown) {
+      const box = { current: fiber as any };
+      const instance = hostOps.createFragmentInstance(() => {
+        const children: unknown[] = [];
+        collectHostChildren(box.current.child, children);
+        return children;
+      });
+      fragmentFibers.set(instance, box);
+      return instance;
     },
     createViewTransitionInstance: (name: string) => ({
       name,
@@ -140,7 +164,7 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
       old: emptyObject,
       new: emptyObject,
     }),
-    deleteChildFromFragmentInstance() {},
+    deleteChildFromFragmentInstance: hostOps.deleteChildFromFragmentInstance,
     hasInstanceAffectedParent: () => false,
     hasInstanceChanged: () => false,
     measureClonedInstance: () => measurement,
@@ -170,7 +194,9 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     },
     stopViewTransition: noop,
     suspendOnActiveViewTransition: noop,
-    updateFragmentInstanceFiber() {},
+    updateFragmentInstanceFiber(fiber: unknown, instance: object) {
+      fragmentFibers.get(instance)!.current = fiber;
+    },
     wasInstanceInViewport: () => true,
     NotPendingTransition: null,
     HostTransitionContext: {

@@ -78,7 +78,7 @@ Without `configure`, the first render throws an error that prints the install li
 
 - An error thrown while rendering is reported to `console.error` instead of being thrown from `render()`.
 - `<ViewTransition>` inside `Stage` renders its children without animating.
-- `<Fragment ref>` inside `Stage` is not supported and reports an error.
+- A `<Fragment ref>` inside `Stage` receives the fragment's top-level display objects: `children` lists them, `getBounds()` returns the bounds of each, and `on(event, fn)` and `off(event, fn)` add and remove a listener on each, including display objects added to the fragment later.
 
 ### PixiJS 8
 

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import * as PIXI from "pixi.js";
 import { strictModeBit } from "@react-pixi-fiber/react-18";
 import * as hostOps from "../src/hostOps";
 import { validateProperties as validateUnknownProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
@@ -222,6 +223,95 @@ describe("hostOps", () => {
       findStrictRoot.mockImplementation(() => null);
       hostOps.validateProperties(TAGS.Text, { text: "42" }, {});
       expect(validateUnknownProperties).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("fragment instance", () => {
+    const node = name => ({ getBounds: vi.fn(() => ({ name })), name, off: vi.fn(), on: vi.fn() });
+
+    function fragment() {
+      const children = [node("a"), node("b")];
+      return { children, instance: hostOps.createFragmentInstance(() => children) };
+    }
+
+    it("reads its children on each access", () => {
+      const { children, instance } = fragment();
+      expect(instance.children).toEqual(children);
+      const c = node("c");
+      children.push(c);
+      expect(instance.children).toEqual([...children]);
+    });
+
+    it("adds a listener to current children and to children added later", () => {
+      const { children, instance } = fragment();
+      const fn = vi.fn();
+      instance.on("pointerdown", fn);
+      instance.on("pointerdown", fn);
+      for (const child of children) {
+        expect(child.on).toHaveBeenCalledTimes(1);
+        expect(child.on).toHaveBeenCalledWith("pointerdown", fn);
+      }
+
+      const c = node("c");
+      hostOps.commitNewChildToFragmentInstance(c, instance);
+      expect(c.on).toHaveBeenCalledWith("pointerdown", fn);
+    });
+
+    it("removes a listener before adding it to a child reported again", () => {
+      const { instance } = fragment();
+      const fn = vi.fn();
+      instance.on("pointerdown", fn);
+      const c = node("c");
+      hostOps.commitNewChildToFragmentInstance(c, instance);
+      hostOps.commitNewChildToFragmentInstance(c, instance);
+      expect(c.off).toHaveBeenCalledTimes(2);
+      expect(c.on).toHaveBeenCalledTimes(2);
+      expect(c.off.mock.invocationCallOrder[1]).toBeLessThan(c.on.mock.invocationCallOrder[1]);
+    });
+
+    it("removes a listener from current children and stops adding it to children added later", () => {
+      const { children, instance } = fragment();
+      const fn = vi.fn();
+      instance.on("pointerdown", fn);
+      instance.off("pointerdown", fn);
+      for (const child of children) expect(child.off).toHaveBeenCalledWith("pointerdown", fn);
+
+      const c = node("c");
+      hostOps.commitNewChildToFragmentInstance(c, instance);
+      expect(c.on).not.toHaveBeenCalled();
+    });
+
+    it("removes its listeners from a deleted child", () => {
+      const { children, instance } = fragment();
+      const fn = vi.fn();
+      instance.on("pointerdown", fn);
+      hostOps.deleteChildFromFragmentInstance(children[0], instance);
+      expect(children[0].off).toHaveBeenCalledWith("pointerdown", fn);
+    });
+
+    it("maps getBounds over the children", () => {
+      const { instance } = fragment();
+      expect(instance.getBounds()).toEqual([{ name: "a" }, { name: "b" }]);
+    });
+
+    it("skips a child without getBounds", () => {
+      const bounds = { name: "b" };
+      const instance = hostOps.createFragmentInstance(() => [{}, { getBounds: () => bounds }]);
+      expect(instance.getBounds()).toEqual([bounds]);
+    });
+
+    it("reaches a PixiJS display object with on, once after it is reported again", () => {
+      const container = new PIXI.Container();
+      const instance = hostOps.createFragmentInstance(() => [container]);
+      const fn = vi.fn();
+      instance.on("pointerdown", fn);
+      hostOps.commitNewChildToFragmentInstance(container, instance);
+      container.emit("pointerdown", 42);
+      expect(fn).toHaveBeenCalledTimes(1);
+      expect(fn).toHaveBeenCalledWith(42);
+      instance.off("pointerdown", fn);
+      container.emit("pointerdown", 43);
+      expect(fn).toHaveBeenCalledTimes(1);
     });
   });
 });

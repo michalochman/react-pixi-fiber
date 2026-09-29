@@ -1,10 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import React, { Fragment, StrictMode, ViewTransition, startTransition } from "react";
+import React, { Activity, Fragment, StrictMode, ViewTransition, startTransition } from "react";
 import react19, { strictModeBit } from "../src/index";
-import type { HostOps } from "react-pixi-fiber";
+import type { HostOps, PixiFragmentInstance } from "react-pixi-fiber";
+import {
+  commitNewChildToFragmentInstance,
+  createFragmentInstance,
+  deleteChildFromFragmentInstance,
+} from "../../react-pixi-fiber/src/hostOps";
 
 // Wraps the real reconciler so a test can see what reaches updateContainerSync.
-const { startViewTransitionSpies, updateContainerSync } = vi.hoisted(() => ({
+const { reconcilers, startViewTransitionSpies, updateContainerSync } = vi.hoisted(() => ({
+  reconcilers: [] as any[],
   startViewTransitionSpies: [] as { mockRestore(): void; mock: { calls: unknown[][] } }[],
   updateContainerSync: vi.fn(),
 }));
@@ -14,6 +20,7 @@ vi.mock("react-reconciler", async importOriginal => {
     default: (config: any) => {
       startViewTransitionSpies.push(vi.spyOn(config, "startViewTransition"));
       const reconciler = Reconciler(config);
+      reconcilers.push(reconciler);
       updateContainerSync.mockImplementation(reconciler.updateContainerSync);
       return { ...reconciler, updateContainerSync };
     },
@@ -28,7 +35,14 @@ function createFakeHostOps() {
       type,
       props,
       children: [] as any[],
+      listeners: [] as [string, unknown][],
       visible: true,
+      off(event: string, fn: unknown) {
+        this.listeners = this.listeners.filter(([e, f]: [string, unknown]) => e !== event || f !== fn);
+      },
+      on(event: string, fn: unknown) {
+        this.listeners.push([event, fn]);
+      },
     }),
     appendChild: (parent, child) => {
       parent.children.push(child);
@@ -56,6 +70,9 @@ function createFakeHostOps() {
       instance.props = next;
     },
     validateProperties: validate,
+    commitNewChildToFragmentInstance,
+    createFragmentInstance,
+    deleteChildFromFragmentInstance,
   };
   return { ops, validate };
 }
@@ -203,23 +220,107 @@ describe("react19", () => {
     }
   });
 
-  it("reports a Fragment ref on the console instead of throwing", () => {
+  it("gives a Fragment ref the fragment's display objects and tracks added and removed ones", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error");
     try {
-      renderer.render(
-        <Fragment ref={() => {}}>
-          <node x={1} />
-        </Fragment>,
-        { children: [] }
+      const container = { children: [] as any[] };
+      const ref = React.createRef<PixiFragmentInstance>();
+      const Scene = ({ xs }: { xs: number[] }) => (
+        <node>
+          <Fragment ref={ref}>
+            {xs.map(x => (
+              <node key={x} x={x} />
+            ))}
+          </Fragment>
+        </node>
       );
-      expect(error).toHaveBeenCalledWith(
-        expect.objectContaining({ message: expect.stringMatching(/does not support Fragment refs/) })
-      );
+      renderer.render(<Scene xs={[1, 2]} />, container);
+      expect(ref.current!.children.map(child => child.props.x)).toEqual([1, 2]);
+      renderer.render(<Scene xs={[1, 3, 2]} />, container);
+      expect(ref.current!.children.map(child => child.props.x)).toEqual([1, 3, 2]);
+      renderer.render(<Scene xs={[3, 2]} />, container);
+      expect(ref.current!.children.map(child => child.props.x)).toEqual([3, 2]);
+      expect(error).not.toHaveBeenCalled();
     } finally {
       error.mockRestore();
     }
+  });
+
+  it("adds a Fragment ref's listener to a child the reconciler adds later", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    const ref = React.createRef<PixiFragmentInstance>();
+    const Scene = ({ xs }: { xs: number[] }) => (
+      <node>
+        <Fragment ref={ref}>
+          {xs.map(x => (
+            <node key={x} x={x} />
+          ))}
+        </Fragment>
+      </node>
+    );
+    const fn = () => {};
+    renderer.render(<Scene xs={[1]} />, container);
+    ref.current!.on("pointerdown", fn);
+    renderer.render(<Scene xs={[1, 2]} />, container);
+    expect(ref.current!.children.map(child => child.listeners)).toEqual([[["pointerdown", fn]], [["pointerdown", fn]]]);
+    const [, second] = ref.current!.children;
+    renderer.render(<Scene xs={[1]} />, container);
+    expect(second.listeners).toEqual([]);
+  });
+
+  it("adds a Fragment ref's listener once to a child added while hidden and then revealed", async () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    const ref = React.createRef<PixiFragmentInstance>();
+    const Scene = ({ mode, xs }: { mode: "hidden" | "visible"; xs: number[] }) => (
+      <node>
+        <Fragment ref={ref}>
+          <Activity mode={mode}>
+            {xs.map(x => (
+              <node key={x} x={x} />
+            ))}
+          </Activity>
+        </Fragment>
+      </node>
+    );
+    const fn = () => {};
+    renderer.render(<Scene mode="visible" xs={[1]} />, container);
+    ref.current!.on("pointerdown", fn);
+    renderer.render(<Scene mode="hidden" xs={[1]} />, container);
+    expect(ref.current!.children).toEqual([]);
+    renderer.render(<Scene mode="hidden" xs={[1, 2]} />, container);
+    await vi.waitFor(() => expect(container.children[0].children).toHaveLength(2));
+    renderer.render(<Scene mode="visible" xs={[1, 2]} />, container);
+    expect(ref.current!.children.map(child => child.listeners)).toEqual([[["pointerdown", fn]], [["pointerdown", fn]]]);
+  });
+
+  it("gives a Fragment ref the display objects of a nested Fragment and of a portal", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    const portalContainer = { children: [] as any[] };
+    const ref = React.createRef<PixiFragmentInstance>();
+    renderer.render(
+      <node>
+        <Fragment ref={ref}>
+          <node x={1} />
+          <Fragment>
+            <node x={2}>
+              <node x={3} />
+            </node>
+          </Fragment>
+          {reconcilers[reconcilers.length - 1].createPortal(<node x={4} />, portalContainer, null, null)}
+        </Fragment>
+      </node>,
+      container
+    );
+    expect(ref.current!.children.map(child => child.props.x)).toEqual([1, 2, 4]);
+    expect(portalContainer.children[0].props.x).toBe(4);
   });
 
   it("validates props with the fiber so the core can find <StrictMode>", () => {

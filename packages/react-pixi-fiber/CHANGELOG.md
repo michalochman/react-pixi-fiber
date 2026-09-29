@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `configure({ react, pixi })`, called once in the app entry before the first render, wires a React adapter and a PixiJS adapter into the core. Without it the first render throws an error that prints the install line and the setup lines
 - `@react-pixi-fiber/react-18`, the React 18 adapter, `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter, and `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter with the `HTMLText` tag
 - `@react-pixi-fiber/react-17`, the React 17 adapter, needs React 17.0.2 or a later 17.x
-- `@react-pixi-fiber/react-19`, the React 19 adapter, needs React 19.3 or newer. It reports render errors on `console.error`, renders a `<ViewTransition>` inside `Stage` without animating and rejects `<Fragment ref>`
+- `@react-pixi-fiber/react-19`, the React 19 adapter, needs React 19.3 or newer. It reports render errors on `console.error` and renders a `<ViewTransition>` inside `Stage` without animating
+- Fragment refs on React 19: a `<Fragment ref>` inside `Stage` receives a `PixiFragmentInstance` with `children`, `getBounds()`, `off(event, fn)` and `on(event, fn)` over the fragment's top-level display objects
 - `@react-pixi-fiber/pixi-5`, the PixiJS 5 adapter
 - `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter with the `DOMContainer`, `HTMLText`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` tags and a `compat` option that translates the 2.x interaction props. `ParticleContainer` throws on it
 - A PixiJS adapter can rename props with `translateProps` before they are validated, set or diffed; a `PIXIComponent` with its own `applyProps` receives the props as written

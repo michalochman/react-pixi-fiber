@@ -10,7 +10,7 @@ import { getBoundBehavior } from "./registry";
 import { getStrictModeBit } from "./configure";
 import { findStrictRoot } from "./utils";
 import invariant from "./invariant";
-import type { HostOps } from "./types";
+import type { HostOps, PixiFragmentInstance } from "./types";
 
 export function appendChild(parentInstance: any, child: any): void {
   if (parentInstance == null) return;
@@ -68,6 +68,57 @@ export function validateProperties(type: string, props: Record<string, unknown>,
     validateUnknownProperties(type, translate(type, props));
 }
 
+type Listener = (...args: any[]) => void;
+
+// The children are read on each access, so their order stays current; the reconciler reports added and removed
+// children only so their listeners follow.
+class FragmentInstance implements PixiFragmentInstance {
+  listeners: [string, Listener][] = [];
+  readChildren: () => any[];
+
+  constructor(readChildren: () => any[]) {
+    this.readChildren = readChildren;
+  }
+
+  get children(): any[] {
+    return this.readChildren();
+  }
+
+  getBounds(): any[] {
+    return this.children.filter(child => typeof child.getBounds === "function").map(child => child.getBounds());
+  }
+
+  off(event: string, fn: Listener): void {
+    const count = this.listeners.length;
+    this.listeners = this.listeners.filter(([e, f]) => e !== event || f !== fn);
+    if (this.listeners.length === count) return;
+    for (const child of this.children) child.off(event, fn);
+  }
+
+  on(event: string, fn: Listener): void {
+    if (this.listeners.some(([e, f]) => e === event && f === fn)) return;
+    this.listeners.push([event, fn]);
+    for (const child of this.children) child.on(event, fn);
+  }
+}
+
+// The reconciler can report a child twice (added while hidden, then revealed), and a PixiJS EventEmitter keeps
+// duplicates, so each listener is removed before it is added.
+export function commitNewChildToFragmentInstance(child: any, instance: PixiFragmentInstance): void {
+  for (const [event, fn] of (instance as FragmentInstance).listeners) {
+    child.off(event, fn);
+    child.on(event, fn);
+  }
+}
+
+export function createFragmentInstance(readChildren: () => any[]): PixiFragmentInstance {
+  return new FragmentInstance(readChildren);
+}
+
+export function deleteChildFromFragmentInstance(child: any, instance: PixiFragmentInstance): void {
+  for (const [event, fn] of (instance as FragmentInstance).listeners) child.off(event, fn);
+}
+
 export const hostOps: HostOps = {
   createInstance: (type, props, rootContainer) => createInstance(type, props, rootContainer),
   appendChild,
@@ -80,4 +131,7 @@ export const hostOps: HostOps = {
   diffProperties,
   updateProperties,
   validateProperties,
+  commitNewChildToFragmentInstance,
+  createFragmentInstance,
+  deleteChildFromFragmentInstance,
 };
