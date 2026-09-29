@@ -1,10 +1,11 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/ReactDOMUnknownPropertyHook.js
-import emptyFunction from "fbjs/lib/emptyFunction";
-import warning from "fbjs/lib/warning";
+import warning from "./warning";
 import { RESERVED, getPropertyInfo, getCustomPropertyInfo, shouldRemoveAttributeWithWarning } from "./PixiProperty";
 import { getStackAddendum } from "./ReactGlobalSharedState";
 import { isInjectedType } from "./inject";
 import possibleStandardNames from "./possibleStandardNames";
+
+const emptyFunction = () => {};
 
 // `emptyFunction` in production, where nothing reads the result.
 let validateProperty: (type: string, name: string, value: unknown) => boolean | void = emptyFunction;

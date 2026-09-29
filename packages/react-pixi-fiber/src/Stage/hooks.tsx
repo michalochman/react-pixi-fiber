@@ -1,8 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
-import emptyObject from "fbjs/lib/emptyObject";
-import invariant from "fbjs/lib/invariant";
-import shallowEqual from "fbjs/lib/shallowEqual";
-import { createPixiApplication } from "../utils";
+import invariant from "../invariant";
+import { createPixiApplication, shallowEqual } from "../utils";
 import {
   cleanupStage,
   renderStage,
@@ -12,12 +10,23 @@ import {
   STAGE_OPTIONS_UNMOUNT,
   type Props,
 } from "./common";
-import { defaultProps, getCanvasProps, propTypes } from "./propTypes";
+import { getCanvasProps } from "./props";
+import warning from "../warning";
 import * as PIXI from "pixi.js";
 import type { StageComponent } from "../types";
 
 type AppRef = React.MutableRefObject<PIXI.Application | null | undefined>;
 type CanvasRef = React.MutableRefObject<HTMLCanvasElement | undefined>;
+
+const emptyObject = Object.freeze({}) as Record<string, never>;
+
+const warned: Record<string, boolean> = {};
+function warnOnce(key: string, message: string) {
+  if (!warned[key]) {
+    warned[key] = true;
+    warning(false, message);
+  }
+}
 
 export function usePreviousProps(value: Props): Props {
   const props = useRef<Props>(emptyObject);
@@ -33,7 +42,7 @@ export function useStageRenderer(props: Props, appRef: AppRef, canvasRef: Canvas
   // create app on mount
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs once on mount, prop changes are handled by useStageRerenderer
   useLayoutEffect(() => {
-    const { app, options } = props;
+    const { app, options = {} } = props;
 
     // Return PIXI.Application if it was provided in props
     if (app != null) {
@@ -77,7 +86,7 @@ export function useStageRerenderer(props: Props, appRef: AppRef, canvasRef: Canv
     // This is first render, no need to do anything
     if (prevProps === emptyObject) return;
 
-    const { app, options } = props;
+    const { app, options = {} } = props;
 
     if (app instanceof PIXI.Application) {
       // Update stage tree
@@ -98,12 +107,8 @@ export function useStageRerenderer(props: Props, appRef: AppRef, canvasRef: Canv
       return;
     }
 
-    const {
-      options: { height, width, ...otherOptions },
-    } = props;
-    const {
-      options: { height: prevHeight, width: prevWidth, ...prevOtherOptions },
-    } = prevProps;
+    const { height, width, ...otherOptions } = options;
+    const { height: prevHeight, width: prevWidth, ...prevOtherOptions } = prevProps.options || {};
 
     // We need to create new PIXI.Application when options other than dimensions
     // are changed because some renderer settings are immutable.
@@ -135,7 +140,19 @@ export function useStageRerenderer(props: Props, appRef: AppRef, canvasRef: Canv
 
 export default function createStageFunction(): StageComponent {
   const Stage = forwardRef(function Stage(props: Props, ref) {
-    const { app, options } = props;
+    const { app, options = {} } = props;
+
+    if (__DEV__) {
+      if (props.width != null || props.height != null) {
+        warnOnce("size", "`width` and `height` props of `Stage` are deprecated. Pass them in `options` instead.");
+      }
+      if (app != null && options != null && Object.keys(options).length > 0) {
+        warnOnce(
+          "app",
+          "`options` prop of `Stage` has no effect when `app` is provided. Use `app` or `options`, never both."
+        );
+      }
+    }
 
     // Store PIXI.Application instance
     const appRef: AppRef = useRef();
@@ -164,7 +181,7 @@ export default function createStageFunction(): StageComponent {
     }
 
     // Do not render anything if canvas is passed in options as `view`
-    if (typeof options !== "undefined" && options.view) {
+    if (options.view) {
       return null;
     }
 
@@ -172,9 +189,6 @@ export default function createStageFunction(): StageComponent {
 
     return <canvas key={canvasKey} ref={canvasRef as React.RefObject<HTMLCanvasElement>} {...canvasProps} />;
   });
-
-  Stage.propTypes = propTypes as any;
-  Stage.defaultProps = defaultProps;
 
   return Stage as unknown as StageComponent;
 }

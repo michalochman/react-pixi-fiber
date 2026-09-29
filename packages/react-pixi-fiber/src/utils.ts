@@ -1,4 +1,4 @@
-import invariant from "fbjs/lib/invariant";
+import invariant from "./invariant";
 import * as PIXI from "pixi.js";
 import { getStackAddendum } from "./ReactGlobalSharedState";
 
@@ -9,9 +9,21 @@ export const not =
   (...args: A) =>
     !fn(...args);
 
-export const including = (props: string[]) => (key: string) => props.indexOf(key) !== -1;
+export const including = (props: readonly string[]) => (key: string) => props.indexOf(key) !== -1;
 
 export const unique = <T>(element: T, index: number, array: T[]) => array.indexOf(element) === index;
+
+export function shallowEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== "object" || a === null || typeof b !== "object" || b === null) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  for (let i = 0; i < keysA.length; i++) {
+    if (!Object.prototype.hasOwnProperty.call(b, keysA[i]) || !Object.is(a[keysA[i]], b[keysA[i]])) return false;
+  }
+  return true;
+}
 
 export function filterByKey<T extends Record<string, unknown>>(
   inputObject: T,

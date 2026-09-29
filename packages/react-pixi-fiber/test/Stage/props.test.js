@@ -1,13 +1,12 @@
 import { describe, it, expect } from "vitest";
-import React from "react";
-import { createStageFunction, createStageClass } from "../../src/Stage";
 import {
+  STAGE_PROP_NAMES,
   getCanvasProps,
   getContainerProps,
   includingCanvasProps,
   includingContainerProps,
   includingStageProps,
-} from "../../src/Stage/propTypes";
+} from "../../src/Stage/props";
 import possibleStandardNames from "../../src/possibleStandardNames";
 import { TYPES } from "../../src/tags";
 
@@ -26,15 +25,8 @@ describe("includingContainerProps", () => {
 });
 
 describe("includingStageProps", () => {
-  const StageClass = createStageClass();
-  const StageFunction = createStageFunction();
-
   it("returns true if prop is one of Stage props", () => {
-    Object.keys(StageFunction.propTypes).forEach(propName => {
-      expect(includingStageProps(propName)).toBeTruthy();
-    });
-
-    Object.keys(StageClass.propTypes).forEach(propName => {
+    STAGE_PROP_NAMES.forEach(propName => {
       expect(includingStageProps(propName)).toBeTruthy();
     });
   });
@@ -47,9 +39,6 @@ describe("includingStageProps", () => {
 });
 
 describe("includingCanvasProps", () => {
-  const StageClass = createStageClass();
-  const StageFunction = createStageFunction();
-
   it("returns true if prop is not one of Container members", () => {
     expect(includingCanvasProps("className")).toBeTruthy();
     expect(includingCanvasProps("id")).toBeTruthy();
@@ -58,13 +47,7 @@ describe("includingCanvasProps", () => {
 
   it("returns false if prop is one of Container members or Stage props", () => {
     Object.keys(possibleStandardNames[TYPES.CONTAINER])
-      .concat(Object.keys(StageFunction.propTypes))
-      .forEach(propName => {
-        expect(includingCanvasProps(propName)).toBeFalsy();
-      });
-
-    Object.keys(possibleStandardNames[TYPES.CONTAINER])
-      .concat(Object.keys(StageClass.propTypes))
+      .concat(STAGE_PROP_NAMES)
       .forEach(propName => {
         expect(includingCanvasProps(propName)).toBeFalsy();
       });
@@ -90,6 +73,11 @@ describe("getCanvasProps", () => {
       style: allProps.style,
     };
     expect(getCanvasProps(allProps)).toEqual(canvasProps);
+  });
+
+  it("does not forward Stage's own props to the canvas", () => {
+    const props = { app: {}, options: {}, children: null, onInit: () => {}, width: 1, height: 2, className: "c" };
+    expect(getCanvasProps(props)).toEqual({ className: "c" });
   });
 });
 

@@ -7,13 +7,12 @@ import pkg from "./package.json" with { type: "json" };
 const isProduction = process.env.NODE_ENV === "production";
 const suffix = isProduction ? "production.min" : "development";
 
-const peers = ["react", "react-dom", "prop-types", "pixi.js", "react-pixi-fiber"];
+const peers = ["react", "pixi.js", "react-pixi-fiber"];
 
 const entries = {
   "react-pixi-fiber": { input: "src/index.ts", external: peers },
-  "react-pixi-alias": { input: "src/react-pixi-alias/index.tsx", external: [...peers, "react-pixi-fiber"] },
 };
-const formats = ["es", "cjs", "umd"] as const;
+const formats = ["es", "cjs"] as const;
 
 // src/index.ts exports `Stage` as a value and a type (a local type alias next to the imported value).
 // rolldown-plugin-dts 0.27 keeps the type and drops the value from the bundled declarations, so this hook
@@ -33,8 +32,7 @@ const declareStageValue: TsdownHooks["build:done"] = ({ chunks }) => {
   }
 };
 
-// One build per entry and format, so the alias entry can treat react-pixi-fiber as external and
-// every output lands in dist/<format>/<entry>.<development|production.min>.js.
+// One build per entry and format, so every output lands in dist/<format>/<entry>.<development|production.min>.js.
 export default defineConfig(
   Object.entries(entries).flatMap(([name, { input, external }]) =>
     formats.map(format => ({
@@ -44,36 +42,26 @@ export default defineConfig(
       // build:prod and build:dev write into the same directories
       clean: false,
       // Declarations next to the ES and CJS development output: publint wants .d.mts for the import condition.
-      // react-pixi-alias has never shipped types.
-      dts: name === "react-pixi-fiber" && format !== "umd" && !isProduction,
+      dts: !isProduction,
       hash: false,
       platform: "browser",
       target: "es2018",
       // The source uses the classic React.createElement runtime.
       inputOptions: { transform: { jsx: "react" } },
       // Peers stay external; dependencies are bundled like the Rollup build did.
-      deps: { alwaysBundle: [/^react-reconciler/, /^fbjs/], onlyBundle: false },
+      deps: { alwaysBundle: [/^react-reconciler/], onlyBundle: false },
       // The plugin marks the modules external and turns require() calls into imports. Rolldown would
       // otherwise keep the require("react") inside react-reconciler's development build, which
       // breaks in browsers.
       plugins: [esmExternalRequirePlugin({ external })],
       hooks: { "build:done": declareStageValue },
-      globalName: "ReactPixiFiber",
       outputOptions: {
-        // tsdown would otherwise add a .umd infix. Declaration chunks are named `<entry>.d`.
+        // Fixed names instead of tsdown's defaults. Declaration chunks are named `<entry>.d`.
         entryFileNames: chunk =>
           chunk.name.endsWith(".d") ? (format === "es" ? "[name].mts" : "[name].ts") : `[name].${suffix}.js`,
-        // react-pixi-alias has a default export next to the named ones
         exports: "named",
         // Rollup always added the __esModule marker, rolldown only does with a default export.
         esModule: true,
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "prop-types": "PropTypes",
-          "pixi.js": "PIXI",
-          "react-pixi-fiber": "ReactPixiFiber",
-        },
       },
       define: {
         __DEV__: JSON.stringify(!isProduction),

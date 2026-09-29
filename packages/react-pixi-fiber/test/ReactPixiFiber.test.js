@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
 import React from "react";
-import emptyObject from "fbjs/lib/emptyObject";
 import * as PIXI from "pixi.js";
 import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
@@ -273,7 +272,7 @@ describe("ReactPixiFiber", () => {
 
   describe("getRootHostContext", () => {
     it("returns empty object", () => {
-      expect(ReactPixiFiber.getRootHostContext()).toEqual(emptyObject);
+      expect(ReactPixiFiber.getRootHostContext()).toEqual({});
     });
   });
 

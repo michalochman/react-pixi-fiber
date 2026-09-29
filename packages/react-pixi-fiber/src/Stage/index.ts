@@ -1,7 +1,19 @@
-import { areReactHooksAvailable } from "../compat";
+import warning from "../warning";
 import createStageFunction from "./hooks";
-import createStageClass from "./legacy";
 
-export default areReactHooksAvailable() ? createStageFunction() : createStageClass();
+const Stage = createStageFunction();
 
-export { createStageFunction, createStageClass };
+let warnedCreateStageClass = false;
+export function createStageClass() {
+  if (__DEV__ && !warnedCreateStageClass) {
+    warnedCreateStageClass = true;
+    warning(
+      false,
+      "`createStageClass` is deprecated and returns the function `Stage`. Import `Stage` instead. It will be removed in 4.0.0."
+    );
+  }
+  return Stage;
+}
+
+export default Stage;
+export { createStageFunction };

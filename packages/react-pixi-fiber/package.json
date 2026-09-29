@@ -3,7 +3,6 @@
   "version": "2.0.0-rc.4",
   "description": "React Fiber renderer for PixiJS",
   "main": "index.js",
-  "umd:main": "index.umd.js",
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": {
@@ -28,35 +27,22 @@
         "default": "./index.js"
       }
     },
-    "./react-pixi-alias": {
-      "node": "./react-pixi-alias.js",
-      "import": {
-        "development": "./dist/es/react-pixi-alias.development.js",
-        "default": "./dist/es/react-pixi-alias.production.min.js"
-      },
-      "require": "./react-pixi-alias.js"
-    },
     "./package.json": "./package.json"
   },
   "files": [
     "LICENSE",
     "README.md",
     "index.js",
-    "index.umd.js",
-    "react-pixi-alias.js",
     "dist/",
     "src/"
   ],
   "sideEffects": false,
   "dependencies": {
-    "fbjs": "^3.0.0",
     "react-reconciler": "^0.29.0"
   },
   "peerDependencies": {
     "pixi.js": ">=4.4.0 <8.0.0",
-    "prop-types": ">=15.0.0",
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react": ">=18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.8",

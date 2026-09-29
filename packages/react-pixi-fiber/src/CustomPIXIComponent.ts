@@ -1,10 +1,11 @@
-import emptyFunction from "fbjs/lib/emptyFunction";
-import invariant from "fbjs/lib/invariant";
+import invariant from "./invariant";
 import { injectType } from "./inject";
 import possibleStandardNames from "./possibleStandardNames";
 import type * as PIXI from "pixi.js";
 import { customProperties, PropertyInfoRecord, type PropertyInfoRecordConstructor } from "./PixiProperty";
 import type { CustomPIXIComponentBehavior, CustomPIXIComponentProps, PixiComponent } from "./types";
+
+const emptyFunction = () => {};
 
 // Create a custom component.
 function CustomPIXIComponent<T extends PIXI.DisplayObject, P>(

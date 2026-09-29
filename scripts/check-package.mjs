@@ -14,7 +14,7 @@ const packageDir = join(root, "packages/react-pixi-fiber");
 const work = realpathSync(mkdtempSync(join(tmpdir(), "react-pixi-fiber-")));
 const installed = join(work, "node_modules/react-pixi-fiber");
 // The builds import only peer dependencies, so nothing else has to be installed.
-const peers = ["pixi.js", "prop-types", "react", "react-dom"];
+const peers = ["pixi.js", "react"];
 
 const run = (command, args, cwd = root) => execFileSync(command, args, { cwd, encoding: "utf8" }).trim();
 
@@ -30,25 +30,15 @@ const check = async (name, fn) => {
 };
 
 const entries = {
-  esm: 'import * as Fiber from "react-pixi-fiber";\nimport * as Alias from "react-pixi-fiber/react-pixi-alias";\nconsole.log(Fiber, Alias);\n',
-  cjs: 'console.log(require("react-pixi-fiber"), require("react-pixi-fiber/react-pixi-alias"));\n',
+  esm: 'import * as Fiber from "react-pixi-fiber";\nconsole.log(Fiber);\n',
+  cjs: 'console.log(require("react-pixi-fiber"));\n',
 };
 
 const files = {
-  esDevelopment: ["dist/es/react-pixi-alias.development.js", "dist/es/react-pixi-fiber.development.js"],
-  esProduction: ["dist/es/react-pixi-alias.production.min.js", "dist/es/react-pixi-fiber.production.min.js"],
-  cjsDevelopment: [
-    "dist/cjs/react-pixi-alias.development.js",
-    "dist/cjs/react-pixi-fiber.development.js",
-    "index.js",
-    "react-pixi-alias.js",
-  ],
-  cjsProduction: [
-    "dist/cjs/react-pixi-alias.production.min.js",
-    "dist/cjs/react-pixi-fiber.production.min.js",
-    "index.js",
-    "react-pixi-alias.js",
-  ],
+  esDevelopment: ["dist/es/react-pixi-fiber.development.js"],
+  esProduction: ["dist/es/react-pixi-fiber.production.min.js"],
+  cjsDevelopment: ["dist/cjs/react-pixi-fiber.development.js", "index.js"],
+  cjsProduction: ["dist/cjs/react-pixi-fiber.production.min.js", "index.js"],
 };
 
 // Files of the installed package that went into a bundle, relative to the package root.
@@ -78,8 +68,7 @@ try {
   const tarball = run("pnpm", ["pack", "--pack-destination", work], packageDir).split("\n").pop();
 
   await check("publint", () => run("pnpm", ["exec", "publint", "--strict", tarball]));
-  // react-pixi-alias has never shipped types.
-  await check("attw", () => run("pnpm", ["exec", "attw", tarball, "--exclude-entrypoints", "react-pixi-alias"]));
+  await check("attw", () => run("pnpm", ["exec", "attw", tarball]));
 
   mkdirSync(installed, { recursive: true });
   run("tar", ["-xzf", tarball, "-C", installed, "--strip-components=1"]);
@@ -88,7 +77,6 @@ try {
   const require = createRequire(join(work, "index.js"));
   await check("node require", () => {
     assert.equal(require.resolve("react-pixi-fiber"), join(installed, "index.js"));
-    assert.equal(require.resolve("react-pixi-fiber/react-pixi-alias"), join(installed, "react-pixi-alias.js"));
   });
   await check("node import", () => {
     const resolve = specifier =>
@@ -98,7 +86,6 @@ try {
         work
       );
     assert.equal(fileURLToPath(resolve("react-pixi-fiber")), join(installed, "index.js"));
-    assert.equal(fileURLToPath(resolve("react-pixi-fiber/react-pixi-alias")), join(installed, "react-pixi-alias.js"));
   });
   await check("deep imports are not exported", () => {
     assert.throws(() => require.resolve("react-pixi-fiber/dist/cjs/react-pixi-fiber.development.js"), {

@@ -1,7 +1,6 @@
 import ReactFiberReconciler from "react-reconciler";
 import { DefaultEventPriority } from "react-reconciler/constants";
-import emptyObject from "fbjs/lib/emptyObject";
-import invariant from "fbjs/lib/invariant";
+import invariant from "./invariant";
 import type * as PIXI from "pixi.js";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
@@ -11,6 +10,8 @@ import { findStrictRoot } from "./utils";
 // A display object the reconciler creates, with the callbacks `inject.ts` may add.
 type Instance = PIXI.Container & CustomDisplayObject<any, any>;
 type Props = Record<string, any>;
+
+const emptyObject = Object.freeze({}) as Record<string, never>;
 
 let validatePropertiesInDevelopment: (type: string, props: Props, internalHandle: unknown) => void;
 

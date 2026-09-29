@@ -4,7 +4,7 @@ import { AppProvider } from "../AppProvider";
 import { ReactPixiFiberAsSecondaryRenderer } from "../ReactPixiFiber";
 import { diffProperties, setInitialProperties, updateProperties } from "../ReactPixiFiberComponent";
 import { createRender, createUnmount } from "../render";
-import { getContainerProps } from "./propTypes";
+import { getContainerProps } from "./props";
 import { TYPES } from "../tags";
 
 export const render = createRender(ReactPixiFiberAsSecondaryRenderer);
@@ -33,9 +33,7 @@ export function cleanupStage(app: PIXI.Application, stageOptions: boolean = STAG
 }
 
 export function getDimensions(props: Props): [number, number] {
-  const {
-    options: { height, width },
-  } = props;
+  const { height, width } = props.options || {};
 
   return [width, height];
 }

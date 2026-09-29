@@ -31,16 +31,6 @@ exports[`ReactPixiFiber public API > should match snapshot 1`] = `
   "Sprite": "Sprite",
   "Stage": {
     "$$typeof": Symbol(react.forward_ref),
-    "defaultProps": {
-      "options": {},
-    },
-    "propTypes": {
-      "app": [Function],
-      "children": [Function],
-      "height": [Function],
-      "options": [Function],
-      "width": [Function],
-    },
     "render": [Function],
   },
   "Text": "Text",

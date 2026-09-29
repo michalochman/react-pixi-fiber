@@ -1,4 +1,4 @@
-import invariant from "fbjs/lib/invariant";
+import invariant from "./invariant";
 import type * as PIXI from "pixi.js";
 import type * as React from "react";
 import { version } from "react";

@@ -1,5 +1,5 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/ReactDOMFiberComponent.js
-import invariant from "fbjs/lib/invariant";
+import invariant from "./invariant";
 import * as PIXI from "pixi.js";
 import { CHILDREN } from "./props";
 import { TYPES } from "./tags";
