@@ -1,6 +1,7 @@
 import invariant from "./invariant";
 import * as PIXI from "pixi.js";
 import { getStackAddendum } from "./ReactGlobalSharedState";
+import type { PixiAdapter } from "./types";
 
 /* Helper Methods */
 
@@ -91,17 +92,12 @@ export function parsePoint(value: any): number[] {
   return arr.map(Number);
 }
 
-export function isPointType(value: unknown): value is PIXI.Point | PIXI.ObservablePoint {
-  return value instanceof PIXI.Point || value instanceof PIXI.ObservablePoint;
+export function isPointType(value: unknown, pixi: PixiAdapter): boolean {
+  return pixi.isPoint(value);
 }
 
-// Use Point.copyFrom if available because Point.copy was deprecated in PIXI 5.0
-export function copyPoint(instance: any, propName: string, value: unknown): void {
-  if (typeof instance[propName].copyFrom === "function") {
-    instance[propName].copyFrom(value);
-  } else {
-    instance[propName].copy(value);
-  }
+export function copyPoint(instance: any, propName: string, value: unknown, pixi: PixiAdapter): void {
+  pixi.copyPoint(instance[propName], value as { x: number; y: number });
 }
 
 // Set props on a DisplayObject by checking the type. If a PIXI.Point or
@@ -109,11 +105,11 @@ export function copyPoint(instance: any, propName: string, value: unknown): void
 // string with in the form of "x,y" or a size 2 array with index 0 being the x
 // coordinate and index 1 being the y coordinate.
 // See: https://github.com/Izzimach/react-pixi/blob/a25196251a13ed9bb116a8576d93e9fceac2a14c/src/ReactPIXI.js#L114
-export function setPixiValue(instance: any, propName: string, value: unknown): void {
-  if (isPointType(instance[propName]) && isPointType(value)) {
+export function setPixiValue(instance: any, propName: string, value: unknown, pixi: PixiAdapter): void {
+  if (isPointType(instance[propName], pixi) && isPointType(value, pixi)) {
     // Just copy the data if a Point type is being assigned to a Point type
-    copyPoint(instance, propName, value);
-  } else if (isPointType(instance[propName])) {
+    copyPoint(instance, propName, value, pixi);
+  } else if (isPointType(instance[propName], pixi)) {
     // Parse value if a non-Point type is being assigned to a Point type
     const coordinateData = parsePoint(value);
 

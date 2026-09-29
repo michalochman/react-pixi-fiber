@@ -3,17 +3,22 @@ import invariant from "./invariant";
 import warning from "./warning";
 import type * as PIXI from "pixi.js";
 import { getPixiAdapter } from "./config";
-import { CHILDREN } from "./props";
-import { DEPRECATED_TAGS } from "./tags";
-import { createRegisteredInstance, getAdapterComponent, getBoundBehavior, resolveComponent } from "./registry";
+import {
+  createRegisteredInstance,
+  getAdapterComponent,
+  getBoundBehavior,
+  resolveComponent,
+  resolveTag,
+} from "./registry";
 import { setValueForProperty } from "./PixiPropertyOperations";
-import { getOwn } from "./PixiProperty";
 
 type Instance = PIXI.DisplayObject;
 type Props = Record<string, any>;
 
-const warnedDeprecatedTags: Record<string, boolean> = {};
-const warnedShadowedTags: Record<string, boolean> = {};
+export const CHILDREN = "children";
+
+const warnedDeprecatedTags = new Set<string>();
+const warnedShadowedTags = new Set<string>();
 
 // Tag resolution: the user `PIXIComponent` registry, then the adapter's components, then the deprecated tag map.
 export function createInstance(
@@ -27,8 +32,8 @@ export function createInstance(
   let tag = type;
   let resolved = resolveComponent(type);
   if (resolved && resolved.source === "user") {
-    if (__DEV__ && getAdapterComponent(type) && !warnedShadowedTags[type]) {
-      warnedShadowedTags[type] = true;
+    if (__DEV__ && getAdapterComponent(type) && !warnedShadowedTags.has(type)) {
+      warnedShadowedTags.add(type);
       warning(
         false,
         "`%s` is registered with PIXIComponent and also defined by the PixiJS adapter. The PIXIComponent registration wins.",
@@ -36,13 +41,13 @@ export function createInstance(
       );
     }
   }
-  const deprecatedTag = getOwn(DEPRECATED_TAGS, type);
-  if (!resolved && deprecatedTag !== undefined) {
-    if (__DEV__ && !warnedDeprecatedTags[type]) {
-      warnedDeprecatedTags[type] = true;
-      warning(false, "Tag `%s` is deprecated, use `%s`. It will be removed in 4.0.0.", type, deprecatedTag);
+  const resolvedTag = resolveTag(type);
+  if (resolvedTag !== type) {
+    if (__DEV__ && !warnedDeprecatedTags.has(type)) {
+      warnedDeprecatedTags.add(type);
+      warning(false, "Tag `%s` is deprecated, use `%s`. It will be removed in 4.0.0.", type, resolvedTag);
     }
-    tag = deprecatedTag;
+    tag = resolvedTag;
     resolved = resolveComponent(tag);
   }
   invariant(
@@ -112,9 +117,8 @@ export function diffProperties(
     if (propKey === CHILDREN) {
       // Noop. Text children not supported
     } else {
-      // For all other deleted properties we add it to the queue. We use
-      // the whitelist in the commit phase instead.
-      (updatePayload = updatePayload || []).push(propKey, null);
+      // A deleted prop is queued as `undefined`, which restores its default; `null` would be written as a value.
+      (updatePayload = updatePayload || []).push(propKey, undefined);
     }
   }
   for (propKey in nextProps) {

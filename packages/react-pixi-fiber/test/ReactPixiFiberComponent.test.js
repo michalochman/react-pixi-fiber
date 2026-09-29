@@ -136,7 +136,7 @@ describe("ReactPixiFiber", () => {
     it("returns changed prop keys and values list if props changed", () => {
       expect(ReactPixiFiberComponent.diffProperties("Text", {}, oldProps, newProps)).toEqual([
         "position",
-        null,
+        undefined,
         "pivot",
         "0,0",
         "text",

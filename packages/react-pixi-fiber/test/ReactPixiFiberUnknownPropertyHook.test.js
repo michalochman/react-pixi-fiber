@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import warning from "../src/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
-import { customStandardNames, shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
+import { customStandardNames, getCustomPropertyInfo, shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
+import { getPixiAdapter } from "../src/configure";
+import { registerAdapterComponents } from "../src/registry";
 import { TAGS } from "../src/tags";
 
 vi.mock("../src/warning", () => ({ default: vi.fn() }));
@@ -90,6 +92,29 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       } finally {
         delete customStandardNames.Circle;
         delete customStandardNames["*"];
+      }
+    });
+
+    it.skipIf(!__DEV__)("looks up names registered for the tag a deprecated type maps to", () => {
+      customStandardNames.NineSliceSprite = { leftwidth: "leftWidth" };
+      // The configured adapter aliases NineSlicePlane itself; without the alias the deprecated tag map applies.
+      registerAdapterComponents({});
+      try {
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("NineSlicePlane", "leftWidth", 1)).toBe(true);
+        expect(getCustomPropertyInfo).toHaveBeenLastCalledWith("leftWidth", "NineSliceSprite");
+        expect(warning).toHaveBeenCalledTimes(0);
+        ReactPixiFiberUnknownPropertyHook.validateProperty("NineSlicePlane", "leftwidth", 1);
+        expect(warning).toHaveBeenCalledWith(
+          false,
+          "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
+          "leftwidth",
+          "NineSlicePlane",
+          "leftWidth",
+          stack
+        );
+      } finally {
+        delete customStandardNames.NineSliceSprite;
+        registerAdapterComponents(getPixiAdapter().components);
       }
     });
 

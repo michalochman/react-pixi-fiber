@@ -67,7 +67,12 @@ describe("builtins", () => {
     const target = new PIXI.Point();
     builtins.copyPoint(target, { x: 3, y: 4 });
     expect([target.x, target.y]).toEqual([3, 4]);
-    expect(builtins.isApplication(new PIXI.Application())).toBe(true);
+    const app = new PIXI.Application();
+    try {
+      expect(builtins.isApplication(app)).toBe(true);
+    } finally {
+      app.destroy(true);
+    }
   });
 
   it("creates every core tag through createInstance and records its tag", () => {

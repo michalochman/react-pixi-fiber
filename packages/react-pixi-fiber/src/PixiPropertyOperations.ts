@@ -2,19 +2,11 @@
 import warning from "./warning";
 import type * as PIXI from "pixi.js";
 import { getPixiAdapter } from "./config";
+import { getRecordedDefault, recordDefault } from "./defaults";
 import { getOwn, getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
-import { defaultProps } from "./props";
 import { getStackAddendum } from "./ReactGlobalSharedState";
-import { DEPRECATED_TAGS } from "./tags";
+import { getInstanceTag } from "./registry";
 import { findStrictRoot, setPixiValue } from "./utils";
-
-export function getDefaultValue(type: string, propName: string): unknown {
-  // A deprecated tag creates the instance of the tag it maps to, so it has that tag's defaults.
-  const defaultValues = defaultProps[getOwn(DEPRECATED_TAGS, type) ?? type];
-  if (typeof defaultValues !== "undefined") {
-    return defaultValues[propName];
-  }
-}
 
 /**
  * Sets the value for a property on a PIXI.DisplayObject instance.
@@ -32,7 +24,8 @@ export function setValueForProperty(
   value: unknown,
   internalHandle?: unknown
 ): void {
-  const propertyInfo = getPropertyInfo(propName, getPixiAdapter());
+  const pixi = getPixiAdapter();
+  const propertyInfo = getPropertyInfo(propName, pixi);
   let strictRoot = null;
   if (__DEV__) {
     strictRoot = findStrictRoot(internalHandle);
@@ -41,33 +34,39 @@ export function setValueForProperty(
   if (shouldIgnoreAttribute(type, propName, propertyInfo)) {
     return;
   }
+
+  // Remember what PixiJS had before we ever touch this prop, so a removal can restore it.
+  recordDefault(instance, propName, pixi.isPoint);
+
   let shouldIgnoreValue = false;
   if (shouldRemoveAttribute(type, propName, value, propertyInfo)) {
-    // Try to reset to property to default value (if it is defined) otherwise ignore provided value.
-    // This is the original behaviour of react-pixi@0.9.19 (on which this is based) and react-pixi-fiber@0.14.3,
-    // left here for backwards compatibility.
-    // TODO This is not the best solution as it makes it impossible to remove props that were once set.
-    //      Setting value to null or undefined makes behaviour of props used by PIXI unstable/undefined.
-    //      Deleting properties i another idea, however with many getters/setters defined by PIXI it is not trivial.
-    const defaultValue = getDefaultValue(type, propName);
-    if (typeof defaultValue !== "undefined") {
+    // `undefined` is also how a removed prop arrives, so only an invalid value warns.
+    const received = value;
+    // The tag the instance was created as: a deprecated tag records the tag it maps to, a user tag records itself.
+    const tag = getInstanceTag(instance) ?? type;
+    const override = getOwn(getOwn(pixi.defaults, tag), propName);
+    const defaultValue = typeof override !== "undefined" ? override : getRecordedDefault(instance, propName);
+    // A default can itself be `undefined` (`mask`, `filters`, custom props); a name the instance does not have is ignored.
+    if (typeof defaultValue !== "undefined" || propName in instance) {
       value = defaultValue;
-      if (strictRoot != null) {
+      if (strictRoot != null && typeof received !== "undefined") {
         warning(
           false,
-          "Received undefined for prop `%s` on `<%s />`. Setting default value to `%s`.%s",
+          "Received `%s` for prop `%s` on `<%s />`. Resetting it to its default `%s`.%s",
+          String(received),
           propName,
           type,
-          value,
+          String(value),
           getStackAddendum()
         );
       }
     } else {
       shouldIgnoreValue = true;
-      if (strictRoot != null) {
+      if (strictRoot != null && typeof received !== "undefined") {
         warning(
           false,
-          "Received undefined for prop `%s` on `<%s />`. Cannot determine default value. Ignoring.%s",
+          "Received `%s` for prop `%s` on `<%s />`. Cannot determine default value. Ignoring.%s",
+          String(received),
           propName,
           type,
           getStackAddendum()
@@ -77,6 +76,6 @@ export function setValueForProperty(
   }
 
   if (!shouldIgnoreValue) {
-    setPixiValue(instance, propName, value);
+    setPixiValue(instance, propName, value, pixi);
   }
 }

@@ -1,5 +1,6 @@
 import invariant from "./invariant";
 import warning from "./warning";
+import { DEPRECATED_TAGS } from "./tags";
 
 export interface ApplyPropsContext<P> {
   applyDisplayObjectProps(oldProps: P | undefined, newProps: P): void;
@@ -94,6 +95,16 @@ export function resolveComponent(type: string): { behavior: Behavior; source: "u
   if (user) return { behavior: user, source: "user" };
   const adapter = getAdapterComponent(type);
   return adapter ? { behavior: adapter, source: "adapter" } : undefined;
+}
+
+// The tag an element type creates: itself when a registration or the adapter defines it, else the tag a deprecated
+// type maps to.
+export function resolveTag(type: string): string {
+  return resolveComponent(type)
+    ? type
+    : Object.prototype.hasOwnProperty.call(DEPRECATED_TAGS, type)
+      ? DEPRECATED_TAGS[type]
+      : type;
 }
 
 const boundBehaviors = new WeakMap<object, BoundBehavior>();

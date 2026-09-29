@@ -11,6 +11,7 @@ import {
   shouldRemoveAttributeWithWarning,
 } from "./PixiProperty";
 import { getStackAddendum } from "./ReactGlobalSharedState";
+import { resolveTag } from "./registry";
 
 const emptyFunction = () => {};
 
@@ -57,7 +58,8 @@ if (__DEV__) {
 
     const pixi = getPixiAdapter();
     const propertyInfo = getPropertyInfo(name, pixi);
-    const customPropertyInfo = getCustomPropertyInfo(name, type);
+    const tag = resolveTag(type);
+    const customPropertyInfo = getCustomPropertyInfo(name, tag);
     const isReserved = propertyInfo !== null && propertyInfo.type === RESERVED;
 
     // Known attributes should match the casing specified in the property config.
@@ -65,7 +67,7 @@ if (__DEV__) {
     // Any other name is set on the instance as-is and not reported (decision 1).
     const standardName =
       getOwn(getStandardNames(pixi), lowerCasedName) ??
-      getOwn(customStandardNames[type], lowerCasedName) ??
+      getOwn(customStandardNames[tag], lowerCasedName) ??
       getOwn(customStandardNames["*"], lowerCasedName);
     if (standardName !== undefined && standardName !== name) {
       warning(
