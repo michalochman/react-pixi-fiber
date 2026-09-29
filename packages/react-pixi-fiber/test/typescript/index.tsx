@@ -11,7 +11,18 @@ import {
 } from "@react-pixi-fiber/pixi-6";
 import * as PIXI from "pixi.js";
 import * as React from "react";
-import type { InteractiveComponent as CoreInteractiveComponent } from "react-pixi-fiber";
+import type {
+  InteractiveComponent as CoreInteractiveComponent,
+  CustomDisplayObject,
+  CustomDisplayObjectAttachHandler,
+  CustomDisplayObjectCreator,
+  CustomDisplayObjectDetachHandler,
+  CustomDisplayObjectPropSetter,
+  CustomDisplayObjectPropSetterContext,
+  CustomPIXIComponentBehavior,
+  CustomPIXIComponentBehaviorDefinition,
+  CustomPIXIComponentProps,
+} from "react-pixi-fiber";
 import {
   AnimatedSprite,
   BitmapText,
@@ -129,6 +140,31 @@ const WickedContainer = CustomPIXIComponent<WickedContainerClass, WickedContaine
   },
   "WickedContainer"
 );
+
+// The deprecated `Custom*` type names still typecheck a 2.x behavior.
+const wickedCreate: CustomDisplayObjectCreator<WickedContainerClass, WickedContainerProps> = props =>
+  new WickedContainerClass(props.isWicked);
+const wickedApplyProps: CustomDisplayObjectPropSetter<WickedContainerClass, WickedContainerProps> = function (
+  instance,
+  oldProps,
+  newProps
+) {
+  const context: CustomDisplayObjectPropSetterContext<WickedContainerClass, WickedContainerProps> = this;
+  context.applyDisplayObjectProps(oldProps, newProps);
+  console.log(instance.isWicked);
+};
+const wickedAttach: CustomDisplayObjectAttachHandler<WickedContainerClass> = instance => console.log(instance);
+const wickedDetach: CustomDisplayObjectDetachHandler<WickedContainerClass> = instance => console.log(instance);
+const wickedDefinition: CustomPIXIComponentBehaviorDefinition<WickedContainerClass, WickedContainerProps> = {
+  customApplyProps: wickedApplyProps,
+  customDidAttach: wickedAttach,
+  customDisplayObject: wickedCreate,
+  customWillDetach: wickedDetach,
+};
+const wickedBehavior: CustomPIXIComponentBehavior<WickedContainerClass, WickedContainerProps> = wickedDefinition;
+const wickedInstance = null as unknown as CustomDisplayObject<WickedContainerClass, WickedContainerProps>;
+const wickedProps: CustomPIXIComponentProps<WickedContainerClass, WickedContainerProps> = { isWicked: true };
+console.log(wickedBehavior, wickedInstance, wickedProps);
 
 type CircleProps = {
   fill: number;

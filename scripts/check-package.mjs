@@ -120,6 +120,11 @@ try {
         code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
       });
     });
+    await check(`${name} has no UMD build, prop-types peer or react-pixi-alias subpath`, () => {
+      assert.ok(!existsSync(join(installed, "umd")), "umd/ is packed");
+      assert.equal(pkg.peerDependencies?.["prop-types"], undefined);
+      assert.throws(() => require.resolve(`${name}/react-pixi-alias`), { code: "ERR_PACKAGE_PATH_NOT_EXPORTED" });
+    });
 
     // Subpaths other than the entry point, for example `@react-pixi-fiber/pixi-8/compat/pixi6`.
     const subpaths = Object.keys(pkg.exports || {})
