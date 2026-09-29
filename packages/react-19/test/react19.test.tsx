@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import React, { Activity, Fragment, StrictMode, ViewTransition, startTransition } from "react";
+import React, { Activity, Fragment, StrictMode, ViewTransition, startTransition, useState } from "react";
 import react19, { strictModeBit } from "../src/index";
 import type { HostOps, PixiFragmentInstance } from "react-pixi-fiber";
 import {
@@ -177,6 +177,25 @@ describe("react19", () => {
     renderer.render(<node />, container);
     // No act(), no await: the child is there when render() returns.
     expect(container.children).toHaveLength(1);
+  });
+
+  it("commits an update from a pointerdown handler in a microtask, as react-dom does", async () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    let setX: (x: number) => void = () => {};
+    function Node() {
+      const [x, set] = useState(1);
+      setX = set;
+      return <node x={x} />;
+    }
+    renderer.render(<Node />, container);
+    const canvas = document.createElement("canvas");
+    canvas.addEventListener("pointerdown", () => setX(2));
+    canvas.dispatchEvent(new Event("pointerdown"));
+    await Promise.resolve();
+    expect(container.children[0].props.x).toBe(2);
+    renderer.unmount(container);
   });
 
   it("skips updateProperties when the diff finds no change", () => {

@@ -1,6 +1,12 @@
 import React from "react";
 import Reconciler from "react-reconciler";
-import { ConcurrentRoot, DefaultEventPriority, NoEventPriority } from "react-reconciler/constants";
+import {
+  ConcurrentRoot,
+  ContinuousEventPriority,
+  DefaultEventPriority,
+  DiscreteEventPriority,
+  NoEventPriority,
+} from "react-reconciler/constants";
 import type { HostOps, ReactAdapter, Renderer } from "react-pixi-fiber";
 
 // https://github.com/facebook/react/blob/v19.3.0/packages/react-reconciler/src/ReactTypeOfMode.js: StrictLegacyMode
@@ -8,6 +14,44 @@ export const strictModeBit = 8;
 const emptyObject = Object.freeze({});
 
 function noop() {}
+
+// The DOM events PixiJS dispatches its handlers from, with the priority react-dom gives an update inside them.
+const DISCRETE_EVENTS = new Set([
+  "click",
+  "contextmenu",
+  "dblclick",
+  "keydown",
+  "keyup",
+  "mousedown",
+  "mouseup",
+  "pointercancel",
+  "pointerdown",
+  "pointerup",
+  "touchcancel",
+  "touchend",
+  "touchstart",
+]);
+const CONTINUOUS_EVENTS = new Set([
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "pointerenter",
+  "pointerleave",
+  "pointermove",
+  "pointerout",
+  "pointerover",
+  "touchmove",
+  "wheel",
+]);
+
+function getEventPriority(): number {
+  const type = typeof window !== "undefined" ? window.event?.type : undefined;
+  if (type === undefined) return DefaultEventPriority;
+  if (DISCRETE_EVENTS.has(type)) return DiscreteEventPriority;
+  return CONTINUOUS_EVENTS.has(type) ? ContinuousEventPriority : DefaultEventPriority;
+}
 
 // A host that does not animate: every measurement is the same inert object.
 const measurement = Object.freeze({});
@@ -70,7 +114,7 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     },
     getCurrentUpdatePriority: () => currentUpdatePriority,
     resolveUpdatePriority: () =>
-      currentUpdatePriority !== NoEventPriority ? currentUpdatePriority : DefaultEventPriority,
+      currentUpdatePriority !== NoEventPriority ? currentUpdatePriority : getEventPriority(),
     getRootHostContext: () => emptyObject,
     getChildHostContext: (parentHostContext: unknown) => parentHostContext,
     getPublicInstance: (instance: unknown) => instance,
