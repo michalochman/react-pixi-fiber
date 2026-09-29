@@ -4,14 +4,16 @@
 
 # react-pixi-fiber repository
 
-This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React Fiber renderer for [PixiJS](https://pixijs.com/), and its examples. Package documentation lives in the [package README](./packages/react-pixi-fiber/README.md).
+This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React Fiber renderer for [PixiJS](https://pixijs.com/), its React and PixiJS adapters, and the examples. Package documentation lives in the [package README](./packages/react-pixi-fiber/README.md).
 
 ## Layout
 
 | Path | Contents |
 | --- | --- |
-| [`packages/react-pixi-fiber`](./packages/react-pixi-fiber) | The library published to npm |
-| [`apps/examples`](./apps/examples) | Examples built with Vite that use the local package |
+| [`packages/pixi-6`](./packages/pixi-6) | `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter |
+| [`packages/react-18`](./packages/react-18) | `@react-pixi-fiber/react-18`, the React 18 adapter |
+| [`packages/react-pixi-fiber`](./packages/react-pixi-fiber) | `react-pixi-fiber`, the core with the components, `Stage` and `configure` |
+| [`apps/examples`](./apps/examples) | Examples built with Vite that use the local packages |
 
 The repository is a [pnpm](https://pnpm.io) workspace. The pnpm version is pinned in the `packageManager` field of `package.json`, and Node comes from `.nvmrc`.
 
@@ -21,16 +23,16 @@ Run these in the repository root:
 
 ```sh
 pnpm install        # install every workspace package
-pnpm build          # build the library, the examples load the built files
-pnpm test           # run the library tests
+pnpm build          # build every package, the examples load the built files
+pnpm test           # run the tests of every package
 pnpm lint           # check formatting and lint with Biome
 pnpm format         # apply Biome formatting and safe fixes
-pnpm check-types    # typecheck the library source, the TypeScript fixture, and the examples (after pnpm build)
-pnpm check-package  # pack the library and check what Node and esbuild resolve (after pnpm build)
+pnpm check-types    # typecheck every package, the TypeScript fixture, the examples and the scripts (after pnpm build)
+pnpm check-package  # pack every package and check what Node and esbuild resolve (after pnpm build)
 pnpm start          # start the examples dev server
 ```
 
-Rebuild the library after changing its source before running or typechecking the examples.
+Rebuild the packages after changing their source before running or typechecking the examples.
 
 ## Hosted examples
 

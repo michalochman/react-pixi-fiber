@@ -9,11 +9,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+- `configure({ react, pixi })`, called once in the app entry before the first render, wires a React adapter and a PixiJS adapter into the core. Without it the first render throws an error that prints the install line and the setup lines
+- `@react-pixi-fiber/react-18`, the React 18 adapter, and `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter
 - `PIXIComponent(type, behavior)` and `PIXIProperty` replace `CustomPIXIComponent(behavior, type)` and `CustomPIXIProperty`. Behavior keys are `create`, `applyProps`, `afterAdd`, `beforeRemove`
 - Tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope` and `NineSliceSprite`
 - `Stage` `onInit(app)` prop, called once the PixiJS application exists and the children are rendered
 
 ### Changed
+- `react-reconciler` moved from the core into the React adapters; `@react-pixi-fiber/react-18` bundles `react-reconciler` 0.29.2
+- `pixi.js` is no longer a peer dependency of the core, the PixiJS adapter has it. The core's `react` peer is `>=17.0.0 <20.0.0`
+- A second `configure` call after a render warns once in development. Trees already rendered keep their React renderer; new PixiJS instances use the new adapter
+- The PixiJS 6 types `InteractionCompatibility`, `InteractionEventCompatibility` and `PixiTypeFallback` import from `@react-pixi-fiber/pixi-6`
 - Build output moved from `cjs/` and `es/` to `dist/cjs/` and `dist/es/`. Imports of `react-pixi-fiber` are unaffected; direct paths to the built files need the `dist/` prefix
 - Examples are built with Vite instead of Create React App
 - `package.json` has an `exports` map. Bundlers that understand it (webpack 5, Vite) get the ES build directly, the development or production file picked by the `development` condition; Node and `require` still get the CommonJS entry points. Only `react-pixi-fiber` and `react-pixi-fiber/package.json` can be imported, deep imports into `dist/` or `src/` no longer resolve
@@ -43,12 +49,18 @@ Each deprecated item warns once in development and is removed in 4.0.0. The depr
 - `createStageClass`, it returns the function `Stage`
 - Tag `NineSlicePlane`, it maps to `NineSliceSprite`
 - `Stage` `width` and `height` props (deprecated since 0.12.0, the warning no longer needs `prop-types`). As in 2.x they set `app.stage.width` and `app.stage.height` and never size the renderer or reach the `<canvas>`; the renderer size comes from `options.width` and `options.height`
+- The `InteractiveComponent` type in `react-pixi-fiber`, import it from the PixiJS adapter
 
 ### Removed
 - The `react-pixi-fiber/react-pixi-alias` subpath and the `react-dom` peer dependency
 - UMD builds, the `prop-types` peer dependency and runtime prop-types validation, `fbjs`
 - `Stage` as a class component
 - The PixiJS 4 fallbacks to the `PIXI.extras`, `PIXI.mesh` and `PIXI.particles` namespaces are removed from the core; PixiJS 4 support moves to the `@react-pixi-fiber/pixi-4` adapter
+
+### Fixed
+- `cancelTimeout` cancels the timeout: `scheduleTimeout` returns its handle
+- `useId` returns ids without the `undefined` prefix (`:r0:` instead of `:undefinedr0:`), the root's `identifierPrefix` is `""`
+- Errors React recovers from are logged with `console.error`; 2.x passed no `onRecoverableError` handler
 
 
 ## [2.0.0-rc.4] - 2026-09-28

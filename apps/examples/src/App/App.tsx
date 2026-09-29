@@ -12,13 +12,14 @@ import CustomApplicationExample from "../CustomApplicationExample";
 import CustomBunnymarkExample from "../CustomBunnymarkExample";
 import CustomPIXIComponentExample from "../CustomPIXIComponentExample";
 import CustomPIXIPropertyExample from "../CustomPIXIPropertyExample";
-const DeprecationsExample = lazy(() => import("../DeprecationsExample"));
 import HooksExample from "../HooksExample";
 import LayersExample from "../LayersExample";
 import PointsExample from "../PointsExample/PointsExample";
 import SmokeTest from "../SmokeTest";
 import SuspenseExample from "../SuspenseExample";
 import Stats from "../Stats";
+
+const DeprecationsExample = lazy(() => import("../DeprecationsExample"));
 
 export type Example = {
   name: string;

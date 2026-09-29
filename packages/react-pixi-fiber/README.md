@@ -6,7 +6,7 @@
   <h1>ReactPixiFiber – React Fiber renderer for PixiJS</h1>
 
   <p>
-    ReactPixiFiber is a JavaScript library for writing <a href="https://pixijs.com/">PixiJS</a> applications using <a href="https://reactjs.org/">React</a> declarative style in React 18 and above.
+    ReactPixiFiber is a JavaScript library for writing <a href="https://pixijs.com/">PixiJS</a> applications using <a href="https://reactjs.org/">React</a> declarative style. An adapter for your React version and one for your PixiJS version plug it in, see <a href="#setup">Setup</a>.
     <br />
     For React <16.0.0 see <a href="https://github.com/Izzimach/react-pixi">react-pixi</a>.
   </p>
@@ -32,17 +32,36 @@ The [examples](../../apps/examples) cover the API. They are hosted at https://re
 
 ## Installing
 
-The current version assumes [React] >16.0.0 and [PixiJS] >4.4.0
+Install the core, one React adapter and one PixiJS adapter next to [React] and [PixiJS]. For React 18 and PixiJS 6:
 
-    yarn add react-pixi-fiber pixi.js
+    npm install react-pixi-fiber @react-pixi-fiber/react-18 @react-pixi-fiber/pixi-6 react pixi.js@6
 
 or
 
-    npm install react-pixi-fiber pixi.js --save
-
-Refer to next sections to see usage examples.
+    yarn add react-pixi-fiber @react-pixi-fiber/react-18 @react-pixi-fiber/pixi-6 react pixi.js@6
 
 This package works with [Vite](https://vite.dev) and webpack based setups such as [Create React App](https://github.com/facebookincubator/create-react-app) – the examples below use Vite.
+
+## Setup
+
+Call `configure` once in the app entry, before the first render:
+
+```js
+import { configure } from "react-pixi-fiber";
+import react18 from "@react-pixi-fiber/react-18";
+import pixi6 from "@react-pixi-fiber/pixi-6";
+
+configure({ react: react18(), pixi: pixi6() });
+```
+
+Components import only from `react-pixi-fiber`, so a shared component library does not depend on the React or PixiJS version. Pick the adapters that match the versions the app installs:
+
+| Adapter | Supports |
+| --- | --- |
+| [`@react-pixi-fiber/react-18`](https://www.npmjs.com/package/@react-pixi-fiber/react-18) | `react` ^18.0.0 |
+| [`@react-pixi-fiber/pixi-6`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-6) | `pixi.js` ^6.0.0 |
+
+Without `configure`, the first render throws an error that prints the install line and these setup lines.
 
 ## Usage
 
@@ -151,7 +170,7 @@ The examples live in [`apps/examples`](../../apps/examples) of the [repository](
 
 ### Components
 
-React Pixi Fiber currently supports following components out of the box (but read [Custom Components](#custom-components) section if you need more):
+React Pixi Fiber supports the following components out of the box (but read [Custom Components](#custom-components) section if you need more):
 
 #### `<Stage />`
 
@@ -161,37 +180,27 @@ Expects **one** the following props:
 * `app` - pass your own [`PIXI.Application`] instance,
 * `options` - pass only the [`PIXI.Application`] options.
 
-#### `<Container />`
+`onInit(app)` is called once the application exists and the children are rendered.
 
-Renders [`PIXI.Container`].
+#### Tags
 
-#### `<Graphics />`
+Each tag names a display object concept. The configured PixiJS adapter creates the matching class of your PixiJS version.
 
-Renders [`PIXI.Graphics`].
-
-#### `<ParticleContainer />`
-
-Renders [`PIXI.ParticleContainer`] (or `PIXI.particles.ParticleContainer` if you're using PixiJS 4).
-
-#### `<Sprite />`
-
-Renders [`PIXI.Sprite`].
-
-#### `<TilingSprite />`
-
-Renders [`PIXI.TilingSprite`] (or `PIXI.extras.TilingSprite` if you're using PixiJS 4).
-
-#### `<Text />`
-
-Renders [`PIXI.Text`].
-
-#### `<BitmapText />`
-
-Renders [`PIXI.BitmapText`] (or `PIXI.extras.BitmapText` if you're using PixiJS 4).
-
-#### `<NineSlicePlane />`
-
-Renders [`PIXI.NineSlicePlane`].
+| Tag | Renders |
+| --- | --- |
+| `<AnimatedSprite />` | an animated sprite, `PIXI.AnimatedSprite` |
+| `<BitmapText />` | bitmap font text, [`PIXI.BitmapText`] |
+| `<Container />` | a container, [`PIXI.Container`] |
+| `<Graphics />` | vector graphics, [`PIXI.Graphics`] |
+| `<Mesh />` | a mesh from geometry and a shader, `PIXI.Mesh` |
+| `<MeshPlane />` | a textured plane mesh |
+| `<MeshRope />` | a textured rope mesh |
+| `<MeshSimple />` | a simple textured mesh |
+| `<NineSliceSprite />` | a nine-slice scaled sprite |
+| `<ParticleContainer />` | a fast container for many sprites, [`PIXI.ParticleContainer`] |
+| `<Sprite />` | a sprite, [`PIXI.Sprite`] |
+| `<Text />` | canvas text, [`PIXI.Text`] |
+| `<TilingSprite />` | a repeating texture, [`PIXI.TilingSprite`] |
 
 ### Props
 
@@ -202,28 +211,29 @@ more about [Unknown Prop Warning](https://reactjs.org/warnings/unknown-prop.html
 
 #### Custom Props / Plugins
 
-In case you are using PixiJS plugins, such as [`pixi-layers`](https://github.com/pixijs/pixi-layers), ReactPixiFiber can
-recognize these custom props by using the following `CustomPIXIProperty` API:
+In case you are using PixiJS plugins, such as [`pixi-layers`](https://github.com/pixijs/pixi-layers), their props are set on the instance like any other prop. To have them checked in development, register them with `PIXIProperty`:
 
-`CustomPIXIProperty(maybeComponentType, propertyName, validator)` accepts:
-* `maybeComponentType` – a ReactPixiFiber component, an array of ReactPixiFiber components or `undefined`/`null`. Passing `undefined` or `null` will apply custom property to all ReactPixiFiber components.
+`PIXIProperty(maybeComponentType, propertyName, validator)` accepts:
+* `maybeComponentType` – a ReactPixiFiber component or tag, an array of them, or `undefined`/`null`. Passing `undefined` or `null` will apply custom property to all ReactPixiFiber components.
 * `propertyName` – a name of the custom property as string. ReactPixiFiber will also check that the casing is correct.
 * `validator` – optional function that will be called with value provided and should return `true` if the value is valid, `false` otherwise.
 
+The checks run in development under a `<StrictMode>` inside `Stage` (or inside the tree passed to `render`) and report warnings, not errors.
+
 For example:
 
-```js
-import { Container, Sprite } from "react-pixi-fiber";
+```jsx
+import { Container, PIXIProperty, Sprite } from "react-pixi-fiber";
 
 const group = new PIXI.display.Group(0, true);
 
-// if you just want to get rid of Unknown Prop Warning:
-CustomPIXIProperty(Container, "parentGroup");
-CustomPIXIProperty(undefined, "zIndex");
+// check only the casing of the name
+PIXIProperty(Container, "parentGroup");
+PIXIProperty(undefined, "zIndex");
 
-// if you want to be strict in the values that are provided
-CustomPIXIProperty(Container, "parentGroup", value => value instanceof PIXI.display.Group);
-CustomPIXIProperty([Container, Sprite], "zIndex", value => Number.isFinite(value));
+// also check the values that are provided
+PIXIProperty(Container, "parentGroup", value => value instanceof PIXI.display.Group);
+PIXIProperty([Container, Sprite], "zIndex", value => Number.isFinite(value));
 
 function App() {
   return (
@@ -445,62 +455,59 @@ render(
 
 ### Custom Components
 
-ReactPixiFiber can recognize your custom components using API compatible with `react-pixi`.
+`PIXIComponent(type, behavior)` registers a component under the `type` string and returns it. `behavior` is an object with the following 4 properties.
 
-`CustomPIXIComponent(behavior, type)` accepts a `behavior` object with the following 4 properties and a `type` string.
+#### `create(props)`
 
-#### `customDisplayObject(props)`
+Use this to create an instance of [`PIXI.DisplayObject`].
 
-Use this to create an instance of [PIXI.DisplayObject]. 
+This is your entry point to custom components and the only required method.
 
-This is your entry point to custom components and the only required method. Can be also passed as `behavior` of type `function` to `CustomPIXIComponent`.
+#### `applyProps(displayObject, oldProps, newProps)` (optional)
 
-#### `customApplyProps(displayObject, oldProps, newProps)` (optional)
+Use this to apply `newProps` to your `Component` in a custom way. `oldProps` is `undefined` on the first render.
 
-Use this to apply `newProps` to your `Component` in a custom way.
+Note: this replaces the default method of transferring `props` to the specified `displayObject`. Call `this.applyDisplayObjectProps(oldProps, newProps)` inside your `applyProps` method if you want that.
 
-Note: this replaces the default method of transfering `props` to the specified `displayObject`. Call `this.applyDisplayObjectProps(oldProps,newProps)` inside your `customApplyProps` method if you want that.
+#### `afterAdd(displayObject)` (optional)
 
-#### `customDidAttach(displayObject)` (optional)
+Use this to do something after `displayObject` is added to its parent.
 
-Use this to do something after `displayObject` is attached, which happens **after** `componentDidMount` lifecycle method.
+#### `beforeRemove(displayObject)` (optional)
 
-#### `customWillDetach(displayObject)` (optional)
-
-Use this to do something (usually cleanup) before detaching, which happens **before** `componentWillUnmount` lifecycle method.
+Use this to do something (usually cleanup) before `displayObject` is removed from its parent.
 
 #### Simple Graphics example
 
 For example, this is how you could implement `Rectangle` component:
 ```javascript
 // components/Rectangle.js
-import { CustomPIXIComponent } from "react-pixi-fiber";
+import { PIXIComponent } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 
-const TYPE = "Rectangle";
-export const behavior = {
-  customDisplayObject: props => new PIXI.Graphics(),
-  customApplyProps: function(instance, oldProps, newProps) {
+export default PIXIComponent("Rectangle", {
+  create: props => new PIXI.Graphics(),
+  applyProps: function (instance, oldProps, newProps) {
     const { fill, x, y, width, height } = newProps;
     instance.clear();
     instance.beginFill(fill);
     instance.drawRect(x, y, width, height);
     instance.endFill();
-  }
-};
-export default CustomPIXIComponent(behavior, TYPE);
+  },
+});
 ```
 
 ```jsx harmony
 // App.js
 import { render } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
-import Rectangle from "./components/Rectangle"
+import Rectangle from "./components/Rectangle";
 
-// Setup PixiJS Application
-const canvasElement = document.getElementById("container")
-const app = new PIXI.Application(800, 600, {
-  view: canvasElement
+// `configure` has run in the app entry, see Setup
+const app = new PIXI.Application({
+  view: document.getElementById("container"),
+  width: 800,
+  height: 600,
 });
 
 render(
@@ -510,7 +517,7 @@ render(
     width={300}
     height={200}
     fill={0xFFFF00}
-  />, 
+  />,
   app.stage
 );
 ```
@@ -529,7 +536,7 @@ Yes and it's awesome! It is battle tested and backed up by [Kalamba Games](https
 
 ### What version of PixiJS I can use?
 
-PixiJS v4, v5 and v6 are supported.
+The one your PixiJS adapter supports, see the adapter table in [Setup](#setup).
 
 ### Can I use it in my TypeScript project?
 
@@ -754,6 +761,37 @@ createRoot(element).render(<Stage options={{ width: 800, height: 600 }}>…</Sta
 
 Every change is listed in the [changelog](./CHANGELOG.md). These are the ones that need a code change.
 
+### Call `configure` once
+
+```js
+// 2.x
+import { Stage, Sprite } from "react-pixi-fiber";
+// 3.0.0, in the app entry, before the first render
+import { configure } from "react-pixi-fiber";
+import react18 from "@react-pixi-fiber/react-18";
+import pixi6 from "@react-pixi-fiber/pixi-6";
+
+configure({ react: react18(), pixi: pixi6() });
+```
+
+The core no longer depends on `react-reconciler` or `pixi.js`; the adapters bring them. Install the adapters from the table in [Setup](#setup). Components keep importing from `react-pixi-fiber`. Without `configure`, the first `Stage` mount, `render` call or created instance throws, on React 18:
+
+```
+react-pixi-fiber is not configured. Install the adapters for your React and PixiJS versions and call `configure` once, before the first render:
+
+  npm install @react-pixi-fiber/react-18 @react-pixi-fiber/pixi-N
+
+  import { configure } from "react-pixi-fiber";
+  import react18 from "@react-pixi-fiber/react-18";
+  import pixiN from "@react-pixi-fiber/pixi-N";
+
+  configure({ react: react18(), pixi: pixiN() });
+
+Replace N with your PixiJS major version (4 to 8).
+```
+
+Call it once. A second call after a render warns in development: trees already rendered keep their React renderer, new PixiJS instances use the new adapters.
+
 ### `CustomPIXIComponent` is `PIXIComponent`
 
 ```js
@@ -908,7 +946,29 @@ The renderer size comes only from `options.width` and `options.height`, in 2.x a
 <NineSliceSprite texture={texture} leftWidth={10} />
 ```
 
-`NineSlicePlane` keeps working in 3.x with a development warning and creates the same `PIXI.NineSlicePlane`. It is removed in 4.0.0.
+`NineSlicePlane` keeps working in 3.x. `@react-pixi-fiber/pixi-6` defines `NineSlicePlane` as its own tag, so it creates a `PIXI.NineSlicePlane` without a warning. With an adapter that does not define it, the core maps it to `NineSliceSprite` with a development warning; the mapping is removed in 4.0.0.
+
+### Adapter tags are recorded under their own name
+
+```js
+pixi6({ defaults: { NineSliceSprite: { leftWidth: 10 } } });
+PIXIProperty("NineSliceSprite", "leftWidth", value => value >= 0);
+// applies to <NineSliceSprite />, not to <NineSlicePlane /> from @react-pixi-fiber/pixi-6
+getInstanceTag(nineSlicePlaneInstance); // "NineSlicePlane"
+```
+
+The tags an adapter adds under its PixiJS class names, for example `NineSlicePlane`, `SimpleMesh`, `SimplePlane` and `SimpleRope` in `@react-pixi-fiber/pixi-6`, create the same display objects as the core tags, but each is a tag of its own. `defaults` and `PIXIProperty` keyed by the core tag do not apply to them, and `getInstanceTag` returns the tag you wrote. Key them by that tag too, or use the core tag.
+
+### PixiJS 6 types import from `@react-pixi-fiber/pixi-6`
+
+```ts
+// 2.x
+import type { InteractionCompatibility, InteractionEventCompatibility, PixiTypeFallback } from "react-pixi-fiber";
+// 3.0.0
+import type { InteractionCompatibility, InteractionEventCompatibility, PixiTypeFallback } from "@react-pixi-fiber/pixi-6";
+```
+
+`InteractiveComponent` still resolves from `react-pixi-fiber` and is deprecated; import it from `@react-pixi-fiber/pixi-6`.
 
 ### Smaller changes
 
@@ -922,7 +982,7 @@ The renderer size comes only from `options.width` and `options.height`, in 2.x a
 
 ## Contributing
 
-The main purpose of this repository is to be able to render PixiJS objects inside React 16 Fiber architecture.
+The main purpose of this repository is to be able to render PixiJS objects inside React Fiber architecture.
  
 Development of React Pixi Fiber happens in the open on GitHub, and I would be grateful to the community for any contributions, including bug reports and suggestions.
 
@@ -971,7 +1031,6 @@ For making an awesome project structure and documentation that is used in simila
 [`PIXI.Container`]: https://pixijs.download/v6.5.10/docs/PIXI.Container.html
 [`PIXI.DisplayObject`]: https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html 
 [`PIXI.Graphics`]: https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
-[`PIXI.NineSlicePlane`]: https://pixijs.download/v6.5.10/docs/PIXI.NineSlicePlane.html
 [`PIXI.ObservablePoint`]: https://pixijs.download/v6.5.10/docs/PIXI.ObservablePoint.html
 [`PIXI.ParticleContainer`]: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
 [`PIXI.Point`]: https://pixijs.download/v6.5.10/docs/PIXI.Point.html
