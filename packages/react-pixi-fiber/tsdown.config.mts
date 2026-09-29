@@ -21,10 +21,9 @@ const declareStageValue: TsdownHooks["build:done"] = ({ chunks }) => {
   }
 };
 
-// pixi.js leaves the list in Task 12, react-reconciler moves to the React adapter in Task 10.
+// pixi.js leaves the list in Task 12.
 export default createTsdownConfig({
   name: "react-pixi-fiber",
   external: ["react", "pixi.js"],
-  bundle: [/^react-reconciler/],
   hooks: { "build:done": declareStageValue },
 });

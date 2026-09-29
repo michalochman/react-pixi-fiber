@@ -1,15 +1,15 @@
 import type * as PIXI from "pixi.js";
 import React from "react";
 import { AppProvider } from "../AppProvider";
-import { ReactPixiFiberAsSecondaryRenderer } from "../ReactPixiFiber";
 import { diffProperties, setInitialProperties, updateProperties } from "../ReactPixiFiberComponent";
-import { createRender, createUnmount } from "../render";
+import { renderers } from "../render";
 import { getPixiAdapter } from "../config";
 import { getContainerProps } from "./props";
 import { TAGS } from "../tags";
 
-export const render = createRender(ReactPixiFiberAsSecondaryRenderer);
-export const unmount = createUnmount(ReactPixiFiberAsSecondaryRenderer);
+// React Pixi Fiber renderer is secondary to React DOM renderer when Stage is rendered by React DOM
+export const render = renderers.secondary.render;
+export const unmount = renderers.secondary.unmount;
 
 // Stage props as the helpers read them; the public shape is `StageProps` in `types.ts`.
 export type Props = Record<string, any>;

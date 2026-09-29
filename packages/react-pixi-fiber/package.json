@@ -38,9 +38,6 @@
     "src/"
   ],
   "sideEffects": false,
-  "dependencies": {
-    "react-reconciler": "^0.29.0"
-  },
   "peerDependencies": {
     "pixi.js": ">=4.4.0 <8.0.0",
     "react": ">=18.2.0"

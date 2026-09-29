@@ -1,50 +1,11 @@
-import invariant from "./invariant";
-import type * as PIXI from "pixi.js";
-import type * as React from "react";
-import { version } from "react";
+// Temporary bridge: the core suite keeps running on the React 18 adapter until Task 11 makes render lazy.
+import react18 from "@react-pixi-fiber/react-18"; // resolved by the Vitest alias; Task 11 removes this import
+import { hostOps } from "./hostOps";
 
-export function getDevToolsVersion(): string {
-  return version;
-}
-
-export const roots = new Map<PIXI.Container, unknown>();
-
-/*
- * element should be any instance of PIXI DisplayObject
- * containerTag should be an instance of PIXI root Container (i.e. the Stage)
- */
-export function createRender(ReactPixiFiber: any) {
-  return function render(
-    element: React.ReactElement<any> | React.ReactElement<any>[] | PIXI.DisplayObject | PIXI.DisplayObject[],
-    containerTag: PIXI.Container,
-    callback?: Function,
-    parentComponent?: unknown
-  ): void {
-    let root = roots.get(containerTag);
-    if (!root) {
-      root = ReactPixiFiber.createContainer(containerTag);
-      roots.set(containerTag, root);
-
-      ReactPixiFiber.injectIntoDevTools({
-        findFiberByHostInstance: ReactPixiFiber.findFiberByHostInstance,
-        bundleType: __DEV__ ? 1 : 0,
-        version: getDevToolsVersion(),
-        rendererPackageName: __PACKAGE_NAME__,
-      });
-    }
-
-    ReactPixiFiber.updateContainer(element, root, parentComponent, callback);
-
-    return ReactPixiFiber.getPublicRootInstance(root);
-  };
-}
-
-export function createUnmount(ReactPixiFiber: any) {
-  return function unmount(containerTag: PIXI.Container): void {
-    const root = roots.get(containerTag);
-
-    invariant(root, "ReactPixiFiber did not render into container provided");
-
-    ReactPixiFiber.updateContainer(null, root);
-  };
-}
+const adapter = react18();
+export const renderers = {
+  primary: adapter.createRenderer(hostOps, { isPrimaryRenderer: true }),
+  secondary: adapter.createRenderer(hostOps, { isPrimaryRenderer: false }),
+};
+export const render = renderers.primary.render;
+export const unmount = renderers.primary.unmount;

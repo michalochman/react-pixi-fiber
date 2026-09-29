@@ -16,8 +16,6 @@ export function createVitestConfig({ setupFiles = [] }: { setupFiles?: string[] 
       },
       define: {
         __DEV__: JSON.stringify(!isProduction),
-        // Read by src/render.ts (devtools renderer name)
-        __PACKAGE_NAME__: JSON.stringify("react-pixi-fiber"),
       },
       resolve: {
         alias: [

@@ -6,8 +6,7 @@ import { AppContext, AppProvider, withApp } from "./AppProvider";
 import Stage, { createStageClass } from "./Stage";
 import { TAGS } from "./tags";
 import { usePixiApp, usePixiTicker } from "./hooks";
-import { createRender, createUnmount } from "./render";
-import { ReactPixiFiberAsPrimaryRenderer } from "./ReactPixiFiber";
+import { renderers } from "./render";
 import { applyDisplayObjectProps, applyProps } from "./ReactPixiFiberComponent";
 import type {
   AnimatedSpriteProps,
@@ -35,9 +34,9 @@ const render: (
   pixiElement: React.ReactElement<any> | React.ReactElement<any>[] | PIXI.DisplayObject | PIXI.DisplayObject[],
   stage: PIXI.Container,
   callback?: Function
-) => void = createRender(ReactPixiFiberAsPrimaryRenderer);
+) => void = renderers.primary.render as any; // 2.x signature; the adapter takes a React.ReactNode
 // Standalone ReactPixiFiber unmount method.
-const unmount: (stage: PIXI.Container) => void = createUnmount(ReactPixiFiberAsPrimaryRenderer);
+const unmount: (stage: PIXI.Container) => void = renderers.primary.unmount;
 
 // `Stage` is both the component and its type; `export { Stage }` below exports both.
 // The declaration bundler drops the value in this form, see `stageTypePlugin` in tsdown.config.mts.

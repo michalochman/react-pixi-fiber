@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
 import { createRegisteredInstance, normalizeBehavior, registerComponent } from "../src/registry";
 import { setValueForProperty } from "../src/PixiPropertyOperations";

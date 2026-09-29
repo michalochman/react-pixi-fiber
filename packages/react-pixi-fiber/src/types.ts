@@ -289,6 +289,50 @@ export interface PixiAdapter {
 }
 
 /**
+ * React adapter
+ */
+
+// The core's tree and prop operations, independent of the react-reconciler version. A React adapter builds its
+// reconciler host config from them.
+export interface HostOps {
+  createInstance(type: string, props: Record<string, unknown>, rootContainer: unknown): any;
+  appendChild(parent: any, child: any): void;
+  insertBefore(parent: any, child: any, before: any): void;
+  removeChild(parent: any, child: any): void;
+  clearContainer(container: any): void;
+  hideInstance(instance: any): void;
+  unhideInstance(instance: any, props: Record<string, unknown>): void;
+  setInitialProperties(type: string, instance: any, props: Record<string, unknown>): void;
+  diffProperties(
+    type: string,
+    instance: any,
+    prevProps: Record<string, unknown>,
+    nextProps: Record<string, unknown>
+  ): unknown[] | null;
+  updateProperties(
+    type: string,
+    instance: any,
+    payload: unknown[] | null,
+    prevProps: Record<string, unknown>,
+    nextProps: Record<string, unknown>,
+    internalHandle?: unknown
+  ): void;
+  // Development only. `internalHandle` is the fiber, so the core can gate on <StrictMode> with the adapter's bit.
+  validateProperties(type: string, props: Record<string, unknown>, internalHandle?: unknown): void;
+}
+
+export interface Renderer {
+  render(element: React.ReactNode, container: any, callback?: () => void, parentComponent?: unknown): unknown;
+  unmount(container: any): void;
+  getStackAddendum(): string;
+}
+
+export interface ReactAdapter {
+  createRenderer(hostOps: HostOps, options: { isPrimaryRenderer: boolean }): Renderer;
+  strictModeBit: number;
+}
+
+/**
  * Rendering: using Stage component or using render and unmount
  */
 

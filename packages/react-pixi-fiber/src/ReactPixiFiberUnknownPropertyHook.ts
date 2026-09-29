@@ -1,6 +1,6 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/ReactDOMUnknownPropertyHook.js
 import warning from "./warning";
-import { getPixiAdapter } from "./config";
+import { getPixiAdapter, getStackAddendum } from "./config";
 import {
   RESERVED,
   customStandardNames,
@@ -10,7 +10,6 @@ import {
   getStandardNames,
   shouldRemoveAttributeWithWarning,
 } from "./PixiProperty";
-import { getStackAddendum } from "./ReactGlobalSharedState";
 import { resolveTag } from "./registry";
 
 const emptyFunction = () => {};

@@ -10,8 +10,7 @@ vi.mock("../../src/render", () => {
   const render = vi.fn();
   const unmount = vi.fn();
   return {
-    createRender: () => render,
-    createUnmount: () => unmount,
+    renderers: { primary: { render, unmount }, secondary: { render, unmount } },
     render,
     unmount,
     __renderMock: render,
@@ -37,7 +36,11 @@ const adapter = {
   }),
   isApplication: v => apps.includes(v),
 };
-vi.mock("../../src/config", () => ({ getPixiAdapter: () => adapter, getStrictModeBit: () => 8 }));
+vi.mock("../../src/config", () => ({
+  getPixiAdapter: () => adapter,
+  getStackAddendum: () => "",
+  getStrictModeBit: () => 8,
+}));
 
 const flush = () =>
   act(async () => {

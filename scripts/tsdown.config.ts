@@ -9,9 +9,12 @@ export interface PackageBuild {
   // Dependencies to inline, for example [/^react-reconciler/]
   bundle?: RegExp[];
   hooks?: Partial<TsdownHooks>;
+  // Declarations are emitted by tsgo, which writes a source outside dirname(tsconfig) next to that source. An adapter
+  // whose tsconfig maps `react-pixi-fiber` to the core's src/ builds with a tsconfig that does not.
+  tsconfig?: string;
 }
 
-export function createTsdownConfig({ name, external, bundle = [], hooks }: PackageBuild) {
+export function createTsdownConfig({ name, external, bundle = [], hooks, tsconfig }: PackageBuild) {
   const isProduction = process.env.NODE_ENV === "production";
   const suffix = isProduction ? "production.min" : "development";
   // One build per format, so every output lands in dist/<format>/.
@@ -36,6 +39,7 @@ export function createTsdownConfig({ name, external, bundle = [], hooks }: Packa
         // require("react") inside react-reconciler's development build, which breaks in browsers.
         plugins: [esmExternalRequirePlugin({ external })],
         hooks,
+        tsconfig,
         outputOptions: {
           // Fixed names instead of tsdown's defaults. Declaration chunks are named `<entry>.d`.
           entryFileNames: chunk =>
@@ -46,8 +50,6 @@ export function createTsdownConfig({ name, external, bundle = [], hooks }: Packa
         },
         define: {
           __DEV__: JSON.stringify(!isProduction),
-          // Read by src/render.ts (devtools renderer name)
-          __PACKAGE_NAME__: JSON.stringify("react-pixi-fiber"),
           "process.env.NODE_ENV": JSON.stringify(isProduction ? "production" : "development"),
         },
         minify: isProduction,

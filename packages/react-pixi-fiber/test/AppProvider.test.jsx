@@ -3,11 +3,8 @@ import React from "react";
 import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, withApp } from "../src";
 import Stage from "../src/Stage";
-import { createRender } from "../src/render";
-import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
+import { render } from "../src/render";
 import * as PIXI from "pixi.js";
-
-const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 
 describe("AppProvider", () => {
   it("exports AppContext with Provider and Consumer", () => {

@@ -1,5 +1,5 @@
 import invariant from "./invariant";
-import { getStackAddendum } from "./ReactGlobalSharedState";
+import { getStackAddendum } from "./config";
 import type { PixiAdapter } from "./types";
 
 /* Helper Methods */
