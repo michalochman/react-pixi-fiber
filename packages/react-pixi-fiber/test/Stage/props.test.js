@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CONTAINER_PROP_NAMES, STAGE_PROP_NAMES, getCanvasProps, getContainerProps } from "../../src/Stage/props";
+import { STAGE_PROP_NAMES, getCanvasProps, getContainerProps } from "../../src/Stage/props";
 import { getStandardNames } from "../../src/PixiProperty";
 import pixi6 from "@react-pixi-fiber/pixi-6";
 
@@ -9,8 +9,8 @@ const typedNames = Object.values(getStandardNames(adapter));
 const toProps = names => Object.fromEntries(names.map(name => [name, 1]));
 
 describe("Container and canvas prop split", () => {
-  it("puts the typed names and the plain Container names on app.stage", () => {
-    const names = [...typedNames, ...CONTAINER_PROP_NAMES];
+  it("puts the typed names and the adapter's untyped Container names on app.stage", () => {
+    const names = [...typedNames, ...adapter.properties.untypedContainer];
     expect(Object.keys(getContainerProps(toProps(names))).sort()).toEqual([...new Set(names)].sort());
     expect(getCanvasProps(toProps(names))).toEqual({});
   });

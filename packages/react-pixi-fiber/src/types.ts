@@ -193,6 +193,8 @@ export interface PixiPropertyTable {
   callback: readonly string[];
   numeric: readonly string[];
   positiveNumeric: readonly string[];
+  // Container props that are not type-checked. `Stage` puts them and the typed names on `app.stage`, not on the `<canvas>`.
+  untypedContainer: readonly string[];
   vector: readonly string[];
 }
 
@@ -270,13 +272,13 @@ export type StageAsContainerProps = ContainerProps;
 // Allow either `app` or `options` passed to `Stage` but not both.
 export type StageProps = (StagePropsWithApp | StagePropsWithOptions) &
   Omit<StageAsCanvasProps & StageAsContainerProps, "height" | "width"> & {
-  /** @deprecated Pass `height` in `options`. */
-  height?: number;
-  /** Called with the application after the first render of `children` into `app.stage`. */
-  onInit?: (app: PixiApplication) => void;
-  /** @deprecated Pass `width` in `options`. */
-  width?: number;
-};
+    /** @deprecated Pass `height` in `options`. */
+    height?: number;
+    /** Called with the application after the first render of `children` into `app.stage`. */
+    onInit?: (app: PixiApplication) => void;
+    /** @deprecated Pass `width` in `options`. */
+    width?: number;
+  };
 
 export type StageRef = {
   _app: React.RefObject<PixiApplication>;

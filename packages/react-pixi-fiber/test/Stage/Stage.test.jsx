@@ -155,6 +155,26 @@ describe("Stage", () => {
     tree.unmount();
   });
 
+  it("translates the props before splitting them, so a compat prop reaches app.stage and not the canvas", async () => {
+    adapter.translateProps = (type, props) => {
+      if (!("click" in props)) return props;
+      const { click, ...rest } = props;
+      return { ...rest, onclick: click };
+    };
+    try {
+      const click = () => {};
+      const tree = renderer.create(<Stage click={click} />, { createNodeMock: () => ({}) });
+      expect(tree.toJSON().props).not.toHaveProperty("click");
+      expect(tree.toJSON().props).not.toHaveProperty("onclick");
+      act(() => resolveInit());
+      await flush();
+      expect(apps[0].stage.onclick).toBe(click);
+      tree.unmount();
+    } finally {
+      delete adapter.translateProps;
+    }
+  });
+
   it("a StrictMode double mount leaves exactly one live application and calls onInit once", async () => {
     const onInit = vi.fn();
     const pending = [];

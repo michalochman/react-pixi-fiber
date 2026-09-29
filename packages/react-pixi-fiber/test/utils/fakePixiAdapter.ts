@@ -98,6 +98,7 @@ export function fakePixiAdapter({ async = false }: { async?: boolean } = {}) {
       callback: ["onclick"],
       numeric: ["rotation", "x", "y"],
       positiveNumeric: ["alpha"],
+      untypedContainer: [],
       vector: ["position", "scale"],
     },
     isPoint: (value: any): value is { x: number; y: number } => value != null && typeof value.copyFrom === "function",
