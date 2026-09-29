@@ -1,7 +1,5 @@
 import warning from "../warning";
-import createStageFunction from "./hooks";
-
-const Stage = createStageFunction();
+import Stage from "./Stage";
 
 let warnedCreateStageClass = false;
 export function createStageClass() {
@@ -16,4 +14,3 @@ export function createStageClass() {
 }
 
 export default Stage;
-export { createStageFunction };

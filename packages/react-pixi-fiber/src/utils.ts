@@ -1,5 +1,4 @@
 import invariant from "./invariant";
-import * as PIXI from "pixi.js";
 import { getStackAddendum } from "./ReactGlobalSharedState";
 import type { PixiAdapter } from "./types";
 
@@ -60,10 +59,6 @@ export function findStrictRoot(fiber: any, strictModeBit: number): any {
 }
 
 /* PIXI related Methods */
-
-export function createPixiApplication(options?: PIXI.IApplicationOptions): PIXI.Application {
-  return new PIXI.Application(options);
-}
 
 // Converts value to an array of coordinates
 export function parsePoint(value: any): number[] {

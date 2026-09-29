@@ -1,5 +1,5 @@
 import { getPixiAdapter } from "../config";
-import { getStandardNames } from "../PixiProperty";
+import { getOwn, getStandardNames } from "../PixiProperty";
 import { filterByKey, including } from "../utils";
 
 // Stage's own props. `width` and `height` are deprecated, pass them in `options`.
@@ -23,10 +23,14 @@ export const CONTAINER_PROP_NAMES = [
 ] as const;
 const includingStageProps = including(STAGE_PROP_NAMES as readonly string[]);
 
-// Lazy: the adapter table is read on each call, not at import.
+// Lazy: the adapter table is read on each call, not at import. A typed name matches as its lowercase table key
+// (`buttonmode`, `onclick`) or its canonical name (`buttonMode`),
+// so React DOM handlers such as `onClick` go to the canvas.
 function includingContainerProps() {
-  const typed = Object.values(getStandardNames(getPixiAdapter()));
-  return including([...typed, ...CONTAINER_PROP_NAMES]);
+  const standardNames = getStandardNames(getPixiAdapter());
+  const isPlainContainerProp = including(CONTAINER_PROP_NAMES);
+  return (key: string) =>
+    getOwn(standardNames, key) != null || getOwn(standardNames, key.toLowerCase()) === key || isPlainContainerProp(key);
 }
 export const getContainerProps = (props: Record<string, unknown>) => filterByKey(props, includingContainerProps());
 export const getCanvasProps = (props: Record<string, unknown>) => {

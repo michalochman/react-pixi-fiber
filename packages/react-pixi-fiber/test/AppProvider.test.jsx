@@ -1,14 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import renderer from "react-test-renderer";
 import { AppContext, AppProvider, Container, withApp } from "../src";
-import { createStageFunction } from "../src/Stage";
+import Stage from "../src/Stage";
 import { createRender } from "../src/render";
 import { ReactPixiFiberAsPrimaryRenderer } from "../src/ReactPixiFiber";
-import { createPixiApplication } from "../src/utils";
 import * as PIXI from "pixi.js";
-
-vi.mock("../src/utils", async importOriginal => ({ ...(await importOriginal()), createPixiApplication: vi.fn() }));
 
 const render = createRender(ReactPixiFiberAsPrimaryRenderer);
 
@@ -36,16 +33,6 @@ describe("AppProvider", () => {
 });
 
 describe("withApp", () => {
-  let app;
-
-  beforeEach(() => {
-    createPixiApplication.mockReset();
-    createPixiApplication.mockImplementation(options => {
-      app = new PIXI.Application(options);
-      return app;
-    });
-  });
-
   it("passes app prop to component rendered inside AppProvider", () => {
     const app = new PIXI.Application();
     const TestComponent = vi.fn(() => null);
@@ -65,19 +52,23 @@ describe("withApp", () => {
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
   });
 
-  it("passes app prop to component rendered inside Stage (function)", () => {
-    const Stage = createStageFunction();
+  it("passes app prop to component rendered inside Stage (function)", async () => {
+    let app;
     const TestComponent = vi.fn(() => null);
     const TestComponentWithApp = withApp(TestComponent);
 
-    renderer.act(() => {
-      renderer.create(
-        <Stage>
+    // Stage renders its children after the application is created, so wait for the init promise.
+    let tree;
+    await renderer.act(async () => {
+      tree = renderer.create(
+        <Stage onInit={created => (app = created)}>
           <TestComponentWithApp foo="bar" />
         </Stage>
       );
     });
 
+    expect(app).toBeInstanceOf(PIXI.Application);
     expect(TestComponent).toHaveBeenCalledWith({ app, foo: "bar" }, {});
+    renderer.act(() => tree.unmount());
   });
 });

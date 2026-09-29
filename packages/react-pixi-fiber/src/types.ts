@@ -308,7 +308,14 @@ export type StageAsContainerProps = DisplayObjectProps<PIXI.Container>;
 export type StageProps = Omit<
   (StagePropsWithApp | StagePropsWithOptions) & StageAsCanvasProps & StageAsContainerProps,
   "height" | "width"
->;
+> & {
+  /** Called with the application after the first render of `children` into `app.stage`. */
+  onInit?: (app: PIXI.Application) => void;
+  /** @deprecated Pass `width` in `options`. */
+  width?: number;
+  /** @deprecated Pass `height` in `options`. */
+  height?: number;
+};
 
 export type StageRef = {
   _app: React.RefObject<PIXI.Application>;

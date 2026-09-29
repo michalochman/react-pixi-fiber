@@ -13,6 +13,11 @@ describe("Container and canvas prop split", () => {
     expect(getCanvasProps(toProps(names))).toEqual({});
   });
 
+  it("puts a miscased typed name on app.stage, as 2.x did", () => {
+    expect(getContainerProps({ buttonmode: true })).toEqual({ buttonmode: true });
+    expect(getCanvasProps({ buttonmode: true })).toEqual({});
+  });
+
   it("puts other props on the canvas", () => {
     const props = { className: "c", id: "i", style: {} };
     expect(getCanvasProps(props)).toEqual(props);

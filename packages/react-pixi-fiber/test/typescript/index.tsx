@@ -335,3 +335,7 @@ const StageAsTypeExample: React.FC = () => {
   const stageRef = React.useRef<Stage | null>(null);
   return <Stage ref={stageRef} options={{}} />;
 };
+
+const OnInitExample: React.FC = () => (
+  <Stage options={{ width: 1, height: 1 }} onInit={app => console.log(app.stage)} />
+);

@@ -1,0 +1,404 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import React, { createRef, StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import renderer, { act } from "react-test-renderer";
+import * as PIXI from "pixi.js";
+import Stage from "../../src/Stage";
+import { __renderMock, __unmountMock } from "../../src/render";
+
+vi.mock("../../src/render", () => {
+  const render = vi.fn();
+  const unmount = vi.fn();
+  return {
+    createRender: () => render,
+    createUnmount: () => unmount,
+    render,
+    unmount,
+    __renderMock: render,
+    __unmountMock: unmount,
+  };
+});
+
+const apps = [];
+function makeApp() {
+  const app = { stage: new PIXI.Container(), renderer: { resize: vi.fn() }, destroyed: false };
+  apps.push(app);
+  return app;
+}
+let resolveInit;
+const adapter = {
+  components: { Container: { create: () => new PIXI.Container() } },
+  properties: { boolean: ["visible"], numeric: ["x", "y"], positiveNumeric: [], vector: ["scale"], callback: [] },
+  isPoint: v => v instanceof PIXI.Point || v instanceof PIXI.ObservablePoint,
+  copyPoint: (t, v) => t.copyFrom(v),
+  createApplication: vi.fn(),
+  destroyApplication: vi.fn(app => {
+    app.destroyed = true;
+  }),
+  isApplication: v => apps.includes(v),
+};
+vi.mock("../../src/config", () => ({ getPixiAdapter: () => adapter, getStrictModeBit: () => 8 }));
+
+const flush = () =>
+  act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+const tick = () => act(() => new Promise(r => setTimeout(r, 0)));
+
+describe("Stage", () => {
+  beforeEach(() => {
+    apps.length = 0;
+    vi.clearAllMocks();
+    vi.useRealTimers();
+    adapter.createApplication.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolveInit = () => resolve(makeApp());
+        })
+    );
+  });
+  afterEach(async () => {
+    // Let the deferred destroy of an unmounted Stage (see cleanupStage) run before the next test clears the mocks.
+    await new Promise(r => setTimeout(r, 0));
+    vi.restoreAllMocks();
+  });
+
+  it("creates the application on the rendered canvas and renders children only after init", async () => {
+    const onInit = vi.fn();
+    const ref = createRef();
+    const tree = renderer.create(<Stage ref={ref} options={{ width: 10, height: 20 }} onInit={onInit} />, {
+      createNodeMock: () => ({ tagName: "CANVAS" }),
+    });
+    expect(adapter.createApplication).toHaveBeenCalledWith({ view: { tagName: "CANVAS" }, width: 10, height: 20 });
+    expect(__renderMock).not.toHaveBeenCalled();
+    expect(onInit).not.toHaveBeenCalled();
+    act(() => resolveInit());
+    await flush();
+    expect(__renderMock).toHaveBeenCalledTimes(1);
+    expect(__renderMock.mock.calls[0][1]).toBe(apps[0].stage);
+    expect(onInit).toHaveBeenCalledWith(apps[0]);
+    expect(ref.current._app.current).toBe(apps[0]);
+    tree.unmount();
+  });
+
+  it("warns once in development when the application does not render to `options.canvas`", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const canvas = { tagName: "CANVAS" };
+    const warnings = () => error.mock.calls.filter(c => /`options.canvas`/.test(c[0]));
+    adapter.createApplication.mockImplementation(() => ({ ...makeApp(), canvas }));
+    let tree = renderer.create(<Stage options={{ canvas }} />);
+    await flush();
+    expect(tree.toJSON()).toBeNull();
+    expect(warnings()).toHaveLength(0);
+    tree.unmount();
+    adapter.createApplication.mockImplementation(() => ({ ...makeApp(), view: {} }));
+    for (let i = 0; i < 2; i++) {
+      tree = renderer.create(<Stage options={{ canvas }} />);
+      await flush();
+      tree.unmount();
+    }
+    expect(warnings()).toHaveLength(__DEV__ ? 1 : 0);
+  });
+
+  it("warns once in development when `app` changes after mount", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const warnings = () => error.mock.calls.filter(c => /`app` prop of `Stage` changed/.test(c[0]));
+    const [first, second] = [makeApp(), makeApp()];
+    const tree = renderer.create(<Stage app={first} />);
+    await flush();
+    act(() => tree.update(<Stage app={first} x={1} />));
+    expect(warnings()).toHaveLength(0);
+    act(() => tree.update(<Stage app={second} />));
+    act(() => tree.update(<Stage app={first} />));
+    expect(warnings()).toHaveLength(__DEV__ ? 1 : 0);
+    tree.unmount();
+  });
+
+  it("_app.current is null while init is pending and warns once in development naming onInit", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const ref = createRef();
+    const tree = renderer.create(<Stage ref={ref} />, { createNodeMock: () => ({}) });
+    expect(ref.current._app.current).toBeNull();
+    // A re-render rebuilds the ref object; the warning still fires once per Stage.
+    tree.update(<Stage ref={ref} x={1} />);
+    expect(ref.current._app.current).toBeNull();
+    expect(error).toHaveBeenCalledTimes(__DEV__ ? 1 : 0);
+    if (__DEV__) expect(error.mock.calls[0][0]).toMatch(/onInit/);
+    act(() => resolveInit());
+    await flush();
+    tree.unmount();
+  });
+
+  it("unmounting while init is pending renders nothing, destroys the app on resolve and never calls onInit", async () => {
+    const onInit = vi.fn();
+    const tree = renderer.create(<Stage onInit={onInit} />, { createNodeMock: () => ({}) });
+    tree.unmount();
+    act(() => resolveInit());
+    await flush();
+    expect(__renderMock).not.toHaveBeenCalled();
+    expect(onInit).not.toHaveBeenCalled();
+    expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, true);
+  });
+
+  it("an options change while init is pending applies after init", async () => {
+    const tree = renderer.create(<Stage options={{ width: 1, height: 1 }} x={1} />, { createNodeMock: () => ({}) });
+    tree.update(<Stage options={{ width: 1, height: 1 }} x={2} />);
+    act(() => resolveInit());
+    await flush();
+    expect(apps[0].stage.x).toBe(2);
+    expect(adapter.createApplication).toHaveBeenCalledTimes(1);
+    tree.unmount();
+  });
+
+  it("a StrictMode double mount leaves exactly one live application and calls onInit once", async () => {
+    const onInit = vi.fn();
+    const pending = [];
+    adapter.createApplication.mockImplementation(() => new Promise(resolve => pending.push(() => resolve(makeApp()))));
+    // React 18 double-invokes effects under StrictMode only on a concurrent root, and react-test-renderer 18
+    // never does (it has no StrictEffectsMode), so this test mounts through react-dom's createRoot.
+    const previousActEnvironment = globalThis.IS_REACT_ACT_ENVIRONMENT;
+    globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+    const root = createRoot(document.createElement("div"));
+    try {
+      act(() => {
+        root.render(
+          <StrictMode>
+            <Stage onInit={onInit} />
+          </StrictMode>
+        );
+      });
+      expect(adapter.createApplication).toHaveBeenCalledTimes(2);
+      act(() => pending.forEach(r => r()));
+      await flush();
+      expect(onInit).toHaveBeenCalledTimes(1);
+      expect(adapter.destroyApplication).toHaveBeenCalledTimes(1);
+      expect(apps.filter(a => !a.destroyed)).toHaveLength(1);
+      act(() => root.unmount());
+      await tick();
+      expect(apps.filter(a => !a.destroyed)).toHaveLength(0);
+    } finally {
+      globalThis.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
+    }
+  });
+
+  it("uses a provided app without destroying it, and unmounts its tree", async () => {
+    const app = makeApp();
+    const onInit = vi.fn();
+    const tree = renderer.create(<Stage app={app} onInit={onInit} />, { createNodeMock: () => ({}) });
+    expect(tree.toJSON()).toBeNull();
+    await flush();
+    expect(onInit).toHaveBeenCalledWith(app);
+    expect(adapter.createApplication).not.toHaveBeenCalled();
+    tree.unmount();
+    await tick();
+    expect(__unmountMock).toHaveBeenCalledWith(app.stage);
+    expect(adapter.destroyApplication).not.toHaveBeenCalled();
+  });
+
+  it("a size change while init is pending resizes the renderer after init", async () => {
+    const onInit = vi.fn();
+    const tree = renderer.create(<Stage options={{ width: 1, height: 1 }} onInit={onInit} />, {
+      createNodeMock: () => ({}),
+    });
+    tree.update(<Stage options={{ width: 4, height: 5 }} onInit={onInit} />);
+    act(() => resolveInit());
+    await flush();
+    expect(apps[0].renderer.resize).toHaveBeenCalledWith(4, 5);
+    expect(adapter.createApplication).toHaveBeenCalledTimes(1);
+    expect(onInit).toHaveBeenCalledWith(apps[0]);
+    tree.unmount();
+  });
+
+  it("any other options change while init is pending recreates the application after init", async () => {
+    const onInit = vi.fn();
+    const tree = renderer.create(<Stage options={{ antialias: false }} onInit={onInit} />, {
+      createNodeMock: () => ({}),
+    });
+    tree.update(<Stage options={{ antialias: true }} onInit={onInit} />);
+    act(() => resolveInit());
+    await flush();
+    expect(adapter.createApplication).toHaveBeenCalledTimes(2);
+    expect(adapter.createApplication).toHaveBeenLastCalledWith({ view: {}, antialias: true });
+    expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, false);
+    act(() => resolveInit());
+    await flush();
+    // The first application was replaced before anyone could use it, so onInit only sees the second.
+    expect(onInit.mock.calls).toEqual([[apps[1]]]);
+    tree.unmount();
+  });
+
+  it("an options change while init is pending never renders into the application created with the old ones", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const tree = renderer.create(<Stage options={{ antialias: false }} />, { createNodeMock: () => ({}) });
+    tree.update(<Stage options={{ antialias: true }} />);
+    act(() => resolveInit());
+    await flush();
+    expect(renderMock).not.toHaveBeenCalled();
+    expect(unmountMock).not.toHaveBeenCalled();
+    expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, false);
+    act(() => resolveInit());
+    await flush();
+    expect(renderMock).toHaveBeenCalledTimes(1);
+    expect(renderMock.mock.calls[0][1]).toBe(apps[1].stage);
+    expect(unmountMock).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
+    tree.unmount();
+  });
+
+  it("destroys the application created with outdated options once, when its canvas is replaced", async () => {
+    const tree = renderer.create(<Stage options={{ antialias: false }} />, { createNodeMock: () => ({}) });
+    tree.update(<Stage options={{ antialias: true }} />);
+    act(() => resolveInit());
+    await flush();
+    expect(adapter.destroyApplication.mock.calls).toEqual([[apps[0], false, false]]);
+    act(() => resolveInit());
+    await flush();
+    act(() => tree.unmount());
+    await tick();
+    expect(adapter.destroyApplication.mock.calls).toEqual([
+      [apps[0], false, false],
+      [apps[1], false, true],
+    ]);
+  });
+
+  it("destroys the application created with outdated options once, when Stage unmounts before the new canvas", async () => {
+    // A concurrent root, so the canvas swap is still pending when the unmount commits.
+    const previousActEnvironment = globalThis.IS_REACT_ACT_ENVIRONMENT;
+    globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+    const root = createRoot(document.createElement("div"));
+    try {
+      act(() => root.render(<Stage options={{ antialias: false }} />));
+      act(() => root.render(<Stage options={{ antialias: true }} />));
+      await act(async () => {
+        resolveInit();
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(adapter.destroyApplication).not.toHaveBeenCalled();
+        root.unmount();
+      });
+      await tick();
+      expect(adapter.createApplication).toHaveBeenCalledTimes(1);
+      expect(adapter.destroyApplication.mock.calls).toEqual([[apps[0], false, false]]);
+    } finally {
+      act(() => root.unmount());
+      globalThis.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
+    }
+  });
+
+  it("a rejected createApplication reaches an error boundary", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failure = new Error("no WebGL");
+    adapter.createApplication.mockImplementation(() => Promise.reject(failure));
+    class Boundary extends React.Component {
+      state = { error: null };
+      static getDerivedStateFromError(caught) {
+        return { error: caught };
+      }
+      render() {
+        return this.state.error ? null : this.props.children;
+      }
+    }
+    const boundary = createRef();
+    const onInit = vi.fn();
+    const tree = renderer.create(
+      <Boundary ref={boundary}>
+        <Stage onInit={onInit} />
+      </Boundary>,
+      { createNodeMock: () => ({}) }
+    );
+    await flush();
+    expect(boundary.current.state.error).toBe(failure);
+    expect(onInit).not.toHaveBeenCalled();
+    expect(__renderMock).not.toHaveBeenCalled();
+    tree.unmount();
+    error.mockRestore();
+  });
+
+  it("an onInit that throws reaches an error boundary", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failure = new Error("onInit failed");
+    const unhandled = vi.fn();
+    process.on("unhandledRejection", unhandled);
+    class Boundary extends React.Component {
+      state = { error: null };
+      static getDerivedStateFromError(caught) {
+        return { error: caught };
+      }
+      render() {
+        return this.state.error ? null : this.props.children;
+      }
+    }
+    const boundary = createRef();
+    const tree = renderer.create(
+      <Boundary ref={boundary}>
+        <Stage
+          onInit={() => {
+            throw failure;
+          }}
+        />
+      </Boundary>,
+      { createNodeMock: () => ({}) }
+    );
+    act(() => resolveInit());
+    await flush();
+    await tick();
+    process.off("unhandledRejection", unhandled);
+    expect(boundary.current.state.error).toBe(failure);
+    expect(unhandled).not.toHaveBeenCalled();
+    tree.unmount();
+    error.mockRestore();
+  });
+
+  it("resizes on a dimension change and recreates on any other options change", async () => {
+    const onInit = vi.fn();
+    const tree = renderer.create(<Stage options={{ width: 1, height: 1, antialias: false }} onInit={onInit} />, {
+      createNodeMock: () => ({}),
+    });
+    act(() => resolveInit());
+    await flush();
+    tree.update(<Stage options={{ width: 2, height: 3, antialias: false }} onInit={onInit} />);
+    expect(apps[0].renderer.resize).toHaveBeenCalledWith(2, 3);
+    tree.update(<Stage options={{ width: 2, height: 3, antialias: true }} onInit={onInit} />);
+    await tick();
+    expect(adapter.createApplication).toHaveBeenCalledTimes(2);
+    expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, false);
+    act(() => resolveInit());
+    await flush();
+    expect(__renderMock.mock.calls.at(-1)[1]).toBe(apps[1].stage);
+    // onInit fires once per created application, so a consumer gets the new reference after a recreate.
+    expect(onInit.mock.calls).toEqual([[apps[0]], [apps[1]]]);
+    tree.unmount();
+  });
+
+  // The warned state is module-level, so each test loads a fresh Stage module.
+  it("warns once about the deprecated width and height props", async () => {
+    vi.resetModules();
+    const { default: FreshStage } = await import("../../src/Stage");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const tree = renderer.create(<FreshStage width={1} height={1} />, { createNodeMock: () => ({}) });
+    tree.update(<FreshStage width={2} height={2} />);
+    expect(
+      error.mock.calls.filter(c =>
+        /`width` and `height` props of `Stage` are deprecated. They size `app.stage`, not the renderer/.test(c[0])
+      )
+    ).toHaveLength(__DEV__ ? 1 : 0);
+    tree.unmount();
+  });
+
+  it("warns once when options are passed together with app", async () => {
+    vi.resetModules();
+    const { default: FreshStage } = await import("../../src/Stage");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const app = makeApp();
+    const tree = renderer.create(<FreshStage app={app} options={{ width: 1 }} />, { createNodeMock: () => ({}) });
+    tree.update(<FreshStage app={app} options={{ width: 2 }} />);
+    expect(
+      error.mock.calls.filter(c => /`options` prop of `Stage` has no effect when `app` is provided/.test(c[0]))
+    ).toHaveLength(__DEV__ ? 1 : 0);
+    await flush();
+    tree.unmount();
+  });
+});
