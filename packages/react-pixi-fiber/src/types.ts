@@ -175,6 +175,7 @@ export type NineSlicePlaneProps = NineSliceSpriteProps;
 export type NineSliceSpriteProps = Props<InstanceOf<"NineSliceSprite">>;
 export type ParticleContainerProps = Props<InstanceOf<"ParticleContainer">> & {
   // Constructor arguments that are not properties on the instance
+  dynamicProperties?: Record<string, boolean>;
   maxSize?: number;
   properties?: Partial<Record<"alpha" | "position" | "rotation" | "scale" | "tint" | "uvs" | "vertices", boolean>>;
 };

@@ -6,6 +6,7 @@ import { properties } from "./properties";
 import type {
   DOMContainerProps,
   HTMLTextProps,
+  ParticleProps,
   PerspectiveMeshProps,
   RenderContainerProps,
   RenderLayerProps,
@@ -15,6 +16,7 @@ export * from "./types";
 // A tag is a string at runtime and a component in the type system, like the core tags.
 export const DOMContainer = "DOMContainer" as unknown as PixiComponent<DOMContainerProps, PIXI.DOMContainer>;
 export const HTMLText = "HTMLText" as unknown as PixiComponent<HTMLTextProps, PIXI.HTMLText>;
+export const Particle = "Particle" as unknown as PixiComponent<ParticleProps, PIXI.Particle>;
 export const PerspectiveMesh = "PerspectiveMesh" as unknown as PixiComponent<
   PerspectiveMeshProps,
   PIXI.PerspectiveMesh

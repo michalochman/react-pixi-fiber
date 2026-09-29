@@ -15,7 +15,7 @@ declare module "react-pixi-fiber" {
     MeshRope: PIXI.MeshRope;
     MeshSimple: PIXI.MeshSimple;
     NineSliceSprite: PIXI.NineSliceSprite;
-    // Typing only: the tag throws at create on this adapter.
+    Particle: PIXI.Particle;
     ParticleContainer: PIXI.ParticleContainer;
     PerspectiveMesh: PIXI.PerspectiveMesh;
     RenderContainer: PIXI.RenderContainer;
@@ -33,6 +33,11 @@ declare module "react-pixi-fiber" {
 
 export type DOMContainerProps = Props<PIXI.DOMContainer>;
 export type HTMLTextProps = Props<PIXI.HTMLText>;
+export type ParticleProps = Omit<Props<PIXI.Particle>, "texture"> & { texture: PIXI.Texture };
+export type ParticleContainerProps = Props<PIXI.ParticleContainer> & {
+  // Constructor argument that is not a property on the instance
+  dynamicProperties?: PIXI.ParticleContainerOptions["dynamicProperties"];
+};
 export type PerspectiveMeshProps = Props<PIXI.PerspectiveMesh> & {
   // Constructor arguments that are not properties on the instance
   verticesX?: number;

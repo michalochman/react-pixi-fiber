@@ -9,6 +9,7 @@ module.exports = mod.default;
 module.exports.default = mod.default;
 module.exports.DOMContainer = mod.DOMContainer;
 module.exports.HTMLText = mod.HTMLText;
+module.exports.Particle = mod.Particle;
 module.exports.PerspectiveMesh = mod.PerspectiveMesh;
 module.exports.RenderContainer = mod.RenderContainer;
 module.exports.RenderLayer = mod.RenderLayer;

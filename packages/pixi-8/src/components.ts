@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import type { Behavior } from "react-pixi-fiber";
+import { type Behavior, getInstanceTag } from "react-pixi-fiber";
 
 // PixiJS 8 constructors spread their options over the class defaults, so a key set to `undefined` would win over the
 // default. Only the props that are set are passed.
@@ -9,12 +9,15 @@ function defined<T extends Record<string, unknown>>(options: T): T {
   return out;
 }
 
-function unsupported(tag: string, why: string): Behavior {
-  return {
-    create() {
-      throw new Error(`\`${tag}\` is not available on \`@react-pixi-fiber/pixi-8\`. ${why}`);
-    },
-  };
+// A particle has no parent pointer, so a prop change finds the container to `update()` here.
+const particleParents = new WeakMap<PIXI.Particle, PIXI.ParticleContainer>();
+
+function asParticle(child: unknown): PIXI.Particle {
+  if (!(child instanceof PIXI.Particle)) {
+    const tag = getInstanceTag(child as object) ?? String(child);
+    throw new Error(`\`ParticleContainer\` takes only \`Particle\` children, got \`${tag}\`.`);
+  }
+  return child;
 }
 
 export const components: Record<string, Behavior> = {
@@ -51,10 +54,46 @@ export const components: Record<string, Behavior> = {
         })
       ),
   },
-  ParticleContainer: unsupported(
-    "ParticleContainer",
-    "On PixiJS 8 its children are `Particle` objects, not display objects, so React cannot manage them. Use a `PIXIComponent` that owns the particles."
-  ),
+  Particle: {
+    create: p => {
+      if (p.texture == null) throw new Error("`Particle` needs a `texture` prop.");
+      return new PIXI.Particle(p.texture);
+    },
+    applyProps(particle: PIXI.Particle, oldProps, newProps) {
+      this.applyDisplayObjectProps(oldProps, newProps);
+      // Only the dynamic properties are uploaded every frame; the rest waits for `update()`.
+      particleParents.get(particle)?.update();
+    },
+  },
+  ParticleContainer: {
+    create: p =>
+      new PIXI.ParticleContainer(
+        defined({
+          dynamicProperties: p.dynamicProperties,
+          roundPixels: p.roundPixels,
+          shader: p.shader,
+          texture: p.texture,
+        })
+      ),
+    appendChild(container: PIXI.ParticleContainer, child) {
+      const particle = asParticle(child);
+      container.removeParticle(particle);
+      container.addParticle(particle);
+      particleParents.set(particle, container);
+    },
+    insertBefore(container: PIXI.ParticleContainer, child, before) {
+      const particle = asParticle(child);
+      container.removeParticle(particle);
+      const index = container.particleChildren.indexOf(before as PIXI.Particle);
+      if (index === -1) throw new Error("`ParticleContainer` cannot insert a `Particle` before one it does not hold.");
+      container.addParticleAt(particle, index);
+      particleParents.set(particle, container);
+    },
+    removeChild(container: PIXI.ParticleContainer, child) {
+      container.removeParticle(child as PIXI.Particle);
+      particleParents.delete(child as PIXI.Particle);
+    },
+  },
   PerspectiveMesh: {
     create: p =>
       new PIXI.PerspectiveMesh(

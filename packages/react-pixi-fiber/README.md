@@ -85,7 +85,8 @@ Without `configure`, the first render throws an error that prints the install li
 - `Stage` creates the application with the asynchronous `app.init()`, so it renders its children after the application exists. Read the application in [`onInit`](#read-the-application-in-oninit-not-from-the-ref-at-mount).
 - `usePixiTicker` callbacks receive the PixiJS 8 `Ticker`, not a delta: read `ticker.deltaTime`.
 - `tint` accepts color strings as well as numbers.
-- `ParticleContainer` throws when it is rendered. Its children are `Particle` objects, not display objects; use a `PIXIComponent` that owns the particles.
+- `ParticleContainer` takes `<Particle>` children, imported from `@react-pixi-fiber/pixi-8`, not display objects. A `Particle` needs a `texture` and takes the `Particle` fields as props (`x`, `y`, `scaleX`, `scaleY`, `anchorX`, `anchorY`, `rotation`, `tint`, `alpha`); a prop change calls the container's `update()`. `ParticleContainer` takes `dynamicProperties`, `roundPixels`, `shader` and `texture`.
+- Suspense does not hide particles while it shows a fallback, a `ParticleContainer` cannot be the container passed to `render`, and a `<Particle>` under any other container fails inside PixiJS.
 - `pixi8({ compat: "pixi6" })` (or `"pixi7"`) translates props that PixiJS 8 renamed: `buttonMode` to `cursor`, `interactive` to `eventMode`, `name` to `label`, and the event names such as `click` and `pointerdown` to `onclick` and `onpointerdown`. In development each translated prop warns once and names the replacement. When both the old and the PixiJS 8 prop are passed, the PixiJS 8 prop wins.
 - Compat covers props only. A filter is not a display object, so `BlurFilter.blur` (now `strength`) still logs PixiJS's own deprecation warning.
 

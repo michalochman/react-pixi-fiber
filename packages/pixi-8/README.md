@@ -16,9 +16,22 @@ configure({ react: reactN(), pixi: pixi8() });
 
 A `usePixiTicker` callback receives the PixiJS 8 `Ticker`, not a delta: read `ticker.deltaTime`.
 
-`DOMContainer`, `HTMLText`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` are tags of this adapter that render the PixiJS classes of the same names. Import them from this package.
+`DOMContainer`, `HTMLText`, `Particle`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` are tags of this adapter that render the PixiJS classes of the same names. Import them from this package.
 
-`ParticleContainer` throws when it is rendered: its children are `Particle` objects, not display objects, so React cannot manage them. Use a `PIXIComponent` that owns the particles.
+`ParticleContainer` takes `<Particle>` children, not display objects:
+
+```jsx
+import { ParticleContainer } from "react-pixi-fiber";
+import { Particle } from "@react-pixi-fiber/pixi-8";
+
+<ParticleContainer dynamicProperties={{ position: true }} texture={texture}>
+  {bunnies.map(bunny => (
+    <Particle key={bunny.id} texture={texture} x={bunny.x} y={bunny.y} />
+  ))}
+</ParticleContainer>;
+```
+
+A `Particle` needs a `texture` and takes the `Particle` fields as props (`x`, `y`, `scaleX`, `scaleY`, `anchorX`, `anchorY`, `rotation`, `tint`, `alpha`). PixiJS uploads only the `dynamicProperties` every frame, so a prop change on a `Particle` calls the container's `update()`. `ParticleContainer` takes `dynamicProperties`, `roundPixels`, `shader` and `texture`; `ParticleContainerProps` types them. Limitations: Suspense does not hide particles while it shows a fallback, a `ParticleContainer` cannot be the container passed to `render`, and a `<Particle>` under any other container fails inside PixiJS.
 
 Importing the package also loads its types: the props of every tag follow the PixiJS 8 classes. Event handlers are the `onclick`, `onpointerdown`, … properties, and `eventMode` makes an object interactive.
 

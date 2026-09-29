@@ -1,10 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
 import * as PIXI from "pixi.js";
 import { TAGS } from "../../react-pixi-fiber/src/tags";
-import pixi8, { DOMContainer, HTMLText, PerspectiveMesh, RenderContainer, RenderLayer } from "../src/index";
+import pixi8, { DOMContainer, HTMLText, Particle, PerspectiveMesh, RenderContainer, RenderLayer } from "../src/index";
 
 const texture = PIXI.Texture.WHITE;
-const EXTRA_TAGS = { DOMContainer, HTMLText, PerspectiveMesh, RenderContainer, RenderLayer } as Record<string, unknown>;
+const EXTRA_TAGS = {
+  DOMContainer,
+  HTMLText,
+  Particle,
+  PerspectiveMesh,
+  RenderContainer,
+  RenderLayer,
+} as Record<string, unknown>;
 const propsFor: Record<string, Record<string, unknown>> = {
   AnimatedSprite: { textures: [texture] },
   BitmapText: { style: { fill: 0xff0000 }, text: "t" },
@@ -17,6 +24,8 @@ const propsFor: Record<string, Record<string, unknown>> = {
   MeshRope: { points: [new PIXI.Point(0, 0), new PIXI.Point(1, 0)], texture },
   MeshSimple: { texture, vertices: new Float32Array([0, 0, 1, 0, 1, 1]) },
   NineSliceSprite: { bottomHeight: 1, leftWidth: 1, rightWidth: 1, texture, topHeight: 1 },
+  Particle: { texture },
+  ParticleContainer: { texture },
   PerspectiveMesh: { texture, x1: 10 },
   RenderContainer: { render: () => {} },
   RenderLayer: {},
@@ -36,6 +45,8 @@ const classFor: Record<string, new (...args: any[]) => unknown> = {
   MeshRope: PIXI.MeshRope,
   MeshSimple: PIXI.MeshSimple,
   NineSliceSprite: PIXI.NineSliceSprite,
+  Particle: PIXI.Particle,
+  ParticleContainer: PIXI.ParticleContainer,
   PerspectiveMesh: PIXI.PerspectiveMesh,
   RenderContainer: PIXI.RenderContainer,
   RenderLayer: PIXI.RenderLayer,
@@ -46,13 +57,13 @@ const classFor: Record<string, new (...args: any[]) => unknown> = {
 
 describe("pixi8", () => {
   const adapter = pixi8();
-  it("implements the 13 core tags and the five PixiJS 8 tags", () => {
+  it("implements the 13 core tags and the six PixiJS 8 tags", () => {
     for (const [name, value] of Object.entries(EXTRA_TAGS)) expect(value).toBe(name);
     expect(Object.keys(adapter.components).sort()).toEqual([...Object.keys(TAGS), ...Object.keys(EXTRA_TAGS)].sort());
     for (const tag of Object.keys(adapter.components))
       expect(typeof adapter.components[tag].create, tag).toBe("function");
   });
-  it("creates every tag but ParticleContainer with the PixiJS 8 class", () => {
+  it("creates every tag with the PixiJS 8 class", () => {
     for (const tag of Object.keys(classFor)) {
       expect(adapter.components[tag].create(propsFor[tag]), tag).toBeInstanceOf(classFor[tag]);
     }
@@ -61,11 +72,6 @@ describe("pixi8", () => {
     const mesh = adapter.components.PerspectiveMesh.create({ texture }) as PIXI.PerspectiveMesh;
     expect(mesh.geometry.positions.every(Number.isFinite)).toBe(true);
     expect((adapter.components.Text.create({}) as PIXI.Text).text).toBe("");
-  });
-  it("ParticleContainer is a documented hole that throws naming the tag and the adapter", () => {
-    expect(() => adapter.components.ParticleContainer.create({})).toThrow(
-      /`ParticleContainer`.*@react-pixi-fiber\/pixi-8.*Particle/s
-    );
   });
   it("lists the on-prefixed event properties as callbacks", () => {
     expect(adapter.properties.callback).toContain("onclick");
