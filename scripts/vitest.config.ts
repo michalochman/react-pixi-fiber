@@ -1,9 +1,20 @@
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 const packagesDir = fileURLToPath(new URL("../packages/", import.meta.url));
 
-export function createVitestConfig({ setupFiles = [] }: { setupFiles?: string[] } = {}) {
+const reactModules = ["react", "react-dom", "react-test-renderer", "react/jsx-runtime", "react/jsx-dev-runtime"];
+
+// `root` is the package directory. Shared test utilities live in the core, so React is aliased to the package's own
+// copy: a React element must be created by the React version that renders it.
+export function createVitestConfig({
+  setupFiles = [],
+  root = process.cwd(),
+}: {
+  setupFiles?: string[];
+  root?: string;
+} = {}) {
   // test:dev and test:prod differ only in __DEV__ (`--mode development|production`). NODE_ENV stays "test" in both:
   // with NODE_ENV=production React has no act() and its context objects differ from the public API snapshot.
   return defineConfig(({ mode }) => {
@@ -19,6 +30,12 @@ export function createVitestConfig({ setupFiles = [] }: { setupFiles?: string[] 
       },
       resolve: {
         alias: [
+          ...reactModules
+            .filter(name => existsSync(`${root}/node_modules/${name.split("/")[0]}`))
+            .map(name => ({
+              find: new RegExp(`^${name}$`),
+              replacement: `${root}/node_modules/${name}`,
+            })),
           { find: /^react-pixi-fiber$/, replacement: `${packagesDir}react-pixi-fiber/src/index.ts` },
           { find: /^@react-pixi-fiber\/(react-1[789]|pixi-[4-8])$/, replacement: `${packagesDir}$1/src/index.ts` },
         ],
