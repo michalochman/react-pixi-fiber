@@ -1,4 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import React from "react";
+import renderer, { act } from "react-test-renderer";
+import * as PIXI from "pixi.js";
+import react18 from "@react-pixi-fiber/react-18";
+import { configure, Sprite, Stage } from "react-pixi-fiber";
+import "../compat/pixi6";
 import pixi8 from "../src/index";
 
 describe('pixi8({ compat: "pixi6" })', () => {
@@ -74,4 +80,44 @@ describe('pixi8({ compat: "pixi7" })', () => {
 
 it("throws on an unknown compat key", () => {
   expect(() => pixi8({ compat: "pixi5" as "pixi6" })).toThrow(/compat.*pixi5.*"pixi6".*"pixi7"/);
+});
+
+describe('2.x props on pixi8({ compat: "pixi6" })', () => {
+  afterEach(() => vi.restoreAllMocks());
+  it("renders the 2.x interaction props on Stage and Sprite", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    configure({ react: react18(), pixi: pixi8({ compat: "pixi6" }) });
+    const click = () => {};
+    const pointerdown = () => {};
+    let app: PIXI.Application | null = null;
+    const tree = renderer.create(
+      <Stage
+        buttonMode
+        click={click}
+        interactive
+        onInit={a => {
+          app = a as PIXI.Application;
+        }}
+        options={{ height: 8, width: 8 }}
+      >
+        <Sprite buttonMode interactive name="bunny" pointerdown={pointerdown} />
+      </Stage>,
+      { createNodeMock: () => document.createElement("canvas") }
+    );
+    await act(async () => {
+      await new Promise(r => setTimeout(r, 0));
+    });
+    const stage = app!.stage;
+    expect(stage).toMatchObject({ cursor: "pointer", eventMode: "static", onclick: click });
+    expect(stage.children[0]).toMatchObject({
+      cursor: "pointer",
+      eventMode: "static",
+      label: "bunny",
+      onpointerdown: pointerdown,
+    });
+    act(() => tree.unmount());
+    const translated = error.mock.calls.filter(c => /is a PixiJS 6 prop/.test(String(c[0])));
+    // One warning per name: buttonMode, click, interactive, name, pointerdown.
+    expect(translated).toHaveLength(__DEV__ ? 5 : 0);
+  });
 });

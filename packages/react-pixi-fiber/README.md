@@ -939,16 +939,23 @@ getInstanceTag(nineSlicePlaneInstance); // "NineSlicePlane"
 
 The tags an adapter adds under its PixiJS class names, for example `NineSlicePlane`, `SimpleMesh`, `SimplePlane` and `SimpleRope` in `@react-pixi-fiber/pixi-6`, create the same display objects as the core tags, but each is a tag of its own. `defaults` and `PIXIProperty` keyed by the core tag do not apply to them, and `getInstanceTag` returns the tag you wrote. Key them by that tag too, or use the core tag.
 
-### PixiJS 6 types import from `@react-pixi-fiber/pixi-6`
+### The 2.x interaction types import from the PixiJS adapter
 
 ```ts
 // 2.x
 import type { InteractionCompatibility, InteractionEventCompatibility, PixiTypeFallback } from "react-pixi-fiber";
-// 3.0.0
+// 3.0.0, from the PixiJS adapter you configure, here PixiJS 6
 import type { InteractionCompatibility, InteractionEventCompatibility, PixiTypeFallback } from "@react-pixi-fiber/pixi-6";
 ```
 
-`InteractiveComponent` still resolves from `react-pixi-fiber` and is deprecated; import it from `@react-pixi-fiber/pixi-6`.
+| 2.x type from `react-pixi-fiber` | 3.0.0 |
+| --- | --- |
+| `InteractionCompatibility` | `@react-pixi-fiber/pixi-4`, `pixi-5`, `pixi-6` |
+| `InteractionEventCompatibility` | `@react-pixi-fiber/pixi-4`, `pixi-5`, `pixi-6` |
+| `InteractiveComponent` | `@react-pixi-fiber/pixi-4`, `pixi-5`, `pixi-6`; still resolves from `react-pixi-fiber`, deprecated |
+| `PixiTypeFallback` | `@react-pixi-fiber/pixi-4`, `pixi-5`, `pixi-6`, `pixi-7` |
+
+PixiJS 7 and 8 have no `PIXI.interaction` and no `PIXI.InteractionEvent`, so `pixi-7` and `pixi-8` have no counterpart for the interaction types; type the event handlers with `FederatedPointerEvent` from `pixi.js`. The other 2.x types, for example `PointLike`, `StageProps` and the `Interaction*Events` maps, still import from `react-pixi-fiber`.
 
 ### Smaller changes
 
