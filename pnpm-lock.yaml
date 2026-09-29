@@ -144,6 +144,9 @@ importers:
       '@types/react':
         specifier: ^18.2.8
         version: 18.3.31
+      '@types/react-test-renderer':
+        specifier: ^18.3.1
+        version: 18.3.1
       pixi.js:
         specifier: ^6.0.2
         version: 6.5.10
@@ -1018,6 +1021,9 @@ packages:
 
   '@types/react-router@5.1.20':
     resolution: {integrity: sha512-jGjmu/ZqS7FjSH6owMcD5qpq19+1RS9DeVRqfl1FeBMxTDQAGwlMWOcs52NDoXaNKyG3d1cYQFMs9rCrb88o9Q==}
+
+  '@types/react-test-renderer@18.3.1':
+    resolution: {integrity: sha512-vAhnk0tG2eGa37lkU9+s5SoroCsRI08xnsWFiAXOuPH2jqzMbcXvKExXViPi1P5fIklDeCvXqyrdmipFaSkZrA==}
 
   '@types/react@18.3.31':
     resolution: {integrity: sha512-vfEqpXTvwT91yhmwdfouStN2hSKwTvyRs8qpLfADyrq/kxDw0hZM7Wk9Ug1FELj8hIby+S/+kQCSRFF32nv2Qw==}
@@ -3097,6 +3103,10 @@ snapshots:
   '@types/react-router@5.1.20':
     dependencies:
       '@types/history': 4.7.11
+      '@types/react': 18.3.31
+
+  '@types/react-test-renderer@18.3.1':
+    dependencies:
       '@types/react': 18.3.31
 
   '@types/react@18.3.31':

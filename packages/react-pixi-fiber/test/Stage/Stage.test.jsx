@@ -2,35 +2,31 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import React, { createRef, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import renderer, { act } from "react-test-renderer";
-import * as PIXI from "pixi.js";
 import Stage from "../../src/Stage";
 import { strictModeBit } from "@react-pixi-fiber/react-18";
+import { createFakeApp, fakePixiAdapter } from "../utils/fakePixiAdapter";
 
 // Stage renders through the configured secondary renderer; these spies stand in for it.
 const { renderMock, unmountMock } = vi.hoisted(() => ({ renderMock: vi.fn(), unmountMock: vi.fn() }));
 
-const apps = [];
+const adapter = fakePixiAdapter({ async: true });
+const { apps } = adapter;
 function makeApp() {
-  const app = { stage: new PIXI.Container(), renderer: { resize: vi.fn() }, destroyed: false };
+  const app = createFakeApp();
+  app.renderer.resize = vi.fn();
   apps.push(app);
   return app;
 }
 let resolveInit;
-const adapter = {
-  components: { Container: { create: () => new PIXI.Container() } },
-  properties: { boolean: ["visible"], numeric: ["x", "y"], positiveNumeric: [], vector: ["scale"], callback: [] },
-  isPoint: v => v instanceof PIXI.Point || v instanceof PIXI.ObservablePoint,
-  copyPoint: (t, v) => t.copyFrom(v),
-  createApplication: vi.fn(),
-  destroyApplication: vi.fn(app => {
-    app.destroyed = true;
-  }),
-  isApplication: v => apps.includes(v),
-};
+// Each test holds the createApplication promise and resolves it with resolveInit.
+adapter.createApplication = vi.fn();
+adapter.destroyApplication = vi.fn(adapter.destroyApplication);
+// The configured adapter; a test replaces it to reconfigure.
+let configuredAdapter = adapter;
 vi.mock("../../src/configure", () => ({
-  getConfigured: () => ({ pixi: adapter, secondary: { render: renderMock, unmount: unmountMock } }),
+  getConfigured: () => ({ pixi: configuredAdapter, secondary: { render: renderMock, unmount: unmountMock } }),
   markRendered() {},
-  getPixiAdapter: () => adapter,
+  getPixiAdapter: () => configuredAdapter,
   getStackAddendum: () => "",
   getStrictModeBit: () => strictModeBit,
 }));
@@ -44,6 +40,7 @@ const tick = () => act(() => new Promise(r => setTimeout(r, 0)));
 
 describe("Stage", () => {
   beforeEach(() => {
+    configuredAdapter = adapter;
     apps.length = 0;
     vi.clearAllMocks();
     vi.useRealTimers();
@@ -135,6 +132,17 @@ describe("Stage", () => {
     expect(renderMock).not.toHaveBeenCalled();
     expect(onInit).not.toHaveBeenCalled();
     expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, true);
+  });
+
+  it("destroys the application with the adapter that created it after a reconfigure", async () => {
+    const tree = renderer.create(<Stage />, { createNodeMock: () => ({}) });
+    act(() => resolveInit());
+    await flush();
+    configuredAdapter = { ...adapter, destroyApplication: vi.fn() };
+    tree.unmount();
+    await tick();
+    expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, true);
+    expect(configuredAdapter.destroyApplication).not.toHaveBeenCalled();
   });
 
   it("an options change while init is pending applies after init", async () => {
@@ -314,6 +322,44 @@ describe("Stage", () => {
     expect(boundary.current.state.error).toBe(failure);
     expect(onInit).not.toHaveBeenCalled();
     expect(renderMock).not.toHaveBeenCalled();
+    tree.unmount();
+    error.mockRestore();
+  });
+
+  it("a Stage prop that fails to apply reaches an error boundary and destroys the application it was not rendered to", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failure = new Error("alpha failed");
+    adapter.createApplication.mockImplementation(() => {
+      const app = makeApp();
+      Object.defineProperty(app.stage, "alpha", {
+        set() {
+          throw failure;
+        },
+      });
+      return Promise.resolve(app);
+    });
+    class Boundary extends React.Component {
+      state = { error: null };
+      static getDerivedStateFromError(caught) {
+        return { error: caught };
+      }
+      render() {
+        return this.state.error ? null : this.props.children;
+      }
+    }
+    const boundary = createRef();
+    const tree = renderer.create(
+      <Boundary ref={boundary}>
+        <Stage alpha={0.5} />
+      </Boundary>,
+      { createNodeMock: () => ({}) }
+    );
+    await flush();
+    await tick();
+    expect(boundary.current.state.error).toBe(failure);
+    expect(renderMock).not.toHaveBeenCalled();
+    expect(adapter.destroyApplication.mock.calls).toEqual([[apps[0], false, true]]);
+    expect(error.mock.calls.flat().join(" ")).not.toContain("did not render into container");
     tree.unmount();
     error.mockRestore();
   });
