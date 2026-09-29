@@ -1,16 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import React, { StrictMode, ViewTransition, startTransition } from "react";
+import React, { Fragment, StrictMode, ViewTransition, startTransition } from "react";
 import react19, { strictModeBit } from "../src/index";
 import type { HostOps } from "react-pixi-fiber";
 
 // Wraps the real reconciler so a test can see what reaches updateContainerSync.
-const { updateContainerSync } = vi.hoisted(() => ({
+const { startViewTransitionSpies, updateContainerSync } = vi.hoisted(() => ({
+  startViewTransitionSpies: [] as { mockRestore(): void; mock: { calls: unknown[][] } }[],
   updateContainerSync: vi.fn(),
 }));
 vi.mock("react-reconciler", async importOriginal => {
   const Reconciler = ((await importOriginal()) as any).default;
   return {
-    default: (config: unknown) => {
+    default: (config: any) => {
+      startViewTransitionSpies.push(vi.spyOn(config, "startViewTransition"));
       const reconciler = Reconciler(config);
       updateContainerSync.mockImplementation(reconciler.updateContainerSync);
       return { ...reconciler, updateContainerSync };
@@ -176,23 +178,48 @@ describe("react19", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    const container = { children: [] as any[] };
-    let setX: (x: number) => void = () => {};
-    const Scene = () => {
-      const [x, setState] = React.useState(1);
-      setX = setState;
-      return (
-        <ViewTransition>
-          <node x={x} />
-        </ViewTransition>
+    const startViewTransition = startViewTransitionSpies[startViewTransitionSpies.length - 1];
+    try {
+      const container = { children: [] as any[] };
+      let setX: (x: number) => void = () => {};
+      const Scene = () => {
+        const [x, setState] = React.useState(1);
+        setX = setState;
+        return (
+          <ViewTransition>
+            <node x={x} />
+          </ViewTransition>
+        );
+      };
+      renderer.render(<Scene />, container);
+      expect(container.children[0].props.x).toBe(1);
+      startTransition(() => setX(2));
+      await vi.waitFor(() => expect(container.children[0].props.x).toBe(2));
+      expect(startViewTransition.mock.calls.length).toBeGreaterThan(0);
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      error.mockRestore();
+      startViewTransition.mockRestore();
+    }
+  });
+
+  it("reports a Fragment ref on the console instead of throwing", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      renderer.render(
+        <Fragment ref={() => {}}>
+          <node x={1} />
+        </Fragment>,
+        { children: [] }
       );
-    };
-    renderer.render(<Scene />, container);
-    expect(container.children[0].props.x).toBe(1);
-    startTransition(() => setX(2));
-    await vi.waitFor(() => expect(container.children[0].props.x).toBe(2));
-    expect(error).not.toHaveBeenCalled();
-    error.mockRestore();
+      expect(error).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringMatching(/does not support Fragment refs/) })
+      );
+    } finally {
+      error.mockRestore();
+    }
   });
 
   it("validates props with the fiber so the core can find <StrictMode>", () => {

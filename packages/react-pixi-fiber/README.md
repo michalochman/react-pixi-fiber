@@ -66,6 +66,32 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 
 Without `configure`, the first render throws an error that prints the install line and these setup lines.
 
+### React 19
+
+`@react-pixi-fiber/react-19` needs React 19.3 or newer, the peer range of the `react-reconciler` it bundles.
+
+- An error thrown while rendering is reported to `console.error` instead of being thrown from `render()`.
+- `<ViewTransition>` inside `Stage` renders its children without animating.
+- `<Fragment ref>` inside `Stage` is not supported and reports an error.
+
+### PixiJS 8
+
+- `Stage` creates the application with the asynchronous `app.init()`, so it renders its children after the application exists. Read the application in [`onInit`](#read-the-application-in-oninit-not-from-the-ref-at-mount).
+- `usePixiTicker` callbacks receive the PixiJS 8 `Ticker`, not a delta: read `ticker.deltaTime`.
+- `tint` accepts color strings as well as numbers.
+- `ParticleContainer` throws when it is rendered. Its children are `Particle` objects, not display objects; use a `PIXIComponent` that owns the particles.
+- `pixi8({ compat: "pixi6" })` (or `"pixi7"`) translates props that PixiJS 8 renamed: `buttonMode` to `cursor`, `interactive` to `eventMode`, `name` to `label`, and the event names such as `click` and `pointerdown` to `onclick` and `onpointerdown`. In development each translated prop warns once and names the replacement. When both the old and the PixiJS 8 prop are passed, the PixiJS 8 prop wins.
+- Compat covers props only. A filter is not a display object, so `BlurFilter.blur` (now `strength`) still logs PixiJS's own deprecation warning.
+
+The bundled examples run on PixiJS 7. Moved to PixiJS 8 with `compat: "pixi6"`, the Bunny, Click and Points examples work after these changes:
+
+- `Texture.from(url)` followed by `.baseTexture` becomes `await Assets.load(url)` and `new Texture({ frame, source })`.
+- `BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST` becomes `TextureSource.defaultOptions.scaleMode = "nearest"`.
+- A `usePixiTicker` callback reads `ticker.deltaTime`.
+- `PIXI.DisplayObject` becomes `PIXI.Container`.
+- The Bunnymark, Custom Bunnymark and Suspense examples still use the PixiJS 7 texture calls (`Texture.from(url, options)`, `Texture.fromURL`) and need the same change.
+- The Layers example depends on `@pixi/layers`, which supports PixiJS 7 only.
+
 ## Usage
 
 <details open>

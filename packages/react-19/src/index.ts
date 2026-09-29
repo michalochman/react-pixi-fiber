@@ -129,6 +129,7 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     applyViewTransitionName: noop,
     cancelRootViewTransitionName: noop,
     cancelViewTransitionName: noop,
+    commitNewChildToFragmentInstance() {},
     createFragmentInstance() {
       invariant(false, "react-pixi-fiber does not support Fragment refs. Remove the ref from the Fragment.");
     },
@@ -139,7 +140,6 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
       old: emptyObject,
       new: emptyObject,
     }),
-    commitNewChildToFragmentInstance() {},
     deleteChildFromFragmentInstance() {},
     hasInstanceAffectedParent: () => false,
     hasInstanceChanged: () => false,
