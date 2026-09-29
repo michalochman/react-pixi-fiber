@@ -12,6 +12,7 @@ This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React
 | --- | --- |
 | [`packages/pixi-6`](./packages/pixi-6) | `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter |
 | [`packages/pixi-7`](./packages/pixi-7) | `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter |
+| [`packages/pixi-8`](./packages/pixi-8) | `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter |
 | [`packages/react-18`](./packages/react-18) | `@react-pixi-fiber/react-18`, the React 18 adapter |
 | [`packages/react-19`](./packages/react-19) | `@react-pixi-fiber/react-19`, the React 19 adapter |
 | [`packages/react-pixi-fiber`](./packages/react-pixi-fiber) | `react-pixi-fiber`, the core with the components, `Stage` and `configure` |

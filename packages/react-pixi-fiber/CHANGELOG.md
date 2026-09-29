@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `configure({ react, pixi })`, called once in the app entry before the first render, wires a React adapter and a PixiJS adapter into the core. Without it the first render throws an error that prints the install line and the setup lines
 - `@react-pixi-fiber/react-18`, the React 18 adapter, `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter, and `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter with the `HTMLText` tag
+- `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter with the `DOMContainer`, `HTMLText`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` tags and a `compat` option that translates the 2.x interaction props. `ParticleContainer` throws on it
+- A PixiJS adapter can rename props with `translateProps` before they are validated, set or diffed; a `PIXIComponent` with its own `applyProps` receives the props as written
 - `PIXIComponent(type, behavior)` and `PIXIProperty` replace `CustomPIXIComponent(behavior, type)` and `CustomPIXIProperty`. Behavior keys are `create`, `applyProps`, `afterAdd`, `beforeRemove`
 - Tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope` and `NineSliceSprite`
 - `Stage` `onInit(app)` prop, called once the PixiJS application exists and the children are rendered
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - A second `configure` call after a render warns once in development. Trees already rendered keep their React renderer; new PixiJS instances use the new adapter
 - The PixiJS 6 types `InteractionCompatibility`, `InteractionEventCompatibility` and `PixiTypeFallback` import from `@react-pixi-fiber/pixi-6`
 - Build output moved from `cjs/` and `es/` to `dist/cjs/` and `dist/es/`. Imports of `react-pixi-fiber` are unaffected; direct paths to the built files need the `dist/` prefix
+- The `usePixiTicker` callback has the type `app.ticker.add` takes on the configured PixiJS version
 - Examples are built with Vite instead of Create React App
 - Examples run on PixiJS 7 with `@pixi/layers` instead of PixiJS 6
 - `package.json` has an `exports` map. Bundlers that understand it (webpack 5, Vite) get the ES build directly, the development or production file picked by the `development` condition; Node and `require` still get the CommonJS entry points. Only `react-pixi-fiber` and `react-pixi-fiber/package.json` can be imported, deep imports into `dist/` or `src/` no longer resolve

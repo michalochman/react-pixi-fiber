@@ -6,9 +6,11 @@ import {
   createRegisteredInstance,
   getAdapterComponent,
   getBoundBehavior,
+  getInstanceTag,
   resolveComponent,
   resolveTag,
 } from "./registry";
+import { getOwn } from "./PixiProperty";
 import { setValueForProperty } from "./PixiPropertyOperations";
 
 type Instance = Record<string, any>;
@@ -18,6 +20,25 @@ export const CHILDREN = "children";
 
 const warnedDeprecatedTags = new Set<string>();
 const warnedShadowedTags = new Set<string>();
+
+// The adapter's `translateProps` renames props before anything reads them, so validation, the initial write and
+// the diff all see the adapter's own prop names.
+export function translate(type: string, props: Props): Props {
+  if (props == null) return props;
+  const pixi = getPixiAdapter();
+  return typeof pixi.translateProps === "function" ? pixi.translateProps(type, props) : props;
+}
+
+// The adapter's `defaults` for a tag fill the props that are missing or `undefined`, like React's `defaultProps`.
+function withDefaults(tag: string, props: Props): Props {
+  const defaults = getOwn(getPixiAdapter().defaults, tag);
+  if (defaults === undefined || props == null) return props;
+  const merged = { ...props };
+  for (const key of Object.keys(defaults)) {
+    if (merged[key] === undefined) merged[key] = defaults[key];
+  }
+  return merged;
+}
 
 // Tag resolution: the user `PIXIComponent` registry, then the adapter's components, then the deprecated tag map.
 export function createInstance(
@@ -55,7 +76,12 @@ export function createInstance(
     type,
     type
   );
-  return createRegisteredInstance(tag, resolved.behavior, props, applyDisplayObjectProps) as Instance;
+  return createRegisteredInstance(
+    tag,
+    resolved.behavior,
+    withDefaults(tag, props),
+    applyDisplayObjectProps
+  ) as Instance;
 }
 
 export function setInitialPixiProperties(
@@ -87,12 +113,13 @@ export function setInitialProperties(
 ): void {
   // components with their own applyProps need to have full control over passed props
   const bound = getBoundBehavior(instance);
+  const tag = getInstanceTag(instance) ?? type;
   if (bound && bound.applyProps) {
-    bound.applyProps(instance, undefined, rawProps);
+    bound.applyProps(instance, undefined, withDefaults(tag, rawProps));
     return;
   }
 
-  setInitialPixiProperties(type, instance, rawProps, rootContainer, hostContext);
+  setInitialPixiProperties(type, instance, withDefaults(tag, translate(type, rawProps)), rootContainer, hostContext);
 }
 
 // Calculate the diff between the two objects.
@@ -105,8 +132,8 @@ export function diffProperties(
 ): unknown[] | null {
   let updatePayload: unknown[] | null = null;
 
-  let lastProps = lastRawProps;
-  let nextProps = nextRawProps;
+  const lastProps = translate(type, lastRawProps);
+  const nextProps = translate(type, nextRawProps);
   let propKey;
 
   for (propKey in lastProps) {
@@ -181,7 +208,8 @@ export function updateProperties(
   // components with their own applyProps need to have full control over passed props
   const bound = getBoundBehavior(instance);
   if (bound && bound.applyProps) {
-    bound.applyProps(instance, prevProps, nextProps);
+    const tag = getInstanceTag(instance) ?? type;
+    bound.applyProps(instance, withDefaults(tag, prevProps as Props), withDefaults(tag, nextProps as Props));
     return;
   }
 
@@ -201,7 +229,7 @@ export function applyProps(
     "`applyProps` expects an instance that react-pixi-fiber created. Use `applyDisplayObjectProps(type, instance, oldProps, newProps)` for other display objects."
   );
   if (bound.applyProps) {
-    bound.applyProps(instance, oldProps, newProps);
+    bound.applyProps(instance, withDefaults(bound.tag, oldProps as Props), withDefaults(bound.tag, newProps));
   } else {
     applyDisplayObjectProps(bound.tag, instance, oldProps || {}, newProps);
   }

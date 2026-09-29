@@ -18,6 +18,7 @@ vi.mock("../src/configure", () => ({
     properties: { boolean: [], numeric: [], positiveNumeric: [], vector: [], callback: [] },
     isPoint: () => false,
     copyPoint() {},
+    defaults: { Defaulted: { alpha: 0.5 } },
   }),
 }));
 
@@ -191,6 +192,23 @@ describe("ReactPixiFiber", () => {
       expect(applyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
     });
 
+    it("passes both props with the adapter defaults to the bound applyProps", () => {
+      const applyProps = vi.fn();
+      const instance = createRegisteredInstance(
+        "Defaulted",
+        normalizeBehavior("Defaulted", { create: () => ({}), applyProps }),
+        {},
+        () => {}
+      );
+      ReactPixiFiberComponent.setInitialProperties("Defaulted", instance, { x: 1 });
+      ReactPixiFiberComponent.updateProperties("Defaulted", instance, ["x", 2], { x: 1 }, { x: 2 });
+
+      expect(applyProps.mock.calls).toEqual([
+        [instance, undefined, { x: 1, alpha: 0.5 }],
+        [instance, { x: 1, alpha: 0.5 }, { x: 2, alpha: 0.5 }],
+      ]);
+    });
+
     it("calls updatePixiProperties for registered instances without applyProps defined", () => {
       const instance = createRegisteredInstance(
         type,
@@ -250,6 +268,14 @@ describe("ReactPixiFiber", () => {
       ReactPixiFiberComponent.applyProps(b, undefined, { x: 3 });
       expect(setValueForProperty).toHaveBeenCalledWith("Plain", b, "x", 3, undefined);
       expect(() => ReactPixiFiberComponent.applyProps({}, {}, {})).toThrow("react-pixi-fiber created");
+    });
+
+    it("passes both props with the adapter defaults to the component's applyProps, as a commit does", () => {
+      const custom = vi.fn();
+      registerComponent("Defaulted", { create: () => ({}), applyProps: custom });
+      const instance = ReactPixiFiberComponent.createInstance("Defaulted", {});
+      ReactPixiFiberComponent.applyProps(instance, {}, { x: 1 });
+      expect(custom).toHaveBeenLastCalledWith(instance, { alpha: 0.5 }, { x: 1, alpha: 0.5 });
     });
   });
 

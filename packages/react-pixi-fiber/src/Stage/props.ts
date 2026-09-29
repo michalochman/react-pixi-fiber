@@ -7,17 +7,20 @@ export const STAGE_PROP_NAMES = ["app", "options", "children", "onInit", "width"
 // Plain (untyped) Container props that belong on app.stage, not on the <canvas>. Typed names come from the adapter table.
 export const CONTAINER_PROP_NAMES = [
   "angle",
+  "blendMode",
   "cursor",
   "eventMode",
   "filterArea",
   "filters",
   "hitArea",
+  "interactive",
   "interactiveChildren",
   "label",
   "mask",
   "name",
   "sortableChildren",
   "sortDirty",
+  "tint",
   "transform",
   "zIndex",
 ] as const;

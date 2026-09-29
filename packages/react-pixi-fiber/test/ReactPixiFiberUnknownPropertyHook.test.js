@@ -3,7 +3,7 @@ import warning from "../src/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
 import { customStandardNames, getCustomPropertyInfo, shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
 import { getPixiAdapter } from "../src/configure";
-import { registerAdapterComponents } from "../src/registry";
+import { registerAdapterComponents, registerComponent } from "../src/registry";
 import { TAGS } from "../src/tags";
 
 vi.mock("../src/warning", () => ({ default: vi.fn() }));
@@ -45,14 +45,22 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
         expect(warning).toHaveBeenCalledTimes(1);
         expect(warning).toHaveBeenCalledWith(
           false,
-          "Invalid event handler prop `%s` on `<%s />`. PIXI events use other naming convention, for example `click`.%s",
+          "Invalid event handler prop `%s` on `<%s />`. PIXI events use other naming convention, for example `%s`.%s",
           name,
           type,
+          "click",
           stack
         );
       } else {
         expect(warning).toHaveBeenCalledTimes(0);
       }
+    });
+
+    it("should not warn about properties starting with `on` on a PIXIComponent", () => {
+      registerComponent("OnHandlerComponent", { create: () => ({}) });
+      ReactPixiFiberUnknownPropertyHook.validateProperty("OnHandlerComponent", "onDragEnd", () => {});
+
+      expect(warning).toHaveBeenCalledTimes(0);
     });
 
     it("should warn about NaNs in development", () => {
@@ -70,6 +78,19 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
         );
       } else {
         expect(warning).toHaveBeenCalledTimes(0);
+      }
+    });
+
+    it.skipIf(!__DEV__)("does not report an on* name registered with PIXIProperty as an event handler", () => {
+      customStandardNames.Draggable = { ondragend: "onDragEnd" };
+      customStandardNames["*"] = { ondrop: "onDrop" };
+      try {
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Draggable", "onDragEnd", () => {})).toBe(true);
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Draggable", "onDrop", () => {})).toBe(true);
+        expect(warning).toHaveBeenCalledTimes(0);
+      } finally {
+        delete customStandardNames.Draggable;
+        delete customStandardNames["*"];
       }
     });
 
@@ -92,6 +113,26 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       } finally {
         delete customStandardNames.Circle;
         delete customStandardNames["*"];
+      }
+    });
+
+    it.skipIf(!__DEV__)("ignores a PIXIProperty registration of a name the adapter types, with one warning", () => {
+      const validator = vi.fn(() => true);
+      getCustomPropertyInfo.mockReturnValue({ type: validator });
+      try {
+        ReactPixiFiberUnknownPropertyHook.validateProperty(TAGS.Sprite, "rotation", 1);
+        ReactPixiFiberUnknownPropertyHook.validateProperty(TAGS.Sprite, "rotation", 2);
+        expect(validator).not.toHaveBeenCalled();
+        expect(warning).toHaveBeenCalledTimes(1);
+        expect(warning).toHaveBeenCalledWith(
+          false,
+          "`PIXIProperty` registered `%s` on `<%s />`, which the PixiJS adapter already types. The registration is ignored.%s",
+          "rotation",
+          TAGS.Sprite,
+          stack
+        );
+      } finally {
+        getCustomPropertyInfo.mockReturnValue(null);
       }
     });
 

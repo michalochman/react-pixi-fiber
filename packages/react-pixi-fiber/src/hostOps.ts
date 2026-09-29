@@ -1,4 +1,10 @@
-import { createInstance, diffProperties, setInitialProperties, updateProperties } from "./ReactPixiFiberComponent";
+import {
+  createInstance,
+  diffProperties,
+  setInitialProperties,
+  translate,
+  updateProperties,
+} from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
 import { getBoundBehavior } from "./registry";
 import { getStrictModeBit } from "./configure";
@@ -58,7 +64,8 @@ export function unhideInstance(instance: any, props: Record<string, unknown>): v
 // Development only: validates under a <StrictMode> ancestor, found on the fiber with the React adapter's mode bit.
 export function validateProperties(type: string, props: Record<string, unknown>, internalHandle?: unknown): void {
   if (!__DEV__) return;
-  if (findStrictRoot(internalHandle, getStrictModeBit()) != null) validateUnknownProperties(type, props);
+  if (findStrictRoot(internalHandle, getStrictModeBit()) != null)
+    validateUnknownProperties(type, translate(type, props));
 }
 
 export const hostOps: HostOps = {

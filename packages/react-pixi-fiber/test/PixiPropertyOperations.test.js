@@ -171,4 +171,54 @@ describe("PixiPropertyOperations", () => {
       expect(instance.alpha).toBe(0.75);
     });
   });
+
+  describe("adapter defaults at construction", () => {
+    const mount = (m, type, props) => {
+      const instance = m.createInstance(type, props);
+      m.setInitialProperties(type, instance, props);
+      return instance;
+    };
+
+    it("fills a prop that is missing or undefined", async () => {
+      const m = await withDefaults({ Sprite: { alpha: 0.5 } });
+      expect(mount(m, "Sprite", {}).alpha).toBe(0.5);
+      expect(mount(m, "Sprite", { alpha: undefined }).alpha).toBe(0.5);
+      expect(mount(m, "Sprite", { alpha: 0.25 }).alpha).toBe(0.25);
+    });
+    it("mounts with the value a removal resets to", async () => {
+      const m = await withDefaults({ Sprite: { alpha: 0.5 } });
+      const instance = mount(m, "Sprite", { alpha: 1 });
+      m.setValueForProperty("Sprite", instance, "alpha", undefined);
+      expect(instance.alpha).toBe(mount(m, "Sprite", {}).alpha);
+    });
+    it("passes the filled props to create", async () => {
+      const m = await withDefaults({ Text: { text: "default" } });
+      expect(m.createInstance("Text", {}).text).toBe("default");
+    });
+    it("keeps an explicit null", async () => {
+      const m = await withDefaults({ Custom: { value: 1 } });
+      const create = vi.fn(() => new PIXI.Container());
+      m.PIXIComponent("Custom", { create });
+      m.createInstance("Custom", { value: null });
+      expect(create).toHaveBeenCalledWith({ value: null });
+    });
+    it("fills the props of a PIXIComponent tag, its own applyProps included", async () => {
+      const m = await withDefaults({ Custom: { value: 1 } });
+      const create = vi.fn(() => new PIXI.Container());
+      const applyProps = vi.fn();
+      m.PIXIComponent("Custom", { create, applyProps });
+      mount(m, "Custom", { other: 2 });
+      expect(create).toHaveBeenCalledWith({ other: 2, value: 1 });
+      expect(applyProps).toHaveBeenCalledWith(expect.anything(), undefined, { other: 2, value: 1 });
+    });
+    it("leaves the props unchanged without a defaults entry", async () => {
+      const m = await withDefaults(undefined);
+      const props = {};
+      const create = vi.fn(() => new PIXI.Container());
+      m.PIXIComponent("Custom", { create });
+      m.createInstance("Custom", props);
+      expect(create.mock.calls[0][0]).toBe(props);
+      expect(mount(m, "Sprite", {}).alpha).toBe(1);
+    });
+  });
 });

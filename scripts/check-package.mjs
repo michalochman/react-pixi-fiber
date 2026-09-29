@@ -112,6 +112,24 @@ try {
       });
     });
 
+    // Subpaths other than the entry point, for example `@react-pixi-fiber/pixi-8/compat/pixi6`.
+    const subpaths = Object.keys(pkg.exports || {})
+      .filter(key => key !== "." && key !== "./package.json")
+      .map(key => `${name}${key.slice(1)}`);
+    for (const subpath of subpaths) {
+      await check(`${subpath} node require and import`, () => {
+        const file = require.resolve(subpath);
+        assert.ok(file.startsWith(installed) && existsSync(file), file);
+        const imported = run(
+          "node",
+          ["--input-type=module", "-e", `console.log(import.meta.resolve(${JSON.stringify(subpath)}))`],
+          pkgWork
+        );
+        assert.equal(fileURLToPath(imported), file);
+      });
+    }
+    const subpathImports = subpaths.map(subpath => `import ${JSON.stringify(subpath)};\n`).join("");
+
     // The default export is called at run time, so the peers have to resolve: link the ones the workspace installed.
     for (const peer of peers) {
       const source = join(dir, "node_modules", peer);
@@ -126,15 +144,17 @@ try {
     const callable = "const callable: (...args: never[]) => unknown =";
     writeFileSync(
       join(pkgWork, "a.mts"),
-      hasDefault
-        ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\nconsole.log(callable);\n`
-        : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`
+      subpathImports +
+        (hasDefault
+          ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\nconsole.log(callable);\n`
+          : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`)
     );
     writeFileSync(
       join(pkgWork, "a.cts"),
-      hasDefault
-        ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\nconsole.log(callable);\n`
-        : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`
+      subpathImports +
+        (hasDefault
+          ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\nconsole.log(callable);\n`
+          : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`)
     );
     writeFileSync(
       join(pkgWork, "tsconfig.json"),

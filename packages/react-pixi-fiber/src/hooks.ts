@@ -13,7 +13,12 @@ export function usePixiApp(): PixiApplication {
   return app;
 }
 
-export function usePixiTicker(fn: (deltaTime: number) => void): void {
+// The callback `app.ticker.add` takes on the configured PixiJS version, a delta-time callback without an adapter.
+export type PixiTickerCallback = PixiApplication extends { ticker: { add(fn: infer F, ...rest: any[]): unknown } }
+  ? F
+  : (deltaTime: number) => void;
+
+export function usePixiTicker(fn: PixiTickerCallback): void {
   const { ticker } = usePixiApp();
 
   useEffect(() => {

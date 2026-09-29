@@ -10,7 +10,7 @@ import {
   getStandardNames,
   shouldRemoveAttributeWithWarning,
 } from "./PixiProperty";
-import { resolveTag } from "./registry";
+import { getUserComponent, resolveTag } from "./registry";
 
 const emptyFunction = () => {};
 
@@ -19,6 +19,7 @@ let validateProperty: (type: string, name: string, value: unknown) => boolean | 
 
 if (__DEV__) {
   const warnedProperties: Record<string, boolean> = {};
+  const warnedRegistrations: Record<string, boolean> = {};
   // React-style camelCase handlers only: `onclick` is a real PixiJS 7+ prop.
   const EVENT_NAME_REGEX = /^on[A-Z]/;
 
@@ -30,13 +31,30 @@ if (__DEV__) {
     }
 
     const lowerCasedName = name.toLowerCase();
+    const pixi = getPixiAdapter();
+    const propertyInfo = getPropertyInfo(name, pixi);
 
-    if (EVENT_NAME_REGEX.test(name)) {
+    const standardNames = getStandardNames(pixi);
+    const tag = resolveTag(type);
+    // A name is typed by the adapter table, or was registered by `PIXIProperty` on the tag or on all tags.
+    // Any other name is set on the instance as-is and not reported.
+    const standardName =
+      getOwn(standardNames, lowerCasedName) ??
+      getOwn(customStandardNames[tag], lowerCasedName) ??
+      getOwn(customStandardNames["*"], lowerCasedName);
+    // A `PIXIComponent` takes handler props of its own, as in 2.x.
+    if (
+      propertyInfo === null &&
+      EVENT_NAME_REGEX.test(name) &&
+      standardName === undefined &&
+      getUserComponent(tag) === undefined
+    ) {
       warning(
         false,
-        "Invalid event handler prop `%s` on `<%s />`. PIXI events use other naming convention, for example `click`.%s",
+        "Invalid event handler prop `%s` on `<%s />`. PIXI events use other naming convention, for example `%s`.%s",
         name,
         type,
+        getOwn(standardNames, "onclick") ?? "click",
         getStackAddendum()
       );
       warnedProperties[name] = true;
@@ -55,19 +73,24 @@ if (__DEV__) {
       return true;
     }
 
-    const pixi = getPixiAdapter();
-    const propertyInfo = getPropertyInfo(name, pixi);
-    const tag = resolveTag(type);
-    const customPropertyInfo = getCustomPropertyInfo(name, tag);
+    let customPropertyInfo = getCustomPropertyInfo(name, tag);
+    // 2.x rejected the registration. The adapter table is known only once `configure` runs, often after it.
+    if (customPropertyInfo != null && getOwn(standardNames, lowerCasedName) !== undefined) {
+      if (!warnedRegistrations[tag + "." + name]) {
+        warnedRegistrations[tag + "." + name] = true;
+        warning(
+          false,
+          "`PIXIProperty` registered `%s` on `<%s />`, which the PixiJS adapter already types. The registration is ignored.%s",
+          name,
+          type,
+          getStackAddendum()
+        );
+      }
+      customPropertyInfo = null;
+    }
     const isReserved = propertyInfo !== null && propertyInfo.type === RESERVED;
 
     // Known attributes should match the casing specified in the property config.
-    // A name is typed by the adapter table, or was registered by `PIXIProperty` on the tag or on all tags.
-    // Any other name is set on the instance as-is and not reported.
-    const standardName =
-      getOwn(getStandardNames(pixi), lowerCasedName) ??
-      getOwn(customStandardNames[tag], lowerCasedName) ??
-      getOwn(customStandardNames["*"], lowerCasedName);
     if (standardName !== undefined && standardName !== name) {
       warning(
         false,
