@@ -41,7 +41,7 @@ export class DraggableContainerInstance extends PIXI.Container implements Dragga
 
 const TYPE = "DraggableContainer";
 
-export default PIXIComponent<DraggableContainerInstance, DraggableContainerProps>(TYPE, {
+const DraggableContainer = PIXIComponent<DraggableContainerInstance, DraggableContainerProps>(TYPE, {
   create: () => new DraggableContainerInstance(),
   afterAdd: instance => {
     instance.eventMode = "static";
@@ -49,11 +49,16 @@ export default PIXIComponent<DraggableContainerInstance, DraggableContainerProps
 
     instance.on("mousedown", instance.dragStart);
     instance.on("mouseup", instance.dragEnd);
-    instance.on("mousemove", instance.dragMove);
+    instance.on("mouseupoutside", instance.dragEnd);
+    // `mousemove` fires only while the pointer is over the container, so a fast drag would lose it.
+    instance.on("globalmousemove", instance.dragMove);
   },
   beforeRemove: instance => {
     instance.off("mousedown", instance.dragStart);
     instance.off("mouseup", instance.dragEnd);
-    instance.off("mousemove", instance.dragMove);
+    instance.off("mouseupoutside", instance.dragEnd);
+    instance.off("globalmousemove", instance.dragMove);
   },
 });
+
+export default DraggableContainer;

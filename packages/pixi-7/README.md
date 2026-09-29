@@ -38,18 +38,46 @@ Features that are plain PixiJS work as the [PixiJS 7 documentation](https://pixi
 | Feature | Support |
 | --- | --- |
 | Application | `Stage` creates a `PIXI.Application` from `options`; `view` defaults to the canvas `Stage` renders |
-| `defaults` option | `pixi7({ defaults: { Text: { text: "" } } })` sets, per tag, the value a prop returns to when it is set to `undefined`. Without it, a prop returns to the value the instance had before the first write |
-| Events | The PixiJS 7 handler properties as props: `onclick`, `onpointerdown`, …. PixiJS 7 does not call a property named after the event, so `click={fn}` or `pointerdown={fn}` is set on the instance but never runs. `interactive` and `buttonMode` are typed; `eventMode` and `cursor` are set as written |
+| `compat` option | Takes the translator from `@react-pixi-fiber/pixi-7/compat/pixi6`, which translates the PixiJS 6 props, see [below](#compatibility-with-the-2x-props) |
+| `defaults` option | Default props per tag, like React's `defaultProps`: with `pixi7({ defaults: { Sprite: { alpha: 0.5 } } })`, `<Sprite />` mounts with `alpha` 0.5. A prop missing or `undefined` when the instance is created gets its default, and `create` sees it; a prop removed later, or set to `undefined`, returns to it. An explicit `null` is kept. Key each tag as you write it. Without an entry, a removed prop returns to the value the instance had before the first write, see [Default props per tag](../react-pixi-fiber/README.md#default-props-per-tag) |
+| Events | The PixiJS 7 handler properties as props: `onclick`, `onpointerdown`, …, with `eventMode` to make an object interactive. `onpointermove` runs only while the pointer is over the object, `onglobalpointermove` on every move. PixiJS 7 does not call a property named after the event, so without `compat`, `click={fn}` or `pointerdown={fn}` is set on the instance, never runs, and warns once in development; so does `buttonMode`, which PixiJS 7 no longer reads (use `cursor`) |
 | Ticker | A `usePixiTicker` callback receives the frame delta, as `app.ticker.add` passes it |
 | TypeScript | Importing the package types the props of every tag from the PixiJS 7 classes; type event handlers with `FederatedPointerEvent` from `pixi.js`. `PixiTypeFallback` imports from this package |
 
+## Compatibility with the 2.x props
+
+Apps written for PixiJS 6 can keep their interaction props while they migrate. Pass the default export of the compat module to `pixi7`:
+
+```js
+import pixi7 from "@react-pixi-fiber/pixi-7";
+import compat from "@react-pixi-fiber/pixi-7/compat/pixi6";
+
+configure({ react: reactN(), pixi: pixi7({ compat }) });
+```
+
+PixiJS 4 and 5 apps use `compat/pixi6` too: PixiJS 5 and 6 renamed none of the props it translates. Without the import, the adapter holds no compat code.
+
+With `compat`, the adapter translates the props before the core reads them:
+
+| Prop | Becomes |
+| --- | --- |
+| `buttonMode` | `cursor: "pointer"`, or `cursor: null` when false |
+| `click`, `pointerdown`, … (the event names) | `onclick`, `onpointerdown`, … |
+| `interactive` | `eventMode: "static"`, or `eventMode: "auto"` when false, as the PixiJS 7 `interactive` setter does, without its deprecation warning |
+| `mousemove`, `pointermove`, `touchmove` | `onglobalmousemove`, `onglobalpointermove`, `onglobaltouchmove`: the handler runs on every move, over the object or not, as in PixiJS 6 |
+
+`name` is a PixiJS 7 prop and is not translated; neither are `added` and `removed`. In development each translated prop warns once, naming the PixiJS 7 prop to use instead. When a translated prop and its PixiJS 7 prop are both passed (`interactive` and `eventMode`), the PixiJS 7 prop wins, with one warning naming both. A `PIXIComponent` with its own `applyProps` receives the props as written.
+
+The compat module also types the translated props on every tag, as deprecated, so TypeScript needs no other import.
+
 ## Migrating from `@react-pixi-fiber/pixi-6`
 
-1. Install `@react-pixi-fiber/pixi-7` and `pixi.js` 7, and pass `pixi7()` to `configure` instead of `pixi6()`.
+1. Install `@react-pixi-fiber/pixi-7` and `pixi.js` 7, and pass `pixi7()` to `configure` instead of `pixi6()`. To keep the PixiJS 6 props while you migrate, pass `compat` from `@react-pixi-fiber/pixi-7/compat/pixi6`, see [above](#compatibility-with-the-2x-props).
 2. Follow the [PixiJS 7 migration guide](https://github.com/pixijs/pixijs/wiki/v7-Migration-Guide) for the PixiJS calls in your app.
 
 What changes for `react-pixi-fiber` code:
 
 - `HTMLText` is a new tag.
-- Rename the event props to the handler properties: `click` to `onclick`, `pointerdown` to `onpointerdown`, and so on. PixiJS 7 calls only the `on` properties, so an event prop left as `click` is set on the instance but never runs.
+- Rename the event props to the handler properties: `click` to `onclick`, `pointerdown` to `onpointerdown`, and so on; a move handler that must run while the pointer is off the object, as a drag does, becomes `onglobalpointermove`. PixiJS 7 calls only the `on` properties, so without `compat` an event prop left as `click` is set on the instance, never runs, and warns once in development.
+- `buttonMode` becomes `cursor="pointer"`, `interactive` becomes `eventMode="static"`.
 - `InteractionCompatibility`, `InteractionEventCompatibility` and `InteractiveComponent` are not exported: PixiJS 7 has no `PIXI.InteractionEvent`. Type event handlers with `FederatedPointerEvent`.

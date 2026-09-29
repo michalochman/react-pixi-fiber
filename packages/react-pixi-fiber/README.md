@@ -104,6 +104,11 @@ Every React adapter works with every PixiJS adapter:
 - `Mesh` and `MeshSimple` both create `PIXI.mesh.Mesh`, the one mesh class of PixiJS 4.
 - PixiJS 4 ships no typings. For TypeScript, install `@types/pixi.js` 4, an optional peer of `@react-pixi-fiber/pixi-4`.
 
+### PixiJS 7
+
+- PixiJS 7 calls only the handler properties such as `onclick` and `onpointerdown`, and no longer reads `buttonMode`. The 2.x props `click`, `pointerdown`, …, and `buttonMode` are set on the instance, do nothing, and warn once in development.
+- `pixi7({ compat })`, with `compat` imported from `@react-pixi-fiber/pixi-7/compat/pixi6`, translates them: the event names to `onclick`, `onpointerdown`, …, `mousemove`, `pointermove` and `touchmove` to `onglobalmousemove`, `onglobalpointermove` and `onglobaltouchmove`, which run on every move as the 2.x move props did, `buttonMode` to `cursor` and `interactive` to `eventMode`. In development each translated prop warns once and names the replacement. PixiJS 4 and 5 apps use `compat/pixi6` too. Without the import, `pixi-7` holds no compat code.
+
 ### PixiJS 8
 
 - `Stage` creates the application with the asynchronous `app.init()`, so it renders its children after the application exists. Read the application in [`onInit`](#read-the-application-in-oninit-not-from-the-ref-at-mount).
