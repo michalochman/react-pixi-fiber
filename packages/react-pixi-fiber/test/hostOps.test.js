@@ -373,6 +373,19 @@ describe("hostOps", () => {
       expect(children[0].off).toHaveBeenCalledWith("pointerdown", fn);
     });
 
+    it("skips a child without on and off", () => {
+      const particle = {};
+      const { children, instance } = fragment();
+      children.push(particle);
+      const fn = vi.fn();
+      expect(() => instance.on("pointerdown", fn)).not.toThrow();
+      expect(() => hostOps.commitNewChildToFragmentInstance(particle, instance)).not.toThrow();
+      expect(() => hostOps.deleteChildFromFragmentInstance(particle, instance)).not.toThrow();
+      expect(() => instance.off("pointerdown", fn)).not.toThrow();
+      expect(children[0].on).toHaveBeenCalledWith("pointerdown", fn);
+      expect(children[0].off).toHaveBeenCalledWith("pointerdown", fn);
+    });
+
     it("maps getBounds over the children", () => {
       const { instance } = fragment();
       expect(instance.getBounds()).toEqual([{ name: "a" }, { name: "b" }]);

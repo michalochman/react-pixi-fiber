@@ -89,6 +89,7 @@ type Listener = (...args: any[]) => void;
 
 // The children are read on each access, so their order stays current; the reconciler reports added and removed
 // children only so their listeners follow.
+// A child without `on` and `off`, such as a particle, takes no listeners and is skipped.
 class FragmentInstance implements PixiFragmentInstance {
   listeners: [string, Listener][] = [];
   readChildren: () => any[];
@@ -109,19 +110,20 @@ class FragmentInstance implements PixiFragmentInstance {
     const count = this.listeners.length;
     this.listeners = this.listeners.filter(([e, f]) => e !== event || f !== fn);
     if (this.listeners.length === count) return;
-    for (const child of this.children) child.off(event, fn);
+    for (const child of this.children) if (typeof child.off === "function") child.off(event, fn);
   }
 
   on(event: string, fn: Listener): void {
     if (this.listeners.some(([e, f]) => e === event && f === fn)) return;
     this.listeners.push([event, fn]);
-    for (const child of this.children) child.on(event, fn);
+    for (const child of this.children) if (typeof child.on === "function") child.on(event, fn);
   }
 }
 
 // The reconciler can report a child twice (added while hidden, then revealed), and a PixiJS EventEmitter keeps
 // duplicates, so each listener is removed before it is added.
 export function commitNewChildToFragmentInstance(child: any, instance: PixiFragmentInstance): void {
+  if (typeof child.on !== "function" || typeof child.off !== "function") return;
   for (const [event, fn] of (instance as FragmentInstance).listeners) {
     child.off(event, fn);
     child.on(event, fn);
@@ -133,6 +135,7 @@ export function createFragmentInstance(readChildren: () => any[]): PixiFragmentI
 }
 
 export function deleteChildFromFragmentInstance(child: any, instance: PixiFragmentInstance): void {
+  if (typeof child.off !== "function") return;
   for (const [event, fn] of (instance as FragmentInstance).listeners) child.off(event, fn);
 }
 
