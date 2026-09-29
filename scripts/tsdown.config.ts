@@ -1,3 +1,5 @@
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
 import { defineConfig, type TsdownHooks, type UserConfig } from "tsdown";
 
@@ -13,6 +15,23 @@ export interface PackageBuild {
   // whose tsconfig maps `react-pixi-fiber` to the core's src/ builds with a tsconfig that does not.
   tsconfig?: string;
 }
+
+// The adapters' index.js sets module.exports to the default export (Node ESM default-imports module.exports), so their
+// CommonJS declarations have to say `export =`; a plain `export default` would type the default import as the namespace.
+const exportDefaultAsExportEquals: TsdownHooks["build:done"] = ({ chunks }) => {
+  for (const chunk of chunks) {
+    if (!chunk.fileName.endsWith(".d.ts")) continue;
+    const path = join(chunk.outDir, chunk.fileName);
+    const code = readFileSync(path, "utf8");
+    const match = /^export \{ (.*?) \};$/m.exec(code);
+    const factory = match?.[1].match(/(\w+) as default/)?.[1];
+    if (!match || !factory) continue;
+    writeFileSync(
+      path,
+      code.replace(match[0], `declare namespace ${factory} {\n  export { ${match[1]} };\n}\nexport = ${factory};`)
+    );
+  }
+};
 
 export function createTsdownConfig({ name, external, bundle = [], hooks, tsconfig }: PackageBuild) {
   const isProduction = process.env.NODE_ENV === "production";
@@ -38,7 +57,13 @@ export function createTsdownConfig({ name, external, bundle = [], hooks, tsconfi
         // Marks the modules external and turns require() calls into imports; rolldown would otherwise keep
         // require("react") inside react-reconciler's development build, which breaks in browsers.
         plugins: [esmExternalRequirePlugin({ external })],
-        hooks,
+        hooks: {
+          ...hooks,
+          "build:done": async context => {
+            if (format === "cjs") await exportDefaultAsExportEquals(context);
+            await hooks?.["build:done"]?.(context);
+          },
+        },
         tsconfig,
         outputOptions: {
           // Fixed names instead of tsdown's defaults. Declaration chunks are named `<entry>.d`.

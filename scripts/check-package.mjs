@@ -2,7 +2,17 @@
 // Run `pnpm build` first.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
@@ -78,8 +88,7 @@ try {
     const tarball = run("pnpm", ["pack", "--pack-destination", pkgWork], dir).split("\n").pop();
 
     await check(`${name} publint`, () => run("pnpm", ["exec", "publint", "--strict", tarball]));
-    // The dist files set __esModule, which attw cannot see through the index.js wrapper, so it flags the adapters' default export.
-    await check(`${name} attw`, () => run("pnpm", ["exec", "attw", tarball, "--ignore-rules", "false-export-default"]));
+    await check(`${name} attw`, () => run("pnpm", ["exec", "attw", tarball]));
 
     run("tar", ["-xzf", tarball, "-C", installed, "--strip-components=1"]);
     for (const [entry, source] of Object.entries(entries)) writeFileSync(join(pkgWork, `${entry}.js`), source);
@@ -102,6 +111,91 @@ try {
         code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
       });
     });
+
+    // The default export is called at run time, so the peers have to resolve: link the ones the workspace installed.
+    for (const peer of peers) {
+      const source = join(dir, "node_modules", peer);
+      if (!existsSync(source)) continue;
+      const target = join(pkgWork, "node_modules", peer);
+      mkdirSync(join(target, ".."), { recursive: true });
+      symlinkSync(realpathSync(source), target);
+    }
+    const hasDefault = /\bas default\b|export default/.test(
+      readFileSync(join(installed, `dist/es/${base}.d.mts`), "utf8")
+    );
+    const callable = "const callable: (...args: never[]) => unknown =";
+    writeFileSync(
+      join(pkgWork, "a.mts"),
+      hasDefault
+        ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\nconsole.log(callable);\n`
+        : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`
+    );
+    writeFileSync(
+      join(pkgWork, "a.cts"),
+      hasDefault
+        ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\nconsole.log(callable);\n`
+        : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`
+    );
+    writeFileSync(
+      join(pkgWork, "tsconfig.json"),
+      JSON.stringify({
+        compilerOptions: {
+          module: "node16",
+          moduleResolution: "node16",
+          strict: true,
+          noEmit: true,
+          skipLibCheck: true,
+          types: [],
+        },
+        include: ["a.mts", "a.cts"],
+      })
+    );
+    await check(`${name} types resolve under node16`, () =>
+      run("pnpm", ["exec", "tsc", "-p", join(pkgWork, "tsconfig.json")])
+    );
+    if (hasDefault) {
+      await check(`${name} default export is callable from node ESM`, () => {
+        writeFileSync(
+          join(pkgWork, "default.mjs"),
+          `import factory from ${JSON.stringify(name)};\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
+        );
+        run("node", ["default.mjs"], pkgWork);
+      });
+      await check(`${name} default export is callable from node CJS`, () => {
+        writeFileSync(
+          join(pkgWork, "default.cjs"),
+          `const mod = require(${JSON.stringify(name)});\nconst factory = mod.default ?? mod;\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
+        );
+        run("node", ["default.cjs"], pkgWork);
+      });
+    }
+    if (name !== "react-pixi-fiber") {
+      await check(`${name} build does not import the core at run time`, () => {
+        for (const file of readdirSync(installed, { recursive: true }).filter(file => file.endsWith(".js"))) {
+          assert.doesNotMatch(
+            readFileSync(join(installed, file), "utf8"),
+            /(?:\bfrom|\bimport\s*\(?|\brequire\()\s*["']react-pixi-fiber["']/,
+            file
+          );
+        }
+      });
+    }
+    // Node ESM reads the named exports of the CommonJS entry by static analysis, so one that the entry does not spell
+    // out is missing there although the ES build has it.
+    for (const [key, conditions] of Object.entries(pkg.exports || {})) {
+      if (key === "./package.json") continue;
+      const specifier = `${name}${key.slice(1)}`;
+      await check(`${specifier} named exports from node ESM match the ES build`, () => {
+        writeFileSync(
+          join(pkgWork, "named.mjs"),
+          `import * as node from ${JSON.stringify(specifier)};\n` +
+            `const es = await import(${JSON.stringify(join(installed, conditions.import.development))});\n` +
+            "const missing = Object.keys(es).filter(name => !(name in node));\n" +
+            'if (missing.length > 0) throw new Error(`missing: ${missing.join(", ")}`);\n'
+        );
+        run("node", [...dom, "named.mjs"], pkgWork);
+      });
+    }
 
     await check(`${name} esbuild import`, async () =>
       assert.deepEqual(await bundleWithEsbuild("esm", { nodeEnv: "production" }), files.esProduction)
