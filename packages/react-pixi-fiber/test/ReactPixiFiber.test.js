@@ -7,7 +7,7 @@ import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
 import { diffProperties, setInitialProperties, updateProperties } from "../src/ReactPixiFiberComponent";
 import { validateProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
 import { createRender } from "../src/render";
-import { TYPES } from "../src/types";
+import { TYPES } from "../src/tags";
 import { findStrictRoot } from "../src/utils";
 
 vi.mock("pixi.js", async importOriginal => {

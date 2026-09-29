@@ -4,7 +4,7 @@ export function areReactHooksAvailable() {
   return typeof React.useEffect === "function";
 }
 
-export function createRef() {
+export function createRef(): { current: any } {
   return typeof React.createRef === "function"
     ? React.createRef()
     : {

@@ -10,13 +10,21 @@ import {
   resizeRenderer,
   STAGE_OPTIONS_RECREATE,
   STAGE_OPTIONS_UNMOUNT,
+  type Props,
 } from "./common";
 import { defaultProps, getCanvasProps, propTypes } from "./propTypes";
 import * as PIXI from "pixi.js";
+import type { StageComponent } from "../types";
 
-export default function createStageClass() {
-  class Stage extends React.Component {
-    constructor(props) {
+// Factory returning Stage as class component.
+export default function createStageClass(): StageComponent {
+  class Stage extends React.Component<Props, { canvasKey: number }> {
+    declare static propTypes: typeof propTypes;
+    declare static defaultProps: typeof defaultProps;
+    declare _app: React.MutableRefObject<PIXI.Application | null>;
+    declare _canvas: React.MutableRefObject<HTMLCanvasElement | null>;
+
+    constructor(props: Props) {
       super(props);
 
       // Store PIXI.Application instance
@@ -31,14 +39,14 @@ export default function createStageClass() {
     componentDidMount() {
       const app = this.getPixiApplication(this.props);
 
-      this.renderStage(app, this.props);
+      this.renderStage(app!, this.props);
 
       // Store app instance
       this._app.current = app;
     }
 
     // Re-render and resize stage on component update
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: Props) {
       const app = this.getPixiApplication(this.props, prevProps);
 
       // Waiting for a new canvas to be rendered, PIXI.Application is created in the next update
@@ -79,7 +87,7 @@ export default function createStageClass() {
       return <canvas key={this.state.canvasKey} ref={this._canvas} {...canvasProps} />;
     }
 
-    getPixiApplication(props, prevProps) {
+    getPixiApplication(props: Props, prevProps?: Props): PIXI.Application | null {
       const { app, options } = props;
 
       // Return PIXI.Application if it was provided in props
@@ -102,7 +110,7 @@ export default function createStageClass() {
       } = props;
       const {
         options: { height: prevHeight, width: prevWidth, ...prevOtherOptions },
-      } = prevProps;
+      } = prevProps!;
 
       // We need to create new Application when options other than dimensions
       // are changed because some of the renderer settings are immutable
@@ -127,7 +135,7 @@ export default function createStageClass() {
       return this._app.current;
     }
 
-    renderStage(app, props) {
+    renderStage(app: PIXI.Application, props: Props) {
       // Only act if the app was created
       if (app === this._app.current) return;
 
@@ -135,7 +143,7 @@ export default function createStageClass() {
       renderStage(app, props, this);
     }
 
-    rerenderStage(app, props, prevProps) {
+    rerenderStage(app: PIXI.Application, props: Props, prevProps: Props) {
       // Only act if new app was not created
       if (app !== this._app.current) return;
 
@@ -152,5 +160,5 @@ export default function createStageClass() {
   Stage.propTypes = propTypes;
   Stage.defaultProps = defaultProps;
 
-  return Stage;
+  return Stage as unknown as StageComponent;
 }

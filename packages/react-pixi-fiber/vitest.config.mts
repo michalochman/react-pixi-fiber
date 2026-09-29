@@ -7,11 +7,9 @@ import pkg from "./package.json" with { type: "json" };
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
   return {
-    // The source has JSX in .js files and uses the classic React.createElement runtime, like the build.
+    // The source uses the classic React.createElement runtime, like the build. oxc infers the language from the extension.
     oxc: {
-      include: /\.jsx?$/,
-      exclude: [],
-      lang: "jsx",
+      include: /\.[jt]sx?$/,
       jsx: { runtime: "classic", pragma: "React.createElement", pragmaFrag: "React.Fragment" },
     },
     define: {
@@ -19,15 +17,15 @@ export default defineConfig(({ mode }) => {
       __PACKAGE_NAME__: JSON.stringify(pkg.name),
     },
     resolve: {
-      alias: [{ find: /^react-pixi-fiber$/, replacement: fileURLToPath(new URL("src/index.js", import.meta.url)) }],
+      alias: [{ find: /^react-pixi-fiber$/, replacement: fileURLToPath(new URL("src/index.ts", import.meta.url)) }],
     },
     test: {
       environment: "jsdom",
-      include: ["test/**/*.test.js"],
+      include: ["test/**/*.test.{js,jsx,ts,tsx}"],
       setupFiles: ["vitest-webgl-canvas-mock", "./config/vitest/setupPixi.js"],
       coverage: {
         provider: "v8",
-        include: ["src/**/*.js"],
+        include: ["src/**/*.{ts,tsx}"],
         reportsDirectory: `coverage/${isProduction ? "prod" : "dev"}`,
         reporter: ["json", "lcov", "text-summary"],
       },

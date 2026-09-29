@@ -5,16 +5,19 @@ import { getStackAddendum } from "./ReactGlobalSharedState";
 /* Helper Methods */
 
 export const not =
-  fn =>
-  (...args) =>
+  <A extends unknown[]>(fn: (...args: A) => unknown) =>
+  (...args: A) =>
     !fn(...args);
 
-export const including = props => key => props.indexOf(key) !== -1;
+export const including = (props: string[]) => (key: string) => props.indexOf(key) !== -1;
 
-export const unique = (element, index, array) => array.indexOf(element) === index;
+export const unique = <T>(element: T, index: number, array: T[]) => array.indexOf(element) === index;
 
-export function filterByKey(inputObject, filter) {
-  const exportObject = {};
+export function filterByKey<T extends Record<string, unknown>>(
+  inputObject: T,
+  filter: (key: string) => boolean
+): Partial<T> {
+  const exportObject: Record<string, unknown> = {};
 
   Object.keys(inputObject)
     .filter(filter)
@@ -22,7 +25,7 @@ export function filterByKey(inputObject, filter) {
       exportObject[key] = inputObject[key];
     });
 
-  return exportObject;
+  return exportObject as Partial<T>;
 }
 
 /* react-reconciler related Methods */
@@ -33,9 +36,9 @@ const StrictMode = 1;
 // Would be better if this was just exported from react-reconciler
 // Additional try/catch added in case the internal API changes
 // See: https://github.com/facebook/react/blob/702fad4b1b48ac8f626ed3f35e8f86f5ea728084/packages/react-reconciler/src/ReactStrictModeWarnings.new.js#L31
-export function findStrictRoot(fiber) {
+export function findStrictRoot(fiber: any): any {
   try {
-    let maybeStrictRoot = null;
+    let maybeStrictRoot: any = null;
 
     let node = fiber;
     while (node !== null) {
@@ -53,13 +56,13 @@ export function findStrictRoot(fiber) {
 
 /* PIXI related Methods */
 
-export function createPixiApplication(options) {
+export function createPixiApplication(options?: PIXI.IApplicationOptions): PIXI.Application {
   return new PIXI.Application(options);
 }
 
 // Converts value to an array of coordinates
-export function parsePoint(value) {
-  let arr = [];
+export function parsePoint(value: any): number[] {
+  let arr: any[] = [];
   if (value == null) {
     return arr;
   } else if (typeof value === "string") {
@@ -76,12 +79,12 @@ export function parsePoint(value) {
   return arr.map(Number);
 }
 
-export function isPointType(value) {
+export function isPointType(value: unknown): value is PIXI.Point | PIXI.ObservablePoint {
   return value instanceof PIXI.Point || value instanceof PIXI.ObservablePoint;
 }
 
 // Use Point.copyFrom if available because Point.copy was deprecated in PIXI 5.0
-export function copyPoint(instance, propName, value) {
+export function copyPoint(instance: any, propName: string, value: unknown): void {
   if (typeof instance[propName].copyFrom === "function") {
     instance[propName].copyFrom(value);
   } else {
@@ -94,7 +97,7 @@ export function copyPoint(instance, propName, value) {
 // string with in the form of "x,y" or a size 2 array with index 0 being the x
 // coordinate and index 1 being the y coordinate.
 // See: https://github.com/Izzimach/react-pixi/blob/a25196251a13ed9bb116a8576d93e9fceac2a14c/src/ReactPIXI.js#L114
-export function setPixiValue(instance, propName, value) {
+export function setPixiValue(instance: any, propName: string, value: unknown): void {
   if (isPointType(instance[propName]) && isPointType(value)) {
     // Just copy the data if a Point type is being assigned to a Point type
     copyPoint(instance, propName, value);

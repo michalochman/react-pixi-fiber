@@ -9,7 +9,7 @@ import {
   includingStageProps,
 } from "../../src/Stage/propTypes";
 import possibleStandardNames from "../../src/possibleStandardNames";
-import { TYPES } from "../../src/types";
+import { TYPES } from "../../src/tags";
 
 describe("includingContainerProps", () => {
   it("returns true if prop is one of Container members", () => {

@@ -2,16 +2,27 @@
 import invariant from "fbjs/lib/invariant";
 import * as PIXI from "pixi.js";
 import { CHILDREN } from "./props";
-import { TYPES } from "./types";
+import { TYPES } from "./tags";
 import { createInjectedTypeInstance, isInjectedType } from "./inject";
 import { setValueForProperty } from "./PixiPropertyOperations";
+import type { CustomDisplayObject } from "./types";
+
+// A display object the reconciler creates, with the callbacks `inject.ts` may add.
+type Instance = PIXI.DisplayObject & CustomDisplayObject<any, any>;
+type Props = Record<string, any>;
 
 // PixiJS v4 keeps these classes under extras/mesh/particles, which v5+ does not export. Reading them from a
 // plain copy of the namespace stops bundlers from reporting them as missing ES module exports.
-const PIXI_V4 = Object.assign({}, PIXI);
+const PIXI_V4 = Object.assign({}, PIXI) as unknown as Record<string, any>;
 
-export function createInstance(type, props, rootContainer, hostContext, internalHandle) {
-  let instance;
+export function createInstance(
+  type: string,
+  props: Props,
+  rootContainer?: unknown,
+  hostContext?: unknown,
+  internalHandle?: unknown
+): PIXI.DisplayObject {
+  let instance: PIXI.DisplayObject | undefined;
 
   switch (type) {
     case TYPES.BITMAP_TEXT:
@@ -96,11 +107,23 @@ export function createInstance(type, props, rootContainer, hostContext, internal
   return instance;
 }
 
-export function setInitialCustomComponentProperties(type, instance, rawProps, rootContainer, hostContext) {
-  instance._customApplyProps(instance, undefined, rawProps);
+export function setInitialCustomComponentProperties(
+  type: string,
+  instance: Instance,
+  rawProps: Props,
+  rootContainer?: unknown,
+  hostContext?: unknown
+): void {
+  instance._customApplyProps!(instance, undefined, rawProps);
 }
 
-export function setInitialPixiProperties(type, instance, rawProps, rootContainer, hostContext) {
+export function setInitialPixiProperties(
+  type: string,
+  instance: Instance,
+  rawProps: Props,
+  rootContainer?: unknown,
+  hostContext?: unknown
+): void {
   for (const propKey in rawProps) {
     if (!rawProps.hasOwnProperty(propKey)) {
       continue;
@@ -114,7 +137,13 @@ export function setInitialPixiProperties(type, instance, rawProps, rootContainer
   }
 }
 
-export function setInitialProperties(type, instance, rawProps, rootContainer, hostContext) {
+export function setInitialProperties(
+  type: string,
+  instance: Instance,
+  rawProps: Props,
+  rootContainer?: unknown,
+  hostContext?: unknown
+): void {
   // injected types with customApplyProps need to have full control over passed props
   if (isInjectedType(type) && typeof instance._customApplyProps === "function") {
     setInitialCustomComponentProperties(type, instance, rawProps, rootContainer, hostContext);
@@ -126,8 +155,13 @@ export function setInitialProperties(type, instance, rawProps, rootContainer, ho
 
 // Calculate the diff between the two objects.
 // See: https://github.com/facebook/react/blob/97e2911/packages/react-dom/src/client/ReactDOMFiberComponent.js#L546
-export function diffProperties(type, instance, lastRawProps, nextRawProps) {
-  let updatePayload = null;
+export function diffProperties(
+  type: string,
+  instance: Instance,
+  lastRawProps: Props,
+  nextRawProps: Props
+): unknown[] | null {
+  let updatePayload: unknown[] | null = null;
 
   let lastProps = lastRawProps;
   let nextProps = nextRawProps;
@@ -162,20 +196,40 @@ export function diffProperties(type, instance, lastRawProps, nextRawProps) {
   return updatePayload;
 }
 
-export function applyDisplayObjectProps(type, instance, oldProps, newProps) {
-  const updatePayload = diffProperties(type, instance, oldProps, newProps);
+// Used to apply `newProps` to your `DisplayObject`.
+export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(
+  type: string,
+  instance: T,
+  oldProps: P,
+  newProps: P
+): void {
+  const updatePayload = diffProperties(type, instance, oldProps as Props, newProps as Props);
   if (updatePayload !== null) {
     updatePixiProperties(type, instance, updatePayload);
   }
 }
 
-export function updateCustomComponentProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle) {
-  instance._customApplyProps(instance, prevProps, nextProps);
+export function updateCustomComponentProperties(
+  type: string,
+  instance: Instance,
+  updatePayload: unknown[],
+  prevProps?: Props,
+  nextProps?: Props,
+  internalHandle?: unknown
+): void {
+  instance._customApplyProps!(instance, prevProps, nextProps);
 }
 
-export function updatePixiProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle) {
+export function updatePixiProperties(
+  type: string,
+  instance: Instance,
+  updatePayload: unknown[],
+  prevProps?: Props,
+  nextProps?: Props,
+  internalHandle?: unknown
+): void {
   for (let i = 0; i < updatePayload.length; i += 2) {
-    const propKey = updatePayload[i];
+    const propKey = updatePayload[i] as string;
     const propValue = updatePayload[i + 1];
     if (propKey === CHILDREN) {
       // Noop. Text children not supported
@@ -186,7 +240,14 @@ export function updatePixiProperties(type, instance, updatePayload, prevProps, n
 }
 
 // Apply the diff.
-export function updateProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle) {
+export function updateProperties(
+  type: string,
+  instance: Instance,
+  updatePayload: unknown[],
+  prevProps?: Props,
+  nextProps?: Props,
+  internalHandle?: unknown
+): void {
   // injected types with customApplyProps need to have full control over passed props
   if (isInjectedType(type) && typeof instance._customApplyProps === "function") {
     updateCustomComponentProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);

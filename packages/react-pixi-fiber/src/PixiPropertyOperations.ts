@@ -1,11 +1,12 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/DOMPropertyOperations.js
 import warning from "fbjs/lib/warning";
+import type * as PIXI from "pixi.js";
 import { getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
 import { defaultProps } from "./props";
 import { getStackAddendum } from "./ReactGlobalSharedState";
 import { findStrictRoot, setPixiValue } from "./utils";
 
-export function getDefaultValue(type, propName) {
+export function getDefaultValue(type: string, propName: string): unknown {
   const defaultValues = defaultProps[type];
   if (typeof defaultValues !== "undefined") {
     return defaultValues[propName];
@@ -21,7 +22,13 @@ export function getDefaultValue(type, propName) {
  * @param {*} value
  * @param {*} internalHandle
  */
-export function setValueForProperty(type, instance, propName, value, internalHandle) {
+export function setValueForProperty(
+  type: string,
+  instance: PIXI.DisplayObject,
+  propName: string,
+  value: unknown,
+  internalHandle?: unknown
+): void {
   const propertyInfo = getPropertyInfo(propName);
   let strictRoot = null;
   if (__DEV__) {

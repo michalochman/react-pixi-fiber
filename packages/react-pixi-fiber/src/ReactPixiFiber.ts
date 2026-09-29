@@ -2,11 +2,17 @@ import ReactFiberReconciler from "react-reconciler";
 import { DefaultEventPriority } from "react-reconciler/constants";
 import emptyObject from "fbjs/lib/emptyObject";
 import invariant from "fbjs/lib/invariant";
+import type * as PIXI from "pixi.js";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
+import type { CustomDisplayObject } from "./types";
 import { findStrictRoot } from "./utils";
 
-let validatePropertiesInDevelopment;
+// A display object the reconciler creates, with the callbacks `inject.ts` may add.
+type Instance = PIXI.Container & CustomDisplayObject<any, any>;
+type Props = Record<string, any>;
+
+let validatePropertiesInDevelopment: (type: string, props: Props, internalHandle: unknown) => void;
 
 if (__DEV__) {
   validatePropertiesInDevelopment = function (type, props, internalHandle) {
@@ -21,11 +27,11 @@ if (__DEV__) {
 
 const noTimeout = -1;
 
-export function afterActiveInstanceBlur() {
+export function afterActiveInstanceBlur(): void {
   // Noop
 }
 
-export function appendChild(parentInstance, child) {
+export function appendChild(parentInstance: PIXI.Container | null | undefined, child: Instance): void {
   if (parentInstance == null) return;
 
   // TODO do we need to remove the child first if it's already added?
@@ -37,7 +43,7 @@ export function appendChild(parentInstance, child) {
   }
 }
 
-export function removeChild(parentInstance, child) {
+export function removeChild(parentInstance: PIXI.Container, child: Instance): void {
   if (typeof child._customWillDetach === "function") {
     child._customWillDetach(child);
   }
@@ -47,7 +53,7 @@ export function removeChild(parentInstance, child) {
   child.destroy({ children: true });
 }
 
-export function insertBefore(parentInstance, child, beforeChild) {
+export function insertBefore(parentInstance: PIXI.Container, child: Instance, beforeChild: Instance): void {
   invariant(child !== beforeChild, "ReactPixiFiber cannot insert node before itself");
 
   const childExists = parentInstance.children.indexOf(child) !== -1;
@@ -60,7 +66,14 @@ export function insertBefore(parentInstance, child, beforeChild) {
   parentInstance.addChildAt(child, index);
 }
 
-export function commitUpdate(instance, updatePayload, type, prevProps, nextProps, internalHandle) {
+export function commitUpdate(
+  instance: Instance,
+  updatePayload: unknown[],
+  type: string,
+  prevProps: Props,
+  nextProps: Props,
+  internalHandle: unknown
+): void {
   updateProperties(type, instance, updatePayload, prevProps, nextProps, internalHandle);
 
   if (__DEV__) {
@@ -68,116 +81,134 @@ export function commitUpdate(instance, updatePayload, type, prevProps, nextProps
   }
 }
 
-export function createTextInstance(text, rootContainer, hostContext, internalHandle) {
+export function createTextInstance(
+  text: string,
+  rootContainer: unknown,
+  hostContext: unknown,
+  internalHandle: unknown
+): never {
   invariant(false, "ReactPixiFiber does not support text instances. Use `Text` component instead.");
 }
 
-export function detachDeletedInstance(node) {
+export function detachDeletedInstance(node: unknown): void {
   // Noop
 }
 
-export function finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
+export function finalizeInitialChildren(
+  instance: Instance,
+  type: string,
+  props: Props,
+  rootContainer: unknown,
+  hostContext: unknown
+): boolean {
   setInitialProperties(type, instance, props, rootContainer, hostContext);
   return true;
 }
 
-export function getChildHostContext(parentHostContext, type, rootContainer) {
+export function getChildHostContext<T>(parentHostContext: T, type: string, rootContainer: unknown): T {
   return parentHostContext;
 }
 
-export function getCurrentEventPriority() {
+export function getCurrentEventPriority(): number {
   return DefaultEventPriority;
 }
 
-export function getInstanceFromNode() {
+export function getInstanceFromNode(): never {
   invariant(false, "Not yet implemented.");
 }
 
-export function getInstanceFromScope() {
+export function getInstanceFromScope(): never {
   invariant(false, "Not yet implemented.");
 }
 
-export function getRootHostContext(rootContainer) {
+export function getRootHostContext(rootContainer: unknown): object {
   return emptyObject;
 }
 
-export function getPublicInstance(instance) {
+export function getPublicInstance<T>(instance: T): T {
   return instance;
 }
 
-export function prepareForCommit(containerInfo) {
+export function prepareForCommit(containerInfo: unknown): null {
   return null;
 }
 
-export function preparePortalMount(containerInfo) {
+export function preparePortalMount(containerInfo: unknown): void {
   // Noop
 }
 
-export function prepareUpdate(instance, type, oldProps, newProps, rootContainer, hostContext) {
+export function prepareUpdate(
+  instance: Instance,
+  type: string,
+  oldProps: Props,
+  newProps: Props,
+  rootContainer: unknown,
+  hostContext: unknown
+): unknown[] | null {
   return diffProperties(type, instance, oldProps, newProps);
 }
 
-export function prepareScopeUpdate() {
+export function prepareScopeUpdate(): void {
   // Noop
 }
 
-export function resetAfterCommit(containerInfo) {
+export function resetAfterCommit(containerInfo: unknown): void {
   // Noop
 }
 
-export function resetTextContent(instance) {
+export function resetTextContent(instance: unknown): void {
   // Noop
 }
 
-export function scheduleTimeout(fn, delay) {
+export function scheduleTimeout(fn: () => void, delay?: number): void {
   setTimeout(fn, delay);
 }
 
-export function shouldSetTextContent(type, props) {
+export function shouldSetTextContent(type: string, props: Props): boolean {
   return false;
 }
 
-export function beforeActiveInstanceBlur() {
+export function beforeActiveInstanceBlur(): void {
   // Noop
 }
 
-export function commitTextUpdate(textInstance, prevText, nextText) {
+export function commitTextUpdate(textInstance: unknown, prevText: string, nextText: string): void {
   // Noop
 }
 
-export function cancelTimeout(id) {
+export function cancelTimeout(id: ReturnType<typeof setTimeout> | undefined): void {
   clearTimeout(id);
 }
 
-export function clearContainer(container) {
+export function clearContainer(container: PIXI.Container | null | undefined): void {
   if (container) {
     container.removeChildren();
   }
 }
 
-export function commitMount(instance, type, props, internalHandle) {
+export function commitMount(instance: Instance, type: string, props: Props, internalHandle: unknown): void {
   if (__DEV__) {
     validatePropertiesInDevelopment(type, props, internalHandle);
   }
 }
 
-export function hideInstance(instance) {
+export function hideInstance(instance: Instance): void {
   instance.visible = false;
 }
 
-export function unhideInstance(instance, props) {
+export function unhideInstance(instance: Instance, props: Props): void {
   instance.visible = typeof props.visible !== "undefined" ? props.visible : true;
 }
 
-export function hideTextInstance(instance) {
+export function hideTextInstance(instance: unknown): void {
   // Noop
 }
 
-export function unhideTextInstance(instance, props) {
+export function unhideTextInstance(instance: unknown, props: Props): void {
   // Noop
 }
 
-export function now() {
+export function now(): () => number {
   return typeof performance === "object" && typeof performance.now === "function"
     ? () => performance.now()
     : () => Date.now();
@@ -230,7 +261,7 @@ const hostConfig = {
     typeof queueMicrotask === "function"
       ? queueMicrotask
       : typeof Promise !== "undefined"
-        ? callback =>
+        ? (callback: () => void) =>
             Promise.resolve(null)
               .then(callback)
               .catch(error => {

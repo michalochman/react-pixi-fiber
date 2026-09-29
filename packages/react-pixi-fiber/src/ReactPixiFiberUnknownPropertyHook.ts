@@ -6,10 +6,11 @@ import { getStackAddendum } from "./ReactGlobalSharedState";
 import { isInjectedType } from "./inject";
 import possibleStandardNames from "./possibleStandardNames";
 
-let validateProperty = emptyFunction;
+// `emptyFunction` in production, where nothing reads the result.
+let validateProperty: (type: string, name: string, value: unknown) => boolean | void = emptyFunction;
 
 if (__DEV__) {
-  const warnedProperties = {};
+  const warnedProperties: Record<string, boolean> = {};
   const EVENT_NAME_REGEX = /^on./;
 
   validateProperty = function (type, name, value) {
@@ -104,8 +105,8 @@ if (__DEV__) {
 
 export { validateProperty };
 
-export const warnUnknownProperties = function (type, props) {
-  const unknownProps = [];
+export const warnUnknownProperties = function (type: string, props: Record<string, unknown>): void {
+  const unknownProps: string[] = [];
   for (const key in props) {
     const isValid = validateProperty(type, key, props[key]);
     if (!isValid) {
@@ -121,7 +122,7 @@ export const warnUnknownProperties = function (type, props) {
   }
 };
 
-export function validateProperties(type, props) {
+export function validateProperties(type: string, props: Record<string, unknown>): void {
   if (isInjectedType(type)) {
     return;
   }

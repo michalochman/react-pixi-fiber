@@ -1,25 +1,28 @@
 import invariant from "fbjs/lib/invariant";
+import type * as PIXI from "pixi.js";
+import type { CustomPIXIComponentBehavior } from "./types";
 
-export const INJECTED_TYPES = {};
+export const INJECTED_TYPES: Record<string, CustomPIXIComponentBehavior<any, any>> = {};
 
-export function injectType(type, behavior) {
+export function injectType(type: string, behavior: CustomPIXIComponentBehavior<any, any>): string {
   INJECTED_TYPES[type] = behavior;
   return type;
 }
 
 export function createInjectedTypeInstance(
-  type,
-  props,
-  rootContainer,
-  hostContext,
-  internalHandle,
-  applyDisplayObjectProps
-) {
-  let instance;
+  type: string,
+  props: any,
+  rootContainer: unknown,
+  hostContext: unknown,
+  internalHandle: unknown,
+  applyDisplayObjectProps: (type: string, instance: any, oldProps: any, newProps: any) => void
+): PIXI.DisplayObject | undefined {
+  let instance: any;
 
   if (type in INJECTED_TYPES) {
-    const injectedType = INJECTED_TYPES[type];
-    let customDisplayObject;
+    // A factory function or a behavior object; the behavior keys are read off either.
+    const injectedType: any = INJECTED_TYPES[type];
+    let customDisplayObject: ((props: any) => any) | undefined;
     if (typeof injectedType === "function") {
       customDisplayObject = injectedType;
     } else if (typeof injectedType.customDisplayObject === "function") {
@@ -47,6 +50,6 @@ export function createInjectedTypeInstance(
   return instance;
 }
 
-export function isInjectedType(type) {
+export function isInjectedType(type: string): boolean {
   return typeof INJECTED_TYPES[type] !== "undefined";
 }

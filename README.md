@@ -25,7 +25,7 @@ pnpm build          # build the library, the examples load the built files
 pnpm test           # run the library tests
 pnpm lint           # check formatting and lint with Biome
 pnpm format         # apply Biome formatting and safe fixes
-pnpm check-types    # typecheck the TypeScript fixture and the examples against index.d.ts
+pnpm check-types    # typecheck the library source, the TypeScript fixture, and the examples (after pnpm build)
 pnpm check-package  # pack the library and check what Node and esbuild resolve (after pnpm build)
 pnpm start          # start the examples dev server
 ```

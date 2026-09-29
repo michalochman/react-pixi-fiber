@@ -1,4 +1,4 @@
-import { TYPES } from "./types";
+import { TYPES } from "./tags";
 import * as PIXI from "pixi.js";
 
 export const CHILDREN = "children";
@@ -84,7 +84,7 @@ const tilingSpriteDefaultProps = {
   uvRespectAnchor: false,
 };
 
-export const defaultProps = {
+export const defaultProps: Record<string, Record<string, unknown>> = {
   [TYPES.BITMAP_TEXT]: bitmapTextDefaultProps,
   [TYPES.CONTAINER]: containerDefaultProps,
   [TYPES.GRAPHICS]: graphicsDefaultProps,

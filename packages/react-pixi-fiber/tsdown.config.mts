@@ -1,5 +1,7 @@
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
-import { defineConfig } from "tsdown";
+import { defineConfig, type TsdownHooks } from "tsdown";
 import pkg from "./package.json" with { type: "json" };
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -8,10 +10,28 @@ const suffix = isProduction ? "production.min" : "development";
 const peers = ["react", "react-dom", "prop-types", "pixi.js", "react-pixi-fiber"];
 
 const entries = {
-  "react-pixi-fiber": { input: "src/index.js", external: peers },
-  "react-pixi-alias": { input: "src/react-pixi-alias/index.js", external: [...peers, "react-pixi-fiber"] },
+  "react-pixi-fiber": { input: "src/index.ts", external: peers },
+  "react-pixi-alias": { input: "src/react-pixi-alias/index.tsx", external: [...peers, "react-pixi-fiber"] },
 };
 const formats = ["es", "cjs", "umd"] as const;
+
+// src/index.ts exports `Stage` as a value and a type (a local type alias next to the imported value).
+// rolldown-plugin-dts 0.27 keeps the type and drops the value from the bundled declarations, so this hook
+// declares the value in the declaration files each build wrote (a Rolldown plugin misses the CJS ones).
+// It does nothing once the bundler keeps the value, for example when `Stage` becomes a local declaration
+// that is both a value and a type (the bundler keeps those, like the tag constants).
+const declareStageValue: TsdownHooks["build:done"] = ({ chunks }) => {
+  for (const chunk of chunks) {
+    if (!/\.d\.m?ts$/.test(chunk.fileName)) continue;
+    const path = join(chunk.outDir, chunk.fileName);
+    const code = readFileSync(path, "utf8");
+    if (/\bdeclare (?:const|let|function|class) Stage\b|\b\w+ as Stage\b/.test(code)) continue;
+    if (!/\btype Stage = StageComponent;/.test(code)) {
+      throw new Error(`${path}: found neither a \`Stage\` value nor its type, see declareStageValue`);
+    }
+    writeFileSync(path, `${code}\ndeclare const Stage: StageComponent;\n`);
+  }
+};
 
 // One build per entry and format, so the alias entry can treat react-pixi-fiber as external and
 // every output lands in dist/<format>/<entry>.<development|production.min>.js.
@@ -23,12 +43,13 @@ export default defineConfig(
       outDir: `dist/${format}`,
       // build:prod and build:dev write into the same directories
       clean: false,
-      dts: false,
+      // Declarations next to the ES and CJS development output: publint wants .d.mts for the import condition.
+      // react-pixi-alias has never shipped types.
+      dts: name === "react-pixi-fiber" && format !== "umd" && !isProduction,
       hash: false,
       platform: "browser",
       target: "es2018",
-      // The source has JSX in .js files and uses the classic React.createElement runtime.
-      loader: { ".js": "jsx" },
+      // The source uses the classic React.createElement runtime.
       inputOptions: { transform: { jsx: "react" } },
       // Peers stay external; dependencies are bundled like the Rollup build did.
       deps: { alwaysBundle: [/^react-reconciler/, /^fbjs/], onlyBundle: false },
@@ -36,10 +57,12 @@ export default defineConfig(
       // otherwise keep the require("react") inside react-reconciler's development build, which
       // breaks in browsers.
       plugins: [esmExternalRequirePlugin({ external })],
+      hooks: { "build:done": declareStageValue },
       globalName: "ReactPixiFiber",
       outputOptions: {
-        // tsdown would otherwise add a .umd infix
-        entryFileNames: `[name].${suffix}.js`,
+        // tsdown would otherwise add a .umd infix. Declaration chunks are named `<entry>.d`.
+        entryFileNames: chunk =>
+          chunk.name.endsWith(".d") ? (format === "es" ? "[name].mts" : "[name].ts") : `[name].${suffix}.js`,
         // react-pixi-alias has a default export next to the named ones
         exports: "named",
         // Rollup always added the __esModule marker, rolldown only does with a default export.

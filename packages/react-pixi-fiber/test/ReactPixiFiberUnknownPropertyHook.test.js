@@ -4,7 +4,7 @@ import warning from "fbjs/lib/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
 import { isInjectedType } from "../src/inject";
 import { shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
-import { TYPES } from "../src/types";
+import { TYPES } from "../src/tags";
 
 vi.mock("fbjs/lib/emptyFunction", () => ({ default: vi.fn() }));
 vi.mock("fbjs/lib/warning", () => ({ default: vi.fn() }));

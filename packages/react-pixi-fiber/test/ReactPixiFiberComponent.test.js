@@ -4,7 +4,7 @@ import * as ReactPixiFiber from "../src/ReactPixiFiber";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
 import { createInjectedTypeInstance, isInjectedType } from "../src/inject";
 import { setValueForProperty } from "../src/PixiPropertyOperations";
-import { TYPES } from "../src/types";
+import { TYPES } from "../src/tags";
 
 vi.mock("../src/inject", async importOriginal => {
   const actual = await importOriginal();

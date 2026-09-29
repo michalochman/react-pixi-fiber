@@ -1,5 +1,5 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/possibleStandardNames.js
-import { TYPES } from "./types";
+import { TYPES } from "./tags";
 
 // https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html
 const eventsStandardNames = {
@@ -169,7 +169,7 @@ const tilingSpriteStandardNames = {
   uvmatrix: "uvMatrix",
 };
 
-const possibleStandardNames = {
+const possibleStandardNames: Record<string, Record<string, string>> = {
   [TYPES.BITMAP_TEXT]: bitmapTextStandardNames,
   [TYPES.CONTAINER]: containerStandardNames,
   [TYPES.GRAPHICS]: graphicsStandardNames,

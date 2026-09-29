@@ -10,12 +10,17 @@ import {
   resizeRenderer,
   STAGE_OPTIONS_RECREATE,
   STAGE_OPTIONS_UNMOUNT,
+  type Props,
 } from "./common";
 import { defaultProps, getCanvasProps, propTypes } from "./propTypes";
 import * as PIXI from "pixi.js";
+import type { StageComponent } from "../types";
 
-export function usePreviousProps(value) {
-  const props = useRef(emptyObject);
+type AppRef = React.MutableRefObject<PIXI.Application | null | undefined>;
+type CanvasRef = React.MutableRefObject<HTMLCanvasElement | undefined>;
+
+export function usePreviousProps(value: Props): Props {
+  const props = useRef<Props>(emptyObject);
 
   useEffect(() => {
     props.current = value;
@@ -24,7 +29,7 @@ export function usePreviousProps(value) {
   return props.current;
 }
 
-export function useStageRenderer(props, appRef, canvasRef) {
+export function useStageRenderer(props: Props, appRef: AppRef, canvasRef: CanvasRef): void {
   // create app on mount
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs once on mount, prop changes are handled by useStageRerenderer
   useLayoutEffect(() => {
@@ -64,7 +69,7 @@ export function useStageRenderer(props, appRef, canvasRef) {
 // destroyed later (see `cleanupStage`) and destroying a renderer unbinds the current program
 // (PixiJS v6) or loses the context (PixiJS v7) of its canvas, which would break the new
 // PIXI.Application if it was sharing that canvas.
-export function useStageRerenderer(props, appRef, canvasRef) {
+export function useStageRerenderer(props: Props, appRef: AppRef, canvasRef: CanvasRef): number {
   const prevProps = usePreviousProps(props);
   const [canvasKey, setCanvasKey] = useState(0);
 
@@ -76,7 +81,7 @@ export function useStageRerenderer(props, appRef, canvasRef) {
 
     if (app instanceof PIXI.Application) {
       // Update stage tree
-      rerenderStage(appRef.current, prevProps, props);
+      rerenderStage(appRef.current!, prevProps, props);
 
       return;
     }
@@ -128,14 +133,14 @@ export function useStageRerenderer(props, appRef, canvasRef) {
   return canvasKey;
 }
 
-export default function createStageFunction() {
-  const Stage = forwardRef(function Stage(props, ref) {
+export default function createStageFunction(): StageComponent {
+  const Stage = forwardRef(function Stage(props: Props, ref) {
     const { app, options } = props;
 
     // Store PIXI.Application instance
-    const appRef = useRef();
+    const appRef: AppRef = useRef();
     // Store canvas if it was rendered
-    const canvasRef = useRef();
+    const canvasRef: CanvasRef = useRef();
 
     useImperativeHandle(ref, () => ({
       _app: appRef,
@@ -165,11 +170,11 @@ export default function createStageFunction() {
 
     const canvasProps = getCanvasProps(props);
 
-    return <canvas key={canvasKey} ref={canvasRef} {...canvasProps} />;
+    return <canvas key={canvasKey} ref={canvasRef as React.RefObject<HTMLCanvasElement>} {...canvasProps} />;
   });
 
-  Stage.propTypes = propTypes;
+  Stage.propTypes = propTypes as any;
   Stage.defaultProps = defaultProps;
 
-  return Stage;
+  return Stage as unknown as StageComponent;
 }

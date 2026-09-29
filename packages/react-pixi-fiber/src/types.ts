@@ -1,5 +1,5 @@
-import * as React from "react";
-import * as PIXI from "pixi.js";
+import type * as React from "react";
+import type * as PIXI from "pixi.js";
 
 /**
  * Compatibility
@@ -159,7 +159,7 @@ export type DisplayObjectProps<T> = PropsWithReactChildren<Partial<WithPointLike
 
 // A component wrapper for `PIXI.BitmapText` (or `PIXI.extras.BitmapText` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
-export type BitmapText = DisplayObjectProps<
+export type BitmapTextProps = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
     PIXI.extras.BitmapText,
@@ -175,63 +175,55 @@ export type BitmapText = DisplayObjectProps<
     >
   >[1];
 };
-export const BitmapText: PixiComponent<BitmapText, PIXI.BitmapText>;
 
 // A component wrapper for `PIXI.Container`.
 // see: https://pixijs.download/v6.5.10/docs/PIXI.Container.html
-export type Container = DisplayObjectProps<PIXI.Container>;
-export const Container: PixiComponent<Container, PIXI.Container>;
+export type ContainerProps = DisplayObjectProps<PIXI.Container>;
 
 // A component wrapper for `PIXI.Graphics`.
 // see: https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
-export type Graphics = DisplayObjectProps<PIXI.Graphics>;
-export const Graphics: PixiComponent<Graphics, PIXI.Graphics>;
+export type GraphicsProps = DisplayObjectProps<PIXI.Graphics>;
 
 // A component wrapper for `PIXI.NineSlicePlane` (or `PIXI.mesh.NineSlicePlane` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.NineSlicePlane.html
-export type NineSlicePlane = DisplayObjectProps<
+export type NineSlicePlaneProps = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
     PIXI.mesh.NineSlicePlane,
     PIXI.NineSlicePlane
   >
 >;
-export const NineSlicePlane: PixiComponent<NineSlicePlane, PIXI.NineSlicePlane>;
 
 // A component wrapper for `PIXI.ParticleContainer` (or `PIXI.particles.ParticleContainer` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html
-export type ParticleContainer = DisplayObjectProps<
+export type ParticleContainerProps = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
     PIXI.particles.ParticleContainer,
     PIXI.ParticleContainer
   >
 >;
-export const ParticleContainer: PixiComponent<ParticleContainer, PIXI.ParticleContainer>;
 
 // A component wrapper for `PIXI.Sprite`.
 // see: https://pixijs.download/v6.5.10/docs/PIXI.Sprite.html
-export type Sprite = DisplayObjectProps<PIXI.Sprite>;
-export const Sprite: PixiComponent<Sprite, PIXI.Sprite>;
+export type SpriteProps = DisplayObjectProps<PIXI.Sprite>;
 
 // A component wrapper for `PIXI.Text`.
 // see: https://pixijs.download/v6.5.10/docs/PIXI.Text.html
-export type Text = Omit<DisplayObjectProps<PIXI.Text>, "style"> & {
+export type TextProps = Omit<DisplayObjectProps<PIXI.Text>, "style"> & {
   // `PIXI.Text` reads `style` as `TextStyle` but its setter also accepts a partial style.
   style?: PIXI.TextStyle | Partial<PIXI.ITextStyle>;
 };
-export const Text: PixiComponent<Text, PIXI.Text>;
 
 // A component wrapper for `PIXI.TilingSprite` (or `PIXI.extras.TilingSprite` in PixiJS v4).
 // see: https://pixijs.download/v6.5.10/docs/PIXI.TilingSprite.html
-export type TilingSprite = DisplayObjectProps<
+export type TilingSpriteProps = DisplayObjectProps<
   PixiTypeFallback<
     // @ts-ignore TS2694
     PIXI.extras.TilingSprite,
     PIXI.TilingSprite
   >
 >;
-export const TilingSprite: PixiComponent<TilingSprite, PIXI.TilingSprite>;
 
 /**
  * Rendering: using Stage component or using render and unmount
@@ -262,24 +254,7 @@ export type StageRef = {
 };
 
 // Type of Stage component.
-export type Stage = React.ForwardRefExoticComponent<StageProps & { ref?: React.Ref<StageRef> }> & StageRef;
-
-// A component wrapper for PIXI `Stage` as function component.
-// see: https://pixijs.download/v6.5.10/docs/PIXI.Application.html#stage
-export const Stage: Stage;
-
-// Factory returning Stage as class component.
-export function createStageClass(): Stage;
-
-// Standalone ReactPixiFiber render method.
-export function render(
-  pixiElement: React.ReactElement<any> | React.ReactElement<any>[] | PIXI.DisplayObject | PIXI.DisplayObject[],
-  stage: PIXI.Container,
-  callback?: Function
-): void;
-
-// Standalone ReactPixiFiber unmount method.
-export function unmount(stage: PIXI.Container): void;
+export type StageComponent = React.ForwardRefExoticComponent<StageProps & { ref?: React.Ref<StageRef> }> & StageRef;
 
 /**
  * Custom components
@@ -292,7 +267,7 @@ export type CustomDisplayObjectCreator<T extends PIXI.DisplayObject, P> = (props
 // Props accepted by a `CustomPIXIComponent`: props defined on custom component overwrite props of underlying DisplayObject.
 export type CustomPIXIComponentProps<T extends PIXI.DisplayObject, P> = P & DisplayObjectProps<Omit<T, keyof P>>;
 
-// `this` available inside `customApplyProps`, see `inject.js`.
+// `this` available inside `customApplyProps`, see `inject.ts`.
 // `applyDisplayObjectProps` is already bound to `type` and `displayObject`.
 export interface CustomDisplayObjectPropSetterContext<T extends PIXI.DisplayObject, P> {
   applyDisplayObjectProps: (
@@ -317,7 +292,7 @@ export type CustomDisplayObjectDetachHandler<T extends PIXI.DisplayObject> = (di
 
 // Inject API adds `_customApplyProps`, `_customDidAttach`, `_customWillDetach` methods.
 export interface CustomDisplayObject<T extends PIXI.DisplayObject, P> extends PIXI.DisplayObject {
-  // Already bound, see `inject.js`.
+  // Already bound, see `inject.ts`.
   _customApplyProps?: OmitThisParameter<CustomDisplayObjectPropSetter<T, P>>;
   _customDidAttach?: CustomDisplayObjectAttachHandler<T>;
   _customWillDetach?: CustomDisplayObjectDetachHandler<T>;
@@ -336,29 +311,6 @@ export type CustomPIXIComponentBehavior<T extends PIXI.DisplayObject, P> =
   | CustomPIXIComponentBehaviorDefinition<T, P>
   | CustomDisplayObjectCreator<T, P>;
 
-// Create a custom component.
-export function CustomPIXIComponent<T extends PIXI.DisplayObject, P>(
-  behavior: CustomPIXIComponentBehavior<T, P>,
-  type: string
-): PixiComponent<CustomPIXIComponentProps<T, P>, T>;
-
-// Register a custom property on given component type(s) so it is not reported as unknown prop in development.
-// `maybeComponentType` accepts a component type (e.g. `Sprite`), a list of them, or `null`/`undefined` for all types.
-// No-op in production.
-export function CustomPIXIProperty(
-  maybeComponentType: string | PixiComponent<any, any> | Array<string | PixiComponent<any, any>> | null | undefined,
-  propertyName: string,
-  validator?: (value: unknown) => boolean
-): void;
-
-// Used to apply `newProps` to your `DisplayObject`.
-export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(
-  type: string,
-  displayObject: T,
-  oldProps: P,
-  newProps: P
-): void;
-
 /**
  * `PIXI.Application` context.
  */
@@ -367,18 +319,3 @@ export function applyDisplayObjectProps<T extends PIXI.DisplayObject, P>(
 export interface PixiAppProperties {
   app: PIXI.Application;
 }
-
-export const AppContext: React.Context<PIXI.Application>;
-export const AppProvider: React.FunctionComponent<PixiAppProperties>;
-
-// `withApp` higher-order component that injects `app` property of `PIXI.Application` type to your component.
-export function withApp<P extends PixiAppProperties>(
-  Component: React.ComponentType<P>
-): React.ComponentType<Omit<P, keyof PixiAppProperties>>;
-
-/**
- * Hooks
- */
-
-export function usePixiApp(): PIXI.Application;
-export function usePixiTicker(callback: (deltaTime: number) => void): void;

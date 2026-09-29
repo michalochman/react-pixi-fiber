@@ -1,8 +1,9 @@
+import type * as PIXI from "pixi.js";
 import React from "react";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./AppProvider";
 
-export function usePixiApp() {
+export function usePixiApp(): PIXI.Application {
   const app = useContext(AppContext);
 
   if (app === null) {
@@ -12,7 +13,7 @@ export function usePixiApp() {
   return app;
 }
 
-export function usePixiTicker(fn) {
+export function usePixiTicker(fn: (deltaTime: number) => void): void {
   const { ticker } = usePixiApp();
 
   useEffect(() => {

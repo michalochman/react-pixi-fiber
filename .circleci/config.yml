@@ -41,7 +41,7 @@ jobs:
       - run: pnpm --filter react-pixi-fiber test:dev --maxWorkers=2
       - run: pnpm --filter react-pixi-fiber test:prod --maxWorkers=2
 
-      # typecheck the TypeScript fixture and the examples against the local index.d.ts
+      # typecheck the library source, the TypeScript fixture, and the examples against the built declarations
       - run: pnpm check-types
 
       # build the examples against the local package

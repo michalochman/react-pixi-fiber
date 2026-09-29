@@ -2,9 +2,16 @@ import warning from "fbjs/lib/warning";
 import * as PIXI from "pixi.js";
 
 // Copied from https://reactjs.org/warnings/dont-call-proptypes.html#fixing-the-false-positive-in-third-party-proptypes
-const deprecatedWarned = {};
+const deprecatedWarned: Record<string, boolean> = {};
 
-export function deprecated(propType, explanation) {
+type Validator = (
+  props: Record<string, any>,
+  propName: string,
+  componentName: string,
+  ...rest: unknown[]
+) => Error | null | undefined;
+
+export function deprecated(propType: Validator, explanation: string): Validator {
   return function validate(props, propName, componentName, ...rest) {
     if (props[propName] != null) {
       const message = `"${propName}" property of "${componentName}" has been deprecated.\n${explanation}`;
@@ -18,7 +25,7 @@ export function deprecated(propType, explanation) {
   };
 }
 
-export function validateApp(props, propName, componentName) {
+export function validateApp(props: Record<string, any>, propName: string, componentName: string): Error | undefined {
   const app = props[propName];
   if (typeof app === "undefined") {
     return;
@@ -40,14 +47,14 @@ export function validateApp(props, propName, componentName) {
   }
 }
 
-export function validateCanvas(props, propName, componentName) {
+export function validateCanvas(props: Record<string, any>, propName: string, componentName: string): Error | undefined {
   // Let's assume that element is canvas if the element is Element and implements getContext
   const element = props[propName];
   if (typeof element === "undefined") {
     return;
   }
 
-  const isCanvas = element instanceof Element && typeof element.getContext === "function";
+  const isCanvas = element instanceof Element && typeof (element as HTMLCanvasElement).getContext === "function";
   if (!isCanvas) {
     const propType = typeof element;
     return new Error(

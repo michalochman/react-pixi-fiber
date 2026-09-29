@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import possibleStandardNames from "../possibleStandardNames";
 import { deprecated, validateApp, validateCanvas } from "../propTypes";
-import { TYPES } from "../types";
+import { TYPES } from "../tags";
 import { filterByKey, including } from "../utils";
 
 export const propTypes = {
@@ -36,7 +36,7 @@ export const defaultProps = {
 
 export const includingContainerProps = including(Object.keys(possibleStandardNames[TYPES.CONTAINER]));
 export const includingStageProps = including(Object.keys(propTypes));
-export const includingCanvasProps = key => !includingContainerProps(key) && !includingStageProps(key);
+export const includingCanvasProps = (key: string) => !includingContainerProps(key) && !includingStageProps(key);
 
-export const getCanvasProps = props => filterByKey(props, includingCanvasProps);
-export const getContainerProps = props => filterByKey(props, includingContainerProps);
+export const getCanvasProps = (props: Record<string, any>) => filterByKey(props, includingCanvasProps);
+export const getContainerProps = (props: Record<string, any>) => filterByKey(props, includingContainerProps);

@@ -1,0 +1,10 @@
+{
+  // Typechecks the fixture against the emitted declarations (run after the build).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "react-pixi-fiber": ["./dist/es/react-pixi-fiber.d.mts"]
+    }
+  },
+  "include": ["test/typescript"]
+}

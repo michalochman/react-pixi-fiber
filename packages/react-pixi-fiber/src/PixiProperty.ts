@@ -30,7 +30,7 @@ export const VECTOR = 5;
 // When falsy, it should be removed.
 export const CALLBACK = 6;
 
-export function shouldIgnoreAttribute(type, name, propertyInfo) {
+export function shouldIgnoreAttribute(type: string, name: string, propertyInfo: PropertyInfoRecord | null): boolean {
   if (propertyInfo !== null) {
     return propertyInfo.type === RESERVED;
   }
@@ -40,7 +40,12 @@ export function shouldIgnoreAttribute(type, name, propertyInfo) {
   return false;
 }
 
-export function shouldRemoveAttributeWithWarning(type, name, value, propertyInfo) {
+export function shouldRemoveAttributeWithWarning(
+  type: string,
+  name: string,
+  value: unknown,
+  propertyInfo: PropertyInfoRecord | null
+): boolean {
   if (propertyInfo !== null && propertyInfo.type === RESERVED) {
     return false;
   }
@@ -62,7 +67,12 @@ export function shouldRemoveAttributeWithWarning(type, name, value, propertyInfo
   }
 }
 
-export function shouldRemoveAttribute(type, name, value, propertyInfo) {
+export function shouldRemoveAttribute(
+  type: string,
+  name: string,
+  value: any,
+  propertyInfo: PropertyInfoRecord | null
+): boolean {
   if (typeof value === "undefined") {
     return true;
   }
@@ -85,17 +95,28 @@ export function shouldRemoveAttribute(type, name, value, propertyInfo) {
   return false;
 }
 
-export function getPropertyInfo(name) {
+export function getPropertyInfo(name: string): PropertyInfoRecord | null {
   return properties.hasOwnProperty(name) ? properties[name] : null;
 }
 
-export function getCustomPropertyInfo(name, type) {
+export function getCustomPropertyInfo(
+  name: string,
+  type: string
+): PropertyInfoRecord<(value: unknown) => boolean> | null {
   return customProperties.hasOwnProperty(type) && customProperties[type].hasOwnProperty(name)
     ? customProperties[type][name]
     : null;
 }
 
-export function PropertyInfoRecord(name, type) {
+// `type` is one of the constants above, or the validator of a custom property (see `CustomPIXIProperty`).
+export interface PropertyInfoRecord<T = number> {
+  acceptsBooleans: boolean;
+  propertyName: string;
+  type: T;
+}
+// A constructor function, not a class. Call it with `new` through this type.
+export type PropertyInfoRecordConstructor = new <T = number>(name: string, type: T) => PropertyInfoRecord<T>;
+export function PropertyInfoRecord(this: PropertyInfoRecord<unknown>, name: string, type: unknown) {
   this.acceptsBooleans = type === BOOLEAN;
   this.propertyName = name;
   this.type = type;
@@ -104,12 +125,12 @@ export function PropertyInfoRecord(name, type) {
 // When adding attributes to this list, be sure to also add them to
 // the `possibleStandardNames` module to ensure casing and incorrect
 // name warnings.
-const properties = {};
-export const customProperties = {};
+const properties: Record<string, PropertyInfoRecord> = {};
+export const customProperties: Record<string, Record<string, PropertyInfoRecord<(value: unknown) => boolean>>> = {};
 
 // These props are reserved by React. They shouldn't be written to the DOM.
 ["children", "parent"].forEach(name => {
-  properties[name] = new PropertyInfoRecord(name, RESERVED);
+  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, RESERVED);
 });
 
 // let otherProps = [
@@ -149,21 +170,21 @@ export const customProperties = {};
   "uvRespectAnchor",
   "visible",
 ].forEach(name => {
-  properties[name] = new PropertyInfoRecord(name, BOOLEAN);
+  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, BOOLEAN);
 });
 
 // These are PIXI attributes that must be positive numbers.
 ["alpha", "fillAlpha", "height", "lineColor", "maxWidth", "resolution", "tint", "width"].forEach(name => {
-  properties[name] = new PropertyInfoRecord(name, POSITIVE_NUMERIC);
+  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, POSITIVE_NUMERIC);
 });
 
 // These are PIXI attributes that must be numbers.
 ["boundsPadding", "clampMargin", "rotation", "x", "y"].forEach(name => {
-  properties[name] = new PropertyInfoRecord(name, NUMERIC);
+  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, NUMERIC);
 });
 
 ["anchor", "pivot", "position", "scale", "skew", "tilePosition", "tileScale"].forEach(name => {
-  properties[name] = new PropertyInfoRecord(name, VECTOR);
+  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, VECTOR);
 });
 
 [
@@ -227,5 +248,5 @@ export const customProperties = {};
   "ontouchstart",
   "onwheel",
 ].forEach(name => {
-  properties[name] = new PropertyInfoRecord(name, CALLBACK);
+  properties[name] = new (PropertyInfoRecord as unknown as PropertyInfoRecordConstructor)(name, CALLBACK);
 });

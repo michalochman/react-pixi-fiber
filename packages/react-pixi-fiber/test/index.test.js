@@ -3,7 +3,7 @@ import * as ReactPixiFiber from "../src/index";
 import CustomPIXIComponent from "../src/CustomPIXIComponent";
 import { AppContext, AppProvider, withApp } from "../src/AppProvider";
 import Stage, { createStageClass } from "../src/Stage";
-import { TYPES } from "../src/types";
+import { TYPES } from "../src/tags";
 import { usePixiApp, usePixiTicker } from "../src/hooks";
 import { applyDisplayObjectProps } from "../src/ReactPixiFiberComponent";
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TYPES } from "../src/types";
+import { TYPES } from "../src/tags";
 
 describe("TYPES", () => {
   it("is an object mapping of supported types", () => {

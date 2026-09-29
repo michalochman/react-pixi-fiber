@@ -311,3 +311,9 @@ const StageFunctionExample: React.FC = () => {
     </>
   );
 };
+
+// `Stage` is a value and a type, as in 2.x (a consumer does `useRef<Stage | null>(null)`).
+const StageAsTypeExample: React.FC = () => {
+  const stageRef = React.useRef<Stage | null>(null);
+  return <Stage ref={stageRef} options={{}} />;
+};
