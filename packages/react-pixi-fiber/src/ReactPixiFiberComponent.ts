@@ -2,7 +2,7 @@
 import invariant from "./invariant";
 import warning from "./warning";
 import type * as PIXI from "pixi.js";
-import { getPixiAdapter } from "./config";
+import { getPixiAdapter } from "./configure";
 import {
   createRegisteredInstance,
   getAdapterComponent,

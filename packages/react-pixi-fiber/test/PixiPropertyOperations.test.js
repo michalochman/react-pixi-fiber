@@ -5,6 +5,7 @@ import { setValueForProperty } from "../src/PixiPropertyOperations";
 import { shouldIgnoreAttribute, shouldRemoveAttribute } from "../src/PixiProperty";
 import { setPixiValue } from "../src/utils";
 import builtins from "../src/builtins";
+import { strictModeBit } from "@react-pixi-fiber/react-18";
 
 // The mocks call the real implementations unless a test overrides them; `mockReset` restores that.
 vi.mock("../src/PixiProperty", async importOriginal => {
@@ -23,11 +24,11 @@ vi.mock("../src/utils", async importOriginal => {
 // Fresh modules whose adapter has the given `defaults` override.
 async function withDefaults(defaults) {
   vi.resetModules();
-  vi.doMock("../src/config", async () => {
+  vi.doMock("../src/configure", async () => {
     const builtins = (await vi.importActual("../src/builtins")).default;
     const { registerAdapterComponents } = await import("../src/registry");
     registerAdapterComponents(builtins.components);
-    return { getPixiAdapter: () => ({ ...builtins, defaults }), getStrictModeBit: () => 8 };
+    return { getPixiAdapter: () => ({ ...builtins, defaults }), getStrictModeBit: () => strictModeBit };
   });
   return {
     ...(await import("../src/PixiPropertyOperations")),
@@ -41,7 +42,7 @@ describe("PixiPropertyOperations", () => {
     setPixiValue.mockReset();
     shouldIgnoreAttribute.mockReset();
     shouldRemoveAttribute.mockReset();
-    vi.doUnmock("../src/config");
+    vi.doUnmock("../src/configure");
     vi.restoreAllMocks();
   });
 
@@ -105,11 +106,11 @@ describe("PixiPropertyOperations", () => {
     });
     it("prefers the adapter defaults override over the recorded value", async () => {
       vi.resetModules();
-      vi.doMock("../src/config", async () => {
+      vi.doMock("../src/configure", async () => {
         const builtins = (await vi.importActual("../src/builtins")).default;
         return {
           getPixiAdapter: () => ({ ...builtins, defaults: { Sprite: { alpha: 0.25 } } }),
-          getStrictModeBit: () => 8,
+          getStrictModeBit: () => strictModeBit,
         };
       });
       const { setValueForProperty } = await import("../src/PixiPropertyOperations");
@@ -117,7 +118,7 @@ describe("PixiPropertyOperations", () => {
       setValueForProperty("Sprite", sprite, "alpha", 0.5);
       setValueForProperty("Sprite", sprite, "alpha", undefined);
       expect(sprite.alpha).toBe(0.25);
-      vi.doUnmock("../src/config");
+      vi.doUnmock("../src/configure");
     });
     it("warns under StrictMode about an invalid value it resets, not about an undefined one", () => {
       const error = vi.spyOn(console, "error").mockImplementation(() => {});

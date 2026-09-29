@@ -12,7 +12,7 @@ const components = {
   Container: { create: vi.fn(() => ({ kind: "Container" })) },
   NineSliceSprite: { create: vi.fn(() => ({ kind: "NineSliceSprite" })) },
 };
-vi.mock("../src/config", () => ({
+vi.mock("../src/configure", () => ({
   getPixiAdapter: () => ({
     components,
     properties: { boolean: [], numeric: [], positiveNumeric: [], vector: [], callback: [] },

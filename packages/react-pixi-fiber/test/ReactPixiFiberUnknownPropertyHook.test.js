@@ -13,7 +13,7 @@ vi.mock("../src/PixiProperty", async importOriginal => ({
   getCustomPropertyInfo: vi.fn(() => null),
   shouldRemoveAttributeWithWarning: vi.fn(() => false),
 }));
-vi.mock("../src/config", async importOriginal => ({
+vi.mock("../src/configure", async importOriginal => ({
   ...(await importOriginal()),
   getStackAddendum: () => "stack",
 }));

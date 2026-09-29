@@ -1,6 +1,6 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/shared/ReactDOMUnknownPropertyHook.js
 import warning from "./warning";
-import { getPixiAdapter, getStackAddendum } from "./config";
+import { getPixiAdapter, getStackAddendum } from "./configure";
 import {
   RESERVED,
   customStandardNames,

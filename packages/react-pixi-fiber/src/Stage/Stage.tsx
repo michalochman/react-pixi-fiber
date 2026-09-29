@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import type { Ref } from "react";
-import { getPixiAdapter } from "../config";
+import { getPixiAdapter } from "../configure";
 import invariant from "../invariant";
 import type { StageComponent, StageProps, StageRef } from "../types";
 import { shallowEqual } from "../utils";

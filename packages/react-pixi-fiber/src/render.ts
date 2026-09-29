@@ -1,11 +1,31 @@
-// Temporary bridge: the core suite keeps running on the React 18 adapter until Task 11 makes render lazy.
-import react18 from "@react-pixi-fiber/react-18"; // resolved by the Vitest alias; Task 11 removes this import
-import { hostOps } from "./hostOps";
+import type { ReactNode } from "react";
+import { getConfigured, markRendered } from "./configure";
+import type { Renderer } from "./types";
 
-const adapter = react18();
-export const renderers = {
-  primary: adapter.createRenderer(hostOps, { isPrimaryRenderer: true }),
-  secondary: adapter.createRenderer(hostOps, { isPrimaryRenderer: false }),
-};
-export const render = renderers.primary.render;
-export const unmount = renderers.primary.unmount;
+type Kind = "primary" | "secondary";
+
+// The renderer that rendered each container. A tree rendered before a second `configure` call keeps updating and
+// unmounting on its own reconciler; each renderer only knows the roots it created.
+const owners: Record<Kind, WeakMap<object, Renderer>> = { primary: new WeakMap(), secondary: new WeakMap() };
+
+// Lazy: the React adapter is resolved on each call, so importing the core instantiates no reconciler.
+export function renderWith(kind: Kind, element: ReactNode, container: any, callback?: () => void): unknown {
+  const renderer = owners[kind].get(container) || getConfigured()[kind];
+  owners[kind].set(container, renderer);
+  markRendered();
+  return renderer.render(element, container, callback);
+}
+
+export function unmountWith(kind: Kind, container: any): void {
+  const renderer = owners[kind].get(container) || getConfigured()[kind];
+  owners[kind].delete(container);
+  renderer.unmount(container);
+}
+
+export function render(element: ReactNode, container: any, callback?: () => void): unknown {
+  return renderWith("primary", element, container, callback);
+}
+
+export function unmount(container: any): void {
+  unmountWith("primary", container);
+}

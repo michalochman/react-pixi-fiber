@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-// The temporary src/render.ts bridge builds its renderers from hostOps at import time and is reached from
-// hostOps' own imports (through src/config.ts), so it must load first. Task 11 makes render lazy and drops this.
-import "../src/render";
+import { strictModeBit } from "@react-pixi-fiber/react-18";
 import * as hostOps from "../src/hostOps";
 import { validateProperties as validateUnknownProperties } from "../src/ReactPixiFiberUnknownPropertyHook";
 import { createRegisteredInstance, normalizeBehavior } from "../src/registry";
@@ -212,7 +210,7 @@ describe("hostOps", () => {
       hostOps.validateProperties(TAGS.Text, props, internalHandle);
 
       if (__DEV__) {
-        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle, 8);
+        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle, strictModeBit);
         expect(validateUnknownProperties).toHaveBeenCalledTimes(1);
         expect(validateUnknownProperties).toHaveBeenCalledWith("Text", props);
       } else {

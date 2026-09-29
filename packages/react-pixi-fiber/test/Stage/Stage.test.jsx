@@ -4,19 +4,10 @@ import { createRoot } from "react-dom/client";
 import renderer, { act } from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import Stage from "../../src/Stage";
-import { __renderMock, __unmountMock } from "../../src/render";
+import { strictModeBit } from "@react-pixi-fiber/react-18";
 
-vi.mock("../../src/render", () => {
-  const render = vi.fn();
-  const unmount = vi.fn();
-  return {
-    renderers: { primary: { render, unmount }, secondary: { render, unmount } },
-    render,
-    unmount,
-    __renderMock: render,
-    __unmountMock: unmount,
-  };
-});
+// Stage renders through the configured secondary renderer; these spies stand in for it.
+const { renderMock, unmountMock } = vi.hoisted(() => ({ renderMock: vi.fn(), unmountMock: vi.fn() }));
 
 const apps = [];
 function makeApp() {
@@ -36,10 +27,12 @@ const adapter = {
   }),
   isApplication: v => apps.includes(v),
 };
-vi.mock("../../src/config", () => ({
+vi.mock("../../src/configure", () => ({
+  getConfigured: () => ({ pixi: adapter, secondary: { render: renderMock, unmount: unmountMock } }),
+  markRendered() {},
   getPixiAdapter: () => adapter,
   getStackAddendum: () => "",
-  getStrictModeBit: () => 8,
+  getStrictModeBit: () => strictModeBit,
 }));
 
 const flush = () =>
@@ -74,12 +67,12 @@ describe("Stage", () => {
       createNodeMock: () => ({ tagName: "CANVAS" }),
     });
     expect(adapter.createApplication).toHaveBeenCalledWith({ view: { tagName: "CANVAS" }, width: 10, height: 20 });
-    expect(__renderMock).not.toHaveBeenCalled();
+    expect(renderMock).not.toHaveBeenCalled();
     expect(onInit).not.toHaveBeenCalled();
     act(() => resolveInit());
     await flush();
-    expect(__renderMock).toHaveBeenCalledTimes(1);
-    expect(__renderMock.mock.calls[0][1]).toBe(apps[0].stage);
+    expect(renderMock).toHaveBeenCalledTimes(1);
+    expect(renderMock.mock.calls[0][1]).toBe(apps[0].stage);
     expect(onInit).toHaveBeenCalledWith(apps[0]);
     expect(ref.current._app.current).toBe(apps[0]);
     tree.unmount();
@@ -139,7 +132,7 @@ describe("Stage", () => {
     tree.unmount();
     act(() => resolveInit());
     await flush();
-    expect(__renderMock).not.toHaveBeenCalled();
+    expect(renderMock).not.toHaveBeenCalled();
     expect(onInit).not.toHaveBeenCalled();
     expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, true);
   });
@@ -195,7 +188,7 @@ describe("Stage", () => {
     expect(adapter.createApplication).not.toHaveBeenCalled();
     tree.unmount();
     await tick();
-    expect(__unmountMock).toHaveBeenCalledWith(app.stage);
+    expect(unmountMock).toHaveBeenCalledWith(app.stage);
     expect(adapter.destroyApplication).not.toHaveBeenCalled();
   });
 
@@ -315,7 +308,7 @@ describe("Stage", () => {
     await flush();
     expect(boundary.current.state.error).toBe(failure);
     expect(onInit).not.toHaveBeenCalled();
-    expect(__renderMock).not.toHaveBeenCalled();
+    expect(renderMock).not.toHaveBeenCalled();
     tree.unmount();
     error.mockRestore();
   });
@@ -370,7 +363,7 @@ describe("Stage", () => {
     expect(adapter.destroyApplication).toHaveBeenCalledWith(apps[0], false, false);
     act(() => resolveInit());
     await flush();
-    expect(__renderMock.mock.calls.at(-1)[1]).toBe(apps[1].stage);
+    expect(renderMock.mock.calls.at(-1)[1]).toBe(apps[1].stage);
     // onInit fires once per created application, so a consumer gets the new reference after a recreate.
     expect(onInit.mock.calls).toEqual([[apps[0]], [apps[1]]]);
     tree.unmount();

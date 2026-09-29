@@ -1,7 +1,7 @@
 import { createInstance, diffProperties, setInitialProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
 import { getBoundBehavior } from "./registry";
-import { getStrictModeBit } from "./config";
+import { getStrictModeBit } from "./configure";
 import { findStrictRoot } from "./utils";
 import invariant from "./invariant";
 import type { HostOps } from "./types";

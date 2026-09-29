@@ -28,7 +28,8 @@ const scheduleMicrotask: (callback: () => void) => void =
 
 // The mutation host config of react-reconciler 0.29.2. The hydration, persistence and test selector keys are left
 // out: the reconciler reads them only behind supportsHydration, supportsPersistence and supportsTestSelectors.
-export function createHostConfig(hostOps: HostOps) {
+// Typed loosely on purpose: it goes straight into Reconciler, and the declaration stays free of inferred core types.
+export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
   return {
     supportsMutation: true,
     supportsPersistence: false,

@@ -1,4 +1,4 @@
-import { getPixiAdapter } from "../config";
+import { getPixiAdapter } from "../configure";
 import { getOwn, getStandardNames } from "../PixiProperty";
 import { filterByKey, including } from "../utils";
 

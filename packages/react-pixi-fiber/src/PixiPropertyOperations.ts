@@ -1,7 +1,7 @@
 // Based on: https://github.com/facebook/react/blob/27535e7bfcb63e8a4d65f273311e380b4ca12eff/packages/react-dom/src/client/DOMPropertyOperations.js
 import warning from "./warning";
 import type * as PIXI from "pixi.js";
-import { getPixiAdapter, getStackAddendum, getStrictModeBit } from "./config";
+import { getPixiAdapter, getStackAddendum, getStrictModeBit } from "./configure";
 import { getRecordedDefault, recordDefault } from "./defaults";
 import { getOwn, getPropertyInfo, shouldIgnoreAttribute, shouldRemoveAttribute } from "./PixiProperty";
 import { getInstanceTag } from "./registry";

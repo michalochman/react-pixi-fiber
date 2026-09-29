@@ -1,7 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import React, { StrictMode } from "react";
 import react18, { strictModeBit } from "../src/index";
 import type { HostOps } from "react-pixi-fiber";
+
+// Wraps the real reconciler so a test can see what reaches updateContainer.
+const { updateContainer } = vi.hoisted(() => ({ updateContainer: vi.fn() }));
+vi.mock("react-reconciler", async importOriginal => {
+  const Reconciler = ((await importOriginal()) as any).default;
+  return {
+    default: (config: unknown) => {
+      const reconciler = Reconciler(config);
+      updateContainer.mockImplementation(reconciler.updateContainer);
+      return { ...reconciler, updateContainer };
+    },
+  };
+});
 
 // A host tree of plain objects; enough to prove the reconciler is wired to hostOps.
 function createFakeHostOps() {
@@ -60,6 +73,10 @@ describe("react18", () => {
     } as any;
     (globalThis as any).__REACT_DEVTOOLS_GLOBAL_HOOK__ = hook;
   });
+  afterEach(() => {
+    delete (globalThis as any).__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    updateContainer.mockClear();
+  });
 
   it("exports the StrictMode bit for React 18", () => {
     expect(strictModeBit).toBe(8);
@@ -84,6 +101,32 @@ describe("react18", () => {
     expect(container.children[0].children).toHaveLength(0);
     renderer.unmount(container);
     expect(container.children).toHaveLength(0);
+  });
+
+  it("passes the callback and parentComponent to updateContainer", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react18().createRenderer(ops, { isPrimaryRenderer: true });
+    // The reconciler reads legacy context from parentComponent, so it must be a mounted class instance.
+    class Parent extends React.Component {
+      render() {
+        return <node />;
+      }
+    }
+    const parent = React.createRef<Parent>();
+    renderer.render(<Parent ref={parent} />, { children: [] });
+    const parentComponent = parent.current;
+    const element = <node />;
+    const callback = vi.fn();
+    renderer.render(element, { children: [] }, callback, parentComponent);
+    expect(updateContainer).toHaveBeenCalledWith(element, expect.anything(), parentComponent, callback);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws when unmounting a container it never rendered into", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react18().createRenderer(ops, { isPrimaryRenderer: true });
+    expect(() => renderer.unmount({ children: [] })).toThrow("ReactPixiFiber did not render into container provided");
+    expect(updateContainer).not.toHaveBeenCalled();
   });
 
   it("injects into DevTools once per root container", () => {

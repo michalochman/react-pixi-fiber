@@ -1,5 +1,5 @@
 import invariant from "./invariant";
-import { getStackAddendum } from "./config";
+import { getStackAddendum } from "./configure";
 import type { PixiAdapter } from "./types";
 
 /* Helper Methods */

@@ -45,6 +45,7 @@ exports[`ReactPixiFiber public API > should match snapshot 1`] = `
   "TilingSprite": "TilingSprite",
   "applyDisplayObjectProps": [Function],
   "applyProps": [Function],
+  "configure": [Function],
   "createStageClass": [Function],
   "getInstanceTag": [Function],
   "render": [Function],
