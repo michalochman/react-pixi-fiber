@@ -160,6 +160,18 @@ describe("react19", () => {
     expect(container.children).toHaveLength(1);
   });
 
+  it("skips updateProperties when the diff finds no change", () => {
+    const { ops } = createFakeHostOps();
+    const updateProperties = vi.spyOn(ops, "updateProperties");
+    const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    renderer.render(<node x={1} />, container);
+    renderer.render(<node x={1} />, container);
+    expect(updateProperties).not.toHaveBeenCalled();
+    renderer.render(<node x={2} />, container);
+    expect(updateProperties).toHaveBeenCalledTimes(1);
+  });
+
   it("validates props with the fiber so the core can find <StrictMode>", () => {
     const { ops, validate } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });

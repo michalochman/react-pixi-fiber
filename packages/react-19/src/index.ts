@@ -25,8 +25,11 @@ const scheduleMicrotask: (callback: () => void) => void =
             })
       : setTimeout;
 
-// The mutation host config of react-reconciler 0.34.0. The hydration, persistence and test selector keys are left
-// out: the reconciler reads them only behind supportsHydration, supportsPersistence and supportsTestSelectors.
+// The mutation host config of react-reconciler 0.33.0. Keys left out, and why the reconciler never reads them here:
+// hydration, persistence and test selectors sit behind supportsHydration, supportsPersistence and supportsTestSelectors;
+// resources and singletons behind supportsResources and supportsSingletons (both undefined); the view transition, gesture
+// and fragment instance keys appear in this build only as bare `$$$config.key;` statements, because the features are
+// compiled out, so no code path calls them.
 // Typed loosely on purpose: it goes straight into Reconciler, and the declaration stays free of inferred core types.
 export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
   let currentUpdatePriority: number = NoEventPriority;
@@ -40,8 +43,6 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     scheduleTimeout: setTimeout,
     cancelTimeout: clearTimeout,
     scheduleMicrotask,
-    now: () =>
-      typeof performance === "object" && typeof performance.now === "function" ? performance.now() : Date.now(),
     setCurrentUpdatePriority(priority: number) {
       currentUpdatePriority = priority;
     },
@@ -101,7 +102,6 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
       invariant(false, "Not yet implemented.");
     },
     beforeActiveInstanceBlur() {},
-    afterActiveInstanceBlur() {},
     rendererPackageName: "react-pixi-fiber",
     rendererVersion: React.version,
     extraDevToolsConfig: null,
@@ -111,21 +111,15 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     preloadInstance: () => true,
     startSuspendingCommit() {},
     suspendInstance() {},
-    suspendOnActiveViewTransition() {},
     waitForCommitToBeReady: () => null,
     getSuspendedCommitReason: () => null,
     shouldAttemptEagerTransition: () => false,
-    requestPostPaintCallback() {},
     trackSchedulerEvent() {},
     resolveEventType: () => null,
     resolveEventTimeStamp: () => -1.1,
     resetFormInstance() {},
     bindToConsole: (methodName: "error", args: unknown[]) =>
       Function.prototype.bind.apply(console[methodName], [console, ...args]),
-    createFragmentInstance: () => null,
-    updateFragmentInstanceFiber() {},
-    commitNewChildToFragmentInstance() {},
-    deleteChildFromFragmentInstance() {},
     NotPendingTransition: null,
     HostTransitionContext: {
       $$typeof: Symbol.for("react.context"),

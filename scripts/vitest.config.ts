@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 
 const packagesDir = fileURLToPath(new URL("../packages/", import.meta.url));
 
-const reactModules = ["react", "react-dom", "react-test-renderer", "react/jsx-runtime", "react/jsx-dev-runtime"];
+const reactModules = ["react", "react-dom", "react-test-renderer", "react/jsx-dev-runtime", "react/jsx-runtime"];
 
 // `root` is the package directory. Shared test utilities live in the core, so React is aliased to the package's own
 // copy: a React element must be created by the React version that renders it.
