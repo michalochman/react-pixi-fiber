@@ -19,7 +19,9 @@ React Pixi Fiber follows [semantic versioning](http://semver.org/). We release p
 
 ## Changelog
 
-Every significant change is documented in the [changelog file](./packages/react-pixi-fiber/CHANGELOG.md).
+Every package has its own `CHANGELOG.md`, for example the [core changelog](./packages/react-pixi-fiber/CHANGELOG.md). Changesets writes the entries at release from the pending changesets, so a change goes into a changeset (`pnpm changeset`), not into a `CHANGELOG.md` by hand.
+
+Changesets inserts a release above the first header that starts with a version number, `## 3.0.0` or `## 2.0.0-rc.4 - 2026-09-28`; a bracketed header such as `## [2.0.0]` does not count. Keep version headers unbracketed, also in entries written by hand on a maintenance branch, so each release lands on top. An adapter `CHANGELOG.md` holds only its `# <package name>` title until its first release.
 
 
 ## Releasing
