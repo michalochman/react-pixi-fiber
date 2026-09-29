@@ -1,17 +1,24 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import React from "react";
 import renderer, { act } from "react-test-renderer";
 import * as PIXI from "pixi.js";
 import react18 from "@react-pixi-fiber/react-18";
 import { configure, Sprite, Stage } from "react-pixi-fiber";
-import "../compat/pixi6";
 import pixi8 from "../src/index";
 
-describe('pixi8({ compat: "pixi6" })', () => {
+type Translate = typeof import("../src/compat/pixi6").default;
+let compat: Translate;
+// The translator warns once per prop name for the whole module, so every test loads a fresh copy.
+beforeEach(async () => {
+  vi.resetModules();
+  compat = (await import("../src/compat/pixi6")).default;
+});
+
+describe("pixi8({ compat }) with compat/pixi6", () => {
   afterEach(() => vi.restoreAllMocks());
   it("renames interactive, buttonMode and the legacy event props, warning once per name in development", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    const adapter = pixi8({ compat: "pixi6" });
+    const adapter = pixi8({ compat });
     const fn = () => {};
     const out = adapter.translateProps!("Sprite", {
       buttonMode: true,
@@ -22,24 +29,38 @@ describe('pixi8({ compat: "pixi6" })', () => {
     });
     expect(out).toEqual({ cursor: "pointer", eventMode: "static", onclick: fn, onpointerdown: fn, x: 1 });
     adapter.translateProps!("Sprite", { buttonMode: false, interactive: false });
-    expect(adapter.translateProps!("Sprite", { interactive: false })).toEqual({ eventMode: "none" });
-    expect(error.mock.calls.filter(c => /is a PixiJS 6 prop/.test(c[0]))).toHaveLength(__DEV__ ? 4 : 0);
+    expect(adapter.translateProps!("Sprite", { interactive: false })).toEqual({ eventMode: "passive" });
+    expect(error.mock.calls.filter(c => /is a PixiJS 6 and 7 prop/.test(c[0]))).toHaveLength(__DEV__ ? 4 : 0);
   });
   it("names the replacement prop in the warning", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    pixi8({ compat: "pixi6" }).translateProps!("Sprite", { click: 1, interactive: true });
+    pixi8({ compat }).translateProps!("Sprite", { click: 1, interactive: true });
     const messages = error.mock.calls.map(c => c[0]);
     expect(messages.filter(m => /`click`.*Rename it to `onclick`/.test(m))).toHaveLength(__DEV__ ? 1 : 0);
     expect(messages.filter(m => /`interactive`.*Rename it to `eventMode`/.test(m))).toHaveLength(__DEV__ ? 1 : 0);
   });
+  it("renames the move events to the global move events, which fire whether or not the pointer is over the object", () => {
+    const fn = () => {};
+    expect(pixi8({ compat }).translateProps!("Sprite", { mousemove: fn, pointermove: fn, touchmove: fn })).toEqual({
+      onglobalmousemove: fn,
+      onglobalpointermove: fn,
+      onglobaltouchmove: fn,
+    });
+  });
+  it("renames uvRespectAnchor to applyAnchorToTexture", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(pixi8({ compat }).translateProps!("TilingSprite", { uvRespectAnchor: true })).toEqual({
+      applyAnchorToTexture: true,
+    });
+  });
   it("renames name to label, which PixiJS 8 renamed on Container", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(pixi8({ compat: "pixi6" }).translateProps!("Sprite", { name: "bunny" })).toEqual({ label: "bunny" });
+    expect(pixi8({ compat }).translateProps!("Sprite", { name: "bunny" })).toEqual({ label: "bunny" });
     expect(error.mock.calls.filter(c => /`name`.*Rename it to `label`/.test(c[0]))).toHaveLength(__DEV__ ? 1 : 0);
   });
   it("lets the PixiJS 8 prop win over the translated one, warning once naming both", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    const adapter = pixi8({ compat: "pixi6" });
+    const adapter = pixi8({ compat });
     const fn = () => {};
     const other = () => {};
     expect(adapter.translateProps!("Sprite", { eventMode: "dynamic", interactive: true })).toEqual({
@@ -58,35 +79,24 @@ describe('pixi8({ compat: "pixi6" })', () => {
   });
   it("returns the same props object when nothing is renamed", () => {
     const props = { foo: 1 };
-    expect(pixi8({ compat: "pixi6" }).translateProps!("Sprite", props)).toBe(props);
+    expect(pixi8({ compat }).translateProps!("Sprite", props)).toBe(props);
   });
 });
 
-describe('pixi8({ compat: "pixi7" })', () => {
-  afterEach(() => vi.restoreAllMocks());
-  it("uses the same table and names PixiJS 7 in the warning", () => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(pixi8({ compat: "pixi7" }).translateProps!("Sprite", { click: 1, name: "a" })).toEqual({
-      label: "a",
-      onclick: 1,
-    });
-    const messages = error.mock.calls.map(c => c[0]);
-    expect(messages.filter(m => /is a PixiJS 7 prop, translated by `compat: "pixi7"`/.test(m))).toHaveLength(
-      __DEV__ ? 2 : 0
-    );
-    expect(messages.filter(m => /PixiJS 6/.test(m))).toHaveLength(0);
-  });
+it("serves compat/pixi7 from the same module as compat/pixi6", async () => {
+  const pkg = (await import("../package.json")).exports as Record<string, unknown>;
+  expect(pkg["./compat/pixi7"]).toEqual(pkg["./compat/pixi6"]);
 });
 
-it("throws on an unknown compat key", () => {
-  expect(() => pixi8({ compat: "pixi5" as "pixi6" })).toThrow(/compat.*pixi5.*"pixi6".*"pixi7"/);
+it("throws when compat is not a function, naming the compat subpaths", () => {
+  expect(() => pixi8({ compat: "pixi6" as unknown as Translate })).toThrow(/"pixi6".*compat\/pixi6.*compat\/pixi7/);
 });
 
-describe('2.x props on pixi8({ compat: "pixi6" })', () => {
+describe("2.x props on pixi8({ compat })", () => {
   afterEach(() => vi.restoreAllMocks());
   it("renders the 2.x interaction props on Stage and Sprite", async () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    configure({ react: react18(), pixi: pixi8({ compat: "pixi6" }) });
+    configure({ react: react18(), pixi: pixi8({ compat }) });
     const click = () => {};
     const pointerdown = () => {};
     let app: PIXI.Application | null = null;
@@ -116,7 +126,7 @@ describe('2.x props on pixi8({ compat: "pixi6" })', () => {
       onpointerdown: pointerdown,
     });
     act(() => tree.unmount());
-    const translated = error.mock.calls.filter(c => /is a PixiJS 6 prop/.test(String(c[0])));
+    const translated = error.mock.calls.filter(c => /is a PixiJS 6 and 7 prop/.test(String(c[0])));
     // One warning per name: buttonMode, click, interactive, name, pointerdown.
     expect(translated).toHaveLength(__DEV__ ? 5 : 0);
   });

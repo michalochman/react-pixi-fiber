@@ -1,1 +1,8 @@
-// Types only: compat/pixi6.d.ts declares the props that `pixi8({ compat: "pixi6" })` and `pixi8({ compat: "pixi7" })` translate.
+const mod =
+  process.env.NODE_ENV === "production"
+    ? require("../dist/cjs/compat/pixi6.production.min.js")
+    : require("../dist/cjs/compat/pixi6.development.js");
+
+// Node ESM default-imports module.exports, so it has to be the translator itself.
+module.exports = mod.default;
+module.exports.default = mod.default;

@@ -6,6 +6,9 @@ import { defineConfig, type TsdownHooks, type UserConfig } from "tsdown";
 export interface PackageBuild {
   // Output basename: dist/<format>/<name>.<development|production.min>.js, declarations <name>.d.mts and <name>.d.ts
   name: string;
+  // Further entry points, output path to source, for example { "compat/pixi6": "src/compat/pixi6.ts" }. They must not
+  // import a module the main entry imports, or rolldown splits that module into a shared chunk.
+  entries?: Record<string, string>;
   // Peer dependencies, left as imports
   external: string[];
   // Dependencies to inline, for example [/^react-reconciler/]
@@ -23,6 +26,16 @@ const exportDefaultAsExportEquals: TsdownHooks["build:done"] = ({ chunks }) => {
     if (!chunk.fileName.endsWith(".d.ts")) continue;
     const path = join(chunk.outDir, chunk.fileName);
     const code = readFileSync(path, "utf8");
+    // A declaration with only a default export already comes out as `export = <name>`; give it the `default` member
+    // that index.js sets as well.
+    const only = /^export = (\w+);$/m.exec(code);
+    if (only && !code.includes(`declare namespace ${only[1]} `)) {
+      writeFileSync(
+        path,
+        code.replace(only[0], `declare namespace ${only[1]} {\n  export { ${only[1]} as default };\n}\n${only[0]}`)
+      );
+      continue;
+    }
     const match = /^export \{ (.*?) \};$/m.exec(code);
     const factory = match?.[1].match(/(\w+) as default/)?.[1];
     if (!match || !factory) continue;
@@ -33,14 +46,14 @@ const exportDefaultAsExportEquals: TsdownHooks["build:done"] = ({ chunks }) => {
   }
 };
 
-export function createTsdownConfig({ name, external, bundle = [], hooks, tsconfig }: PackageBuild) {
+export function createTsdownConfig({ name, entries, external, bundle = [], hooks, tsconfig }: PackageBuild) {
   const isProduction = process.env.NODE_ENV === "production";
   const suffix = isProduction ? "production.min" : "development";
   // One build per format, so every output lands in dist/<format>/.
   return defineConfig(
     (["es", "cjs"] as const).map(
       (format): UserConfig => ({
-        entry: { [name]: "src/index.ts" },
+        entry: { [name]: "src/index.ts", ...entries },
         format,
         outDir: `dist/${format}`,
         // build:prod and build:dev write into the same directories

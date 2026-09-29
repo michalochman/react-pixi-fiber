@@ -28,8 +28,34 @@
       }
     },
     "./compat/pixi6": {
-      "types": "./compat/pixi6.d.ts",
-      "default": "./compat/pixi6.js"
+      "node": {
+        "types": "./dist/cjs/compat/pixi6.d.ts",
+        "default": "./compat/pixi6.js"
+      },
+      "import": {
+        "types": "./dist/es/compat/pixi6.d.mts",
+        "development": "./dist/es/compat/pixi6.development.js",
+        "default": "./dist/es/compat/pixi6.production.min.js"
+      },
+      "require": {
+        "types": "./dist/cjs/compat/pixi6.d.ts",
+        "default": "./compat/pixi6.js"
+      }
+    },
+    "./compat/pixi7": {
+      "node": {
+        "types": "./dist/cjs/compat/pixi6.d.ts",
+        "default": "./compat/pixi6.js"
+      },
+      "import": {
+        "types": "./dist/es/compat/pixi6.d.mts",
+        "development": "./dist/es/compat/pixi6.development.js",
+        "default": "./dist/es/compat/pixi6.production.min.js"
+      },
+      "require": {
+        "types": "./dist/cjs/compat/pixi6.d.ts",
+        "default": "./compat/pixi6.js"
+      }
     },
     "./package.json": "./package.json"
   },

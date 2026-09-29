@@ -42,9 +42,9 @@ Import the tags of this adapter from this package. `<NineSlicePlane />` is not a
 
 | Feature | Support |
 | --- | --- |
-| Application | `Stage` creates a `PIXI.Application` and awaits `app.init(options)`, then renders its children and calls `onInit(app)`. The `view` option, by default the canvas `Stage` renders, is passed to PixiJS as `canvas` |
-| `compat` option | Translates the PixiJS 6 and 7 props, see [below](#compatibility-with-the-2x-props) |
-| `defaults` option | `pixi8({ defaults: { Text: { text: "" } } })` sets, per tag, the value a prop returns to when it is set to `undefined`. Without it, a prop returns to the value the instance had before the first write |
+| Application | `Stage` creates a `PIXI.Application` and awaits `app.init(options)`, then renders its children and calls `onInit(app)`. An existing canvas goes in `options.canvas`, or in 2.x's `options.view`, which wins when both are given; without either, the application draws on the canvas `Stage` renders |
+| `compat` option | Takes the translator from `@react-pixi-fiber/pixi-8/compat/pixi6` or `/compat/pixi7`, which translates the PixiJS 6 and 7 props, see [below](#compatibility-with-the-2x-props) |
+| `defaults` option | Default props per tag, like React's `defaultProps`: with `pixi8({ defaults: { Sprite: { alpha: 0.5 } } })`, `<Sprite />` mounts with `alpha` 0.5. A prop missing or `undefined` when the instance is created gets its default, and `create` sees it; a prop removed later, or set to `undefined`, returns to it. An explicit `null` is kept. Key each tag as you write it. Without an entry, a removed prop returns to the value the instance had before the first write, see [Default props per tag](../react-pixi-fiber/README.md#default-props-per-tag) |
 | Events | The PixiJS 8 handler properties as props: `onclick`, `onpointerdown`, …, with `eventMode` to make an object interactive |
 | Ticker | A `usePixiTicker` callback receives the PixiJS 8 `Ticker`, not a delta: read `ticker.deltaTime` |
 | `tint` | Not type-checked in development: PixiJS 8 accepts a number, a color string or an array |
@@ -97,11 +97,16 @@ function Scene({ texture }) {
 
 ## Compatibility with the 2.x props
 
-Apps written for PixiJS 6 or 7 can keep their interaction props while they migrate:
+Apps written for PixiJS 6 or 7 can keep their props while they migrate. Pass the default export of the compat module to `pixi8`:
 
 ```js
-configure({ react: reactN(), pixi: pixi8({ compat: "pixi6" }) }); // or "pixi7"
+import pixi8 from "@react-pixi-fiber/pixi-8";
+import compat from "@react-pixi-fiber/pixi-8/compat/pixi6"; // or ".../compat/pixi7", the same module
+
+configure({ react: reactN(), pixi: pixi8({ compat }) });
 ```
+
+PixiJS 4 and 5 apps use `compat/pixi6`: PixiJS 5 and 6 renamed none of the props it translates. Without the import, the adapter holds no compat code.
 
 With `compat`, the adapter translates the props before the core reads them:
 
@@ -109,27 +114,27 @@ With `compat`, the adapter translates the props before the core reads them:
 | --- | --- |
 | `buttonMode` | `cursor: "pointer"`, or `cursor: null` when false |
 | `click`, `pointerdown`, … (the event names) | `onclick`, `onpointerdown`, … |
-| `interactive` | `eventMode: "static"`, or `eventMode: "none"` when false |
+| `interactive` | `eventMode: "static"`, or `eventMode: "passive"` when false, as the PixiJS 8 `interactive` setter does |
+| `mousemove`, `pointermove`, `touchmove` | `onglobalmousemove`, `onglobalpointermove`, `onglobaltouchmove`: the handler runs on every move, over the object or not, as in PixiJS 6 |
 | `name` | `label` |
+| `uvRespectAnchor` | `applyAnchorToTexture` |
 
 In development each translated prop warns once, naming the PixiJS 8 prop to use instead. When a translated prop and its PixiJS 8 prop are both passed (`interactive` and `eventMode`), the PixiJS 8 prop wins, with one warning naming both. A `PIXIComponent` with its own `applyProps` receives the props as written.
 
-For TypeScript, import the compat typings once, for example in the app entry:
+The compat module also types the translated props on every tag, as deprecated, so TypeScript needs no other import.
 
-```ts
-import "@react-pixi-fiber/pixi-8/compat/pixi6";
-```
+Not translated: `cacheAsBitmap` still works in PixiJS 8 (its replacement `cacheAsTexture` is a method, not a prop); `isMask` and the `BitmapText` props that PixiJS 8 moved into `style` have no prop to rename to.
 
 ## Migrating from `@react-pixi-fiber/pixi-7`
 
-1. Install `@react-pixi-fiber/pixi-8` and `pixi.js` 8, and pass `pixi8()` to `configure` instead of `pixi7()`. To keep the PixiJS 7 props while you migrate, pass `pixi8({ compat: "pixi7" })` and import `@react-pixi-fiber/pixi-8/compat/pixi6` for the types.
+1. Install `@react-pixi-fiber/pixi-8` and `pixi.js` 8, and pass `pixi8()` to `configure` instead of `pixi7()`. To keep the PixiJS 7 props while you migrate, pass `compat` from `@react-pixi-fiber/pixi-8/compat/pixi7`, see [above](#compatibility-with-the-2x-props).
 2. Follow the [PixiJS 8 migration guide](https://pixijs.com/8.x/guides/migrations/v8) for the PixiJS calls in your app.
 
 What changes for `react-pixi-fiber` code:
 
-- `Stage` awaits `app.init()`, so read the application in `onInit`. An existing canvas still goes in `options.view`.
+- `Stage` awaits `app.init()`, so read the application in `onInit`. An existing canvas goes in `options.canvas`; 2.x's `options.view` still works.
 - A `usePixiTicker` callback receives the `Ticker`: `delta => …` becomes `ticker => … ticker.deltaTime …`.
-- `buttonMode`, `interactive` and `name` are not PixiJS 8 props: use `cursor`, `eventMode` and `label`, or `compat: "pixi7"`.
+- `interactive`, `name` and `uvRespectAnchor` are deprecated in PixiJS 8 and `buttonMode` is gone: use `eventMode`, `label`, `applyAnchorToTexture` and `cursor`, or the compat module.
 - The `NineSlicePlane`, `SimpleMesh`, `SimplePlane` and `SimpleRope` tags are gone: use `NineSliceSprite`, `MeshSimple`, `MeshPlane` and `MeshRope`.
 - `Graphics` passes `context` to the constructor instead of `geometry`; `MeshSimple` takes `topology` instead of `drawMode`.
 - `ParticleContainer` takes `<Particle>` children instead of sprites.

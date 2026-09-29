@@ -2,6 +2,7 @@ import type { PixiPropertyTable } from "react-pixi-fiber";
 
 export const properties: PixiPropertyTable = {
   boolean: [
+    "applyAnchorToTexture",
     "cacheAsBitmap",
     "cullable",
     "cullableChildren",

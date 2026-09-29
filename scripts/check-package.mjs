@@ -182,18 +182,26 @@ try {
     const pixiTypes = pkg.peerDependencies?.["pixi.js"]
       ? `import type { PixiInstances } from "react-pixi-fiber";\n${notAny('null as unknown as PixiInstances["Container"]')}`
       : "";
+    // A compat subpath default-exports the translator that the factory takes as `compat`. Its declarations add the
+    // translated props to the core's `PixiExtraProps`, so reading one of them fails when the augmentation is lost.
+    const compat = subpaths.filter(subpath => subpath.includes("/compat/"));
+    const compatTypes = (factory, load) =>
+      compat.map((subpath, i) => `${load(`compat${i}`, subpath)}${factory}({ compat: compat${i} });\n`).join("") +
+      (compat.length > 0
+        ? 'import type { PixiExtraProps } from "react-pixi-fiber";\nconst buttonMode: PixiExtraProps["buttonMode"] = true;\nconsole.log(buttonMode);\n'
+        : "");
     writeFileSync(
       join(pkgWork, "a.mts"),
       subpathImports +
         (hasDefault
-          ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\n${notAny("factory")}${pixiTypes}console.log(callable);\n`
+          ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\n${notAny("factory")}${pixiTypes}${compatTypes("factory", (id, subpath) => `import ${id} from ${JSON.stringify(subpath)};\n`)}console.log(callable);\n`
           : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`)
     );
     writeFileSync(
       join(pkgWork, "a.cts"),
       subpathImports +
         (hasDefault
-          ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\n${notAny("mod.default")}${pixiTypes}console.log(callable);\n`
+          ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\n${notAny("mod.default")}${pixiTypes}${compatTypes("mod.default", (id, subpath) => `import * as ${id}Mod from ${JSON.stringify(subpath)};\nconst ${id} = ${id}Mod.default;\n`)}console.log(callable);\n`
           : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`)
     );
     writeFileSync(
@@ -216,17 +224,24 @@ try {
       run("pnpm", ["exec", "tsc", "-p", join(pkgWork, "tsconfig.json")])
     );
     if (hasDefault) {
+      // The factory installs the compat translator it is given.
+      const compatCalls = compat
+        .map(
+          (subpath, i) =>
+            `if (factory({ compat: compat${i} }).translateProps !== compat${i}) throw new Error(${JSON.stringify(subpath)});\n`
+        )
+        .join("");
       await check(`${name} default export is callable from node ESM`, () => {
         writeFileSync(
           join(pkgWork, "default.mjs"),
-          `import factory from ${JSON.stringify(name)};\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
+          `import factory from ${JSON.stringify(name)};\n${compat.map((subpath, i) => `import compat${i} from ${JSON.stringify(subpath)};\n`).join("")}if (typeof factory !== "function") throw new Error(typeof factory);\n${compatCalls}`
         );
         run("node", [...dom, "default.mjs"], pkgWork);
       });
       await check(`${name} default export is callable from node CJS`, () => {
         writeFileSync(
           join(pkgWork, "default.cjs"),
-          `const mod = require(${JSON.stringify(name)});\nconst factory = mod.default ?? mod;\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
+          `const mod = require(${JSON.stringify(name)});\nconst factory = mod.default ?? mod;\n${compat.map((subpath, i) => `const compat${i} = require(${JSON.stringify(subpath)}).default;\n`).join("")}if (typeof factory !== "function") throw new Error(typeof factory);\n${compatCalls}`
         );
         run("node", [...dom, "default.cjs"], pkgWork);
       });
@@ -259,6 +274,13 @@ try {
       });
     }
 
+    if (compat.length > 0) {
+      await check(`${name} production entry holds no compat code`, () => {
+        for (const file of [files.esProduction[0], files.cjsProduction[0]]) {
+          assert.doesNotMatch(readFileSync(join(installed, file), "utf8"), /["'`]touchendoutside["'`]/, file);
+        }
+      });
+    }
     await check(`${name} esbuild import`, async () =>
       assert.deepEqual(await bundleWithEsbuild("esm", { nodeEnv: "production" }), files.esProduction)
     );

@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 import type { PixiAdapter, PixiComponent } from "react-pixi-fiber";
-import { type Compat, createTranslateProps, tables } from "./compat";
 import { components } from "./components";
 import { properties } from "./properties";
 import type {
@@ -28,7 +27,13 @@ export const RenderContainer = "RenderContainer" as unknown as PixiComponent<
 export const RenderLayer = "RenderLayer" as unknown as PixiComponent<RenderLayerProps, PIXI.RenderLayer>;
 
 export interface Pixi8Options {
-  compat?: Compat;
+  // The default export of `@react-pixi-fiber/pixi-8/compat/pixi6` or `/compat/pixi7`.
+  compat?: PixiAdapter["translateProps"];
+  /**
+   * Default props per tag, like React's `defaultProps`, keyed by the tag as written in JSX. A prop that is missing or
+   * `undefined` when an instance is created gets its default before `create` runs; a prop that is later removed or
+   * set to `undefined` returns to it. An explicit `null` is not replaced.
+   */
   defaults?: Record<string, Record<string, unknown>>;
 }
 
@@ -59,12 +64,12 @@ export default function pixi8({ compat, defaults }: Pixi8Options = {}): PixiAdap
     isApplication: value => value instanceof PIXI.Application,
   };
   if (compat !== undefined) {
-    if (!Object.prototype.hasOwnProperty.call(tables, compat)) {
+    if (typeof compat !== "function") {
       throw new Error(
-        `\`pixi8({ compat })\` got ${JSON.stringify(compat)}. Pass "pixi6" or "pixi7", or leave \`compat\` out.`
+        `\`pixi8({ compat })\` got ${JSON.stringify(compat)}. Pass the default export of \`@react-pixi-fiber/pixi-8/compat/pixi6\` or \`@react-pixi-fiber/pixi-8/compat/pixi7\`, or leave \`compat\` out.`
       );
     }
-    adapter.translateProps = createTranslateProps(compat);
+    adapter.translateProps = compat;
   }
   return adapter;
 }
