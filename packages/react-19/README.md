@@ -11,3 +11,5 @@ import pixiN from "@react-pixi-fiber/pixi-N"; // the PixiJS adapter for your Pix
 
 configure({ react: react19(), pixi: pixiN() });
 ```
+
+`<ViewTransition>` inside `Stage` renders its children without animating.

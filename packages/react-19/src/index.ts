@@ -7,12 +7,10 @@ import type { HostOps, ReactAdapter, Renderer } from "react-pixi-fiber";
 export const strictModeBit = 8;
 const emptyObject = Object.freeze({});
 
-const viewTransitionError =
-  "react-pixi-fiber does not support <ViewTransition>. Remove it from the tree rendered inside Stage.";
+function noop() {}
 
-function unsupportedViewTransition(): never {
-  throw new Error(viewTransitionError);
-}
+// A host that does not animate: every measurement is the same inert object.
+const measurement = Object.freeze({});
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -127,27 +125,53 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     resetFormInstance() {},
     bindToConsole: (methodName: "error", args: unknown[]) =>
       Function.prototype.bind.apply(console[methodName], [console, ...args]),
-    addViewTransitionFinishedListener: unsupportedViewTransition,
-    applyViewTransitionName: unsupportedViewTransition,
-    cancelRootViewTransitionName: unsupportedViewTransition,
-    cancelViewTransitionName: unsupportedViewTransition,
+    addViewTransitionFinishedListener: noop,
+    applyViewTransitionName: noop,
+    cancelRootViewTransitionName: noop,
+    cancelViewTransitionName: noop,
     createFragmentInstance() {
       invariant(false, "react-pixi-fiber does not support Fragment refs. Remove the ref from the Fragment.");
     },
-    createViewTransitionInstance: unsupportedViewTransition,
+    createViewTransitionInstance: (name: string) => ({
+      name,
+      group: emptyObject,
+      imagePair: emptyObject,
+      old: emptyObject,
+      new: emptyObject,
+    }),
     commitNewChildToFragmentInstance() {},
     deleteChildFromFragmentInstance() {},
-    hasInstanceAffectedParent: unsupportedViewTransition,
-    hasInstanceChanged: unsupportedViewTransition,
-    measureClonedInstance: unsupportedViewTransition,
-    measureInstance: unsupportedViewTransition,
-    restoreRootViewTransitionName: unsupportedViewTransition,
-    restoreViewTransitionName: unsupportedViewTransition,
-    startViewTransition: unsupportedViewTransition,
-    stopViewTransition: unsupportedViewTransition,
-    suspendOnActiveViewTransition: unsupportedViewTransition,
+    hasInstanceAffectedParent: () => false,
+    hasInstanceChanged: () => false,
+    measureClonedInstance: () => measurement,
+    measureInstance: () => measurement,
+    restoreRootViewTransitionName: noop,
+    restoreViewTransitionName: noop,
+    // Commits without animating. The passive effects stay with the reconciler, which flushes them on its own.
+    startViewTransition(
+      suspendedState: unknown,
+      container: unknown,
+      types: unknown,
+      mutationCallback: () => void,
+      layoutCallback: () => void,
+      afterMutationCallback: () => void,
+      spawnedWorkCallback: () => void,
+      passiveCallback: () => void,
+      errorCallback: (error: unknown) => void,
+      blockedCallback: (reason: string) => void,
+      finishedAnimation: () => void
+    ) {
+      mutationCallback();
+      layoutCallback();
+      afterMutationCallback();
+      spawnedWorkCallback();
+      finishedAnimation();
+      return null;
+    },
+    stopViewTransition: noop,
+    suspendOnActiveViewTransition: noop,
     updateFragmentInstanceFiber() {},
-    wasInstanceInViewport: unsupportedViewTransition,
+    wasInstanceInViewport: () => true,
     NotPendingTransition: null,
     HostTransitionContext: {
       $$typeof: Symbol.for("react.context"),
