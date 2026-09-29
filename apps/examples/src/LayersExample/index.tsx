@@ -9,7 +9,7 @@ import LayeredStage from "./LayeredStage";
 import Rect from "../CustomPIXIComponentExample/Rect";
 import { DraggableContainerInstance } from "../CustomPIXIComponentExample/DraggableContainer";
 import * as PIXI from "pixi.js";
-import { display } from "./pixiLayers";
+import { Group, Stage as LayersStage } from "@pixi/layers";
 
 const OPTIONS = {
   backgroundColor: 0x1099bb,
@@ -18,12 +18,12 @@ const OPTIONS = {
 };
 
 // Mark parentGroup prop as legal on Container as long as it's a valid display group
-PIXIProperty(Container, "parentGroup", value => value instanceof display.Group);
+PIXIProperty(Container, "parentGroup", value => value instanceof Group);
 
 //META STUFF, groups exist without stage just fine
 
 // z-index = 0, sorting = true;
-const greenGroup = new display.Group(0, true);
+const greenGroup = new Group(0, true);
 
 // green bunnies go down
 greenGroup.on("sort", (bunny: PIXI.DisplayObject) => {
@@ -33,22 +33,22 @@ greenGroup.on("sort", (bunny: PIXI.DisplayObject) => {
 
 // blue bunnies go up
 // z-index = 1, sorting = true, we can provide zOrder function directly in constructor
-const blueGroup = new display.Group(1, (bunny: PIXI.DisplayObject) => {
+const blueGroup = new Group(1, (bunny: PIXI.DisplayObject) => {
   // we are dragging bunny parent, not the bunny itself
   bunny.zOrder = -bunny.parent.y;
 });
 
 // Drag is the best layer, dragged element is above everything else
-const dragGroup = new display.Group(2, false);
+const dragGroup = new Group(2, false);
 
 // Shadows are the lowest
-const shadowGroup = new display.Group(-1, false);
+const shadowGroup = new Group(-1, false);
 
 const blurFilter = new PIXI.filters.BlurFilter();
 blurFilter.blur = 0.5;
 const shadowFilters = [blurFilter];
 
-type BunnyWithGroup = PIXI.DisplayObject & { oldGroup?: unknown };
+type BunnyWithGroup = PIXI.DisplayObject & { oldGroup?: Group };
 
 const onBunnyDragEnd = (instance: DraggableContainerInstance) => {
   // we are dragging bunny parent, not the bunny itself
@@ -80,7 +80,7 @@ const shadowProps = {
   y: -22,
 };
 
-const stage = new display.Stage();
+const stage = new LayersStage();
 stage.group.enableSort = true;
 
 function LayersExample() {

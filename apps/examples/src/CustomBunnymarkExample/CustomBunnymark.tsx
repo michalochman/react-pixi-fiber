@@ -129,8 +129,8 @@ function CustomBunnymark(props: PixiAppProperties) {
       <Sprite
         height={600}
         interactive
-        pointerdown={handlePointerDown}
-        pointerup={handlePointerUp}
+        onpointerdown={handlePointerDown}
+        onpointerup={handlePointerUp}
         texture={PIXI.Texture.EMPTY}
         width={800}
       />

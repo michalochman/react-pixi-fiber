@@ -28,11 +28,11 @@ export class DraggableContainerInstance extends PIXI.Container implements Dragga
     this.onDragEnd?.(this);
   };
 
-  dragMove = (e: PIXI.InteractionEvent) => {
+  dragMove = (e: PIXI.FederatedPointerEvent) => {
     if (this.draggedObject === null) {
       return;
     }
-    const { movementX, movementY } = e.data.originalEvent as MouseEvent;
+    const { movementX, movementY } = e;
     this.draggedObject.position.x += movementX;
     this.draggedObject.position.y += movementY;
     this.onDragMove?.(this);

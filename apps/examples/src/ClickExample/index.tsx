@@ -23,11 +23,11 @@ function ClickExample() {
     <Stage options={OPTIONS}>
       <Bunny
         // Shows hand cursor
-        buttonMode
+        cursor="pointer"
         // Opt-in to interactivity
         interactive
         // Pointers normalize touch and mouse
-        pointerdown={handleClick}
+        onpointerdown={handleClick}
         scale={new PIXI.Point(scale, scale)}
         x={400}
         y={300}

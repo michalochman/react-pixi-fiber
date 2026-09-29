@@ -1,5 +1,6 @@
 ---
 "@react-pixi-fiber/pixi-6": major
+"@react-pixi-fiber/pixi-7": major
 "@react-pixi-fiber/react-18": major
 ---
 

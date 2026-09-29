@@ -60,6 +60,7 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | --- | --- |
 | [`@react-pixi-fiber/react-18`](https://www.npmjs.com/package/@react-pixi-fiber/react-18) | `react` ^18.0.0 |
 | [`@react-pixi-fiber/pixi-6`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-6) | `pixi.js` ^6.0.0 |
+| [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.0.0 |
 
 Without `configure`, the first render throws an error that prints the install line and these setup lines.
 
