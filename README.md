@@ -8,18 +8,21 @@ This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React
 
 ## Layout
 
-| Path | Contents |
-| --- | --- |
-| [`packages/pixi-4`](./packages/pixi-4) | `@react-pixi-fiber/pixi-4`, the PixiJS 4 adapter |
-| [`packages/pixi-5`](./packages/pixi-5) | `@react-pixi-fiber/pixi-5`, the PixiJS 5 adapter |
-| [`packages/pixi-6`](./packages/pixi-6) | `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter |
-| [`packages/pixi-7`](./packages/pixi-7) | `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter |
-| [`packages/pixi-8`](./packages/pixi-8) | `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter |
-| [`packages/react-17`](./packages/react-17) | `@react-pixi-fiber/react-17`, the React 17 adapter |
-| [`packages/react-18`](./packages/react-18) | `@react-pixi-fiber/react-18`, the React 18 adapter |
-| [`packages/react-19`](./packages/react-19) | `@react-pixi-fiber/react-19`, the React 19 adapter |
-| [`packages/react-pixi-fiber`](./packages/react-pixi-fiber) | `react-pixi-fiber`, the core with the components, `Stage` and `configure` |
-| [`apps/examples`](./apps/examples) | Examples built with Vite that use the local packages |
+| Path | Package | Peer dependencies |
+| --- | --- | --- |
+| [`packages/pixi-4`](./packages/pixi-4) | `@react-pixi-fiber/pixi-4`, the PixiJS 4 adapter | `@types/pixi.js` ^4.8.9 (optional), `pixi.js` ^4.4.0, `react-pixi-fiber` ^3.0.0 |
+| [`packages/pixi-5`](./packages/pixi-5) | `@react-pixi-fiber/pixi-5`, the PixiJS 5 adapter | `pixi.js` ^5.0.0, `react-pixi-fiber` ^3.0.0 |
+| [`packages/pixi-6`](./packages/pixi-6) | `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter | `pixi.js` ^6.0.0, `react-pixi-fiber` ^3.0.0 |
+| [`packages/pixi-7`](./packages/pixi-7) | `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter | `pixi.js` ^7.0.0, `react-pixi-fiber` ^3.0.0 |
+| [`packages/pixi-8`](./packages/pixi-8) | `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter | `pixi.js` ^8.0.0, `react-pixi-fiber` ^3.0.0 |
+| [`packages/react-17`](./packages/react-17) | `@react-pixi-fiber/react-17`, the React 17 adapter, bundles `react-reconciler` 0.26.2 | `react` ^17.0.2, `react-pixi-fiber` ^3.0.0 |
+| [`packages/react-18`](./packages/react-18) | `@react-pixi-fiber/react-18`, the React 18 adapter, bundles `react-reconciler` 0.29.2 | `react` ^18.3.1, `react-pixi-fiber` ^3.0.0 |
+| [`packages/react-19`](./packages/react-19) | `@react-pixi-fiber/react-19`, the React 19 adapter, bundles `react-reconciler` 0.34.0 | `react` ^19.3.0, `react-pixi-fiber` ^3.0.0 |
+| [`packages/react-pixi-fiber`](./packages/react-pixi-fiber) | `react-pixi-fiber`, the core with the components, `Stage` and `configure` | `react` >=17.0.0 <20.0.0 |
+
+[`apps/examples`](./apps/examples) holds the examples, built with Vite on the local packages.
+
+An app installs the core, one React adapter and one PixiJS adapter. Every PixiJS adapter implements all 13 core tags; the version notes (React 17, React 19, PixiJS 4 and PixiJS 8) are in the [package README](./packages/react-pixi-fiber/README.md#setup) and in each adapter's README.
 
 The repository is a [pnpm](https://pnpm.io) workspace. The pnpm version is pinned in the `packageManager` field of `package.json`, and Node comes from `.nvmrc`.
 

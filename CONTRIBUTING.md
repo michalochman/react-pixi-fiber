@@ -19,12 +19,28 @@ React Pixi Fiber follows [semantic versioning](http://semver.org/). We release p
 
 ## Changelog
 
-Every significant change is documented in the [changelog file](https://github.com/michalochman/react-pixi-fiber/blob/master/packages/react-pixi-fiber/CHANGELOG.md).
+Every significant change is documented in the [changelog file](./packages/react-pixi-fiber/CHANGELOG.md).
 
 
 ## Releasing
 
 Every user-visible change adds a changeset with `pnpm changeset`. The release runs `pnpm version-packages`, commits the result, then runs `pnpm release`.
+
+Changesets versions every package on its own. The adapters peer `react-pixi-fiber` with a caret range (`^3.0.0`); `.changeset/config.json` sets `onlyUpdatePeerDependentsWhenOutOfRange`, so a core release inside that range does not bump the adapters.
+
+### React minor versions
+
+Each React adapter bundles the newest `react-reconciler` of its React major and peers the `react` range that reconciler declares, for example `@react-pixi-fiber/react-19` bundles 0.34.0 and peers `react` ^19.3.0. When a React minor needs a newer reconciler, the adapter gets a new major version that bundles it and raises the `react` floor. Apps on older React minors stay on the previous adapter major.
+
+
+## Adding an adapter
+
+1. Copy the nearest adapter: `packages/pixi-N` for a PixiJS major, `packages/react-N` for a React major.
+2. Rename the package, its directory and its build entries, and change the data: the PixiJS classes of the 13 core tags, the typed property table and the application factory, or the bundled `react-reconciler` version and the host config. Set the peer dependencies to the new major and `react-pixi-fiber` ^3.0.0, and keep `version` at `0.0.0`.
+3. Add the smoke test, `test/smoke.test.tsx`, that runs `smokeSuite` from `packages/react-pixi-fiber/test/utils/smoke.tsx` with the new adapter.
+4. Add the adapter to the package tables in the root `README.md` and in the [Setup](./packages/react-pixi-fiber/README.md#setup) section of the core README, and write its `README.md`, describing only that adapter.
+5. Add a changeset (`pnpm changeset`) that releases the new package as `major`, so it starts at `1.0.0`.
+6. Run `pnpm install`, then the checks listed in [Sending a Pull Request](#sending-a-pull-request).
 
 
 ## Bugs

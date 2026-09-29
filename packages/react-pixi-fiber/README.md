@@ -67,6 +67,8 @@ Components import only from `react-pixi-fiber`, so a shared component library do
 | [`@react-pixi-fiber/pixi-7`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-7) | `pixi.js` ^7.0.0 |
 | [`@react-pixi-fiber/pixi-8`](https://www.npmjs.com/package/@react-pixi-fiber/pixi-8) | `pixi.js` ^8.0.0 |
 
+Which adapters do I need: the React adapter is the major version of `react` in your `package.json` (`"react": "^18.3.1"` needs `@react-pixi-fiber/react-18`), and the PixiJS adapter is the major version of `pixi.js` likewise (`"pixi.js": "^7.4.3"` needs `@react-pixi-fiber/pixi-7`). Every PixiJS adapter implements all 13 [tags](#tags).
+
 Without `configure`, the first render throws an error that prints the install line and these setup lines.
 
 ### React 17
@@ -80,6 +82,11 @@ Without `configure`, the first render throws an error that prints the install li
 - An error thrown while rendering is reported to `console.error` instead of being thrown from `render()`.
 - `<ViewTransition>` inside `Stage` renders its children without animating.
 - A `<Fragment ref>` inside `Stage` receives the fragment's top-level display objects: `children` lists them, `getBounds()` returns the bounds of each, and `on(event, fn)` and `off(event, fn)` add and remove a listener on each, including display objects added to the fragment later.
+
+### PixiJS 4
+
+- `Mesh` and `MeshSimple` both create `PIXI.mesh.Mesh`, the one mesh class of PixiJS 4.
+- PixiJS 4 ships no typings. For TypeScript, install `@types/pixi.js` 4, an optional peer of `@react-pixi-fiber/pixi-4`.
 
 ### PixiJS 8
 
@@ -221,7 +228,9 @@ Expects **one** the following props:
 
 #### Tags
 
-Each tag names a display object concept. The configured PixiJS adapter creates the matching class of your PixiJS version.
+Each tag names a display object concept. The configured PixiJS adapter creates the matching class of your PixiJS version; every adapter implements all 13 tags.
+
+A display object is an object in the scene graph: a `PIXI.DisplayObject` on PixiJS 4 to 7, a `PIXI.Container` on PixiJS 8, which has no `DisplayObject`. The API names that contain `DisplayObject`, for example `applyDisplayObjectProps` and `DisplayObjectProps`, keep the 2.x names on every PixiJS version.
 
 | Tag | Renders |
 | --- | --- |
@@ -234,7 +243,7 @@ Each tag names a display object concept. The configured PixiJS adapter creates t
 | `<MeshRope />` | a textured rope mesh |
 | `<MeshSimple />` | a simple textured mesh from `texture`, `vertices`, `uvs` and `indices` |
 | `<NineSliceSprite />` | a nine-slice scaled sprite |
-| `<ParticleContainer />` | a fast container for many sprites, [`PIXI.ParticleContainer`] |
+| `<ParticleContainer />` | a fast container for many sprites, [`PIXI.ParticleContainer`]; on PixiJS 8 it takes `<Particle>` children, see [PixiJS 8](#pixijs-8) |
 | `<Sprite />` | a sprite, [`PIXI.Sprite`] |
 | `<Text />` | canvas text, [`PIXI.Text`] |
 | `<TilingSprite />` | a repeating texture, [`PIXI.TilingSprite`] |
@@ -243,9 +252,29 @@ For code that runs on every PixiJS version, use `<MeshSimple texture vertices uv
 
 ### Props
 
-[Similarly](https://reactjs.org/blog/2017/09/08/dom-attributes-in-react-16.html) to ReactDOM in React 16,
-ReactPixiFiber is not ignoring unknown [`PIXI.DisplayObject`] members – they are all passed through. You can read
-more about [Unknown Prop Warning](https://reactjs.org/warnings/unknown-prop.html) in ReactDOM.
+ReactPixiFiber does not ignore unknown display object members – they are all set on the instance as-is, and
+an unknown name is not reported.
+
+
+#### Default props per tag
+
+The PixiJS adapter's `defaults` option sets default props per tag, like React's `defaultProps`:
+
+```js
+configure({ react: react18(), pixi: pixi6({ defaults: { Sprite: { alpha: 0.5 }, Text: { text: "" } } }) });
+
+<Sprite texture={texture} />; // alpha 0.5
+<Sprite texture={texture} alpha={1} />; // alpha 1
+```
+
+- **When the instance is created**, a prop that is missing or `undefined` gets its default. `create` receives it, so a
+  prop the constructor reads, such as `Text` `text`, sees it too, and so does a component's own `applyProps`.
+- **When a prop is removed** or set to `undefined` (or to an invalid value), it returns to its default. A prop with no
+  entry returns to the value the instance had before React Pixi Fiber first set it.
+- An explicit `null` is not replaced: it is set as `null`.
+- Entries are keyed by the tag as you write it, `PIXIComponent` tags included, and by the prop names of the adapter.
+  A tag an adapter adds under its PixiJS class name is a tag of its own, see
+  [Adapter tags are recorded under their own name](#adapter-tags-are-recorded-under-their-own-name).
 
 
 #### Custom Props / Plugins
@@ -439,7 +468,7 @@ render(
 
 #### `create(props)`
 
-Use this to create an instance of [`PIXI.DisplayObject`].
+Use this to create the display object.
 
 This is your entry point to custom components and the only required method.
 
@@ -544,6 +573,8 @@ No, unfortunately it is not supported right now.
 
 
 ## Migrating from `react-pixi-fiber@0.x.y` (before version `1.0.0`)
+
+These notes describe the move to 1.0.0. Code that follows them also needs [Migrating to 3.0.0](#migrating-to-300): `Stage` is a function component and `createStageClass` is deprecated, `ref.current._app.current` is `null` until `onInit`, `CustomPIXIComponent` and the `custom*` behavior keys are deprecated, and `_customApplyProps` is gone, `applyProps(instance, oldProps, newProps)` replaces the code in the last note.
 
 <details>
   <summary>
@@ -770,7 +801,7 @@ react-pixi-fiber is not configured. Install the adapters for your React and Pixi
 Replace N with your PixiJS major version (4 to 8).
 ```
 
-Call it once. A second call after a render warns in development: trees already rendered keep their React renderer, new PixiJS instances use the new adapters.
+Call it once. A second call after a render warns in development: trees already rendered keep their React renderer, new PixiJS instances and prop writes use the new adapters.
 
 ### `CustomPIXIComponent` is `PIXIComponent`
 
@@ -959,7 +990,7 @@ PixiJS 7 and 8 have no `PIXI.interaction` and no `PIXI.InteractionEvent`, so `pi
 
 ### Smaller changes
 
-- A prop set to `undefined` resets to the value the instance had before React Pixi Fiber first set it. For example, `Text` `text` goes back to the value the `PIXI.Text` was created with, not `""`.
+- A prop set to `undefined` resets to the value the instance had before React Pixi Fiber first set it. For example, `Text` `text` goes back to the value the `PIXI.Text` was created with, not `""`. To choose the value, set it in the adapter's [`defaults`](#default-props-per-tag).
 - `Stage` passes typed prop names and Container prop names, for example `buttonMode` and `interactiveChildren`, to `app.stage`. In 2.x these props went to the `<canvas>` element.
 - `AppContext` is typed `Context<Application | null>` and its default value is `null`.
 - `Graphics` passes `props.geometry` to the `PIXI.Graphics` constructor.
@@ -1016,7 +1047,6 @@ For making an awesome project structure and documentation that is used in simila
 [`PIXI.Application`]: https://pixijs.download/v6.5.10/docs/PIXI.Application.html
 [`PIXI.BitmapText`]: https://pixijs.download/v6.5.10/docs/PIXI.BitmapText.html
 [`PIXI.Container`]: https://pixijs.download/v6.5.10/docs/PIXI.Container.html
-[`PIXI.DisplayObject`]: https://pixijs.download/v6.5.10/docs/PIXI.DisplayObject.html 
 [`PIXI.Graphics`]: https://pixijs.download/v6.5.10/docs/PIXI.Graphics.html
 [`PIXI.ObservablePoint`]: https://pixijs.download/v6.5.10/docs/PIXI.ObservablePoint.html
 [`PIXI.ParticleContainer`]: https://pixijs.download/v6.5.10/docs/PIXI.ParticleContainer.html

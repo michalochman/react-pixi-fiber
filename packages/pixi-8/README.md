@@ -1,8 +1,8 @@
 # @react-pixi-fiber/pixi-8
 
-PixiJS 8 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It tells `react-pixi-fiber` how to create the PixiJS 8 display objects for the core tags, which props it types, and how to create and initialize a `PIXI.Application`.
+PixiJS 8 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It tells `react-pixi-fiber` how to create the PixiJS 8 display objects for all 13 core tags, which props it types, and how to create and initialize a `PIXI.Application`.
 
-Install it next to `react-pixi-fiber`, `pixi.js` 8 and a React adapter from the [adapter table](https://github.com/michalochman/react-pixi-fiber/tree/master/packages/react-pixi-fiber#setup), then configure once in the app entry, before the first render:
+Install it next to `react-pixi-fiber`, `pixi.js` 8 and a React adapter from the [adapter table](../react-pixi-fiber/README.md#setup), then configure once in the app entry, before the first render:
 
 ```js
 import { configure } from "react-pixi-fiber";

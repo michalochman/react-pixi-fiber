@@ -14,20 +14,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `@react-pixi-fiber/react-17`, the React 17 adapter, needs React 17.0.2 or a later 17.x
 - `@react-pixi-fiber/react-19`, the React 19 adapter, needs React 19.3 or newer. It reports render errors on `console.error` and renders a `<ViewTransition>` inside `Stage` without animating
 - Fragment refs on React 19: a `<Fragment ref>` inside `Stage` receives a `PixiFragmentInstance` with `children`, `getBounds()`, `off(event, fn)` and `on(event, fn)` over the fragment's top-level display objects
-- `@react-pixi-fiber/pixi-4`, the PixiJS 4 adapter. `Mesh` and `MeshSimple` both create `PIXI.mesh.Mesh`
+- `@react-pixi-fiber/pixi-4`, the PixiJS 4 adapter. `Mesh` and `MeshSimple` both create `PIXI.mesh.Mesh`. PixiJS 4 ships no typings; for TypeScript install `@types/pixi.js` 4, an optional peer
 - `@react-pixi-fiber/pixi-5`, the PixiJS 5 adapter
-- `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter with the `DOMContainer`, `HTMLText`, `Particle`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` tags and a `compat` option that translates the 2.x interaction props. `ParticleContainer` takes `Particle` children on it
+- `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter with the `DOMContainer`, `HTMLText`, `Particle`, `PerspectiveMesh`, `RenderContainer` and `RenderLayer` tags and a `compat` option that translates the 2.x props PixiJS 8 renamed. `ParticleContainer` takes `Particle` children on it; a Suspense boundary inside it does not hide its particles, it cannot be the container passed to `render`, and a `Particle` under any other container fails inside PixiJS
 - A PixiJS adapter can rename props with `translateProps` before they are validated, set or diffed; a `PIXIComponent` with its own `applyProps` receives the props as written
 - `PIXIComponent(type, behavior)` and `PIXIProperty` replace `CustomPIXIComponent(behavior, type)` and `CustomPIXIProperty`. Behavior keys are `create`, `applyProps`, `afterAdd`, `beforeRemove`
 - `PixiTickerCallback` type export, the callback type `usePixiTicker` takes
-- Tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope` and `NineSliceSprite`
+- Tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope` and `NineSliceSprite`. Every PixiJS adapter implements all 13 tags
 - `Stage` `onInit(app)` prop, called once the PixiJS application exists and the children are rendered
 
 ### Changed
 - `react-reconciler` moved from the core into the React adapters; `@react-pixi-fiber/react-17` bundles `react-reconciler` 0.26.2, `@react-pixi-fiber/react-18` 0.29.2 and `@react-pixi-fiber/react-19` 0.34.0
 - `pixi.js` is no longer a peer dependency of the core, the PixiJS adapter has it. The core's `react` peer is `>=17.0.0 <20.0.0`
-- A second `configure` call after a render warns once in development. Trees already rendered keep their React renderer; new PixiJS instances use the new adapter
-- The PixiJS 6 types `InteractionCompatibility`, `InteractionEventCompatibility` and `PixiTypeFallback` import from `@react-pixi-fiber/pixi-6`
+- A second `configure` call after a render warns once in development. Trees already rendered keep their React renderer; new PixiJS instances and prop writes use the new adapter
+- The types `InteractionCompatibility`, `InteractionEventCompatibility` and `PixiTypeFallback` import from the PixiJS adapter: `@react-pixi-fiber/pixi-4`, `pixi-5` and `pixi-6` export all three, `@react-pixi-fiber/pixi-7` exports `PixiTypeFallback`
 - Build output moved from `cjs/` and `es/` to `dist/cjs/` and `dist/es/`. Imports of `react-pixi-fiber` are unaffected; direct paths to the built files need the `dist/` prefix
 - The `usePixiTicker` callback has the type `app.ticker.add` takes on the configured PixiJS version
 - Examples are built with Vite instead of Create React App
@@ -52,14 +52,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The source is TypeScript; the types ship from the build instead of a handwritten `index.d.ts`. `CustomDisplayObject*` and `CustomPIXIComponent*` types are renamed without the `Custom` prefix
 
 ### Deprecated
-Each deprecated item warns once in development and is removed in 4.0.0. The deprecated functions, behavior keys, type names and tag keep working in 3.x.
+Each deprecated item keeps working in 3.x and is removed in 4.0.0. The deprecated functions, behavior keys, tag and `Stage` props warn once in development; the deprecated types, for example `InteractiveComponent` and the `Custom*` names, do not warn.
 - `CustomPIXIComponent(behavior, type)` and `CustomPIXIProperty`, use `PIXIComponent(type, behavior)` and `PIXIProperty`
 - Behavior keys `customDisplayObject`, `customApplyProps`, `customDidAttach` and `customWillDetach`, use `create`, `applyProps`, `afterAdd` and `beforeRemove`
-- The `Custom*` type names (`CustomDisplayObject*`, `CustomPIXIComponent*`), use the names without the prefix. Types do not warn
+- The `Custom*` type names (`CustomDisplayObject*`, `CustomPIXIComponent*`), use the names without the prefix
 - `createStageClass`, it returns the function `Stage`
 - Tag `NineSlicePlane`, it maps to `NineSliceSprite`
 - `Stage` `width` and `height` props (deprecated since 0.12.0, the warning no longer needs `prop-types`). As in 2.x they set `app.stage.width` and `app.stage.height` and never size the renderer or reach the `<canvas>`; the renderer size comes from `options.width` and `options.height`
-- The `InteractiveComponent` type in `react-pixi-fiber`, import it from the PixiJS adapter
+- The `InteractiveComponent` type in `react-pixi-fiber`, import it from `@react-pixi-fiber/pixi-4`, `pixi-5` or `pixi-6`
 
 ### Removed
 - The `react-pixi-fiber/react-pixi-alias` subpath and the `react-dom` peer dependency

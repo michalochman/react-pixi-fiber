@@ -1,8 +1,8 @@
 # @react-pixi-fiber/react-19
 
-React 19 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It bundles `react-reconciler` 0.34.0 and builds the renderer that `react-pixi-fiber` uses to render PixiJS display objects.
+React 19 adapter for [react-pixi-fiber](https://github.com/michalochman/react-pixi-fiber). It bundles `react-reconciler` 0.34.0 and builds the renderer that `react-pixi-fiber` uses to render PixiJS display objects. It needs React 19.3 or newer, the peer range of that `react-reconciler`.
 
-Install it next to `react-pixi-fiber`, `react` 19 and a PixiJS adapter from the [adapter table](https://github.com/michalochman/react-pixi-fiber/tree/master/packages/react-pixi-fiber#setup), then configure once in the app entry, before the first render:
+Install it next to `react-pixi-fiber`, `react` 19 and a PixiJS adapter from the [adapter table](../react-pixi-fiber/README.md#setup), then configure once in the app entry, before the first render:
 
 ```js
 import { configure } from "react-pixi-fiber";
@@ -11,6 +11,8 @@ import pixiN from "@react-pixi-fiber/pixi-N"; // the PixiJS adapter for your Pix
 
 configure({ react: react19(), pixi: pixiN() });
 ```
+
+An error thrown while rendering is reported to `console.error` instead of being thrown from `render()`.
 
 `<ViewTransition>` inside `Stage` renders its children without animating.
 
