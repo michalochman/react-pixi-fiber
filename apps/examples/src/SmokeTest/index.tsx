@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useState } from "react";
-import { CustomPIXIComponent, Stage } from "react-pixi-fiber";
-import * as PIXI from "pixi.js";
+import { Stage } from "react-pixi-fiber";
 import RotatingBunny from "../RotatingBunny";
 
 const COLORS = [0x1099bb, 0x10bb99];
@@ -8,12 +7,6 @@ const SIZES = [
   { width: 400, height: 300 },
   { width: 300, height: 400 },
 ];
-
-// 2.x API on purpose: proves the deprecated alias still works
-const LegacyContainer = CustomPIXIComponent<PIXI.Container, {}>(
-  { customDisplayObject: () => new PIXI.Container() },
-  "LegacyContainer"
-);
 
 function SmokeTestExample() {
   const [color, setColor] = useState(0);
@@ -83,13 +76,11 @@ function SmokeTestExample() {
       </table>
       {mount && (
         <Stage options={{ backgroundColor, height, width }}>
-          <LegacyContainer>
-            {count > 0 && <RotatingBunny x={width / 2} y={height / 2} texture={0} step={0.1} />}
-            {count > 1 && <RotatingBunny x={width / 4} y={height / 4} texture={1} step={0.2} />}
-            {count > 2 && <RotatingBunny x={width / 4} y={(3 * height) / 4} texture={2} step={-0.25} />}
-            {count > 3 && <RotatingBunny x={(3 * width) / 4} y={height / 4} texture={3} step={-0.1} />}
-            {count > 4 && <RotatingBunny x={(3 * width) / 4} y={(3 * height) / 4} texture={4} step={-0.02} />}
-          </LegacyContainer>
+          {count > 0 && <RotatingBunny x={width / 2} y={height / 2} texture={0} step={0.1} />}
+          {count > 1 && <RotatingBunny x={width / 4} y={height / 4} texture={1} step={0.2} />}
+          {count > 2 && <RotatingBunny x={width / 4} y={(3 * height) / 4} texture={2} step={-0.25} />}
+          {count > 3 && <RotatingBunny x={(3 * width) / 4} y={height / 4} texture={3} step={-0.1} />}
+          {count > 4 && <RotatingBunny x={(3 * width) / 4} y={(3 * height) / 4} texture={4} step={-0.02} />}
         </Stage>
       )}
     </Fragment>
