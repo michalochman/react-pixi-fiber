@@ -1,4 +1,4 @@
-import { CustomPIXIComponent } from "react-pixi-fiber";
+import { PIXIComponent } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 
 type DragHandler = (instance: DraggableContainerInstance) => void;
@@ -10,7 +10,7 @@ export type DraggableContainerProps = {
 };
 
 // Drag handlers passed as props are set on the instance by react-pixi-fiber,
-// listeners are stored on the instance so `customWillDetach` can remove them.
+// listeners are stored on the instance so `beforeRemove` can remove them.
 export class DraggableContainerInstance extends PIXI.Container implements DraggableContainerProps {
   onDragEnd?: DragHandler;
   onDragMove?: DragHandler;
@@ -41,22 +41,19 @@ export class DraggableContainerInstance extends PIXI.Container implements Dragga
 
 const TYPE = "DraggableContainer";
 
-export default CustomPIXIComponent<DraggableContainerInstance, DraggableContainerProps>(
-  {
-    customDisplayObject: () => new DraggableContainerInstance(),
-    customDidAttach: instance => {
-      instance.interactive = true;
-      instance.cursor = "pointer";
+export default PIXIComponent<DraggableContainerInstance, DraggableContainerProps>(TYPE, {
+  create: () => new DraggableContainerInstance(),
+  afterAdd: instance => {
+    instance.interactive = true;
+    instance.cursor = "pointer";
 
-      instance.on("mousedown", instance.dragStart);
-      instance.on("mouseup", instance.dragEnd);
-      instance.on("mousemove", instance.dragMove);
-    },
-    customWillDetach: instance => {
-      instance.off("mousedown", instance.dragStart);
-      instance.off("mouseup", instance.dragEnd);
-      instance.off("mousemove", instance.dragMove);
-    },
+    instance.on("mousedown", instance.dragStart);
+    instance.on("mouseup", instance.dragEnd);
+    instance.on("mousemove", instance.dragMove);
   },
-  TYPE
-);
+  beforeRemove: instance => {
+    instance.off("mousedown", instance.dragStart);
+    instance.off("mouseup", instance.dragEnd);
+    instance.off("mousemove", instance.dragMove);
+  },
+});

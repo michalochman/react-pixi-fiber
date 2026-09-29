@@ -1,7 +1,7 @@
 // This is demo of pixi-display.js, https://github.com/gameofbombs/pixi-display
 // Drag the rabbits to understand what's going on
 // https://pixijs.io/examples/#/layers/zorder.js
-import { CustomPIXIProperty, Container, Stage } from "react-pixi-fiber";
+import { Container, PIXIProperty, Stage } from "react-pixi-fiber";
 import ColoredBunny from "./ColoredBunny";
 import DraggableContainer from "../CustomPIXIComponentExample/DraggableContainer";
 import Layer from "./Layer";
@@ -18,7 +18,7 @@ const OPTIONS = {
 };
 
 // Mark parentGroup prop as legal on Container as long as it's a valid display group
-CustomPIXIProperty(Container, "parentGroup", value => value instanceof display.Group);
+PIXIProperty(Container, "parentGroup", value => value instanceof display.Group);
 
 //META STUFF, groups exist without stage just fine
 

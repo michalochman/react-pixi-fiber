@@ -1,4 +1,4 @@
-import { CustomPIXIComponent } from "react-pixi-fiber";
+import { PIXIComponent } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 import { display } from "./pixiLayers";
 
@@ -12,24 +12,21 @@ type LayeredStageInstance = PIXI.Container & {
 
 const TYPE = "LayeredStage";
 
-export default CustomPIXIComponent<LayeredStageInstance, LayeredStageProps>(
-  {
-    customDisplayObject: () => {
-      const stage: LayeredStageInstance = new display.Stage();
-      stage.sortableChildren = true;
-      return stage;
-    },
-    customDidAttach: instance => {
-      const updateStage = () => {
-        instance.updateStage();
-        instance._updateStageRafId = window.requestAnimationFrame(updateStage);
-      };
-      updateStage();
-    },
-    customWillDetach: instance => {
-      window.cancelAnimationFrame(instance._updateStageRafId);
-      instance.destroy();
-    },
+export default PIXIComponent<LayeredStageInstance, LayeredStageProps>(TYPE, {
+  create: () => {
+    const stage: LayeredStageInstance = new display.Stage();
+    stage.sortableChildren = true;
+    return stage;
   },
-  TYPE
-);
+  afterAdd: instance => {
+    const updateStage = () => {
+      instance.updateStage();
+      instance._updateStageRafId = window.requestAnimationFrame(updateStage);
+    };
+    updateStage();
+  },
+  beforeRemove: instance => {
+    window.cancelAnimationFrame(instance._updateStageRafId);
+    instance.destroy();
+  },
+});

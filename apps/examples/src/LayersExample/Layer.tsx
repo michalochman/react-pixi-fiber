@@ -1,4 +1,4 @@
-import { CustomPIXIComponent } from "react-pixi-fiber";
+import { PIXIComponent } from "react-pixi-fiber";
 import * as PIXI from "pixi.js";
 import { display } from "./pixiLayers";
 
@@ -8,9 +8,6 @@ export type LayerProps = {
 
 const TYPE = "Layer";
 
-export default CustomPIXIComponent<PIXI.Container, LayerProps>(
-  {
-    customDisplayObject: ({ group }) => new display.Layer(group),
-  },
-  TYPE
-);
+export default PIXIComponent<PIXI.Container, LayerProps>(TYPE, {
+  create: ({ group }) => new display.Layer(group),
+});
