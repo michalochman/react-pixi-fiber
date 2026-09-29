@@ -1,6 +1,6 @@
 {
   "name": "@react-pixi-fiber/react-18",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "React 18 adapter for react-pixi-fiber",
   "main": "index.js",
   "author": "Michal Ochman",

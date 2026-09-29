@@ -12,11 +12,16 @@
     "format": "biome check --write",
     "check-types": "pnpm -r check-types",
     "start": "pnpm --filter examples start",
-    "check-package": "node scripts/check-package.mjs"
+    "check-package": "node scripts/check-package.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm -r build && pnpm check-package && changeset publish"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@biomejs/biome": "2.5.14",
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
     "@vitest/coverage-v8": "4.1.10",
     "canvas": "^3.2.3",
     "cross-env": "^7.0.3",

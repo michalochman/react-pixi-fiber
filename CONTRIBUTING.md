@@ -22,6 +22,11 @@ React Pixi Fiber follows [semantic versioning](http://semver.org/). We release p
 Every significant change is documented in the [changelog file](https://github.com/michalochman/react-pixi-fiber/blob/master/packages/react-pixi-fiber/CHANGELOG.md).
 
 
+## Releasing
+
+Every user-visible change adds a changeset with `pnpm changeset`. The release runs `pnpm version-packages`, commits the result, then runs `pnpm release`.
+
+
 ## Bugs
 
 We are using [GitHub Issues](https://github.com/michalochman/react-pixi-fiber/issues) for our public bugs. We keep a close eye on this and try to make it clear when we have an internal fix in progress. Before filing a new task, try to make sure your problem doesn't already exist.
