@@ -10,6 +10,7 @@ This repository holds [`react-pixi-fiber`](./packages/react-pixi-fiber), a React
 
 | Path | Contents |
 | --- | --- |
+| [`packages/pixi-5`](./packages/pixi-5) | `@react-pixi-fiber/pixi-5`, the PixiJS 5 adapter |
 | [`packages/pixi-6`](./packages/pixi-6) | `@react-pixi-fiber/pixi-6`, the PixiJS 6 adapter |
 | [`packages/pixi-7`](./packages/pixi-7) | `@react-pixi-fiber/pixi-7`, the PixiJS 7 adapter |
 | [`packages/pixi-8`](./packages/pixi-8) | `@react-pixi-fiber/pixi-8`, the PixiJS 8 adapter |

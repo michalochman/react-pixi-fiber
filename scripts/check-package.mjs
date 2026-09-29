@@ -28,6 +28,14 @@ const packages = readdirSync(packagesDir)
   }))
   .filter(({ pkg }) => !pkg.private);
 const work = realpathSync(mkdtempSync(join(tmpdir(), "react-pixi-fiber-")));
+// PixiJS 5 reads the DOM globals when it is imported, so the Node checks that import an adapter define them first.
+const preload = join(work, "dom.cjs");
+writeFileSync(
+  preload,
+  `const { window } = new (require(${JSON.stringify(createRequire(import.meta.url).resolve("jsdom"))}).JSDOM)();\n` +
+    "Object.defineProperty(globalThis, 'window', { value: window, configurable: true });\n" +
+    "Object.defineProperty(globalThis, 'document', { value: window.document, configurable: true });\n"
+);
 
 const run = (command, args, cwd = root) => execFileSync(command, args, { cwd, encoding: "utf8" }).trim();
 
@@ -179,14 +187,14 @@ try {
           join(pkgWork, "default.mjs"),
           `import factory from ${JSON.stringify(name)};\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
         );
-        run("node", ["default.mjs"], pkgWork);
+        run("node", ["--require", preload, "default.mjs"], pkgWork);
       });
       await check(`${name} default export is callable from node CJS`, () => {
         writeFileSync(
           join(pkgWork, "default.cjs"),
           `const mod = require(${JSON.stringify(name)});\nconst factory = mod.default ?? mod;\nif (typeof factory !== "function") throw new Error(typeof factory);\n`
         );
-        run("node", ["default.cjs"], pkgWork);
+        run("node", ["--require", preload, "default.cjs"], pkgWork);
       });
     }
     if (name !== "react-pixi-fiber") {
