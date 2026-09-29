@@ -249,7 +249,7 @@ describe("ReactPixiFiber", () => {
       ReactPixiFiber.commitUpdate(instance, updatePayload, type, oldProps, newProps, internalHandle);
 
       if (__DEV__) {
-        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle);
+        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle, 8);
         expect(validateProperties).toHaveBeenCalledTimes(1);
         expect(validateProperties).toHaveBeenCalledWith("Text", newProps);
       } else {
@@ -403,7 +403,7 @@ describe("ReactPixiFiber", () => {
       ReactPixiFiber.commitMount(instance, type, props, internalHandle);
 
       if (__DEV__) {
-        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle);
+        expect(findStrictRoot).toHaveBeenCalledWith(internalHandle, 8);
         expect(validateProperties).toHaveBeenCalledTimes(1);
         expect(validateProperties).toHaveBeenCalledWith("Text", props);
       } else {

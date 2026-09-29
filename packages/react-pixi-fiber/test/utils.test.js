@@ -1,7 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
 import * as PIXI from "pixi.js";
 import builtins from "../src/builtins";
-import { filterByKey, including, isPointType, not, parsePoint, setPixiValue, copyPoint } from "../src/utils";
+import {
+  filterByKey,
+  findStrictRoot,
+  including,
+  isPointType,
+  not,
+  parsePoint,
+  setPixiValue,
+  copyPoint,
+} from "../src/utils";
 
 describe("not", () => {
   it("returns a function", () => {
@@ -162,5 +171,25 @@ describe("copyPoint", () => {
     copyPoint(instance, "position", position, pixi);
     expect(pixi.copyPoint).toHaveBeenCalledTimes(1);
     expect(pixi.copyPoint).toHaveBeenCalledWith(instance.position, position);
+  });
+});
+
+describe("findStrictRoot", () => {
+  it("returns the outermost fiber that has the StrictMode bit", () => {
+    const root = { mode: 8, return: null };
+    const middle = { mode: 8, return: root };
+    const leaf = { mode: 0, return: middle };
+    expect(findStrictRoot(leaf, 8)).toBe(root);
+  });
+
+  it("returns null when no fiber has the bit", () => {
+    expect(findStrictRoot({ mode: 0, return: { mode: 0, return: null } }, 8)).toBeNull();
+    expect(findStrictRoot(undefined, 8)).toBeNull();
+  });
+
+  it("uses the bit it is given", () => {
+    const fiber = { mode: 1, return: null };
+    expect(findStrictRoot(fiber, 1)).toBe(fiber);
+    expect(findStrictRoot(fiber, 8)).toBeNull();
   });
 });

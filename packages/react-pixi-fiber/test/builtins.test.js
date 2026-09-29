@@ -97,8 +97,8 @@ describe("builtins", () => {
     expect([sprite.x, sprite.y]).toEqual([3, 4]);
   });
 
-  // `validateProperties` is what the reconciler runs under a <StrictMode> ancestor in development. It is called
-  // directly: until Task 6 `findStrictRoot` tests mode bit 1, which is not StrictMode on React 18.
+  // `validateProperties` is what the reconciler runs under a <StrictMode> ancestor in development; test/strictMode.test.jsx
+  // covers the same through the renderer.
   it("does not report plain props on a PIXIComponent tag, but still checks the casing of typed names", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     PIXIComponent("StrictThing", () => new PIXI.Container());

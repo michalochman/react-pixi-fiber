@@ -7,3 +7,8 @@ registerAdapterComponents(builtins.components);
 export function getPixiAdapter(): PixiAdapter {
   return builtins;
 }
+
+// Phase 1 shim for React 18. Task 11 reads it from the configured React adapter.
+export function getStrictModeBit(): number {
+  return 8;
+}

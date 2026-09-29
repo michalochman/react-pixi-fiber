@@ -5,6 +5,7 @@ import type * as PIXI from "pixi.js";
 import { createInstance, setInitialProperties, diffProperties, updateProperties } from "./ReactPixiFiberComponent";
 import { validateProperties as validateUnknownProperties } from "./ReactPixiFiberUnknownPropertyHook";
 import { getBoundBehavior } from "./registry";
+import { getStrictModeBit } from "./config";
 import { findStrictRoot } from "./utils";
 
 type Instance = PIXI.Container;
@@ -16,7 +17,7 @@ let validatePropertiesInDevelopment: (type: string, props: Props, internalHandle
 
 if (__DEV__) {
   validatePropertiesInDevelopment = function (type, props, internalHandle) {
-    const strictRoot = findStrictRoot(internalHandle);
+    const strictRoot = findStrictRoot(internalHandle, getStrictModeBit());
     if (strictRoot != null) {
       validateUnknownProperties(type, props);
     }

@@ -27,7 +27,7 @@ async function withDefaults(defaults) {
     const builtins = (await vi.importActual("../src/builtins")).default;
     const { registerAdapterComponents } = await import("../src/registry");
     registerAdapterComponents(builtins.components);
-    return { getPixiAdapter: () => ({ ...builtins, defaults }) };
+    return { getPixiAdapter: () => ({ ...builtins, defaults }), getStrictModeBit: () => 8 };
   });
   return {
     ...(await import("../src/PixiPropertyOperations")),
@@ -107,7 +107,10 @@ describe("PixiPropertyOperations", () => {
       vi.resetModules();
       vi.doMock("../src/config", async () => {
         const builtins = (await vi.importActual("../src/builtins")).default;
-        return { getPixiAdapter: () => ({ ...builtins, defaults: { Sprite: { alpha: 0.25 } } }) };
+        return {
+          getPixiAdapter: () => ({ ...builtins, defaults: { Sprite: { alpha: 0.25 } } }),
+          getStrictModeBit: () => 8,
+        };
       });
       const { setValueForProperty } = await import("../src/PixiPropertyOperations");
       const sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
