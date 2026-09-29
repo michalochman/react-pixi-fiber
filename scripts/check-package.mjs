@@ -139,30 +139,56 @@ try {
     }
     const subpathImports = subpaths.map(subpath => `import ${JSON.stringify(subpath)};\n`).join("");
 
-    // The default export is called at run time, so the peers have to resolve: link the ones the workspace installed.
+    // The default export is called at run time and the types are read from the declarations, so the peers have to
+    // resolve: link the ones the workspace installed, optional ones such as @types/pixi.js included. Nothing else is
+    // linked, so the type check sees what a consumer gets.
     for (const peer of peers) {
       const source = join(dir, "node_modules", peer);
       if (!existsSync(source)) continue;
       const target = join(pkgWork, "node_modules", peer);
       mkdirSync(join(target, ".."), { recursive: true });
-      symlinkSync(realpathSync(source), target);
+      const real = realpathSync(source);
+      symlinkSync(real, target);
+      // A pnpm store entry keeps the dependencies of a peer next to it. preserveSymlinks hides them from the type check,
+      // so link them the way a flat install has them.
+      const store = real.slice(0, real.lastIndexOf("/node_modules/") + "/node_modules".length);
+      if (real.includes("/node_modules/.pnpm/")) {
+        for (const entry of readdirSync(store)) {
+          for (const dep of entry.startsWith("@")
+            ? readdirSync(join(store, entry)).map(d => `${entry}/${d}`)
+            : [entry]) {
+            const link = join(pkgWork, "node_modules", dep);
+            if (existsSync(link) || dep === peer) continue;
+            mkdirSync(join(link, ".."), { recursive: true });
+            symlinkSync(join(store, dep), link);
+          }
+        }
+      }
     }
     const hasDefault = /\bas default\b|export default/.test(
       readFileSync(join(installed, `dist/es/${base}.d.mts`), "utf8")
     );
     const callable = "const callable: (...args: never[]) => unknown =";
+    // skipLibCheck hides an unresolved import, which turns its types into `any`. Assigning a value to a `number`
+    // only fails when the value has a real type, so the @ts-expect-error line breaks the check if the types collapse.
+    const notAny = value => `// @ts-expect-error\nconst notAny${counter++}: number = ${value};\n`;
+    let counter = 0;
+    // An adapter fills the core's `PixiInstances` with the classes of its PixiJS, so it is a PixiJS type that must resolve.
+    const pixiTypes = pkg.peerDependencies?.["pixi.js"]
+      ? `import type { PixiInstances } from "react-pixi-fiber";\n${notAny('null as unknown as PixiInstances["Container"]')}`
+      : "";
     writeFileSync(
       join(pkgWork, "a.mts"),
       subpathImports +
         (hasDefault
-          ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\nconsole.log(callable);\n`
+          ? `import factory from ${JSON.stringify(name)};\n${callable} factory;\n${notAny("factory")}${pixiTypes}console.log(callable);\n`
           : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`)
     );
     writeFileSync(
       join(pkgWork, "a.cts"),
       subpathImports +
         (hasDefault
-          ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\nconsole.log(callable);\n`
+          ? `import * as mod from ${JSON.stringify(name)};\n${callable} mod.default;\n${notAny("mod.default")}${pixiTypes}console.log(callable);\n`
           : `import * as mod from ${JSON.stringify(name)};\nconsole.log(mod);\n`)
     );
     writeFileSync(
@@ -173,6 +199,8 @@ try {
           moduleResolution: "node16",
           strict: true,
           noEmit: true,
+          // Resolve from the temporary directory, not from the real path of a linked peer inside the workspace.
+          preserveSymlinks: true,
           skipLibCheck: true,
           types: [],
         },

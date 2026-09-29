@@ -39,8 +39,14 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
+    "@types/pixi.js": "^4.8.9",
     "pixi.js": "^4.4.0",
     "react-pixi-fiber": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/pixi.js": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/pixi.js": "^4.8.9",
