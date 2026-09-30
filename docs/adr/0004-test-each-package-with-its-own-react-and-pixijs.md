@@ -12,7 +12,7 @@ Version 2.x tested one package with Jest 26 and babel-plugin-rewire. Version 3.0
 - Each package must be tested against the React or PixiJS version that it supports, not against the version that another package uses
 - Tests must cover the development behavior and the production behavior
 - A test of one package must not add another package as a workspace dependency. The dependency graph of the packages must stay the same as for a consumer.
-- The number of test runs must not grow with the number of possible adapter pairs
+- The full behavior suite must run for one adapter pair only. A small smoke suite may run for every pair.
 - The public types are part of the API and must have tests too
 
 ## Decision
@@ -31,10 +31,14 @@ Each package pins its own `react` and `pixi.js` versions as devDependencies. The
 The tests of each package have these scopes:
 
 - **Core:** the full behavior suite runs against one real React adapter and one real PixiJS adapter, the development pair. A 2.x compatibility suite (`test/compat2x.test.jsx`) runs 2.x usage against the 3.0.0 core.
-- **React adapters:** render, unmount, DevTools injection, and synchronous commit. A fake PixiJS adapter from the test utilities of the core drives these tests. The fake uses plain objects, not real PixiJS.
+- **React adapters:** render, unmount, DevTools injection, and synchronous commit. The tests wrap the real reconciler and give it a host tree of plain objects, not real PixiJS.
 - **PixiJS adapters:** components, property tables, application creation, and compat translation, against the real PixiJS version of the adapter. One React adapter renders the components.
 
-One smoke suite lives in the test utilities of the core, as a function. It mounts a `Stage`, renders a `Sprite`, changes a prop, reorders children, and unmounts. Each adapter calls the smoke suite with its own `configure({ react, pixi })` pair. React adapters use the fake PixiJS adapter. PixiJS adapters use a real React adapter. The full matrix of all adapter pairs does not run.
+One smoke suite lives in the test utilities of the core, as a function. It mounts a `Stage`, renders a `Sprite`, changes a prop, reorders children, and unmounts. A private app, `apps/test-matrix`, holds one package for each React major. Each package pins its own `react` and `react-test-renderer`. Each package runs the smoke suite with its React adapter and every PixiJS adapter. So every adapter pair runs the smoke suite, and only the smoke suite.
+
+With `RPF_DIST=es`, the Vitest config resolves the core and the adapters to their ES builds instead of their sources. CI runs the smoke suite once from the ES development builds. The production builds bundle the production reconciler. The development React of the test environment cannot drive the production reconciler of React 19, so the production builds do not render in tests. `pnpm check-package` loads them (see [0005](0005-check-each-package-as-a-consumer-installs-it.md)).
+
+The test-matrix packages have no type check. Every PixiJS adapter augments the same core types, so one TypeScript program cannot hold all PixiJS adapters.
 
 Type tests are TSX fixtures under `test/typescript/`. `pnpm check-types` compiles them. A fixture shows that valid usage compiles and that invalid usage fails, with `@ts-expect-error`.
 
@@ -44,9 +48,13 @@ Type tests are TSX fixtures under `test/typescript/`. `pnpm check-types` compile
 
 The 2.x suite already ran on Jest. But Jest needs Babel or a separate transform for TypeScript. babel-plugin-rewire, which the 2.x tests used to replace module internals, depends on Babel. Vitest uses the same transform as the build tooling and runs TypeScript directly.
 
-### Run the full matrix of adapter pairs
+### Run the full behavior suite for every adapter pair
 
-Each React adapter would run with each PixiJS adapter. This finds a problem that only one pair has. But the number of runs grows as the product of the React majors and the PixiJS majors. The adapters meet only through the data contract of the core, so a pair-specific problem is unlikely. The smoke suite tests each adapter with one real partner.
+Each React adapter would run the full suite of the core with each PixiJS adapter. This finds every problem that only one pair has. But the number of runs grows as the product of the React majors and the PixiJS majors. The adapters meet only through the data contract of the core, so a pair-specific problem shows in a small smoke test. The smoke suite runs for every pair, and the full suite runs for one pair.
+
+### Install every React major in one test package
+
+One package would install each React major under an alias, for example `react17`. But pnpm resolves the `react` peer of `react-test-renderer` to one React version for the whole package. The aliased renderers then pair with the wrong React. One package for each React major gives pnpm one React to pair with.
 
 ### A browser test runner instead of jsdom
 
@@ -56,6 +64,8 @@ A real browser runs real WebGL, and the PixiJS application code runs as in produ
 
 - Each package tests the versions that it supports, but the workspace installs several React and PixiJS majors side by side. Each package needs the Vitest alias to find its own copy.
 - Development and production behavior both have tests, but each test run takes twice as long
-- The smoke suite and the fake PixiJS adapter keep the adapter tests small. But a release can contain a problem that only one adapter pair has.
+- The smoke suite runs for every adapter pair, but only the smoke suite. A pair-specific problem outside the smoke suite still reaches a release.
+- The smoke suite renders once from the ES development builds, but the production builds and the CommonJS builds do not render in tests
+- The test-matrix packages install every adapter, but they have no type check
 - Tests run in jsdom with a canvas mock, so they are fast, but no automated test checks real WebGL rendering. A rendering change needs a manual browser check of the examples.
-- Adapters import shared test utilities from the core by relative path, so a change to these utilities can break the tests of every adapter
+- The test-matrix packages import the smoke suite from the core by relative path. A change to the smoke suite can break the tests of every adapter pair.

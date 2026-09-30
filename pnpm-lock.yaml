@@ -116,71 +116,125 @@ importers:
         specifier: ^8.3.1
         version: 8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(terser@5.51.2)(yaml@2.9.1)
 
+  apps/test-matrix/react-17:
+    devDependencies:
+      '@react-pixi-fiber/pixi-4':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-4
+      '@react-pixi-fiber/pixi-5':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-5
+      '@react-pixi-fiber/pixi-6':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-6
+      '@react-pixi-fiber/pixi-7':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-7
+      '@react-pixi-fiber/pixi-8':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-8
+      '@react-pixi-fiber/react-17':
+        specifier: workspace:*
+        version: link:../../../packages/react-17
+      react:
+        specifier: ^17.0.2
+        version: 17.0.2
+      react-pixi-fiber:
+        specifier: workspace:*
+        version: link:../../../packages/react-pixi-fiber
+      react-test-renderer:
+        specifier: ^17.0.2
+        version: 17.0.2(react@17.0.2)
+
+  apps/test-matrix/react-18:
+    devDependencies:
+      '@react-pixi-fiber/pixi-4':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-4
+      '@react-pixi-fiber/pixi-5':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-5
+      '@react-pixi-fiber/pixi-6':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-6
+      '@react-pixi-fiber/pixi-7':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-7
+      '@react-pixi-fiber/pixi-8':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-8
+      '@react-pixi-fiber/react-18':
+        specifier: workspace:*
+        version: link:../../../packages/react-18
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-pixi-fiber:
+        specifier: workspace:*
+        version: link:../../../packages/react-pixi-fiber
+      react-test-renderer:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
+  apps/test-matrix/react-19:
+    devDependencies:
+      '@react-pixi-fiber/pixi-4':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-4
+      '@react-pixi-fiber/pixi-5':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-5
+      '@react-pixi-fiber/pixi-6':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-6
+      '@react-pixi-fiber/pixi-7':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-7
+      '@react-pixi-fiber/pixi-8':
+        specifier: workspace:*
+        version: link:../../../packages/pixi-8
+      '@react-pixi-fiber/react-19':
+        specifier: workspace:*
+        version: link:../../../packages/react-19
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      react-pixi-fiber:
+        specifier: workspace:*
+        version: link:../../../packages/react-pixi-fiber
+      react-test-renderer:
+        specifier: ^19.3.0
+        version: 19.3.0(react@19.3.0)
+
   packages/pixi-4:
     devDependencies:
       '@types/pixi.js':
         specifier: ^4.8.9
         version: 4.8.9
-      '@types/react':
-        specifier: ^18.2.8
-        version: 18.3.31
-      '@types/react-test-renderer':
-        specifier: ^18.3.1
-        version: 18.3.1
       pixi.js:
         specifier: ^4.8.9
         version: 4.8.9
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
       react-pixi-fiber:
         specifier: workspace:*
         version: link:../react-pixi-fiber
-      react-test-renderer:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
 
   packages/pixi-5:
     devDependencies:
-      '@types/react':
-        specifier: ^18.2.8
-        version: 18.3.31
-      '@types/react-test-renderer':
-        specifier: ^18.3.1
-        version: 18.3.1
       pixi.js:
         specifier: ^5.3.12
         version: 5.3.12
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
       react-pixi-fiber:
         specifier: workspace:*
         version: link:../react-pixi-fiber
-      react-test-renderer:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
 
   packages/pixi-6:
     devDependencies:
-      '@types/react':
-        specifier: ^18.2.8
-        version: 18.3.31
-      '@types/react-test-renderer':
-        specifier: ^18.3.1
-        version: 18.3.1
       pixi.js:
         specifier: ^6.5.10
         version: 6.5.10
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
       react-pixi-fiber:
         specifier: workspace:*
         version: link:../react-pixi-fiber
-      react-test-renderer:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
 
   packages/pixi-7:
     devDependencies:
@@ -247,9 +301,6 @@ importers:
       react-reconciler:
         specifier: 0.26.2
         version: 0.26.2(react@17.0.2)
-      react-test-renderer:
-        specifier: ^17.0.2
-        version: 17.0.2(react@17.0.2)
 
   packages/react-18:
     devDependencies:
@@ -286,9 +337,6 @@ importers:
       react-reconciler:
         specifier: 0.34.0
         version: 0.34.0(react@19.3.0)
-      react-test-renderer:
-        specifier: ^19.3.0
-        version: 19.3.0(react@19.3.0)
 
   packages/react-pixi-fiber:
     devDependencies:

@@ -43,12 +43,8 @@
     "react-pixi-fiber": "^3.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.8",
-    "@types/react-test-renderer": "^18.3.1",
     "pixi.js": "^6.5.10",
-    "react": "^18.3.1",
-    "react-pixi-fiber": "workspace:*",
-    "react-test-renderer": "^18.3.1"
+    "react-pixi-fiber": "workspace:*"
   },
   "scripts": {
     "build": "rm -rf dist && pnpm run build:prod && pnpm run build:dev",
