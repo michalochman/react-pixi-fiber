@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { getConfigured, markRendered } from "./configure";
 import type { Renderer } from "./types";
+import warning from "./warning";
 
 type Kind = "primary" | "secondary";
 
@@ -16,16 +17,16 @@ export function renderWith(kind: Kind, element: ReactNode, container: any, callb
   return renderer.render(element, container, callback);
 }
 
-export function unmountWith(kind: Kind, container: any): void {
-  const renderer = owners[kind].get(container) || getConfigured()[kind];
-  owners[kind].delete(container);
-  renderer.unmount(container);
+export function unmountWith(kind: Kind, container: any): boolean {
+  const owner = owners[kind].get(container);
+  if (__DEV__) warning(owner, "ReactPixiFiber did not render into container provided");
+  return owner ? owner.unmount(container) : false;
 }
 
 export function render(element: ReactNode, container: any, callback?: () => void): unknown {
   return renderWith("primary", element, container, callback);
 }
 
-export function unmount(container: any): void {
-  unmountWith("primary", container);
+export function unmount(container: any): boolean {
+  return unmountWith("primary", container);
 }

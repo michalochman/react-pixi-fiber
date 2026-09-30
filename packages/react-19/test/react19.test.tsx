@@ -109,6 +109,16 @@ describe("react19", () => {
     expect(react19().strictModeBit).toBe(8);
   });
 
+  it("builds one renderer per hostOps and kind and injects each into DevTools once", () => {
+    const { ops } = createFakeHostOps();
+    const primary = react19().createRenderer(ops, { isPrimaryRenderer: true });
+    const secondary = react19().createRenderer(ops, { isPrimaryRenderer: false });
+    expect(primary).not.toBe(secondary);
+    expect(react19().createRenderer(ops, { isPrimaryRenderer: true })).toBe(primary);
+    expect(react19().createRenderer(ops, { isPrimaryRenderer: false })).toBe(secondary);
+    expect(hook.inject).toHaveBeenCalledTimes(2);
+  });
+
   it("renders synchronously into the container through hostOps", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
@@ -148,33 +158,35 @@ describe("react19", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it("forgets the root on unmount, so a second unmount throws and a new render starts a new root", () => {
+  it("keeps the root after unmount, so a second unmount is a no-op that returns true and a new render reuses the root", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
     const container = { children: [] as any[] };
     renderer.render(<node />, container);
-    renderer.unmount(container);
-    expect(() => renderer.unmount(container)).toThrow("ReactPixiFiber did not render into container provided");
+    expect(renderer.unmount(container)).toBe(true);
+    expect(renderer.unmount(container)).toBe(true);
+    expect(updateContainerSync).toHaveBeenCalledTimes(3);
+    expect(updateContainerSync).toHaveBeenNthCalledWith(2, null, expect.anything(), null, null);
+    expect(updateContainerSync).toHaveBeenNthCalledWith(3, null, expect.anything(), null, null);
     renderer.render(<node x={3} />, container);
     expect(container.children).toHaveLength(1);
     expect(container.children[0].props.x).toBe(3);
   });
 
-  it("throws when unmounting a container it never rendered into", () => {
+  it("returns false without touching the reconciler when unmounting a container it never rendered into", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, { isPrimaryRenderer: true });
-    expect(() => renderer.unmount({ children: [] })).toThrow("ReactPixiFiber did not render into container provided");
+    expect(renderer.unmount({ children: [] })).toBe(false);
     expect(updateContainerSync).not.toHaveBeenCalled();
   });
 
-  it("injects into DevTools once per root container", () => {
+  it("injects into DevTools once per renderer", () => {
     const { ops } = createFakeHostOps();
     const renderer = react19().createRenderer(ops, {
       isPrimaryRenderer: false,
     });
-    const container = { children: [] as any[] };
-    renderer.render(<node />, container);
-    renderer.render(<node />, container);
+    renderer.render(<node />, { children: [] as any[] });
+    renderer.render(<node />, { children: [] as any[] });
     expect(hook.inject).toHaveBeenCalledTimes(1);
     expect(hook.inject.mock.calls[0][0]).toMatchObject({
       rendererPackageName: "react-pixi-fiber",

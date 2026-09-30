@@ -259,7 +259,7 @@ export interface HostOps {
 
 export interface Renderer {
   render(element: React.ReactNode, container: any, callback?: () => void, parentComponent?: unknown): unknown;
-  unmount(container: any): void;
+  unmount(container: any): boolean;
   getStackAddendum(): string;
 }
 

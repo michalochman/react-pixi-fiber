@@ -578,6 +578,12 @@ Sure thing! We've got you covered.
 
 Yes, you can pass `app` property to `Stage` component, e.g. `<Stage app={app} />`.
 
+Two `Stage` components sharing one `app` are not supported: both render into `app.stage`, so the second replaces the first's children and unmounting either empties both.
+
+### What does `unmount` return?
+
+`unmount(container)` never throws. It returns `true` for a container that was rendered into (calling it again is a no-op that returns `true`) and `false`, with a warning in development, for a container that never was.
+
 ### Can I migrate from `react-pixi-fiber@0.x.y`?
 
 Yes, read [migration guide](#migrating-from-react-pixi-fiber0xy-before-version-100).

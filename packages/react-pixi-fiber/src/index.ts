@@ -48,7 +48,7 @@ const render: (
   callback?: Function
 ) => void = renderLazy as any; // 2.x signature; the adapter takes a React.ReactNode
 // Standalone ReactPixiFiber unmount method.
-const unmount: (stage: InstanceOf<"Container">) => void = unmountLazy;
+const unmount: (stage: InstanceOf<"Container">) => boolean = unmountLazy;
 
 // `Stage` is both the component and its type; `export { Stage }` below exports both.
 // The declaration bundler drops the value in this form, see `stageTypePlugin` in tsdown.config.mts.

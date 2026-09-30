@@ -97,41 +97,52 @@ function getStackAddendum(): string {
   return stack != null ? stack : "";
 }
 
+function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean): Renderer {
+  const reconciler = Reconciler({ ...createHostConfig(hostOps), isPrimaryRenderer } as any);
+  reconciler.injectIntoDevTools({
+    findFiberByHostInstance: () => null,
+    bundleType: __DEV__ ? 1 : 0,
+    version: React.version,
+    rendererPackageName: "react-pixi-fiber",
+  });
+  const roots = new WeakMap<object, unknown>();
+  return {
+    render(element, container, callback, parentComponent) {
+      let root = roots.get(container);
+      if (!root) {
+        // @types/react-reconciler 0.26 declares the createContainer signature of a later reconciler.
+        root = (
+          reconciler as unknown as {
+            createContainer(container: unknown, tag: number, hydrate: boolean, hydrationCallbacks: null): unknown;
+          }
+        ).createContainer(container, LegacyRoot, false, null);
+        roots.set(container, root);
+      }
+      reconciler.updateContainer(element, root as any, parentComponent as any, callback as any);
+      return reconciler.getPublicRootInstance(root as any);
+    },
+    unmount(container) {
+      const root = roots.get(container);
+      if (!root) return false;
+      reconciler.updateContainer(null, root as any, null, null);
+      return true;
+    },
+    getStackAddendum,
+  };
+}
+
+// One renderer per core and kind for the lifetime of the page: React DevTools keeps every renderer injected into it,
+// and `configure` may be called more than once.
+const renderers = new WeakMap<HostOps, { primary?: Renderer; secondary?: Renderer }>();
+
 export default function react17(): ReactAdapter {
   return {
     strictModeBit,
     createRenderer(hostOps, { isPrimaryRenderer }): Renderer {
-      const reconciler = Reconciler({ ...createHostConfig(hostOps), isPrimaryRenderer } as any);
-      const roots = new Map<unknown, unknown>();
-      return {
-        render(element, container, callback, parentComponent) {
-          let root = roots.get(container);
-          if (!root) {
-            // @types/react-reconciler 0.26 declares the createContainer signature of a later reconciler.
-            root = (
-              reconciler as unknown as {
-                createContainer(container: unknown, tag: number, hydrate: boolean, hydrationCallbacks: null): unknown;
-              }
-            ).createContainer(container, LegacyRoot, false, null);
-            roots.set(container, root);
-            reconciler.injectIntoDevTools({
-              findFiberByHostInstance: () => null,
-              bundleType: __DEV__ ? 1 : 0,
-              version: React.version,
-              rendererPackageName: "react-pixi-fiber",
-            });
-          }
-          reconciler.updateContainer(element, root as any, parentComponent as any, callback as any);
-          return reconciler.getPublicRootInstance(root as any);
-        },
-        unmount(container) {
-          const root = roots.get(container);
-          invariant(root, "ReactPixiFiber did not render into container provided");
-          reconciler.updateContainer(null, root as any, null, null);
-          roots.delete(container);
-        },
-        getStackAddendum,
-      };
+      let cached = renderers.get(hostOps);
+      if (!cached) renderers.set(hostOps, (cached = {}));
+      const kind = isPrimaryRenderer ? "primary" : "secondary";
+      return cached[kind] || (cached[kind] = createRenderer(hostOps, isPrimaryRenderer));
     },
   };
 }

@@ -18,8 +18,31 @@ describe("render and unmount", () => {
     expect(stage.children).toHaveLength(0);
   });
 
-  it("throws when unmounting a container that was never rendered into", () => {
-    expect(() => unmount(new PIXI.Container())).toThrow("ReactPixiFiber did not render into container provided");
+  it("returns false and warns once in development when unmounting a container that was never rendered into", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(unmount(new PIXI.Container())).toBe(false);
+    expect(error.mock.calls.filter(c => /did not render into container provided/.test(c[0]))).toHaveLength(
+      __DEV__ ? 1 : 0
+    );
+    error.mockRestore();
+  });
+
+  it("returns false without throwing when configure was never called", async () => {
+    vi.resetModules();
+    const { unmount: freshUnmount } = await import("../src/render");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(freshUnmount({})).toBe(false);
+    expect(error.mock.calls.filter(c => /did not render into container provided/.test(c[0]))).toHaveLength(
+      __DEV__ ? 1 : 0
+    );
+    error.mockRestore();
+  });
+
+  it("returns true for every unmount of a container that was rendered into", () => {
+    const stage = new PIXI.Container();
+    render(<Container />, stage);
+    expect(unmount(stage)).toBe(true);
+    expect(unmount(stage)).toBe(true);
   });
 
   it("calls the callback after commit", () => {

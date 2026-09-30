@@ -107,6 +107,18 @@ describe("configure", () => {
     expect(stage.children).toHaveLength(0);
   });
 
+  it("a second unmount after a second call is still a no-op that returns true", async () => {
+    const { configure } = await import("../src/configure");
+    const { render, unmount, Container } = await import("../src/index");
+    const adapter = (await import("@react-pixi-fiber/pixi-6")).default();
+    configure({ react: react18(), pixi: adapter });
+    const stage = new PIXI.Container();
+    render(<Container />, stage);
+    expect(unmount(stage)).toBe(true);
+    configure({ react: react18(), pixi: adapter });
+    expect(unmount(stage)).toBe(true);
+  });
+
   it("unmounts a Stage mounted before a second call", async () => {
     const { configure } = await import("../src/configure");
     const Stage = (await import("../src/Stage")).default;
