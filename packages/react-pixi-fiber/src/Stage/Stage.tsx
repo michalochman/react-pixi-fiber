@@ -13,6 +13,7 @@ import {
   STAGE_OPTIONS_RECREATE,
   STAGE_OPTIONS_UNMOUNT,
 } from "./common";
+import { ContextBridge } from "./ContextBridge";
 import { getCanvasProps } from "./props";
 
 interface InitToken {
@@ -63,7 +64,7 @@ function needsRecreate(prevOptions: unknown, nextOptions: unknown): boolean {
   return !shallowEqual(other, prevOther);
 }
 
-function Stage(props: StageProps, ref: Ref<StageRef>) {
+function StageWithoutBridge(props: StageProps, ref: Ref<StageRef>) {
   const { app, options } = props;
   const pixi = getPixiAdapter();
 
@@ -231,6 +232,26 @@ function Stage(props: StageProps, ref: Ref<StageRef>) {
   if (app != null) return null;
   if (options && ((options as any).view || (options as any).canvas)) return null;
   return <canvas key={canvasKey} ref={canvasRef} {...getCanvasProps(props as Record<string, unknown>)} />;
+}
+
+const BridgelessStage = forwardRef(StageWithoutBridge);
+const NO_CONTEXTS: never[] = [];
+
+// The bridge sits around the application: the consumers of `bridgeContexts` render in the tree that owns `Stage`.
+// A change to the number of contexts changes the tree shape and remounts the application, as a hook count would.
+function Stage(props: StageProps, ref: Ref<StageRef>) {
+  return (
+    <ContextBridge
+      contexts={props.bridgeContexts ?? NO_CONTEXTS}
+      render={children => (
+        <BridgelessStage ref={ref} {...props}>
+          {children}
+        </BridgelessStage>
+      )}
+    >
+      {props.children as React.ReactNode}
+    </ContextBridge>
+  );
 }
 
 export default forwardRef(Stage) as unknown as StageComponent;

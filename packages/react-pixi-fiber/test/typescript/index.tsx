@@ -411,6 +411,9 @@ const OnInitExample: React.FC = () => (
   <Stage options={{ width: 1, height: 1 }} onInit={app => console.log(app.stage)} />
 );
 
+const TitleContext = React.createContext<{ title: string }>({ title: "" });
+const StageWithBridgedContextsExample: React.FC = () => <Stage bridgeContexts={[TitleContext]} options={{}} />;
+
 const app = new PIXI.Application();
 const StageWithAppExample: React.FC = () => <Stage app={app} />;
 // @ts-expect-error `app` and `options` are exclusive

@@ -249,6 +249,8 @@ Expects **one** the following props:
 
 `onInit(app)` is called once the application exists and the children are rendered.
 
+`bridgeContexts` lists React contexts provided around `<Stage />` that its children can read, see [Context – Using a context provided outside `Stage`](#context--using-a-context-provided-outside-stage).
+
 #### Tags
 
 Each tag names a display object concept. The configured PixiJS adapter creates the matching class of your PixiJS version; every adapter implements all 13 tags.
@@ -484,6 +486,36 @@ render(
 </details>
 
 ---
+
+### Context – Using a context provided outside `Stage`
+
+React does not pass context between renderers, and the children of `<Stage />` render in their own React root. A provider around `<Stage />` is not visible inside it, so `useContext`, `react-redux` `connect` and similar read the default value there.
+
+Pass the contexts to bridge in `bridgeContexts`. `<Stage />` reads each one where it renders and provides it again inside, and renders the children again when a value changes:
+
+```jsx harmony
+import { createContext, useContext } from "react";
+import { Sprite, Stage } from "react-pixi-fiber";
+
+const ThemeContext = createContext("light");
+
+function ThemedSprite() {
+  const theme = useContext(ThemeContext);
+  return <Sprite tint={theme === "dark" ? 0x333333 : 0xffffff} />;
+}
+
+function App({ theme }) {
+  return (
+    <ThemeContext.Provider value={theme}>
+      <Stage bridgeContexts={[ThemeContext]} options={{ height: 600, width: 800 }}>
+        <ThemedSprite />
+      </Stage>
+    </ThemeContext.Provider>
+  );
+}
+```
+
+Keep the number of contexts the same across renders, as with hooks: a change remounts the application. The standalone `render` has no React tree around it, so it cannot bridge; provide the contexts inside the rendered element instead.
 
 ### Custom Components
 

@@ -286,6 +286,11 @@ export type StageAsContainerProps = ContainerProps;
 // Allow either `app` or `options` passed to `Stage` but not both.
 export type StageProps = (StagePropsWithApp | StagePropsWithOptions) &
   Omit<StageAsCanvasProps & StageAsContainerProps, "height" | "width"> & {
+    /**
+     * Contexts provided around `Stage` that are provided again inside it. React does not pass context between
+     * renderers. Keep the number of contexts the same across renders; a change remounts the application.
+     */
+    bridgeContexts?: React.Context<any>[];
     /** @deprecated Pass `height` in `options`. */
     height?: number;
     /** Called with the application after the first render of `children` into `app.stage`. */

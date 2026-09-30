@@ -57,6 +57,42 @@ export function smokeSuite(name: string, pair: () => { react: ReactAdapter; pixi
       expect(stage.children).toHaveLength(0);
     });
 
+    it("bridges a context provided around Stage and applies a value change", async () => {
+      configure(pair());
+      const X = React.createContext(0);
+      const Bridged = () => <Sprite x={React.useContext(X)} />;
+      let app: any = null;
+      const Scene = ({ x }: { x: number }) => (
+        <X.Provider value={x}>
+          <Stage
+            bridgeContexts={[X]}
+            options={{ width: 8, height: 8 }}
+            onInit={a => {
+              app = a;
+            }}
+          >
+            <Bridged />
+          </Stage>
+        </X.Provider>
+      );
+      const tree = renderer.create(<Scene x={1} />, {
+        createNodeMock: () => document.createElement("canvas"),
+      });
+      await settle();
+      const sprite = app.stage.children[0];
+      expect(sprite.x).toBe(1);
+
+      act(() => {
+        tree.update(<Scene x={5} />);
+      });
+      expect(sprite.x).toBe(5);
+
+      act(() => {
+        tree.unmount();
+      });
+      await settle();
+    });
+
     it("restores a removed prop to its default without a warning under StrictMode, and writes an explicit null", async () => {
       configure(pair());
       const error = vi.spyOn(console, "error").mockImplementation(() => {});

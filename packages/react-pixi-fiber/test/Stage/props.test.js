@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { STAGE_PROP_NAMES, getCanvasProps, getContainerProps } from "../../src/Stage/props";
 import { getStandardNames } from "../../src/PixiProperty";
+import { getPixiAdapter } from "../../src/configure";
 import pixi6 from "@react-pixi-fiber/pixi-6";
 
 const adapter = pixi6();
@@ -30,6 +31,16 @@ describe("Container and canvas prop split", () => {
     expect(getCanvasProps(toProps(STAGE_PROP_NAMES))).toEqual({});
     expect(Object.keys(getContainerProps(toProps(STAGE_PROP_NAMES))).sort()).toEqual(["height", "width"]);
   });
+
+  it("keeps an own prop off app.stage even when the adapter lists it as a Container property", () => {
+    const { untypedContainer } = getPixiAdapter().properties;
+    untypedContainer.push("bridgeContexts");
+    try {
+      expect(getContainerProps({ bridgeContexts: [], width: 1 })).toEqual({ width: 1 });
+    } finally {
+      untypedContainer.pop();
+    }
+  });
 });
 
 describe("getCanvasProps", () => {
@@ -54,7 +65,16 @@ describe("getCanvasProps", () => {
   });
 
   it("does not forward Stage's own props to the canvas", () => {
-    const props = { app: {}, options: {}, children: null, onInit: () => {}, width: 1, height: 2, className: "c" };
+    const props = {
+      app: {},
+      bridgeContexts: [],
+      options: {},
+      children: null,
+      onInit: () => {},
+      width: 1,
+      height: 2,
+      className: "c",
+    };
     expect(getCanvasProps(props)).toEqual({ className: "c" });
   });
 });

@@ -457,6 +457,33 @@ describe("Stage", () => {
   });
 
   // The warned state is module-level, so each test loads a fresh Stage module.
+  it("provides the bridged contexts inside the PixiJS tree and renders again when a value changes", async () => {
+    const Theme = React.createContext("none");
+    const Size = React.createContext(0);
+    const Probe = () => `${React.useContext(Theme)}:${React.useContext(Size)}`;
+    const App = ({ theme }) => (
+      <Theme.Provider value={theme}>
+        <Size.Provider value={1}>
+          <Stage bridgeContexts={[Theme, Size]}>
+            <Probe />
+          </Stage>
+        </Size.Provider>
+      </Theme.Provider>
+    );
+    // The element handed to the secondary renderer, rendered on its own: only a bridged value can reach Probe.
+    const rendered = () => renderer.create(renderMock.mock.calls.at(-1)[0]).toJSON();
+    const tree = renderer.create(<App theme="light" />, { createNodeMock: () => ({ tagName: "CANVAS" }) });
+    act(() => resolveInit());
+    await flush();
+    expect(renderMock).toHaveBeenCalledTimes(1);
+    expect(rendered()).toBe("light:1");
+    act(() => tree.update(<App theme="dark" />));
+    expect(renderMock).toHaveBeenCalledTimes(2);
+    expect(rendered()).toBe("dark:1");
+    expect(tree.toJSON().props.bridgeContexts).toBeUndefined();
+    tree.unmount();
+  });
+
   it("warns once about the deprecated width and height props", async () => {
     vi.resetModules();
     const { default: FreshStage } = await import("../../src/Stage");

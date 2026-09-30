@@ -18,6 +18,7 @@ Split into a core package and per-version adapters. Call `configure({ react, pix
 - `PixiTickerCallback` type export, the callback type `usePixiTicker` takes
 - Tags `AnimatedSprite`, `Mesh`, `MeshSimple`, `MeshPlane`, `MeshRope` and `NineSliceSprite`. Every PixiJS adapter implements all 13 tags
 - `Stage` `onInit(app)` prop, called once the PixiJS application exists and the children are rendered
+- `Stage` `bridgeContexts` prop, a list of React contexts provided around `Stage` that its children can read. React does not pass context between renderers; `Stage` reads each context where it renders and provides it again inside, and renders the children again when a value changes
 
 ### Changed
 - `react-reconciler` moved from the core into the React adapters; `@react-pixi-fiber/react-17` bundles `react-reconciler` 0.26.2, `@react-pixi-fiber/react-18` 0.29.2 and `@react-pixi-fiber/react-19` 0.34.0
