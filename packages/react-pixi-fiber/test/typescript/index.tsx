@@ -1,10 +1,36 @@
+import "@react-pixi-fiber/pixi-6"; // loads the PixiInstances augmentation
+import {
+  type InteractionCompatibility,
+  type InteractionEventCompatibility,
+  type InteractiveComponent,
+  type PixiTypeFallback,
+  SimpleMesh,
+  SimplePlane,
+  SimpleRope,
+  NineSlicePlane as Pixi6NineSlicePlane,
+} from "@react-pixi-fiber/pixi-6";
 import * as PIXI from "pixi.js";
 import * as React from "react";
+import type {
+  InteractiveComponent as CoreInteractiveComponent,
+  CustomDisplayObject,
+  CustomDisplayObjectAttachHandler,
+  CustomDisplayObjectCreator,
+  CustomDisplayObjectDetachHandler,
+  CustomDisplayObjectPropSetter,
+  CustomDisplayObjectPropSetterContext,
+  CustomPIXIComponentBehavior,
+  CustomPIXIComponentBehaviorDefinition,
+  CustomPIXIComponentProps,
+} from "react-pixi-fiber";
 import {
+  AnimatedSprite,
   BitmapText,
   Container,
   Graphics,
+  MeshRope,
   NineSlicePlane,
+  NineSliceSprite,
   ParticleContainer,
   Sprite,
   Stage,
@@ -12,8 +38,35 @@ import {
   TilingSprite,
   CustomPIXIComponent,
   CustomPIXIProperty,
+  PIXIComponent,
+  PIXIProperty,
+  applyProps,
+  getInstanceTag,
   createStageClass,
 } from "react-pixi-fiber";
+
+// @ts-expect-error x is a number on PixiJS 6; if this line is unused, the augmentation did not merge
+const WrongProp = <Sprite x="1" />;
+console.log(WrongProp);
+
+// The 2.x compatibility types.
+const interactionKey: InteractionCompatibility = "anything";
+const interactionEventKey: InteractionEventCompatibility = "prototype";
+const interactive: InteractiveComponent = { click: (event: PIXI.InteractionEvent) => console.log(event.data) };
+const coreInteractive: CoreInteractiveComponent = interactive;
+const fallback: PixiTypeFallback<PIXI.Sprite, number> = new PIXI.Sprite();
+console.log(interactionKey, interactionEventKey, coreInteractive, fallback);
+
+// The PixiJS 6 class names are components too.
+const AliasExample: React.FC<{ texture: PIXI.Texture }> = ({ texture }) => (
+  <>
+    <Pixi6NineSlicePlane texture={texture} leftWidth={1} />
+    <SimpleMesh texture={texture} uvs={new Float32Array([0, 0])} />
+    <SimplePlane texture={texture} verticesX={2} />
+    <SimpleRope texture={texture} points={[new PIXI.Point(0, 0)]} />
+  </>
+);
+console.log(AliasExample);
 
 const anchor = new PIXI.ObservablePoint(() => {}, undefined, 0.5, 0.5);
 
@@ -25,27 +78,26 @@ const CompositionExample: React.FC = () => (
   </Container>
 );
 
-type AnimatedSpriteProps = {
+type CustomAnimatedSpriteProps = {
   textures: PIXI.AnimatedSprite["textures"];
 };
-const AnimatedSprite = CustomPIXIComponent<PIXI.AnimatedSprite, AnimatedSpriteProps>(
-  {
-    customDisplayObject: props => new PIXI.AnimatedSprite(props.textures),
-    customApplyProps: (instance, oldProps, newProps) => {
-      console.log(instance.animationSpeed);
-      console.log(instance.textures);
-      console.log(oldProps?.textures);
-      console.log(newProps.textures);
-    },
-    customDidAttach: instance => {
-      console.log(instance.textures);
-    },
-    customWillDetach: instance => {
-      console.log(instance.textures);
-    },
+const CustomAnimatedSprite = PIXIComponent<PIXI.AnimatedSprite, CustomAnimatedSpriteProps>("CustomAnimatedSprite", {
+  create: props => new PIXI.AnimatedSprite(props.textures),
+  applyProps: (instance, oldProps, newProps) => {
+    console.log(instance.animationSpeed);
+    console.log(instance.textures);
+    console.log(oldProps?.textures);
+    console.log(newProps.textures);
   },
-  "AnimatedSprite"
-);
+  afterAdd: instance => {
+    console.log(instance.textures);
+  },
+  beforeRemove: instance => {
+    console.log(instance.textures);
+  },
+});
+
+// The deprecated 2.x argument order and behavior keys still typecheck.
 
 interface WickedContainerProps {
   isJungleMassive?: boolean;
@@ -89,38 +141,72 @@ const WickedContainer = CustomPIXIComponent<WickedContainerClass, WickedContaine
   "WickedContainer"
 );
 
+// The deprecated `Custom*` type names still typecheck a 2.x behavior.
+const wickedCreate: CustomDisplayObjectCreator<WickedContainerClass, WickedContainerProps> = props =>
+  new WickedContainerClass(props.isWicked);
+const wickedApplyProps: CustomDisplayObjectPropSetter<WickedContainerClass, WickedContainerProps> = function (
+  instance,
+  oldProps,
+  newProps
+) {
+  const context: CustomDisplayObjectPropSetterContext<WickedContainerClass, WickedContainerProps> = this;
+  context.applyDisplayObjectProps(oldProps, newProps);
+  console.log(instance.isWicked);
+};
+const wickedAttach: CustomDisplayObjectAttachHandler<WickedContainerClass> = instance => console.log(instance);
+const wickedDetach: CustomDisplayObjectDetachHandler<WickedContainerClass> = instance => console.log(instance);
+const wickedDefinition: CustomPIXIComponentBehaviorDefinition<WickedContainerClass, WickedContainerProps> = {
+  customApplyProps: wickedApplyProps,
+  customDidAttach: wickedAttach,
+  customDisplayObject: wickedCreate,
+  customWillDetach: wickedDetach,
+};
+const wickedBehavior: CustomPIXIComponentBehavior<WickedContainerClass, WickedContainerProps> = wickedDefinition;
+const wickedInstance = null as unknown as CustomDisplayObject<WickedContainerClass, WickedContainerProps>;
+const wickedProps: CustomPIXIComponentProps<WickedContainerClass, WickedContainerProps> = { isWicked: true };
+console.log(wickedBehavior, wickedInstance, wickedProps);
+
 type CircleProps = {
   fill: number;
   radius: number;
 };
 // `function` form of `customApplyProps` gets bound `this.applyDisplayObjectProps`.
-const Circle = CustomPIXIComponent<PIXI.Graphics, CircleProps>(
-  {
-    customDisplayObject: () => new PIXI.Graphics(),
-    customApplyProps: function (instance, oldProps, newProps) {
-      const { fill, radius, ...newPropsRest } = newProps;
-      const { fill: oldFill, radius: oldRadius, ...oldPropsRest }: Partial<CircleProps> = oldProps ?? {};
-      if (oldFill !== fill || oldRadius !== radius) {
-        instance.clear();
-        instance.beginFill(fill);
-        instance.drawCircle(0, 0, radius);
-        instance.endFill();
-      }
-      this.applyDisplayObjectProps(oldPropsRest, newPropsRest);
-    },
+const Circle = PIXIComponent<PIXI.Graphics, CircleProps>("Circle", {
+  create: () => new PIXI.Graphics(),
+  applyProps: function (instance, oldProps, newProps) {
+    const { fill, radius, ...newPropsRest } = newProps;
+    const { fill: oldFill, radius: oldRadius, ...oldPropsRest }: Partial<CircleProps> = oldProps ?? {};
+    if (oldFill !== fill || oldRadius !== radius) {
+      instance.clear();
+      instance.beginFill(fill);
+      instance.drawCircle(0, 0, radius);
+      instance.endFill();
+    }
+    this.applyDisplayObjectProps(oldPropsRest, newPropsRest);
   },
-  "Circle"
-);
+});
+
+// A bare function is the `create` of a behavior.
+const PlainGraphics = PIXIComponent("PlainGraphics", () => new PIXI.Graphics());
 
 // Custom properties can be registered on one, many or all component types.
-CustomPIXIProperty(Sprite, "id", value => typeof value === "number");
-CustomPIXIProperty([Container, "Sprite"], "parentGroup");
-CustomPIXIProperty(undefined, "zOrder");
+PIXIProperty(Sprite, "id", value => typeof value === "number");
+PIXIProperty([Container, "Sprite"], "parentGroup");
+PIXIProperty(undefined, "zOrder");
+CustomPIXIProperty(null, "legacyZOrder");
+
+// Re-apply props the way the component that created the instance does.
+const reapply = (instance: PIXI.DisplayObject): string | undefined => {
+  applyProps(instance, {}, { alpha: 1 });
+  return getInstanceTag(instance);
+};
+console.log(reapply);
 
 const CustomPIXIComponentExample: React.FC = () => (
   <>
-    <AnimatedSprite textures={[]} />
+    <CustomAnimatedSprite textures={[]} />
     <Circle fill={0xffff00} radius={10} position="10,10" />
+    <PlainGraphics x={1} />
   </>
 );
 
@@ -215,8 +301,11 @@ const StageClassExample: React.FC = () => {
         <Text text="Styled text" style={{ fontSize: 12 }} />
         <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
         <TilingSprite texture={texture} />
+        <AnimatedSprite textures={[]} />
+        <MeshRope texture={texture} points={[]} />
+        <NineSliceSprite texture={texture} leftWidth={1} topHeight={1} rightWidth={1} bottomHeight={1} />
         <CompositionExample />
-        <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+        <CustomAnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
         <WickedContainer isWicked={false} />
         <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
         <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
@@ -303,7 +392,7 @@ const StageFunctionExample: React.FC = () => {
         <Text text="Styled text" style={new PIXI.TextStyle({ fontSize: 12 })} />
         <TilingSprite texture={texture} />
         <CompositionExample />
-        <AnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
+        <CustomAnimatedSprite animationSpeed={2} textures={[]} position="0,10" />
         <WickedContainer isWicked={false} />
         <WickedContainer isWicked={true} isJungleMassive={true} ref={wickedContainerRef} />
         <RestPropsExample propertyNotInSpriteAlready="2" render anchor="0.5,0.5" />
@@ -311,3 +400,21 @@ const StageFunctionExample: React.FC = () => {
     </>
   );
 };
+
+// `Stage` is a value and a type, as in 2.x (a consumer does `useRef<Stage | null>(null)`).
+const StageAsTypeExample: React.FC = () => {
+  const stageRef = React.useRef<Stage | null>(null);
+  return <Stage ref={stageRef} options={{}} />;
+};
+
+const OnInitExample: React.FC = () => (
+  <Stage options={{ width: 1, height: 1 }} onInit={app => console.log(app.stage)} />
+);
+
+const TitleContext = React.createContext<{ title: string }>({ title: "" });
+const StageWithBridgedContextsExample: React.FC = () => <Stage bridgeContexts={[TitleContext]} options={{}} />;
+
+const app = new PIXI.Application();
+const StageWithAppExample: React.FC = () => <Stage app={app} />;
+// @ts-expect-error `app` and `options` are exclusive
+const StageWithAppAndOptionsExample: React.FC = () => <Stage app={app} options={{ width: 1 }} />;

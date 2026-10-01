@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { createStageFunction, createStageClass } from "../../src/Stage";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import Stage, { createStageClass } from "../../src/Stage";
 
-describe("Stage", () => {
-  it("should export Stage class creator", () => {
-    expect(typeof createStageClass).toEqual("function");
-  });
-
-  it("should export Stage function creator", () => {
-    expect(typeof createStageFunction).toEqual("function");
+describe("createStageClass", () => {
+  afterEach(() => vi.restoreAllMocks());
+  it("returns the function Stage and warns once in development", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(createStageClass()).toBe(Stage);
+    expect(createStageClass()).toBe(Stage);
+    expect(error).toHaveBeenCalledTimes(__DEV__ ? 1 : 0);
   });
 });

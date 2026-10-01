@@ -1,9 +1,8 @@
 {
   "name": "react-pixi-fiber",
-  "version": "2.0.0-rc.4",
+  "version": "2.0.0",
   "description": "React Fiber renderer for PixiJS",
   "main": "index.js",
-  "umd:main": "index.umd.js",
   "author": "Michal Ochman",
   "license": "MIT",
   "repository": {
@@ -11,76 +10,50 @@
     "url": "git+https://github.com/michalochman/react-pixi-fiber.git",
     "directory": "packages/react-pixi-fiber"
   },
-  "typings": "./index.d.ts",
+  "typings": "./dist/cjs/react-pixi-fiber.d.ts",
   "exports": {
     ".": {
       "node": {
-        "types": "./index.d.ts",
+        "types": "./dist/cjs/react-pixi-fiber.d.ts",
         "default": "./index.js"
       },
       "import": {
-        "types": "./index.d.mts",
+        "types": "./dist/es/react-pixi-fiber.d.mts",
         "development": "./dist/es/react-pixi-fiber.development.js",
         "default": "./dist/es/react-pixi-fiber.production.min.js"
       },
       "require": {
-        "types": "./index.d.ts",
+        "types": "./dist/cjs/react-pixi-fiber.d.ts",
         "default": "./index.js"
       }
-    },
-    "./react-pixi-alias": {
-      "node": "./react-pixi-alias.js",
-      "import": {
-        "development": "./dist/es/react-pixi-alias.development.js",
-        "default": "./dist/es/react-pixi-alias.production.min.js"
-      },
-      "require": "./react-pixi-alias.js"
     },
     "./package.json": "./package.json"
   },
   "files": [
+    "CHANGELOG.md",
     "LICENSE",
     "README.md",
-    "index.d.mts",
-    "index.d.ts",
     "index.js",
-    "index.umd.js",
-    "react-pixi-alias.js",
     "dist/",
     "src/"
   ],
   "sideEffects": false,
-  "dependencies": {
-    "fbjs": "^3.0.0",
-    "react-reconciler": "^0.29.0"
-  },
   "peerDependencies": {
-    "pixi.js": ">=4.4.0 <8.0.0",
-    "prop-types": ">=15.0.0",
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react": ">=17.0.0 <20.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.8",
-    "@vitest/coverage-v8": "4.1.10",
-    "canvas": "^3.2.3",
-    "cross-env": "^7.0.3",
-    "jsdom": "28.1.0",
+    "@types/react-test-renderer": "^18.3.1",
     "pixi.js": "^6.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-test-renderer": "^18.2.0",
-    "rolldown": "1.1.5",
-    "tsdown": "0.22.8",
-    "typescript": "^7.0.2",
-    "vitest": "4.1.10",
-    "vitest-webgl-canvas-mock": "1.1.0"
+    "react-test-renderer": "^18.2.0"
   },
   "scripts": {
     "build": "rm -rf dist && pnpm run build:prod && pnpm run build:dev",
     "build:dev": "cross-env NODE_ENV=development tsdown",
     "build:prod": "cross-env NODE_ENV=production tsdown",
-    "check-types": "tsc -p tsconfig.json",
+    "check-types": "tsc -p tsconfig.json && tsc -p tsconfig.fallback.json && tsc -p tsconfig.dist-es.json && tsc -p tsconfig.dist-cjs.json",
     "prepublishOnly": "pnpm run test && pnpm run build && pnpm -w check-package",
     "test": "pnpm run test:dev && pnpm run test:prod",
     "test:cov": "pnpm run test:dev --coverage --reporter=blob --outputFile=.vitest-reports/blob-dev.json && pnpm run test:prod --coverage --reporter=blob --outputFile=.vitest-reports/blob-prod.json && vitest run --merge-reports=.vitest-reports --coverage --coverage.reportsDirectory=coverage",

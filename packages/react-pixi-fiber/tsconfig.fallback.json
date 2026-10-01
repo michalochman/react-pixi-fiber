@@ -1,0 +1,11 @@
+{
+  // Typechecks the core with no PixiJS adapter: the augmentable interfaces stay empty and props fall back to loose records.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "react-pixi-fiber": ["./src/index.ts"]
+    }
+  },
+  "include": [],
+  "files": ["src/globals.d.ts", "test/typescript/fallback.tsx"]
+}

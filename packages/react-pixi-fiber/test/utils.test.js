@@ -1,6 +1,18 @@
 import { describe, it, expect, vi } from "vitest";
 import * as PIXI from "pixi.js";
-import { filterByKey, including, isPointType, not, parsePoint, setPixiValue, copyPoint } from "../src/utils";
+import pixi6 from "@react-pixi-fiber/pixi-6";
+import {
+  filterByKey,
+  findStrictRoot,
+  including,
+  isPointType,
+  not,
+  parsePoint,
+  setPixiValue,
+  copyPoint,
+} from "../src/utils";
+
+const adapter = pixi6();
 
 describe("not", () => {
   it("returns a function", () => {
@@ -99,13 +111,13 @@ describe("isPointType", () => {
   const y = 50;
 
   it("returns true if value is instance of PIXI.Point", () => {
-    expect(isPointType(new PIXI.Point(x, y))).toBeTruthy();
+    expect(isPointType(new PIXI.Point(x, y), adapter)).toBeTruthy();
   });
   it("returns true if value is instance of PIXI.ObservablePoint", () => {
-    expect(isPointType(new PIXI.ObservablePoint(vi.fn, null, x, y))).toBeTruthy();
+    expect(isPointType(new PIXI.ObservablePoint(vi.fn, null, x, y), adapter)).toBeTruthy();
   });
   it("returns false if value is not instance of PIXI.Point or PIXI.ObservablePoint", () => {
-    expect(isPointType(`${x},${y}`)).toBeFalsy();
+    expect(isPointType(`${x},${y}`, adapter)).toBeFalsy();
   });
 });
 
@@ -118,7 +130,7 @@ describe("setPixiValue", () => {
     };
     const test = new PIXI.Point(13, 37);
 
-    setPixiValue(obj, "test", test);
+    setPixiValue(obj, "test", test, adapter);
     expect(JestPoint.prototype.copyFrom).toHaveBeenCalledTimes(1);
     expect(JestPoint.prototype.copyFrom).toHaveBeenCalledWith(test);
     expect(obj.test).toEqual(new PIXI.Point(13, 37));
@@ -130,7 +142,7 @@ describe("setPixiValue", () => {
     const obj = {
       test: new JestPoint(0, 0),
     };
-    setPixiValue(obj, "test", "13,37");
+    setPixiValue(obj, "test", "13,37", adapter);
     expect(JestPoint.prototype.set).toHaveBeenCalledTimes(1);
     expect(JestPoint.prototype.set).toHaveBeenCalledWith(13, 37);
     expect(obj.test).toEqual(new PIXI.Point(13, 37));
@@ -140,7 +152,7 @@ describe("setPixiValue", () => {
     const obj = {};
     const value = "value";
     expect(obj.test).not.toEqual(value);
-    setPixiValue(obj, "test", value);
+    setPixiValue(obj, "test", value, adapter);
     expect(obj.test).toEqual(value);
   });
 
@@ -148,38 +160,38 @@ describe("setPixiValue", () => {
     const obj = {
       test: new PIXI.Point(0, 0),
     };
-    expect(() => setPixiValue(obj, "test", false)).toThrow();
+    expect(() => setPixiValue(obj, "test", false, adapter)).toThrow();
   });
 });
 
-// The copy method has been deprecated in PIXI 5.0.
-// Should react-pixi-fiber ever be updated to use 5.0,
-// this test should probably be updated test for existance of copyForm instead.
 describe("copyPoint", () => {
-  const PixiJSv4Point = { copy: vi.fn() };
-  // Method Point.copy is still available in PixiJS v5 but it is deprecated
-  const PixiJSv5Point = { copy: vi.fn(), copyFrom: vi.fn() };
-
-  it("copies value using copy method when using PixiJS v4", () => {
-    const instance = {
-      position: PixiJSv4Point,
-    };
+  it("copies the value into the current point through the adapter", () => {
+    const pixi = { copyPoint: vi.fn() };
+    const instance = { position: new PIXI.Point(0, 0) };
     const position = new PIXI.Point(13, 37);
 
-    copyPoint(instance, "position", position);
-    expect(PixiJSv4Point.copy).toHaveBeenCalledTimes(1);
-    expect(PixiJSv4Point.copy).toHaveBeenCalledWith(position);
+    copyPoint(instance, "position", position, pixi);
+    expect(pixi.copyPoint).toHaveBeenCalledTimes(1);
+    expect(pixi.copyPoint).toHaveBeenCalledWith(instance.position, position);
+  });
+});
+
+describe("findStrictRoot", () => {
+  it("returns the outermost fiber that has the StrictMode bit", () => {
+    const root = { mode: 8, return: null };
+    const middle = { mode: 8, return: root };
+    const leaf = { mode: 0, return: middle };
+    expect(findStrictRoot(leaf, 8)).toBe(root);
   });
 
-  it("copies value using copyFrom method when using PixiJS v5", () => {
-    const instance = {
-      position: PixiJSv5Point,
-    };
-    const position = new PIXI.Point(13, 37);
+  it("returns null when no fiber has the bit", () => {
+    expect(findStrictRoot({ mode: 0, return: { mode: 0, return: null } }, 8)).toBeNull();
+    expect(findStrictRoot(undefined, 8)).toBeNull();
+  });
 
-    copyPoint(instance, "position", position);
-    expect(PixiJSv5Point.copy).not.toHaveBeenCalled();
-    expect(PixiJSv5Point.copyFrom).toHaveBeenCalledTimes(1);
-    expect(PixiJSv5Point.copyFrom).toHaveBeenCalledWith(position);
+  it("uses the bit it is given", () => {
+    const fiber = { mode: 1, return: null };
+    expect(findStrictRoot(fiber, 1)).toBe(fiber);
+    expect(findStrictRoot(fiber, 8)).toBeNull();
   });
 });

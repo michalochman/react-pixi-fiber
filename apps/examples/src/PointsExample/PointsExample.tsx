@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js";
 import Bunny from "../Bunny";
 
 // Scale mode for all textures, will retain pixelation
-PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
 const WIDTH = 800;
 const HEIGHT = 600;

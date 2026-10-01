@@ -1,21 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import emptyFunction from "fbjs/lib/emptyFunction";
-import warning from "fbjs/lib/warning";
+import warning from "../src/warning";
 import * as ReactPixiFiberUnknownPropertyHook from "../src/ReactPixiFiberUnknownPropertyHook";
-import { isInjectedType } from "../src/inject";
-import { shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
-import { TYPES } from "../src/types";
+import { customStandardNames, getCustomPropertyInfo, shouldRemoveAttributeWithWarning } from "../src/PixiProperty";
+import { getPixiAdapter } from "../src/configure";
+import { registerAdapterComponents, registerComponent } from "../src/registry";
+import { TAGS } from "../src/tags";
 
-vi.mock("fbjs/lib/emptyFunction", () => ({ default: vi.fn() }));
-vi.mock("fbjs/lib/warning", () => ({ default: vi.fn() }));
-vi.mock("../src/inject", async importOriginal => ({ ...(await importOriginal()), isInjectedType: vi.fn() }));
+vi.mock("../src/warning", () => ({ default: vi.fn() }));
 vi.mock("../src/PixiProperty", async importOriginal => ({
   ...(await importOriginal()),
   getPropertyInfo: vi.fn(() => null),
   getCustomPropertyInfo: vi.fn(() => null),
   shouldRemoveAttributeWithWarning: vi.fn(() => false),
 }));
-vi.mock("../src/ReactGlobalSharedState", async importOriginal => ({
+vi.mock("../src/configure", async importOriginal => ({
   ...(await importOriginal()),
   getStackAddendum: () => "stack",
 }));
@@ -30,10 +28,12 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
     });
 
     it("should be defined in development", () => {
+      // A no-op returning `undefined` in production, a validator returning a boolean in development.
+      const result = ReactPixiFiberUnknownPropertyHook.validateProperty(type, "position", "0,0");
       if (__DEV__) {
-        expect(ReactPixiFiberUnknownPropertyHook.validateProperty).not.toEqual(emptyFunction);
+        expect(typeof result).toEqual("boolean");
       } else {
-        expect(ReactPixiFiberUnknownPropertyHook.validateProperty).toEqual(emptyFunction);
+        expect(result).toBeUndefined();
       }
     });
 
@@ -45,14 +45,22 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
         expect(warning).toHaveBeenCalledTimes(1);
         expect(warning).toHaveBeenCalledWith(
           false,
-          "Invalid event handler prop `%s` on `<%s />`. PIXI events use other naming convention, for example `click`.%s",
+          "Invalid event handler prop `%s` on `<%s />`. PIXI events use other naming convention, for example `%s`.%s",
           name,
           type,
+          "click",
           stack
         );
       } else {
         expect(warning).toHaveBeenCalledTimes(0);
       }
+    });
+
+    it("should not warn about properties starting with `on` on a PIXIComponent", () => {
+      registerComponent("OnHandlerComponent", { create: () => ({}) });
+      ReactPixiFiberUnknownPropertyHook.validateProperty("OnHandlerComponent", "onDragEnd", () => {});
+
+      expect(warning).toHaveBeenCalledTimes(0);
     });
 
     it("should warn about NaNs in development", () => {
@@ -73,9 +81,108 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
       }
     });
 
-    it.skip("should warn about invalid prop casing", () => {});
+    it.skipIf(!__DEV__)("does not report an on* name registered with PIXIProperty as an event handler", () => {
+      customStandardNames.Draggable = { ondragend: "onDragEnd" };
+      customStandardNames["*"] = { ondrop: "onDrop" };
+      try {
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Draggable", "onDragEnd", () => {})).toBe(true);
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Draggable", "onDrop", () => {})).toBe(true);
+        expect(warning).toHaveBeenCalledTimes(0);
+      } finally {
+        delete customStandardNames.Draggable;
+        delete customStandardNames["*"];
+      }
+    });
 
-    it.skip("should warn about unknown properties if they are not reserved", () => {});
+    it.skipIf(!__DEV__)("treats names registered with PIXIProperty as known and checks their casing", () => {
+      customStandardNames.Circle = { radius: "radius" };
+      customStandardNames["*"] = { zorder: "zOrder" };
+      try {
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Circle", "radius", 1)).toBe(true);
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("Circle", "zOrder", 1)).toBe(true);
+        expect(warning).toHaveBeenCalledTimes(0);
+        ReactPixiFiberUnknownPropertyHook.validateProperty("Circle", "zorder", 1);
+        expect(warning).toHaveBeenCalledWith(
+          false,
+          "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
+          "zorder",
+          "Circle",
+          "zOrder",
+          stack
+        );
+      } finally {
+        delete customStandardNames.Circle;
+        delete customStandardNames["*"];
+      }
+    });
+
+    it.skipIf(!__DEV__)("ignores a PIXIProperty registration of a name the adapter types, with one warning", () => {
+      const validator = vi.fn(() => true);
+      getCustomPropertyInfo.mockReturnValue({ type: validator });
+      try {
+        ReactPixiFiberUnknownPropertyHook.validateProperty(TAGS.Sprite, "rotation", 1);
+        ReactPixiFiberUnknownPropertyHook.validateProperty(TAGS.Sprite, "rotation", 2);
+        expect(validator).not.toHaveBeenCalled();
+        expect(warning).toHaveBeenCalledTimes(1);
+        expect(warning).toHaveBeenCalledWith(
+          false,
+          "`PIXIProperty` registered `%s` on `<%s />`, which the PixiJS adapter already types. The registration is ignored.%s",
+          "rotation",
+          TAGS.Sprite,
+          stack
+        );
+      } finally {
+        getCustomPropertyInfo.mockReturnValue(null);
+      }
+    });
+
+    it.skipIf(!__DEV__)("looks up names registered for the tag a deprecated type maps to", () => {
+      customStandardNames.NineSliceSprite = { leftwidth: "leftWidth" };
+      // The configured adapter aliases NineSlicePlane itself; without the alias the deprecated tag map applies.
+      registerAdapterComponents({});
+      try {
+        expect(ReactPixiFiberUnknownPropertyHook.validateProperty("NineSlicePlane", "leftWidth", 1)).toBe(true);
+        expect(getCustomPropertyInfo).toHaveBeenLastCalledWith("leftWidth", "NineSliceSprite");
+        expect(warning).toHaveBeenCalledTimes(0);
+        ReactPixiFiberUnknownPropertyHook.validateProperty("NineSlicePlane", "leftwidth", 1);
+        expect(warning).toHaveBeenCalledWith(
+          false,
+          "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
+          "leftwidth",
+          "NineSlicePlane",
+          "leftWidth",
+          stack
+        );
+      } finally {
+        delete customStandardNames.NineSliceSprite;
+        registerAdapterComponents(getPixiAdapter().components);
+      }
+    });
+
+    it.skipIf(!__DEV__)("checks the casing of the names the adapter table types", () => {
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "buttonMode", true)).toBe(true);
+      expect(warning).toHaveBeenCalledTimes(0);
+      ReactPixiFiberUnknownPropertyHook.validateProperty(type, "buttonmode", true);
+      expect(warning).toHaveBeenCalledWith(
+        false,
+        "Invalid prop `%s` on `<%s />`. Did you mean `%s`?%s",
+        "buttonmode",
+        type,
+        "buttonMode",
+        stack
+      );
+    });
+
+    it.skipIf(!__DEV__)("does not report names the adapter table does not type", () => {
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "textur", "value")).toBe(true);
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "sortableChildren", true)).toBe(true);
+      expect(warning).toHaveBeenCalledTimes(0);
+    });
+
+    it.skipIf(!__DEV__)("does not report the lowercase PixiJS 7+ handlers as React-style events", () => {
+      expect(ReactPixiFiberUnknownPropertyHook.validateProperty(type, "onclick", () => {})).toBe(true);
+      expect(warning).toHaveBeenCalledTimes(0);
+    });
 
     it.skip("should assume that values for reserved properties are valid", () => {});
 
@@ -85,40 +192,39 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
   });
 
   describe("validateProperties", () => {
-    const type = "type";
-    const props = { position: "0,0" };
-
     afterEach(() => {
-      isInjectedType.mockReset();
       warning.mockReset();
     });
 
-    it("should not call warnUnknownProperties for injected types", () => {
-      const strictRoot = null;
-      isInjectedType.mockImplementation(() => true);
-      ReactPixiFiberUnknownPropertyHook.validateProperties(type, props, strictRoot);
+    it("validates the props of every type", () => {
+      // `alpha` is a known Sprite prop no earlier test in this module warned about. In development
+      // shouldRemoveAttributeWithWarning reports it invalid; in production validateProperty is a no-op, so every
+      // prop counts as invalid. Either way warnUnknownProperties (internal) reports it.
+      shouldRemoveAttributeWithWarning.mockImplementationOnce(() => true);
+      ReactPixiFiberUnknownPropertyHook.validateProperties(TAGS.Sprite, { alpha: 2 });
 
-      // warnUnknownProperties is internal to the module, it would have warned about `position`
-      expect(warning).toHaveBeenCalledTimes(0);
+      expect(warning).toHaveBeenCalledWith(
+        false,
+        "Invalid value for prop %s on `<%s />`.%s",
+        "`alpha`",
+        TAGS.Sprite,
+        "stack"
+      );
     });
   });
 
   describe("warnUnknownProperties", () => {
-    const type = TYPES.SPRITE;
+    const type = TAGS.Sprite;
     const props = { position: "0,0", scale: 2 };
     const stack = "stack";
 
     // validateProperty is internal to the module and remembers which props it warned about, so every test
     // gets a fresh module. Its result is controlled through what it depends on: in development the props are
-    // known Sprite properties and shouldRemoveAttributeWithWarning decides if they are valid, in production
-    // it is fbjs emptyFunction, mocked above.
+    // known Sprite properties and shouldRemoveAttributeWithWarning decides if they are valid. In production
+    // it is a no-op returning `undefined`, so every prop counts as not valid and only that case runs.
     let warnUnknownProperties;
     const mockValidateProperty = isValid => {
-      if (__DEV__) {
-        shouldRemoveAttributeWithWarning.mockImplementation((type, name) => !isValid(name));
-      } else {
-        emptyFunction.mockImplementation((type, name) => isValid(name));
-      }
+      shouldRemoveAttributeWithWarning.mockImplementation((type, name) => !isValid(name));
     };
 
     beforeEach(async () => {
@@ -127,19 +233,18 @@ describe("ReactPixiFiberUnknownPropertyHook", () => {
     });
 
     afterEach(() => {
-      emptyFunction.mockReset();
       shouldRemoveAttributeWithWarning.mockReset();
       warning.mockReset();
     });
 
-    it("should not warn is props are valid", () => {
+    it.skipIf(!__DEV__)("should not warn is props are valid", () => {
       mockValidateProperty(() => true);
       warnUnknownProperties(type, props);
 
       expect(warning).toHaveBeenCalledTimes(0);
     });
 
-    it("should warn if one prop is not valid", () => {
+    it.skipIf(!__DEV__)("should warn if one prop is not valid", () => {
       mockValidateProperty(name => name === "position");
       warnUnknownProperties(type, props);
 

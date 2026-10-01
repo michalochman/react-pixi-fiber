@@ -33,16 +33,17 @@ jobs:
       # run build
       - run: pnpm build
 
-      # check the packed package with publint and attw, and which files Node and esbuild resolve
+      # check the packed packages with publint and attw, and which files Node and esbuild resolve
       - run: pnpm check-package
 
       # run tests
       # Cap workers: vitest sizes its pool from the host CPU count and OOMs the 4 GB container.
-      - run: pnpm --filter react-pixi-fiber test:dev --maxWorkers=2
-      - run: pnpm --filter react-pixi-fiber test:prod --maxWorkers=2
+      - run: pnpm -r --workspace-concurrency=1 test:dev --maxWorkers=2
+      - run: pnpm -r --workspace-concurrency=1 test:prod --maxWorkers=2
 
-      # typecheck the TypeScript fixture and the examples against the local index.d.ts
+      # render once from the ES builds. The production builds bundle the production reconciler, which the development
+      # React of the test environment cannot drive, so only the development builds render here.
+      - run: RPF_DIST=es pnpm --filter "test-matrix-*" --workspace-concurrency=1 test:dev --maxWorkers=2
+
+      # typecheck the library source, the TypeScript fixture, and the examples against the built declarations
       - run: pnpm check-types
-
-      # build the examples against the local package
-      - run: pnpm --filter examples build

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import logo from "../logo.svg";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
@@ -18,6 +18,8 @@ import PointsExample from "../PointsExample/PointsExample";
 import SmokeTest from "../SmokeTest";
 import SuspenseExample from "../SuspenseExample";
 import Stats from "../Stats";
+
+const DeprecationsExample = lazy(() => import("../DeprecationsExample"));
 
 export type Example = {
   name: string;
@@ -72,6 +74,11 @@ const examples: Example[] = [
     component: CustomPIXIPropertyExample,
   },
   {
+    name: "Deprecations",
+    slug: "deprecations",
+    component: DeprecationsExample,
+  },
+  {
     name: "Hooks",
     slug: "hooks",
     component: HooksExample,
@@ -107,12 +114,14 @@ function App() {
         <h1 className="App-title">react-pixi-fiber Examples</h1>
       </header>
       <div className="App-intro">
-        <Switch>
-          <Route exact path="/" render={() => <ExampleList examples={examples} />} />
-          {examples.map(example => (
-            <Route key={example.slug} exact path={`/${example.slug}`} component={example.component} />
-          ))}
-        </Switch>
+        <Suspense fallback={null}>
+          <Switch>
+            <Route exact path="/" render={() => <ExampleList examples={examples} />} />
+            {examples.map(example => (
+              <Route key={example.slug} exact path={`/${example.slug}`} component={example.component} />
+            ))}
+          </Switch>
+        </Suspense>
       </div>
     </div>
   );

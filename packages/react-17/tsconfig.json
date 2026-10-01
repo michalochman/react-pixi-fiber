@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["es2018", "dom"],
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "react-pixi-fiber": ["../react-pixi-fiber/src/index.ts"]
+    },
+    "types": []
+  },
+  "include": ["src", "test"]
+}

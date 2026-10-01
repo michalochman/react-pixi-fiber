@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import * as PIXI from "pixi.js";
 import * as PixiProperty from "../src/PixiProperty";
-import { isInjectedType } from "../src/inject";
+import pixi6 from "@react-pixi-fiber/pixi-6";
 
-vi.mock("../src/inject", async importOriginal => ({ ...(await importOriginal()), isInjectedType: vi.fn(() => false) }));
+const adapter = pixi6();
 
 describe("PixiProperty", () => {
   describe("types", () => {
@@ -27,16 +27,8 @@ describe("PixiProperty", () => {
       expect(PixiProperty.shouldIgnoreAttribute("type", "prop", { type: PixiProperty.STRING })).toBeFalsy();
     });
 
-    it("should return false for injected types", () => {
-      isInjectedType.mockImplementation(() => true);
-      expect(PixiProperty.shouldIgnoreAttribute("type", "prop", null)).toBeFalsy();
-      isInjectedType.mockReset();
-    });
-
     it("should return false otherwise", () => {
-      isInjectedType.mockImplementation(() => false);
       expect(PixiProperty.shouldIgnoreAttribute("type", "prop", null)).toBeFalsy();
-      isInjectedType.mockReset();
     });
   });
 
@@ -47,68 +39,43 @@ describe("PixiProperty", () => {
       ).toBeFalsy();
     });
 
-    it("should return false if value is boolean for injected types", () => {
-      isInjectedType.mockImplementation(() => true);
+    it("should return false if value is boolean and property info is null", () => {
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, null)).toBeFalsy();
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", false, null)).toBeFalsy();
-      isInjectedType.mockReset();
     });
 
-    it("should return true if value is boolean and property info is null for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
-      expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, null)).toBeTruthy();
-      expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", false, null)).toBeTruthy();
-      isInjectedType.mockReset();
-    });
-
-    it("should return true if value is boolean and property does not accept booleans for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
+    it("should return true if value is boolean and property does not accept booleans", () => {
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, { acceptsBooleans: false })
       ).toBeTruthy();
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", false, { acceptsBooleans: false })
       ).toBeTruthy();
-      isInjectedType.mockReset();
     });
 
-    it("should return false if value is boolean and property accepts booleans for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
+    it("should return false if value is boolean and property accepts booleans", () => {
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", true, { acceptsBooleans: true })
       ).toBeFalsy();
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", false, { acceptsBooleans: true })
       ).toBeFalsy();
-      isInjectedType.mockReset();
     });
 
-    it("should return false if value is function for injected types", () => {
-      isInjectedType.mockImplementation(() => true);
+    it("should return false if value is function and property info is null", () => {
       expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, null)).toBeFalsy();
-      isInjectedType.mockReset();
     });
 
-    it("should return true if value is function and property info is null for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
-      expect(PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, null)).toBeTruthy();
-      isInjectedType.mockReset();
-    });
-
-    it("should return true if value is function and property is not a callback for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
+    it("should return true if value is function and property is not a callback", () => {
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, { type: PixiProperty.STRING })
       ).toBeTruthy();
-      isInjectedType.mockReset();
     });
 
-    it("should return false if value is function and property is a callback for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
+    it("should return false if value is function and property is a callback", () => {
       expect(
         PixiProperty.shouldRemoveAttributeWithWarning("type", "prop", () => {}, { type: PixiProperty.CALLBACK })
       ).toBeFalsy();
-      isInjectedType.mockReset();
     });
 
     it("should return true if value is a symbol", () => {
@@ -119,6 +86,14 @@ describe("PixiProperty", () => {
   describe("shouldRemoveAttribute", () => {
     const type = "type";
     const name = "prop";
+
+    it("keeps a boolean or function on an untyped name for every component", () => {
+      expect(PixiProperty.shouldRemoveAttribute("Container", "sortableChildren", true, null)).toBe(false);
+      expect(PixiProperty.shouldRemoveAttribute("Container", "onSomething", () => {}, null)).toBe(false);
+      expect(PixiProperty.shouldRemoveAttribute("Sprite", "x", true, PixiProperty.getPropertyInfo("x", adapter))).toBe(
+        true
+      );
+    });
 
     it("should return true if value is undefined", () => {
       expect(PixiProperty.shouldRemoveAttribute(type, name, undefined, null)).toBeTruthy();
@@ -181,6 +156,54 @@ describe("PixiProperty", () => {
       expect(PixiProperty.shouldRemoveAttribute(type, name, "value", null)).toBeFalsy();
       expect(PixiProperty.shouldRemoveAttribute(type, name, 42, { type: PixiProperty.STRING })).toBeFalsy();
       expect(PixiProperty.shouldRemoveAttribute(type, name, "answer", { type: PixiProperty.STRING })).toBeFalsy();
+    });
+  });
+
+  describe("getPropertyInfo", () => {
+    it("types the names of the adapter table and reserves children and parent", () => {
+      expect(PixiProperty.getPropertyInfo("buttonMode", adapter).type).toBe(PixiProperty.BOOLEAN);
+      expect(PixiProperty.getPropertyInfo("alpha", adapter).type).toBe(PixiProperty.POSITIVE_NUMERIC);
+      expect(PixiProperty.getPropertyInfo("x", adapter).type).toBe(PixiProperty.NUMERIC);
+      expect(PixiProperty.getPropertyInfo("scale", adapter).type).toBe(PixiProperty.VECTOR);
+      expect(PixiProperty.getPropertyInfo("click", adapter).type).toBe(PixiProperty.CALLBACK);
+      expect(PixiProperty.getPropertyInfo("children", adapter).type).toBe(PixiProperty.RESERVED);
+      expect(PixiProperty.getPropertyInfo("texture", adapter)).toBeNull();
+      expect(PixiProperty.getPropertyInfo("constructor", adapter)).toBeNull();
+    });
+
+    it("reads each adapter's own table", () => {
+      const other = { properties: { boolean: ["flag"], numeric: [], positiveNumeric: [], vector: [], callback: [] } };
+      expect(PixiProperty.getPropertyInfo("flag", other).type).toBe(PixiProperty.BOOLEAN);
+      expect(PixiProperty.getPropertyInfo("buttonMode", other)).toBeNull();
+    });
+  });
+
+  describe("getStandardNames", () => {
+    it("maps the lowercase typed names to their canonical names", () => {
+      const names = PixiProperty.getStandardNames(adapter);
+      expect(names.buttonmode).toBe("buttonMode");
+      expect(names.tileposition).toBe("tilePosition");
+      expect(names.click).toBe("click");
+      expect(names.texture).toBeUndefined();
+      expect(PixiProperty.getStandardNames(adapter)).toBe(names);
+    });
+  });
+
+  describe("getCustomPropertyInfo", () => {
+    it("checks the tag, then `*`, and only own keys", () => {
+      const tagged = { type: () => true };
+      const all = { type: () => true };
+      PixiProperty.customProperties.TestTag = { a: tagged };
+      PixiProperty.customProperties["*"] = { a: all, b: all };
+      try {
+        expect(PixiProperty.getCustomPropertyInfo("a", "TestTag")).toBe(tagged);
+        expect(PixiProperty.getCustomPropertyInfo("b", "TestTag")).toBe(all);
+        expect(PixiProperty.getCustomPropertyInfo("a", "Other")).toBe(all);
+        expect(PixiProperty.getCustomPropertyInfo("constructor", "TestTag")).toBeNull();
+      } finally {
+        delete PixiProperty.customProperties.TestTag;
+        delete PixiProperty.customProperties["*"];
+      }
     });
   });
 });

@@ -2,6 +2,7 @@
 
 exports[`ReactPixiFiber public API > should match snapshot 1`] = `
 {
+  "AnimatedSprite": "AnimatedSprite",
   "AppContext": {
     "$$typeof": Symbol(react.context),
     "Consumer": {
@@ -26,27 +27,27 @@ exports[`ReactPixiFiber public API > should match snapshot 1`] = `
   "CustomPIXIComponent": [Function],
   "CustomPIXIProperty": [Function],
   "Graphics": "Graphics",
+  "Mesh": "Mesh",
+  "MeshPlane": "MeshPlane",
+  "MeshRope": "MeshRope",
+  "MeshSimple": "MeshSimple",
   "NineSlicePlane": "NineSlicePlane",
+  "NineSliceSprite": "NineSliceSprite",
+  "PIXIComponent": [Function],
+  "PIXIProperty": [Function],
   "ParticleContainer": "ParticleContainer",
   "Sprite": "Sprite",
   "Stage": {
     "$$typeof": Symbol(react.forward_ref),
-    "defaultProps": {
-      "options": {},
-    },
-    "propTypes": {
-      "app": [Function],
-      "children": [Function],
-      "height": [Function],
-      "options": [Function],
-      "width": [Function],
-    },
     "render": [Function],
   },
   "Text": "Text",
   "TilingSprite": "TilingSprite",
   "applyDisplayObjectProps": [Function],
+  "applyProps": [Function],
+  "configure": [Function],
   "createStageClass": [Function],
+  "getInstanceTag": [Function],
   "render": [Function],
   "unmount": [Function],
   "usePixiApp": [Function],

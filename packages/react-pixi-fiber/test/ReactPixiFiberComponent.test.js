@@ -1,154 +1,68 @@
-import { describe, it, expect, vi, afterAll, beforeEach } from "vitest";
-import * as PIXI from "pixi.js";
-import * as ReactPixiFiber from "../src/ReactPixiFiber";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as ReactPixiFiberComponent from "../src/ReactPixiFiberComponent";
-import { createInjectedTypeInstance, isInjectedType } from "../src/inject";
+import { createRegisteredInstance, normalizeBehavior, registerComponent } from "../src/registry";
 import { setValueForProperty } from "../src/PixiPropertyOperations";
-import { TYPES } from "../src/types";
 
-vi.mock("../src/inject", async importOriginal => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    createInjectedTypeInstance: vi.fn(actual.createInjectedTypeInstance),
-    isInjectedType: vi.fn(actual.isInjectedType),
-  };
-});
 vi.mock("../src/PixiPropertyOperations", async importOriginal => ({
   ...(await importOriginal()),
   setValueForProperty: vi.fn(),
 }));
 
-vi.mock("pixi.js", async importOriginal => {
-  return Object.assign({}, await importOriginal(), {
-    Container: vi.fn(),
-    Graphics: vi.fn(),
-    Sprite: vi.fn(),
-    Text: vi.fn(),
-    extras: {
-      BitmapText: vi.fn(),
-      TilingSprite: vi.fn(),
-    },
-    mesh: {
-      NineSlicePlane: vi.fn(),
-    },
-    particles: {
-      ParticleContainer: vi.fn(),
-    },
+const components = {
+  Container: { create: vi.fn(() => ({ kind: "Container" })) },
+  NineSliceSprite: { create: vi.fn(() => ({ kind: "NineSliceSprite" })) },
+};
+vi.mock("../src/configure", () => ({
+  getPixiAdapter: () => ({
+    components,
+    properties: { boolean: [], numeric: [], positiveNumeric: [], vector: [], callback: [] },
+    isPoint: () => false,
+    copyPoint() {},
+    defaults: { Defaulted: { alpha: 0.5 } },
+  }),
+}));
+
+describe("createInstance", () => {
+  let error;
+  beforeEach(async () => {
+    vi.resetModules();
+    (await import("../src/registry")).registerAdapterComponents(components);
+    error = vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it("resolves the user registry before the adapter", async () => {
+    const { registerComponent } = await import("../src/registry");
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    const user = { kind: "user" };
+    registerComponent("Container", () => user);
+    expect(createInstance("Container", {})).toBe(user);
+    expect(createInstance("Container", {})).toBe(user);
+    expect(error).toHaveBeenCalledTimes(__DEV__ ? 1 : 0); // "also defined by the adapter"
+    if (__DEV__) expect(error.mock.calls[0][0]).toMatch(/`Container`.*PIXIComponent.*adapter/s);
+  });
+  it("resolves adapter components", async () => {
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    expect(createInstance("Container", { a: 1 })).toEqual({ kind: "Container" });
+    expect(components.Container.create).toHaveBeenCalledWith({ a: 1 });
+    expect(error).not.toHaveBeenCalled();
+  });
+  it("maps the deprecated NineSlicePlane tag to NineSliceSprite and warns once", async () => {
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    expect(createInstance("NineSlicePlane", {})).toEqual({ kind: "NineSliceSprite" });
+    expect(createInstance("NineSlicePlane", {})).toEqual({ kind: "NineSliceSprite" });
+    expect(error).toHaveBeenCalledTimes(__DEV__ ? 1 : 0);
+    if (__DEV__) expect(error.mock.calls[0][0]).toMatch(/NineSlicePlane.*NineSliceSprite/s);
+  });
+  it("throws for an unknown tag naming the tag and configure", async () => {
+    const { createInstance } = await import("../src/ReactPixiFiberComponent");
+    expect(() => createInstance("Nope", {})).toThrow(/`Nope`.*PIXIComponent.*configure/s);
   });
 });
 
 describe("ReactPixiFiber", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe("createInstance", () => {
-    it("returns PIXI.BitmapText if type is BITMAP_TEXT with style prop", () => {
-      const text = "Hello World";
-      const style = { font: "16 Arial", align: "left", tint: 0x421337 };
-      ReactPixiFiberComponent.createInstance(TYPES.BITMAP_TEXT, { text, style });
-
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);
-    });
-
-    it("returns PIXI.BitmapText if type is BITMAP_TEXT with font prop", () => {
-      const text = "Hello World";
-      const style = { font: "16 Arial", align: "left", tint: 0x421337 };
-      ReactPixiFiberComponent.createInstance(TYPES.BITMAP_TEXT, {
-        text,
-        font: style.font,
-        align: style.align,
-        tint: style.tint,
-      });
-
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.BitmapText).toHaveBeenCalledWith(text, style);
-    });
-
-    it("returns PIXI.Container if type is CONTAINER", () => {
-      ReactPixiFiberComponent.createInstance(TYPES.CONTAINER, {});
-
-      expect(PIXI.Container).toHaveBeenCalledTimes(1);
-      expect(PIXI.Container).toHaveBeenCalledWith();
-    });
-
-    it("returns PIXI.Graphics if type is GRAPHICS", () => {
-      ReactPixiFiberComponent.createInstance(TYPES.GRAPHICS, {});
-
-      expect(PIXI.Graphics).toHaveBeenCalledTimes(1);
-      expect(PIXI.Graphics).toHaveBeenCalledWith();
-    });
-
-    it("returns PIXI.NineSlicePlane if type is NINE_SLICE_PLANE", () => {
-      const texture = "TEXTURE";
-      const leftWidth = 15;
-      const topHeight = 20;
-      const rightWidth = 25;
-      const bottomHeight = 30;
-      ReactPixiFiberComponent.createInstance(TYPES.NINE_SLICE_PLANE, {
-        texture,
-        leftWidth,
-        topHeight,
-        rightWidth,
-        bottomHeight,
-      });
-
-      expect(PIXI.mesh.NineSlicePlane).toHaveBeenCalledTimes(1);
-      expect(PIXI.mesh.NineSlicePlane).toHaveBeenCalledWith(texture, leftWidth, topHeight, rightWidth, bottomHeight);
-    });
-
-    it("returns PIXI.ParticleContainer if type is PARTICLE_CONTAINER", () => {
-      const maxSize = 1024;
-      const properties = { rotation: true };
-      const batchSize = 128;
-      const autoResize = false;
-      ReactPixiFiberComponent.createInstance(TYPES.PARTICLE_CONTAINER, { autoResize, batchSize, maxSize, properties });
-
-      expect(PIXI.particles.ParticleContainer).toHaveBeenCalledTimes(1);
-      expect(PIXI.particles.ParticleContainer).toHaveBeenCalledWith(maxSize, properties, batchSize, autoResize);
-    });
-
-    it("returns PIXI.Sprite if type is SPRITE", () => {
-      const texture = "TEXTURE";
-      ReactPixiFiberComponent.createInstance(TYPES.SPRITE, { texture });
-
-      expect(PIXI.Sprite).toHaveBeenCalledTimes(1);
-      expect(PIXI.Sprite).toHaveBeenCalledWith(texture);
-    });
-
-    it("returns PIXI.Text if type is TEXT", () => {
-      const text = "Hello World";
-      const style = { fontFamily: "Arial" };
-      const canvas = document.createElement("canvas");
-      ReactPixiFiberComponent.createInstance(TYPES.TEXT, { text, style, canvas });
-
-      expect(PIXI.Text).toHaveBeenCalledTimes(1);
-      expect(PIXI.Text).toHaveBeenCalledWith(text, style, canvas);
-    });
-
-    it("returns PIXI.TilingSprite if type is TILING_SPRITE", () => {
-      const texture = "TEXTURE";
-      const height = 16;
-      const width = 32;
-      ReactPixiFiberComponent.createInstance(TYPES.TILING_SPRITE, { height, texture, width });
-
-      expect(PIXI.extras.TilingSprite).toHaveBeenCalledTimes(1);
-      expect(PIXI.extras.TilingSprite).toHaveBeenCalledWith(texture, width, height);
-    });
-
-    it("returns injected instance if type was injected", () => {
-      const instance = {};
-      createInjectedTypeInstance.mockImplementationOnce(() => instance);
-      expect(() => ReactPixiFiberComponent.createInstance("INJECTED_TYPE", {})).not.toThrow();
-    });
-
-    it("throws if type is not supported", () => {
-      expect(() => ReactPixiFiberComponent.createInstance("INJECTED_TYPE", {})).toThrow(
-        "ReactPixiFiber does not support the type: `INJECTED_TYPE`."
-      );
-    });
   });
 
   describe("setInitialProperties", () => {
@@ -158,26 +72,30 @@ describe("ReactPixiFiber", () => {
     const rootContainer = {};
     const hostContext = {};
 
-    // setInitialCustomComponentProperties and setInitialPixiProperties are internal to the module, so the tests
-    // observe what they do: call instance._customApplyProps or setValueForProperty for each prop
-    afterAll(() => {
-      isInjectedType.mockReset();
-    });
-
-    it("calls setInitialCustomComponentProperties for injected types with _customApplyProps defined", () => {
-      const instance = {
-        _customApplyProps: vi.fn(),
-      };
-      isInjectedType.mockImplementation(() => true);
+    // setInitialPixiProperties is internal to the module, so the tests observe what it does: call the bound
+    // applyProps of a registered instance, or setValueForProperty for each prop
+    it("calls the bound applyProps for registered instances with applyProps defined", () => {
+      const applyProps = vi.fn();
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, { create: () => ({}), applyProps }),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setValueForProperty).toHaveBeenCalledTimes(0);
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
+      expect(applyProps).toHaveBeenCalledTimes(1);
+      expect(applyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
     });
 
-    it("calls setInitialPixiProperties for injected types without _customApplyProps defined", () => {
-      isInjectedType.mockImplementation(() => true);
+    it("calls setInitialPixiProperties for registered instances without applyProps defined", () => {
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, () => ({})),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setValueForProperty).toHaveBeenCalledTimes(1);
@@ -185,27 +103,10 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls setInitialPixiProperties for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
       ReactPixiFiberComponent.setInitialProperties(type, instance, rawProps, rootContainer, hostContext);
 
       expect(setValueForProperty).toHaveBeenCalledTimes(1);
       expect(setValueForProperty).toHaveBeenCalledWith(type, instance, "position", rawProps.position);
-    });
-  });
-
-  describe("setInitialCustomComponentProperties", () => {
-    const instance = {
-      _customApplyProps: vi.fn(),
-    };
-    const type = "type";
-    const rawProps = { position: "0,0" };
-    const rootContainerElement = {};
-
-    it("calls _customApplyProps on instance", () => {
-      ReactPixiFiberComponent.setInitialCustomComponentProperties(type, instance, rawProps, rootContainerElement);
-
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, undefined, rawProps);
     });
   });
 
@@ -235,7 +136,7 @@ describe("ReactPixiFiber", () => {
     it("returns changed prop keys and values list if props changed", () => {
       expect(ReactPixiFiberComponent.diffProperties("Text", {}, oldProps, newProps)).toEqual([
         "position",
-        null,
+        undefined,
         "pivot",
         "0,0",
         "text",
@@ -267,17 +168,16 @@ describe("ReactPixiFiber", () => {
     const updatePayload = ["position", "1,1"];
     const internalInstanceHandle = {};
 
-    // updateCustomComponentProperties and updatePixiProperties are internal to the module, so the tests observe
-    // what they do: call instance._customApplyProps or setValueForProperty for each prop
-    afterAll(() => {
-      isInjectedType.mockReset();
-    });
-
-    it("calls updateCustomComponentProperties for injected types with _customApplyProps defined", () => {
-      const instance = {
-        _customApplyProps: vi.fn(),
-      };
-      isInjectedType.mockImplementation(() => true);
+    // updatePixiProperties is internal to the module, so the tests observe what it does: call the bound
+    // applyProps of a registered instance, or setValueForProperty for each prop
+    it("calls the bound applyProps for registered instances with applyProps defined", () => {
+      const applyProps = vi.fn();
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, { create: () => ({}), applyProps }),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.updateProperties(
         type,
         instance,
@@ -288,12 +188,34 @@ describe("ReactPixiFiber", () => {
       );
 
       expect(setValueForProperty).toHaveBeenCalledTimes(0);
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
+      expect(applyProps).toHaveBeenCalledTimes(1);
+      expect(applyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
     });
 
-    it("calls updatePixiProperties for injected types without _customApplyProps defined", () => {
-      isInjectedType.mockImplementation(() => true);
+    it("passes both props with the adapter defaults to the bound applyProps", () => {
+      const applyProps = vi.fn();
+      const instance = createRegisteredInstance(
+        "Defaulted",
+        normalizeBehavior("Defaulted", { create: () => ({}), applyProps }),
+        {},
+        () => {}
+      );
+      ReactPixiFiberComponent.setInitialProperties("Defaulted", instance, { x: 1 });
+      ReactPixiFiberComponent.updateProperties("Defaulted", instance, ["x", 2], { x: 1 }, { x: 2 });
+
+      expect(applyProps.mock.calls).toEqual([
+        [instance, undefined, { x: 1, alpha: 0.5 }],
+        [instance, { x: 1, alpha: 0.5 }, { x: 2, alpha: 0.5 }],
+      ]);
+    });
+
+    it("calls updatePixiProperties for registered instances without applyProps defined", () => {
+      const instance = createRegisteredInstance(
+        type,
+        normalizeBehavior(type, () => ({})),
+        {},
+        () => {}
+      );
       ReactPixiFiberComponent.updateProperties(
         type,
         instance,
@@ -314,7 +236,6 @@ describe("ReactPixiFiber", () => {
     });
 
     it("calls updatePixiProperties for regular types", () => {
-      isInjectedType.mockImplementation(() => false);
       ReactPixiFiberComponent.updateProperties(
         type,
         instance,
@@ -335,28 +256,26 @@ describe("ReactPixiFiber", () => {
     });
   });
 
-  describe("updateCustomComponentProperties", () => {
-    const instance = {
-      _customApplyProps: vi.fn(),
-    };
-    const type = "type";
-    const lastRawProps = { position: "0,0" };
-    const nextRawProps = { position: "1,1" };
-    const updatePayload = ["position", "1,1"];
-    const internalInstanceHandle = {};
+  describe("applyProps", () => {
+    it("applyProps delegates to the component's applyProps or to the display-object pipeline", () => {
+      const custom = vi.fn();
+      registerComponent("WithApply", { create: () => ({ kind: "custom" }), applyProps: custom });
+      registerComponent("Plain", () => ({ kind: "plain" }));
+      const a = ReactPixiFiberComponent.createInstance("WithApply", {});
+      ReactPixiFiberComponent.applyProps(a, { x: 1 }, { x: 2 });
+      expect(custom).toHaveBeenCalledWith(a, { x: 1 }, { x: 2 });
+      const b = ReactPixiFiberComponent.createInstance("Plain", {});
+      ReactPixiFiberComponent.applyProps(b, undefined, { x: 3 });
+      expect(setValueForProperty).toHaveBeenCalledWith("Plain", b, "x", 3, undefined);
+      expect(() => ReactPixiFiberComponent.applyProps({}, {}, {})).toThrow("react-pixi-fiber created");
+    });
 
-    it("calls _customApplyProps on instance", () => {
-      ReactPixiFiberComponent.updateCustomComponentProperties(
-        type,
-        instance,
-        updatePayload,
-        lastRawProps,
-        nextRawProps,
-        internalInstanceHandle
-      );
-
-      expect(instance._customApplyProps).toHaveBeenCalledTimes(1);
-      expect(instance._customApplyProps).toHaveBeenCalledWith(instance, lastRawProps, nextRawProps);
+    it("passes both props with the adapter defaults to the component's applyProps, as a commit does", () => {
+      const custom = vi.fn();
+      registerComponent("Defaulted", { create: () => ({}), applyProps: custom });
+      const instance = ReactPixiFiberComponent.createInstance("Defaulted", {});
+      ReactPixiFiberComponent.applyProps(instance, {}, { x: 1 });
+      expect(custom).toHaveBeenLastCalledWith(instance, { alpha: 0.5 }, { x: 1, alpha: 0.5 });
     });
   });
 

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es2015", "dom"],
+    "lib": ["es2018", "dom"],
     "noEmit": true,
     // pixi.js 6 typings conflict with lib.dom in TypeScript 5+ (CanvasRenderingContext2D.letterSpacing)
     "skipLibCheck": true,
@@ -8,10 +8,16 @@
     "jsx": "react",
     // Required for importing 3rd-party dependencies like EventEmitter3
     "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "paths": {
-      "react-pixi-fiber": ["./index.d.ts"]
+      "react-pixi-fiber": ["./src/index.ts"],
+      "@react-pixi-fiber/pixi-6": ["../pixi-6/src/index.ts"],
+      "@react-pixi-fiber/react-18": ["../react-18/src/index.ts"]
     },
     "types": []
   },
-  "files": ["test/typescript/index.tsx"]
+  "include": ["src", "test/typescript"],
+  // Compiled without an adapter by tsconfig.fallback.json
+  "exclude": ["test/typescript/fallback.tsx"]
 }

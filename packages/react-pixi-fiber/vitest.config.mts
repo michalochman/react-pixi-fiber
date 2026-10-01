@@ -1,36 +1,7 @@
-import { fileURLToPath } from "node:url";
-import { defineConfig } from "vitest/config";
-import pkg from "./package.json" with { type: "json" };
+import { createVitestConfig } from "../../scripts/vitest.config.ts";
 
-// test:dev and test:prod differ only in __DEV__ (`--mode development|production`). NODE_ENV stays "test" in
-// both: with NODE_ENV=production React has no act() and its context objects differ from the public API snapshot.
-export default defineConfig(({ mode }) => {
-  const isProduction = mode === "production";
-  return {
-    // The source has JSX in .js files and uses the classic React.createElement runtime, like the build.
-    oxc: {
-      include: /\.jsx?$/,
-      exclude: [],
-      lang: "jsx",
-      jsx: { runtime: "classic", pragma: "React.createElement", pragmaFrag: "React.Fragment" },
-    },
-    define: {
-      __DEV__: JSON.stringify(!isProduction),
-      __PACKAGE_NAME__: JSON.stringify(pkg.name),
-    },
-    resolve: {
-      alias: [{ find: /^react-pixi-fiber$/, replacement: fileURLToPath(new URL("src/index.js", import.meta.url)) }],
-    },
-    test: {
-      environment: "jsdom",
-      include: ["test/**/*.test.js"],
-      setupFiles: ["vitest-webgl-canvas-mock", "./config/vitest/setupPixi.js"],
-      coverage: {
-        provider: "v8",
-        include: ["src/**/*.js"],
-        reportsDirectory: `coverage/${isProduction ? "prod" : "dev"}`,
-        reporter: ["json", "lcov", "text-summary"],
-      },
-    },
-  };
+// The core tests run on PixiJS 6: setupPixi.js hides its banner, and test/setup.ts configures react-18 and pixi-6.
+export default createVitestConfig({
+  root: import.meta.dirname,
+  setupFiles: ["./config/vitest/setupPixi.js", "./test/setup.ts"],
 });

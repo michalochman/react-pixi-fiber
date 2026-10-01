@@ -26,9 +26,9 @@ function BunnyExample() {
       <Bunny
         anchor={centerAnchor}
         as={Animated.Sprite}
-        interactive
-        pointerdown={handleDown}
-        pointerup={handleUp}
+        eventMode="static"
+        onpointerdown={handleDown}
+        onpointerup={handleUp}
         position="400,300"
         rotation={animationProgress.current.interpolate({
           inputRange: [0, 1],

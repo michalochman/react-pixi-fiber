@@ -128,9 +128,9 @@ function CustomBunnymark(props: PixiAppProperties) {
             so here's a clickable hit area */}
       <Sprite
         height={600}
-        interactive
-        pointerdown={handlePointerDown}
-        pointerup={handlePointerUp}
+        eventMode="static"
+        onpointerdown={handlePointerDown}
+        onpointerup={handlePointerUp}
         texture={PIXI.Texture.EMPTY}
         width={800}
       />

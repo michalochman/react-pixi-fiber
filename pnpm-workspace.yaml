@@ -1,5 +1,6 @@
 packages:
   - apps/*
+  - apps/test-matrix/*
   - packages/*
 onlyBuiltDependencies:
   - canvas
