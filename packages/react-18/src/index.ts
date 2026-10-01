@@ -1,12 +1,64 @@
 import React from "react";
 import Reconciler from "react-reconciler";
-import { DefaultEventPriority } from "react-reconciler/constants";
+import {
+  ConcurrentRoot,
+  ContinuousEventPriority,
+  DefaultEventPriority,
+  DiscreteEventPriority,
+  LegacyRoot,
+} from "react-reconciler/constants";
 import type { HostOps, ReactAdapter, Renderer } from "react-pixi-fiber";
 
 // https://github.com/facebook/react/blob/v18.3.1/packages/react-reconciler/src/ReactTypeOfMode.js: StrictLegacyMode
 export const strictModeBit = 8;
-const LegacyRoot = 0;
 const emptyObject = Object.freeze({});
+
+export interface React18Options {
+  /**
+   * The kind of root Stage and `render` create: `"legacy"` (the default) commits every update synchronously, as 2.x
+   * did; `"concurrent"` enables transitions, Suspense and update priorities.
+   */
+  root?: "concurrent" | "legacy";
+}
+
+// The DOM events PixiJS dispatches its handlers from, with the priority react-dom gives an update inside them.
+const DISCRETE_EVENTS = new Set([
+  "click",
+  "contextmenu",
+  "dblclick",
+  "keydown",
+  "keyup",
+  "mousedown",
+  "mouseup",
+  "pointercancel",
+  "pointerdown",
+  "pointerup",
+  "touchcancel",
+  "touchend",
+  "touchstart",
+]);
+const CONTINUOUS_EVENTS = new Set([
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "pointerenter",
+  "pointerleave",
+  "pointermove",
+  "pointerout",
+  "pointerover",
+  "touchmove",
+  "wheel",
+]);
+
+// A legacy root ignores the priority: every update on it is synchronous.
+function getEventPriority(): number {
+  const type = typeof window !== "undefined" ? window.event?.type : undefined;
+  if (type === undefined) return DefaultEventPriority;
+  if (DISCRETE_EVENTS.has(type)) return DiscreteEventPriority;
+  return CONTINUOUS_EVENTS.has(type) ? ContinuousEventPriority : DefaultEventPriority;
+}
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -42,7 +94,7 @@ export function createHostConfig(hostOps: HostOps): Record<string, unknown> {
     scheduleMicrotask,
     now: () =>
       typeof performance === "object" && typeof performance.now === "function" ? performance.now() : Date.now(),
-    getCurrentEventPriority: () => DefaultEventPriority,
+    getCurrentEventPriority: getEventPriority,
     getRootHostContext: () => emptyObject,
     getChildHostContext: (parentHostContext: unknown) => parentHostContext,
     getPublicInstance: (instance: unknown) => instance,
@@ -117,7 +169,11 @@ function getStackAddendum(): string {
   return stack != null ? stack : "";
 }
 
-function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean): Renderer {
+function createRenderer(
+  hostOps: HostOps,
+  isPrimaryRenderer: boolean,
+  rootTag: typeof ConcurrentRoot | typeof LegacyRoot
+): Renderer {
   const reconciler = Reconciler({ ...createHostConfig(hostOps), isPrimaryRenderer } as any);
   reconciler.injectIntoDevTools({
     findFiberByHostInstance: () => null,
@@ -126,38 +182,54 @@ function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean): Renderer 
     rendererPackageName: "react-pixi-fiber",
   });
   const roots = new WeakMap<object, unknown>();
+  // A concurrent root commits the first render and the unmount before they return, as a legacy root does, so Stage
+  // reads its tree in the same effect on both.
+  const commit =
+    rootTag === ConcurrentRoot
+      ? (update: () => void) => reconciler.flushSync(update)
+      : (update: () => void) => update();
   return {
     render(element, container, callback, parentComponent) {
       let root = roots.get(container);
       if (!root) {
-        root = reconciler.createContainer(container, LegacyRoot, null, false, null, "", console.error, null);
+        root = reconciler.createContainer(container, rootTag, null, false, null, "", console.error, null);
         roots.set(container, root);
       }
-      reconciler.updateContainer(element, root as any, parentComponent as any, callback as any);
+      commit(() => {
+        reconciler.updateContainer(element, root as any, parentComponent as any, callback as any);
+      });
       return reconciler.getPublicRootInstance(root as any);
     },
     unmount(container) {
       const root = roots.get(container);
       if (!root) return false;
-      reconciler.updateContainer(null, root as any, null, null);
+      commit(() => {
+        reconciler.updateContainer(null, root as any, null, null);
+      });
       return true;
     },
     getStackAddendum,
   };
 }
 
-// One renderer per core and kind for the lifetime of the page: React DevTools keeps every renderer injected into it,
-// and `configure` may be called more than once.
-const renderers = new WeakMap<HostOps, { primary?: Renderer; secondary?: Renderer }>();
+// One renderer per core, kind and root for the lifetime of the page: React DevTools keeps every renderer injected into
+// it, and `configure` may be called more than once.
+const renderers = new WeakMap<HostOps, Record<string, Renderer>>();
 
-export default function react18(): ReactAdapter {
+export default function react18({ root = "legacy" }: React18Options = {}): ReactAdapter {
+  if (root !== "concurrent" && root !== "legacy") {
+    throw new Error(
+      `\`react18({ root })\` got ${JSON.stringify(root)}. Pass "concurrent" or "legacy", or leave \`root\` out.`
+    );
+  }
+  const rootTag = root === "concurrent" ? ConcurrentRoot : LegacyRoot;
   return {
     strictModeBit,
     createRenderer(hostOps, { isPrimaryRenderer }): Renderer {
       let cached = renderers.get(hostOps);
       if (!cached) renderers.set(hostOps, (cached = {}));
-      const kind = isPrimaryRenderer ? "primary" : "secondary";
-      return cached[kind] || (cached[kind] = createRenderer(hostOps, isPrimaryRenderer));
+      const key = `${isPrimaryRenderer ? "primary" : "secondary"} ${root}`;
+      return cached[key] || (cached[key] = createRenderer(hostOps, isPrimaryRenderer, rootTag));
     },
   };
 }

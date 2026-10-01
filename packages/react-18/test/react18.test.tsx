@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import React, { StrictMode } from "react";
+import React, { StrictMode, useState } from "react";
 import react18, { strictModeBit } from "../src/index";
 import type { HostOps } from "react-pixi-fiber";
 
@@ -184,6 +184,60 @@ describe("react18", () => {
     } else {
       expect(validate).not.toHaveBeenCalled();
     }
+  });
+
+  it("commits synchronously on a concurrent root", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react18({ root: "concurrent" }).createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    renderer.render(<node />, container);
+    // No act(), no await: the child is there when render() returns.
+    expect(container.children).toHaveLength(1);
+    renderer.unmount(container);
+    expect(container.children).toHaveLength(0);
+  });
+
+  it("commits an update from a pointerdown handler in a microtask on a concurrent root, as react-dom does", async () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react18({ root: "concurrent" }).createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    let setX: (x: number) => void = () => {};
+    function Node() {
+      const [x, set] = useState(1);
+      setX = set;
+      return <node x={x} />;
+    }
+    renderer.render(<Node />, container);
+    const canvas = document.createElement("canvas");
+    canvas.addEventListener("pointerdown", () => setX(2));
+    canvas.dispatchEvent(new Event("pointerdown"));
+    await Promise.resolve();
+    expect(container.children[0].props.x).toBe(2);
+    renderer.unmount(container);
+  });
+
+  it("commits an update from a handler synchronously on the default root", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react18().createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    let setX: (x: number) => void = () => {};
+    function Node() {
+      const [x, set] = useState(1);
+      setX = set;
+      return <node x={x} />;
+    }
+    renderer.render(<Node />, container);
+    const canvas = document.createElement("canvas");
+    canvas.addEventListener("pointerdown", () => setX(2));
+    canvas.dispatchEvent(new Event("pointerdown"));
+    expect(container.children[0].props.x).toBe(2);
+    renderer.unmount(container);
+  });
+
+  it("throws on an unknown root", () => {
+    expect(() => react18({ root: "blocking" as any })).toThrow(
+      '`react18({ root })` got "blocking". Pass "concurrent" or "legacy", or leave `root` out.'
+    );
   });
 
   it("throws on text children", () => {

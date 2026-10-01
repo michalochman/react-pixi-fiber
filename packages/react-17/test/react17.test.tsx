@@ -127,6 +127,37 @@ describe("react17", () => {
     expect(createContainer).toHaveBeenCalledWith(container, 0, false, null);
   });
 
+  it("creates a concurrent root that commits synchronously", () => {
+    const { ops } = createFakeHostOps();
+    const renderer = react17({ root: "concurrent" }).createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    renderer.render(<node />, container);
+    expect(createContainer).toHaveBeenCalledWith(container, 2, false, null);
+    // No act(), no await: the child is there when render() returns.
+    expect(container.children).toHaveLength(1);
+    renderer.unmount(container);
+    expect(container.children).toHaveLength(0);
+  });
+
+  it("puts the whole tree in strict mode on a concurrent root, as React 17 does", () => {
+    const { ops, validate } = createFakeHostOps();
+    const renderer = react17({ root: "concurrent" }).createRenderer(ops, { isPrimaryRenderer: true });
+    const container = { children: [] as any[] };
+    renderer.render(<node />, container);
+    if (__DEV__) {
+      expect((validate.mock.calls[0][2] as any).mode & strictModeBit).toBeTruthy();
+    } else {
+      expect(validate).not.toHaveBeenCalled();
+    }
+    renderer.unmount(container);
+  });
+
+  it("throws on an unknown root", () => {
+    expect(() => react17({ root: "blocking" as any })).toThrow(
+      '`react17({ root })` got "blocking". Pass "concurrent" or "legacy", or leave `root` out.'
+    );
+  });
+
   it("passes the callback and parentComponent to updateContainer", () => {
     const { ops } = createFakeHostOps();
     const renderer = react17().createRenderer(ops, { isPrimaryRenderer: true });

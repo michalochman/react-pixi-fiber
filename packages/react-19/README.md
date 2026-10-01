@@ -49,6 +49,6 @@ The tree inside `Stage`, or inside a container passed to `render`, is its own Re
 
 What changes inside `Stage`:
 
-- The root is a concurrent root instead of a legacy root. The first render still commits synchronously; transitions and deferred values inside the tree now defer.
+- The root is a concurrent root instead of a legacy root, and React 19 has no legacy root, so `react19()` takes no `root` option. The first render still commits synchronously; transitions and deferred values inside the tree now defer. With `react18({ root: "concurrent" })` this was already the case.
 - An error thrown while rendering, or a string child, is reported to `console.error` instead of being thrown from `render()`. Code or tests that caught it from `render()` read the console or use an error boundary.
 - `<Activity>`, `<ViewTransition>` and fragment refs are available.

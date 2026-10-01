@@ -4,8 +4,18 @@ import type { HostOps, ReactAdapter, Renderer } from "react-pixi-fiber";
 
 // https://github.com/facebook/react/blob/v17.0.2/packages/react-reconciler/src/ReactTypeOfMode.js: StrictMode
 export const strictModeBit = 1;
+// https://github.com/facebook/react/blob/v17.0.2/packages/react-reconciler/src/ReactRootTags.js
 const LegacyRoot = 0;
+const ConcurrentRoot = 2;
 const emptyObject = Object.freeze({});
+
+export interface React17Options {
+  /**
+   * The kind of root Stage and `render` create: `"legacy"` (the default) commits every update synchronously, as 2.x
+   * did; `"concurrent"` is the experimental concurrent mode of React 17.
+   */
+  root?: "concurrent" | "legacy";
+}
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -97,7 +107,7 @@ function getStackAddendum(): string {
   return stack != null ? stack : "";
 }
 
-function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean): Renderer {
+function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean, rootTag: number): Renderer {
   const reconciler = Reconciler({ ...createHostConfig(hostOps), isPrimaryRenderer } as any);
   reconciler.injectIntoDevTools({
     findFiberByHostInstance: () => null,
@@ -106,6 +116,12 @@ function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean): Renderer 
     rendererPackageName: "react-pixi-fiber",
   });
   const roots = new WeakMap<object, unknown>();
+  // A concurrent root commits the first render and the unmount before they return, as a legacy root does, so Stage
+  // reads its tree in the same effect on both.
+  const commit =
+    rootTag === ConcurrentRoot
+      ? (update: () => void) => reconciler.flushSync(update, undefined)
+      : (update: () => void) => update();
   return {
     render(element, container, callback, parentComponent) {
       let root = roots.get(container);
@@ -115,34 +131,44 @@ function createRenderer(hostOps: HostOps, isPrimaryRenderer: boolean): Renderer 
           reconciler as unknown as {
             createContainer(container: unknown, tag: number, hydrate: boolean, hydrationCallbacks: null): unknown;
           }
-        ).createContainer(container, LegacyRoot, false, null);
+        ).createContainer(container, rootTag, false, null);
         roots.set(container, root);
       }
-      reconciler.updateContainer(element, root as any, parentComponent as any, callback as any);
+      commit(() => {
+        reconciler.updateContainer(element, root as any, parentComponent as any, callback as any);
+      });
       return reconciler.getPublicRootInstance(root as any);
     },
     unmount(container) {
       const root = roots.get(container);
       if (!root) return false;
-      reconciler.updateContainer(null, root as any, null, null);
+      commit(() => {
+        reconciler.updateContainer(null, root as any, null, null);
+      });
       return true;
     },
     getStackAddendum,
   };
 }
 
-// One renderer per core and kind for the lifetime of the page: React DevTools keeps every renderer injected into it,
-// and `configure` may be called more than once.
-const renderers = new WeakMap<HostOps, { primary?: Renderer; secondary?: Renderer }>();
+// One renderer per core, kind and root for the lifetime of the page: React DevTools keeps every renderer injected into
+// it, and `configure` may be called more than once.
+const renderers = new WeakMap<HostOps, Record<string, Renderer>>();
 
-export default function react17(): ReactAdapter {
+export default function react17({ root = "legacy" }: React17Options = {}): ReactAdapter {
+  if (root !== "concurrent" && root !== "legacy") {
+    throw new Error(
+      `\`react17({ root })\` got ${JSON.stringify(root)}. Pass "concurrent" or "legacy", or leave \`root\` out.`
+    );
+  }
+  const rootTag = root === "concurrent" ? ConcurrentRoot : LegacyRoot;
   return {
     strictModeBit,
     createRenderer(hostOps, { isPrimaryRenderer }): Renderer {
       let cached = renderers.get(hostOps);
       if (!cached) renderers.set(hostOps, (cached = {}));
-      const kind = isPrimaryRenderer ? "primary" : "secondary";
-      return cached[kind] || (cached[kind] = createRenderer(hostOps, isPrimaryRenderer));
+      const key = `${isPrimaryRenderer ? "primary" : "secondary"} ${root}`;
+      return cached[key] || (cached[key] = createRenderer(hostOps, isPrimaryRenderer, rootTag));
     },
   };
 }
