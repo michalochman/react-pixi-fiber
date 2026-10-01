@@ -37,7 +37,10 @@ writeFileSync(
     "Object.defineProperty(globalThis, 'document', { value: window.document, configurable: true });\n"
 );
 
-const run = (command, args, cwd = root) => execFileSync(command, args, { cwd, encoding: "utf8" }).trim();
+// `pnpm publish --json` exports npm_config_json to the prepublishOnly hook, and `pnpm pack` would then print JSON instead of the tarball path.
+const env = { ...process.env };
+delete env.npm_config_json;
+const run = (command, args, cwd = root) => execFileSync(command, args, { cwd, encoding: "utf8", env }).trim();
 
 const failures = [];
 const check = async (name, fn) => {
