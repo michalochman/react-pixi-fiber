@@ -54,6 +54,16 @@ describe("pixi6", () => {
       expect(adapter.components[tag].create(propsFor[tag]), tag).toBeInstanceOf(classFor[tag]);
     }
   });
+  it("creates a BitmapText from a fontName prop without a style, the props winning over the style", () => {
+    const text = adapter.components.BitmapText.create({ fontName: "test", text: "t" }) as PIXI.BitmapText;
+    expect(text.fontName).toBe("test");
+    const sized = adapter.components.BitmapText.create({
+      fontSize: 20,
+      style: { fontName: "test", fontSize: 10 },
+      text: "t",
+    });
+    expect((sized as PIXI.BitmapText).fontSize).toBe(20);
+  });
   it("lists the event names as callbacks, without an on prefix", () => {
     expect(adapter.properties.callback).toContain("click");
     expect(adapter.properties.callback).not.toContain("onclick");

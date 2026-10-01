@@ -62,6 +62,16 @@ describe("pixi7", () => {
     expect(HTMLText).toBe("HTMLText");
     expect(adapter.components.HTMLText.create({ text: "x" })).toBeInstanceOf(PIXI.HTMLText);
   });
+  it("creates a BitmapText from a fontName prop without a style, the props winning over the style", () => {
+    const text = adapter.components.BitmapText.create({ fontName: "test", text: "t" }) as PIXI.BitmapText;
+    expect(text.fontName).toBe("test");
+    const sized = adapter.components.BitmapText.create({
+      fontSize: 20,
+      style: { fontName: "test", fontSize: 10 },
+      text: "t",
+    });
+    expect((sized as PIXI.BitmapText).fontSize).toBe(20);
+  });
   it("lists the on-prefixed event properties as callbacks, not the PixiJS 6 event names", () => {
     expect(adapter.properties.callback).toContain("onclick");
     expect(adapter.properties.callback).toContain("onglobalpointermove");

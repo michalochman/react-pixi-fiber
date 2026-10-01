@@ -1,8 +1,13 @@
 import * as PIXI from "pixi.js";
 import type { Behavior } from "react-pixi-fiber";
 
+// The constructor reads the font from its style, so a `fontName` passed as a prop of its own goes in it too.
+const BITMAP_TEXT_STYLE_KEYS = ["align", "font", "fontName", "fontSize", "letterSpacing", "maxWidth", "tint"];
+
 function bitmapTextStyle(props: Record<string, any>) {
-  return typeof props.style !== "undefined" ? props.style : { align: props.align, font: props.font, tint: props.tint };
+  const style = { ...props.style };
+  for (const key of BITMAP_TEXT_STYLE_KEYS) if (props[key] !== undefined) style[key] = props[key];
+  return style;
 }
 
 export const components: Record<string, Behavior> = {
