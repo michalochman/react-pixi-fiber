@@ -9,33 +9,40 @@ jobs:
     steps:
       - checkout
 
+      # pnpm version comes from the packageManager field in package.json
+      - run: sudo corepack enable
+
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - npm-dependencies-{{ checksum ".nvmrc" }}-{{ checksum "package-lock.json" }}
+          - pnpm-store-{{ checksum ".nvmrc" }}-{{ checksum "pnpm-lock.yaml" }}
           # fallback to using the latest cache if no exact match is found
-          - npm-dependencies-
+          - pnpm-store-
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       # Cache dependencies
       - save_cache:
           paths:
-            - node_modules
-          key: npm-dependencies-{{ checksum ".nvmrc" }}-{{ checksum "package-lock.json" }}
+            - ~/.local/share/pnpm/store
+          key: pnpm-store-{{ checksum ".nvmrc" }}-{{ checksum "pnpm-lock.yaml" }}
+
+      # check formatting and lint
+      - run: pnpm lint
 
       # run build
-      - run: npm run build
+      - run: pnpm build
+
+      # check the packed package with publint and attw, and which files Node and esbuild resolve
+      - run: pnpm check-package
 
       # run tests
-      # Cap workers: jest sizes its pool from the host CPU count and OOMs the 4 GB container.
-      - run: npm run test:dev -- --ci --maxWorkers=2
-      - run: npm run test:prod -- --ci --maxWorkers=2
-      - run: npm run test:ts
+      # Cap workers: vitest sizes its pool from the host CPU count and OOMs the 4 GB container.
+      - run: pnpm --filter react-pixi-fiber test:dev --maxWorkers=2
+      - run: pnpm --filter react-pixi-fiber test:prod --maxWorkers=2
 
-      # typecheck examples against local index.d.ts
-      - run: cd examples && npm ci && sh link.sh && npm run check-types
+      # typecheck the TypeScript fixture and the examples against the local index.d.ts
+      - run: pnpm check-types
 
-      # upload coverage report
-      # TODO: Migrate to new uploader
-      # - run: npm exec codecov
+      # build the examples against the local package
+      - run: pnpm --filter examples build

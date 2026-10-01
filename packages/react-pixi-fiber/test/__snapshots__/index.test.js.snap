@@ -1,0 +1,56 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ReactPixiFiber public API > should match snapshot 1`] = `
+{
+  "AppContext": {
+    "$$typeof": Symbol(react.context),
+    "Consumer": {
+      "$$typeof": Symbol(react.context),
+      "_context": [Circular],
+    },
+    "Provider": {
+      "$$typeof": Symbol(react.provider),
+      "_context": [Circular],
+    },
+    "_currentRenderer": null,
+    "_currentRenderer2": null,
+    "_currentValue": null,
+    "_currentValue2": null,
+    "_defaultValue": null,
+    "_globalName": null,
+    "_threadCount": 0,
+  },
+  "AppProvider": [Function],
+  "BitmapText": "BitmapText",
+  "Container": "Container",
+  "CustomPIXIComponent": [Function],
+  "CustomPIXIProperty": [Function],
+  "Graphics": "Graphics",
+  "NineSlicePlane": "NineSlicePlane",
+  "ParticleContainer": "ParticleContainer",
+  "Sprite": "Sprite",
+  "Stage": {
+    "$$typeof": Symbol(react.forward_ref),
+    "defaultProps": {
+      "options": {},
+    },
+    "propTypes": {
+      "app": [Function],
+      "children": [Function],
+      "height": [Function],
+      "options": [Function],
+      "width": [Function],
+    },
+    "render": [Function],
+  },
+  "Text": "Text",
+  "TilingSprite": "TilingSprite",
+  "applyDisplayObjectProps": [Function],
+  "createStageClass": [Function],
+  "render": [Function],
+  "unmount": [Function],
+  "usePixiApp": [Function],
+  "usePixiTicker": [Function],
+  "withApp": [Function],
+}
+`;

@@ -41,17 +41,16 @@ The core team is monitoring for pull requests. We will review your pull request 
 **Before submitting a pull request**, please make sure the following is done:
 
 1. Fork [the repository](https://github.com/michalochman/react-pixi-fiber) and create your branch from `master`.
-2. Run `npm install` in the repository root.
+2. Run `pnpm install` in the repository root.
 3. If you've fixed a bug or added code that should be tested, add tests!
-4. Ensure the test suite passes (`npm run test`). Tip: `npm run test --watch TestName` is helpful in development.
-5. Format your code with [prettier](https://github.com/prettier/prettier) (`npm run prettier`).
-6. Make sure your code lints (`npm run eslint`).
+4. Ensure the test suite passes (`pnpm test`), the types check (`pnpm check-types`) and, if you changed `package.json` or the build, the package check (`pnpm check-package`).
+5. Format your code (`pnpm format`) and make sure it lints (`pnpm lint`).
+
+Every pull request gets a preview of the examples on Cloudflare Pages; the URL is posted as a comment on the pull request.
 
 ## Style Guide
 
-We use an automatic code formatter called [Prettier](https://prettier.io/). Run `npm run prettier` after making any changes to the code.
-
-Then, our linter will catch most issues that may exist in your code. You can check the status of your code styling by simply running `npm run eslint`.
+We use [Biome](https://biomejs.dev) to format and lint the code. Run `pnpm format` after making any changes to the code, and `pnpm lint` to check it.
 
 However, there are still some styles that the linter cannot pick up. If you are unsure about something, looking at [Airbnb's Style Guide](https://github.com/airbnb/javascript) will guide you in the right direction.
 
