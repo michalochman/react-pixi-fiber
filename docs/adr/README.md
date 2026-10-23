@@ -51,3 +51,4 @@ Write the title as an instruction that states the decision, for example "Use Con
 | 0015 | [Restore the Default When a Prop Is Removed](0015-restore-the-default-when-a-prop-is-removed.md) | accepted | 2026-09-26 |
 | 0016 | [Ship PixiJS Compat as Opt-In Subpaths](0016-ship-pixijs-compat-as-opt-in-subpaths.md) | accepted | 2026-09-29 |
 | 0017 | [Keep a Shared Canvas Context When an Application Is Destroyed](0017-keep-a-shared-canvas-context-when-an-application-is-destroyed.md) | accepted | 2026-09-29 |
+| 0018 | [Let the App List the PixiJS 8 Classes It Renders](0018-let-the-app-list-the-pixijs-8-classes-it-renders.md) | accepted | 2026-10-24 |
