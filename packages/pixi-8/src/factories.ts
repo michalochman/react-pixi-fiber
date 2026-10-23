@@ -1,5 +1,9 @@
-import * as PIXI from "pixi.js";
+import type * as PIXI from "pixi.js";
 import type { Behavior } from "react-pixi-fiber";
+import type { Pixi8Components } from "./types";
+
+export type Pixi8Tag = Exclude<keyof Pixi8Components, "Application">;
+export type Factory<K extends Pixi8Tag> = (Ctor: Pixi8Components[K], components: Partial<Pixi8Components>) => Behavior;
 
 // PixiJS 8 constructors spread their options over the class defaults, so a key set to `undefined` would win over the
 // default. Only the props that are set are passed.
@@ -12,8 +16,8 @@ function defined<T extends Record<string, unknown>>(options: T): T {
 // A particle has no parent pointer, so a prop change finds the container to `update()` here.
 const particleParents = new WeakMap<PIXI.Particle, PIXI.ParticleContainer>();
 
-function asParticle(child: unknown): PIXI.Particle {
-  if (!(child instanceof PIXI.Particle)) {
+function asParticle(child: unknown, Particle: Pixi8Components["Particle"] | undefined): PIXI.Particle {
+  if (Particle === undefined || !(child instanceof Particle)) {
     throw new Error(
       "`ParticleContainer` takes only `Particle` children from `@react-pixi-fiber/pixi-8`, not display objects."
     );
@@ -49,31 +53,31 @@ function changesStaticAttributes(
   return false;
 }
 
-export const components: Record<string, Behavior> = {
-  AnimatedSprite: { create: p => new PIXI.AnimatedSprite(p.textures, p.autoUpdate) },
-  BitmapText: { create: p => new PIXI.BitmapText(defined({ style: p.style, text: p.text })) },
-  Container: { create: () => new PIXI.Container() },
-  DOMContainer: { create: p => new PIXI.DOMContainer(defined({ anchor: p.anchor, element: p.element })) },
-  Graphics: { create: p => new PIXI.Graphics(p.context) },
-  HTMLText: { create: p => new PIXI.HTMLText(defined({ style: p.style, text: p.text })) },
-  Mesh: {
-    create: p => new PIXI.Mesh(defined({ geometry: p.geometry, shader: p.shader, state: p.state, texture: p.texture })),
-  },
-  MeshPlane: {
-    create: p => new PIXI.MeshPlane(defined({ texture: p.texture, verticesX: p.verticesX, verticesY: p.verticesY })),
-  },
-  MeshRope: {
-    create: p => new PIXI.MeshRope(defined({ points: p.points, texture: p.texture, textureScale: p.textureScale })),
-  },
-  MeshSimple: {
+export const factories: { [K in Pixi8Tag]: Factory<K> } = {
+  AnimatedSprite: Ctor => ({ create: p => new Ctor(p.textures, p.autoUpdate) }),
+  BitmapText: Ctor => ({ create: p => new Ctor(defined({ style: p.style, text: p.text })) }),
+  Container: Ctor => ({ create: () => new Ctor() }),
+  DOMContainer: Ctor => ({ create: p => new Ctor(defined({ anchor: p.anchor, element: p.element })) }),
+  Graphics: Ctor => ({ create: p => new Ctor(p.context) }),
+  HTMLText: Ctor => ({ create: p => new Ctor(defined({ style: p.style, text: p.text })) }),
+  Mesh: Ctor => ({
+    create: p => new Ctor(defined({ geometry: p.geometry, shader: p.shader, state: p.state, texture: p.texture })),
+  }),
+  MeshPlane: Ctor => ({
+    create: p => new Ctor(defined({ texture: p.texture, verticesX: p.verticesX, verticesY: p.verticesY })),
+  }),
+  MeshRope: Ctor => ({
+    create: p => new Ctor(defined({ points: p.points, texture: p.texture, textureScale: p.textureScale })),
+  }),
+  MeshSimple: Ctor => ({
     create: p =>
-      new PIXI.MeshSimple(
+      new Ctor(
         defined({ indices: p.indices, texture: p.texture, topology: p.topology, uvs: p.uvs, vertices: p.vertices })
       ),
-  },
-  NineSliceSprite: {
+  }),
+  NineSliceSprite: Ctor => ({
     create: p =>
-      new PIXI.NineSliceSprite(
+      new Ctor(
         defined({
           bottomHeight: p.bottomHeight,
           leftWidth: p.leftWidth,
@@ -82,21 +86,21 @@ export const components: Record<string, Behavior> = {
           topHeight: p.topHeight,
         })
       ),
-  },
-  Particle: {
+  }),
+  Particle: Ctor => ({
     create: p => {
       if (p.texture == null) throw new Error("`Particle` needs a `texture` prop.");
-      return new PIXI.Particle(p.texture);
+      return new Ctor(p.texture);
     },
     applyProps(particle: PIXI.Particle, oldProps, newProps) {
       this.applyDisplayObjectProps(oldProps, newProps);
       const container = particleParents.get(particle);
       if (container && changesStaticAttributes(container, oldProps, newProps)) container.update();
     },
-  },
-  ParticleContainer: {
+  }),
+  ParticleContainer: (Ctor, components) => ({
     create: p =>
-      new PIXI.ParticleContainer(
+      new Ctor(
         defined({
           dynamicProperties: p.dynamicProperties,
           roundPixels: p.roundPixels,
@@ -105,13 +109,13 @@ export const components: Record<string, Behavior> = {
         })
       ),
     appendChild(container: PIXI.ParticleContainer, child) {
-      const particle = asParticle(child);
+      const particle = asParticle(child, components.Particle);
       container.removeParticle(particle);
       container.addParticle(particle);
       particleParents.set(particle, container);
     },
     insertBefore(container: PIXI.ParticleContainer, child, before) {
-      const particle = asParticle(child);
+      const particle = asParticle(child, components.Particle);
       container.removeParticle(particle);
       const index = container.particleChildren.indexOf(before as PIXI.Particle);
       if (index === -1) throw new Error("`ParticleContainer` cannot insert a `Particle` before one it does not hold.");
@@ -122,10 +126,10 @@ export const components: Record<string, Behavior> = {
       container.removeParticle(child as PIXI.Particle);
       particleParents.delete(child as PIXI.Particle);
     },
-  },
-  PerspectiveMesh: {
+  }),
+  PerspectiveMesh: Ctor => ({
     create: p =>
-      new PIXI.PerspectiveMesh(
+      new Ctor(
         defined({
           texture: p.texture,
           verticesX: p.verticesX,
@@ -140,15 +144,14 @@ export const components: Record<string, Behavior> = {
           y3: p.y3,
         })
       ),
-  },
-  RenderContainer: {
-    create: p =>
-      new PIXI.RenderContainer(defined({ addBounds: p.addBounds, containsPoint: p.containsPoint, render: p.render })),
-  },
-  RenderLayer: { create: () => new PIXI.RenderLayer() },
-  Sprite: { create: p => new PIXI.Sprite(p.texture) },
-  Text: { create: p => new PIXI.Text(defined({ style: p.style, text: p.text })) },
-  TilingSprite: {
-    create: p => new PIXI.TilingSprite(defined({ height: p.height, texture: p.texture, width: p.width })),
-  },
+  }),
+  RenderContainer: Ctor => ({
+    create: p => new Ctor(defined({ addBounds: p.addBounds, containsPoint: p.containsPoint, render: p.render })),
+  }),
+  RenderLayer: Ctor => ({ create: () => new Ctor() }),
+  Sprite: Ctor => ({ create: p => new Ctor(p.texture) }),
+  Text: Ctor => ({ create: p => new Ctor(defined({ style: p.style, text: p.text })) }),
+  TilingSprite: Ctor => ({
+    create: p => new Ctor(defined({ height: p.height, texture: p.texture, width: p.width })),
+  }),
 };

@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
-import type { PixiAdapter, PixiComponent } from "react-pixi-fiber";
-import { components } from "./components";
+import type { Behavior, PixiAdapter, PixiComponent } from "react-pixi-fiber";
+import { allComponents } from "./all";
+import { type Factory, factories, type Pixi8Tag } from "./factories";
 import { properties } from "./properties";
 import type {
   DOMContainerProps,
@@ -25,6 +26,11 @@ export const RenderContainer = "RenderContainer" as unknown as PixiComponent<
   PIXI.RenderContainer
 >;
 export const RenderLayer = "RenderLayer" as unknown as PixiComponent<RenderLayerProps, PIXI.RenderLayer>;
+
+const components: Record<string, Behavior> = {};
+for (const tag of Object.keys(factories) as Pixi8Tag[]) {
+  components[tag] = (factories[tag] as Factory<Pixi8Tag>)(allComponents[tag] as never, allComponents);
+}
 
 export interface Pixi8Options {
   // The default export of `@react-pixi-fiber/pixi-8/compat/pixi6` or `/compat/pixi7`.
