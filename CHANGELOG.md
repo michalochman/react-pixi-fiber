@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [2.0.0] - 2026-10-23
+
+Same code as 2.0.0-rc.4. Changes since 1.0.6, collected from the prereleases below:
+
+### Changed
+- Requires React 18.2 or newer, `react-reconciler` updated to 0.29
+- `ref` on built-in and custom components is now typed as the underlying `PIXI.DisplayObject` instance instead of the props type
+- Every component accepts `children` again in TypeScript, as every wrapped display object is a `PIXI.Container`
+- Declared `pixi.js` peer dependency as `>=4.4.0 <8.0.0`, PixiJS v8 is not supported
+
+### Removed
+- Removed unstable_batchedUpdates API ([#89])
+
+### Added
+- TypeScript: `CustomPIXIProperty` is now declared in `index.d.ts`
+- TypeScript: `PointLikeTuple` accepts a single element tuple (e.g. `scale={[2]}`), matching runtime behavior
+- TypeScript: `this.applyDisplayObjectProps` inside `customApplyProps` is now typed (`CustomDisplayObjectPropSetterContext`), along with `CustomPIXIComponentProps` helper type
+- Examples are now written in TypeScript and typechecked against the local `index.d.ts` in CI
+
+### Fixed
+- `Stage` renders a new canvas when `PIXI.Application` is recreated after non-dimensional `options` change. Previously the new `PIXI.Application` shared the canvas with the one being destroyed, and destroying it unbound the current WebGL program (PixiJS v6) or lost the context (PixiJS v7), leaving only the background color rendered
+- Create React App 5 (and other webpack builds with strict export checks) failed with "Attempted import error: 'extras' is not exported from 'pixi.js'" when using PixiJS v5+. The ES build read the PixiJS v4 `extras`, `mesh` and `particles` namespaces straight from the `pixi.js` import, the fallback to the top-level classes is unchanged
+- TypeScript: `Text` accepts a plain style object in `style` (`Partial<PIXI.ITextStyle>`), matching the `PIXI.Text` setter. PixiJS v7 types the `style` getter as `TextStyle` only, so passing an object literal failed to typecheck
+
+
 ## [2.0.0-rc.4] - 2026-09-28
 
 ### Fixed
@@ -478,7 +503,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `<TilingSprite />` component
 
 
-[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.4...HEAD
+[Unreleased]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/michalochman/react-pixi-fiber/compare/v1.0.6...v2.0.0
 [2.0.0-rc.4]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.3...v2.0.0-rc.4
 [2.0.0-rc.3]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.2...v2.0.0-rc.3
 [2.0.0-rc.2]: https://github.com/michalochman/react-pixi-fiber/compare/v2.0.0-rc.1...v2.0.0-rc.2
