@@ -1,5 +1,6 @@
 import type * as PIXI from "pixi.js";
 import type { Props } from "react-pixi-fiber";
+import type { allComponents } from "./all";
 
 // Importing this package fills the core's augmentable interfaces with the PixiJS 8 classes.
 declare module "react-pixi-fiber" {
@@ -30,6 +31,8 @@ declare module "react-pixi-fiber" {
     Point: PIXI.Point | PIXI.ObservablePoint | PIXI.PointData;
   }
 }
+
+export type Pixi8Components = typeof allComponents;
 
 export type DOMContainerProps = Props<PIXI.DOMContainer>;
 export type HTMLTextProps = Props<PIXI.HTMLText>;
