@@ -3,10 +3,11 @@ import { createElement } from "react";
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
 import { act } from "react-test-renderer";
+import * as PIXI from "pixi.js";
 import { Application } from "pixi.js";
 import react18 from "@react-pixi-fiber/react-18";
-import { configure, Stage } from "react-pixi-fiber";
-import pixi8 from "../src/index";
+import { configure, Sprite, Stage } from "react-pixi-fiber";
+import pixi8, { pixi8WithComponents } from "../src/index";
 
 it("PixiJS 8 Application.init resolves under jsdom with the WebGL mock", async () => {
   const app = new Application();
@@ -91,5 +92,20 @@ describe("Stage with the pixi-8 adapter", () => {
     act(() => root.unmount());
     await act(() => new Promise(r => setTimeout(r, 0)));
     expect(destroyedConnected).toEqual([false, false]);
+  });
+
+  it("mounts on a provided app that has only stage and ticker, renders no canvas and never creates an application", async () => {
+    const trimmed = pixi8WithComponents({ components: { Container: PIXI.Container, Sprite: PIXI.Sprite } });
+    const createApplication = vi.spyOn(trimmed, "createApplication");
+    configure({ react: react18(), pixi: trimmed });
+    const stage = new PIXI.Container();
+    const app = { stage, ticker: PIXI.Ticker.shared } as unknown as Application;
+    await act(async () =>
+      root.render(createElement(Stage, { app }, createElement(Sprite, { texture: PIXI.Texture.WHITE })))
+    );
+    expect(container.querySelector("canvas")).toBeNull();
+    expect(stage.children).toHaveLength(1);
+    expect(stage.children[0]).toBeInstanceOf(PIXI.Sprite);
+    expect(createApplication).not.toHaveBeenCalled();
   });
 });
