@@ -38,6 +38,7 @@ pnpm lint           # check formatting and lint with Biome
 pnpm format         # apply Biome formatting and safe fixes
 pnpm check-types    # typecheck every package, the TypeScript fixture, the examples and the scripts (after pnpm build)
 pnpm check-package  # pack every package and check what Node and esbuild resolve (after pnpm build)
+pnpm check-bundle   # bundle the entries of each package that has a bundle check and check which modules each bundle holds (after pnpm build)
 pnpm start          # start the examples dev server
 ```
 

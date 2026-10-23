@@ -66,7 +66,7 @@ The core team is monitoring for pull requests. We will review your pull request 
 1. Fork [the repository](https://github.com/michalochman/react-pixi-fiber) and create your branch from `master`.
 2. Run `pnpm install` in the repository root.
 3. If you've fixed a bug or added code that should be tested, add tests!
-4. Ensure the test suite passes (`pnpm test`), the types check (`pnpm check-types`) and, if you changed `package.json` or the build, the package check (`pnpm check-package`).
+4. Ensure the test suite passes (`pnpm test`) and the types check (`pnpm check-types`). If you changed `package.json` or the build, run the package check (`pnpm check-package`). If you changed an adapter or its build, run the bundle check (`pnpm check-bundle`).
 5. Format your code (`pnpm format`) and make sure it lints (`pnpm lint`).
 6. Write your commit messages as [Conventional Commits](#commit-messages).
 

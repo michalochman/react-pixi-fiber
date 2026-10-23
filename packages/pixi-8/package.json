@@ -87,6 +87,7 @@
     "build": "rm -rf dist && pnpm run build:prod && pnpm run build:dev",
     "build:dev": "cross-env NODE_ENV=development tsdown",
     "build:prod": "cross-env NODE_ENV=production tsdown",
+    "check-bundle": "node scripts/check-bundle.mjs",
     "check-types": "tsc -p tsconfig.json",
     "test": "pnpm run test:dev && pnpm run test:prod",
     "test:dev": "vitest run --mode development",
