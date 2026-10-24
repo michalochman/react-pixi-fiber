@@ -57,6 +57,13 @@ describe("Stage", () => {
     vi.restoreAllMocks();
   });
 
+  it("throws when the PixiJS adapter does not accept the provided app", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => renderer.create(<Stage app={{}} />)).toThrow(
+      "Provided `app` has to be a PIXI.Application, or an object that the PixiJS adapter accepts as one"
+    );
+  });
+
   it("creates the application on the rendered canvas and renders children only after init", async () => {
     const onInit = vi.fn();
     const ref = createRef();

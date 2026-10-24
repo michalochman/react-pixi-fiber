@@ -89,4 +89,22 @@ describe("usePixiTicker", () => {
 
     expect(remove).toHaveBeenCalledWith(fn);
   });
+
+  it("throws when the app has no ticker", () => {
+    const TestComponent = () => {
+      usePixiTicker(vi.fn());
+
+      return null;
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    expect(() =>
+      renderer.create(
+        <AppContext.Provider value={{ stage: new PIXI.Container() }}>
+          <TestComponent />
+        </AppContext.Provider>
+      )
+    ).toThrow("`usePixiTicker` needs an `app` with a `ticker`.");
+    error.mockRestore();
+  });
 });

@@ -12,10 +12,11 @@
     "format": "biome check --write",
     "check-types": "pnpm -r check-types && tsc -p scripts/tsconfig.json",
     "start": "pnpm --filter examples start",
+    "check-bundle": "pnpm -r --if-present check-bundle",
     "check-package": "node scripts/check-package.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm -r build && pnpm check-package && changeset publish"
+    "release": "pnpm -r build && pnpm check-package && pnpm check-bundle && changeset publish"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

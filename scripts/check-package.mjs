@@ -66,11 +66,14 @@ try {
       esm: `import * as Mod from ${JSON.stringify(name)};\nconsole.log(Mod);\n`,
       cjs: `console.log(require(${JSON.stringify(name)}));\n`,
     };
+    // pixi-8 builds `allComponents` as an entry of its own, which its main entry imports, so a bundle holds both.
+    const chunks = existsSync(join(dir, "dist/es/all.development.js")) ? ["all", base] : [base];
+    const built = (format, suffix) => chunks.map(chunk => `dist/${format}/${chunk}.${suffix}.js`);
     const files = {
-      esDevelopment: [`dist/es/${base}.development.js`],
-      esProduction: [`dist/es/${base}.production.min.js`],
-      cjsDevelopment: [`dist/cjs/${base}.development.js`, "index.js"],
-      cjsProduction: [`dist/cjs/${base}.production.min.js`, "index.js"],
+      esDevelopment: built("es", "development"),
+      esProduction: built("es", "production.min"),
+      cjsDevelopment: [...built("cjs", "development"), "index.js"],
+      cjsProduction: [...built("cjs", "production.min"), "index.js"],
     };
 
     // Files of the installed package that went into a bundle, relative to the package root.
@@ -279,7 +282,7 @@ try {
 
     if (compat.length > 0) {
       await check(`${name} production entry holds no compat code`, () => {
-        for (const file of [files.esProduction[0], files.cjsProduction[0]]) {
+        for (const file of [`dist/es/${base}.production.min.js`, `dist/cjs/${base}.production.min.js`]) {
           assert.doesNotMatch(readFileSync(join(installed, file), "utf8"), /["'`]touchendoutside["'`]/, file);
         }
       });

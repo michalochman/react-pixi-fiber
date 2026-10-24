@@ -83,7 +83,10 @@ function StageWithoutBridge(props: StageProps, ref: Ref<StageRef>) {
     }
   }
   if (app != null) {
-    invariant(pixi.isApplication(app), "Provided `app` has to be an instance of PIXI.Application");
+    invariant(
+      pixi.isApplication(app),
+      "Provided `app` has to be a PIXI.Application, or an object that the PixiJS adapter accepts as one"
+    );
   }
 
   const appRef = useRef<any>(null);

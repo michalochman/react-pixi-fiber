@@ -43,6 +43,9 @@ jobs:
       # check the packed packages with publint and attw, and which files Node and esbuild resolve
       - run: pnpm check-package
 
+      # bundle the entries of each package that has a bundle check and check which modules each bundle holds
+      - run: pnpm check-bundle
+
       # run tests
       - run: pnpm -r --workspace-concurrency=1 test:dev
       - run: pnpm -r --workspace-concurrency=1 test:prod

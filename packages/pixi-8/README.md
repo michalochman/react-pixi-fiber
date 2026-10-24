@@ -12,6 +12,8 @@ import pixi8 from "@react-pixi-fiber/pixi-8";
 configure({ react: reactN(), pixi: pixi8() });
 ```
 
+`pixi8()` bundles every PixiJS class the adapter can create. To ship only the classes the app renders, see [Choosing the classes](#choosing-the-classes). Only the ES build drops classes. The CommonJS build loads every class.
+
 ## Supported features
 
 Features that are plain PixiJS work as the [PixiJS 8 documentation](https://pixijs.com/8.x/guides) describes.
@@ -44,11 +46,53 @@ Import the tags of this adapter from this package. `<NineSlicePlane />` is not a
 | --- | --- |
 | Application | `Stage` creates a `PIXI.Application` and awaits `app.init(options)`, then renders its children and calls `onInit(app)`. An existing canvas goes in `options.canvas`, or in 2.x's `options.view`, which wins when both are given; without either, the application draws on the canvas `Stage` renders |
 | `compat` option | Takes the translator from `@react-pixi-fiber/pixi-8/compat/pixi6` or `/compat/pixi7`, which translates the PixiJS 6 and 7 props, see [below](#compatibility-with-the-2x-props) |
-| `defaults` option | Default props per tag, like React's `defaultProps`: with `pixi8({ defaults: { Sprite: { alpha: 0.5 } } })`, `<Sprite />` mounts with `alpha` 0.5. A prop missing or `undefined` when the instance is created gets its default, and `create` sees it; a prop removed later, or set to `undefined`, returns to it. An explicit `null` is kept. Key each tag as you write it. Without an entry, a removed prop returns to the value the instance had before the first write, see [Default props per tag](../react-pixi-fiber/README.md#default-props-per-tag) |
+| `defaults` option | Default props per tag, like React's `defaultProps`: with `pixi8({ defaults: { Sprite: { alpha: 0.5 } } })`, `<Sprite />` mounts with `alpha` 0.5. A prop that is missing or `undefined` at instance creation gets its default, and `create` sees it. A prop removed later, or set to `undefined`, returns to it. An explicit `null` stays. Key each tag as you write it. Without an entry, a removed prop returns to the value the instance had before the first write, see [Default props per tag](../react-pixi-fiber/README.md#default-props-per-tag) |
 | Events | The PixiJS 8 handler properties as props: `onclick`, `onpointerdown`, …, with `eventMode` to make an object interactive |
 | Ticker | A `usePixiTicker` callback receives the PixiJS 8 `Ticker`, not a delta: read `ticker.deltaTime` |
 | `tint` | Not type-checked in development: PixiJS 8 accepts a number, a color string or an array |
 | TypeScript | Importing the package types the props of every tag from the PixiJS 8 classes |
+
+### Choosing the classes
+
+`pixi8()` creates every tag, so a bundle holds every class that the adapter can create. To ship only the classes the app renders, use `pixi8WithComponents`. It takes the options of `pixi8`, plus `components`: the PixiJS classes the app renders, keyed by the tag as written in JSX, plus `Application`. `pixi8` takes no `components`.
+
+PixiJS 8 lets a bundler drop every class the app does not import. `pixi8WithComponents` references no PixiJS display class of its own. So a bundle of the ES build (the `import` condition) holds only the display classes in `components`. The CommonJS build loads every class. A bundler uses it when the app's code reaches `@react-pixi-fiber/pixi-8` through `require`, for example after TypeScript compiles to CommonJS. pixi.js then loads its own CommonJS build too, and that build keeps every class. There are three ways to configure the adapter:
+
+1. `pixi8()`: every class and all three renderers (WebGL, WebGPU and Canvas).
+2. `pixi8WithComponents` with `Application` in the list: the listed classes and all three renderers.
+3. `pixi8WithComponents` without `Application`, and an `app` that the app makes with its own renderer: the listed classes and one renderer.
+
+A list with `Application`:
+
+```js
+import { Application, Container, Sprite, Text } from "pixi.js";
+import { pixi8WithComponents } from "@react-pixi-fiber/pixi-8";
+
+configure({ react: reactN(), pixi: pixi8WithComponents({ components: { Application, Container, Sprite, Text } }) });
+```
+
+An app that makes its own renderer:
+
+```tsx
+import { Container, Sprite, Text, Ticker, WebGLRenderer, type Application } from "pixi.js";
+import { pixi8WithComponents } from "@react-pixi-fiber/pixi-8";
+
+configure({ react: reactN(), pixi: pixi8WithComponents({ components: { Container, Sprite, Text } }) });
+
+const renderer = new WebGLRenderer();
+await renderer.init({ canvas, width: 800, height: 600 });
+const stage = new Container();
+Ticker.shared.add(() => renderer.render(stage));
+const app = { stage, ticker: Ticker.shared } as unknown as Application;
+
+<Stage app={app}>...</Stage>
+```
+
+With `app` provided, `Stage` renders no canvas of its own and ignores `options`. Only this form omits `autoDetectRenderer` and the WebGPU and Canvas renderers, because `Application.init` calls `autoDetectRenderer` itself.
+
+`ParticleContainer` needs `Particle` in the list. A tag left out of the list typechecks and throws at first render, naming the class to add. Render each screen once in a test, so that a tag left out of the list fails there and not in production. Without `Application` in the list, every `Stage` needs an `app`.
+
+`allComponents` holds the classes that `pixi8` uses. pixi-8 is the only adapter with a class list.
 
 ### `ParticleContainer`
 
