@@ -1,31 +1,38 @@
-version: 2
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master, develop]
+
+permissions:
+  contents: read
+
 jobs:
   build:
-    docker:
-      - image: cimg/node:24.15.0
-
-    working_directory: ~/react-pixi-fiber
+    runs-on: ubuntu-latest
 
     steps:
-      - checkout
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
 
       # pnpm version comes from the packageManager field in package.json
-      - run: sudo corepack enable
+      - run: corepack enable
 
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - pnpm-store-{{ checksum ".nvmrc" }}-{{ checksum "pnpm-lock.yaml" }}
+      - id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ hashFiles('.nvmrc', 'pnpm-lock.yaml') }}
           # fallback to using the latest cache if no exact match is found
-          - pnpm-store-
+          restore-keys: pnpm-store-
 
       - run: pnpm install --frozen-lockfile
-
-      # Cache dependencies
-      - save_cache:
-          paths:
-            - ~/.local/share/pnpm/store
-          key: pnpm-store-{{ checksum ".nvmrc" }}-{{ checksum "pnpm-lock.yaml" }}
 
       # check formatting and lint
       - run: pnpm lint
@@ -37,13 +44,12 @@ jobs:
       - run: pnpm check-package
 
       # run tests
-      # Cap workers: vitest sizes its pool from the host CPU count and OOMs the 4 GB container.
-      - run: pnpm -r --workspace-concurrency=1 test:dev --maxWorkers=2
-      - run: pnpm -r --workspace-concurrency=1 test:prod --maxWorkers=2
+      - run: pnpm -r --workspace-concurrency=1 test:dev
+      - run: pnpm -r --workspace-concurrency=1 test:prod
 
       # render once from the ES builds. The production builds bundle the production reconciler, which the development
       # React of the test environment cannot drive, so only the development builds render here.
-      - run: RPF_DIST=es pnpm --filter "test-matrix-*" --workspace-concurrency=1 test:dev --maxWorkers=2
+      - run: RPF_DIST=es pnpm --filter "test-matrix-*" --workspace-concurrency=1 test:dev
 
       # typecheck the library source, the TypeScript fixture, and the examples against the built declarations
       - run: pnpm check-types

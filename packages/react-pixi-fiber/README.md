@@ -17,8 +17,8 @@
   <a href="./LICENSE">
     <img alt="License" src="https://img.shields.io/github/license/michalochman/react-pixi-fiber.svg" />
   </a>
-  <a href="https://circleci.com/gh/michalochman/react-pixi-fiber/tree/master">
-    <img alt="CircleCI" src="https://img.shields.io/circleci/project/github/michalochman/react-pixi-fiber/master.svg" />
+  <a href="https://github.com/KalambaGames/react-pixi-fiber/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/KalambaGames/react-pixi-fiber/actions/workflows/ci.yml/badge.svg" />
   </a>
   <a href="https://biomejs.dev">
     <img alt="formatted with Biome" src="https://img.shields.io/badge/formatted_with-Biome-60a5fa.svg" />
