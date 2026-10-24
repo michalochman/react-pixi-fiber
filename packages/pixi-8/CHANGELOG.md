@@ -1,5 +1,20 @@
 # @react-pixi-fiber/pixi-8
 
+## 1.0.0-alpha.1
+
+### Minor Changes
+
+- [#387](https://github.com/KalambaGames/react-pixi-fiber/pull/387) [`7a6bea7`](https://github.com/KalambaGames/react-pixi-fiber/commit/7a6bea7d9e4054995e96add63b4df6ce0d579bfd) Thanks [@michalochman](https://github.com/michalochman)! - `pixi8WithComponents` takes the PixiJS classes that the app renders as `components`. A bundle of the ES build holds only those classes. `pixi8()` keeps every class:
+  
+  ```js
+  import { Application, Container, Sprite, Text } from "pixi.js";
+  import { pixi8WithComponents } from "@react-pixi-fiber/pixi-8";
+  
+  configure({ react: react18(), pixi: pixi8WithComponents({ components: { Application, Container, Sprite, Text } }) });
+  ```
+  
+  A tag left out of the list throws at first render, and the error names the class to add. `ParticleContainer` needs `Particle` in the list. Without `Application` in the list, `Stage` needs an `app` prop. That `app` needs a `Container` as `stage`, and a `ticker` for `usePixiTicker`. So an app can make its own renderer. `allComponents` holds every class that `pixi8()` uses.
+
 ## 1.0.0-alpha.0
 
 ### Major Changes

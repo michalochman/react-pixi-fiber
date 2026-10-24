@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/). From 3.0.0 on, [Changesets](https://github.com/changesets/changesets) writes the entries from `.changeset/` at release; the entries up to 2.x follow [Keep a Changelog](http://keepachangelog.com/).
 
+## 3.0.0-alpha.1
+
+### Patch Changes
+
+- [#387](https://github.com/KalambaGames/react-pixi-fiber/pull/387) [`8ab7e10`](https://github.com/KalambaGames/react-pixi-fiber/commit/8ab7e1002f794144633a4f8a6d582c8b6554171b) Thanks [@michalochman](https://github.com/michalochman)! - The `Stage` error for a rejected `app` prop names the two forms that `Stage` accepts: a `PIXI.Application`, or an object that the PixiJS adapter accepts as one. The pixi-8 adapter accepts an object with a `Container` as `stage`.
+  
+  `usePixiTicker` throws during render when the `app` has no `ticker`, and the error names the `ticker`.
+
 ## 3.0.0-alpha.0
 
 ### Major Changes
