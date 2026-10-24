@@ -21,6 +21,10 @@ export type PixiTickerCallback = PixiApplication extends { ticker: { add(fn: inf
 export function usePixiTicker(fn: PixiTickerCallback): void {
   const { ticker } = usePixiApp();
 
+  if (ticker == null) {
+    throw new Error("`usePixiTicker` needs an `app` with a `ticker`.");
+  }
+
   useEffect(() => {
     ticker.add(fn);
 

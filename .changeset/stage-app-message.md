@@ -2,4 +2,6 @@
 "react-pixi-fiber": patch
 ---
 
-The error for an `app` prop that the PixiJS adapter rejects no longer says it has to be an instance of `PIXI.Application`. The pixi-8 adapter also accepts an object with a `stage`, so the message now names both.
+The `Stage` error for a rejected `app` prop names the two forms that `Stage` accepts: a `PIXI.Application`, or an object that the PixiJS adapter accepts as one. The pixi-8 adapter accepts an object with a `Container` as `stage`.
+
+`usePixiTicker` throws during render when the `app` has no `ticker`, and the error names the `ticker`.
